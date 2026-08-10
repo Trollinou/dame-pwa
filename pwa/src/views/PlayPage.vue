@@ -192,8 +192,6 @@ clock.onTimeOut = (flaggedColor) => {
 };
 
 const getWorkerUrl = () => {
-  const base = authStore.stockfishUrl;
-  if (base) return `${base}stockfish.js`;
   return import.meta.env.DEV
     ? '/stockfish/stockfish.js'
     : new URL(/* @vite-ignore */ '../stockfish/stockfish.js', import.meta.url).href;

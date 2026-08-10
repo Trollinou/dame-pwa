@@ -2,6 +2,7 @@ import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,12 +15,28 @@ export default defineConfig({
 				},
 			},
 		}),
+		viteStaticCopy({
+			targets: [
+				{
+					src: '../node_modules/eg-chessboard/dist/stockfish.js',
+					dest: 'stockfish',
+					rename: (name, ext) => `../../../${name}.${ext}`,
+				},
+				{
+					src: '../node_modules/eg-chessboard/dist/stockfish.wasm',
+					dest: 'stockfish',
+					rename: (name, ext) => `../../../${name}.${ext}`,
+				},
+			],
+		}),
 		VitePWA({
 			registerType: 'autoUpdate',
 			includeAssets: [
 				'favicon.ico',
 				'apple-touch-icon.png',
 				'assets/icon/*.png',
+				'stockfish/stockfish.js',
+				'stockfish/stockfish.wasm',
 			],
 			manifest: {
 				name: 'Echiquier Lédonien',
@@ -43,16 +60,16 @@ export default defineConfig({
 			},
 			workbox: {
 				// On s'assure que tous les assets nécessaires sont mis en cache
-				globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+				globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm}'],
 				// On augmente la limite de taille pour le fichier WASM de Stockfish (environ 7Mo)
 				maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 				runtimeCaching: [
 					{
 						urlPattern:
-							/.*\/roi\/includes\/chess\/dist\/stockfish\.(js|wasm)$/,
+							/.*\/stockfish\.(js|wasm)$/,
 						handler: 'CacheFirst',
 						options: {
-							cacheName: 'roi-stockfish-cache',
+							cacheName: 'pwa-stockfish-cache',
 							expiration: {
 								maxEntries: 2,
 								maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours

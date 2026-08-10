@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [1.0.0] - 2026-08-11
 ### Ajouté
+- **Intégration directe de Stockfish dans la PWA (`vite.config.ts`, `PlayPage.vue`, `auth.ts`)** :
+  - Copie et livraison automatique des fichiers `stockfish.js` et `stockfish.wasm` depuis `node_modules/eg-chessboard/dist/` lors de la build Vite avec `vite-plugin-static-copy`.
+  - Conservation stricte des noms originaux pour garantir la liaison du module WebAssembly UCI.
+  - Mise en cache hors-ligne via le Service Worker PWA (`VitePWA`) pour une utilisation 100% autonome.
+  - Suppression de la récupération distante de `stockfish_url` depuis le backend WordPress (`pwa-config`).
 - **Composant d'En-tête Unifié d'Exercice (`ExerciseHeader.vue`)** :
   - Création et déploiement du composant réutilisable `ExerciseHeader.vue` pour harmoniser l'affichage supérieur de l'ensemble des types d'exercices (Types 1 à 16).
   - **Panel 1 (Métadonnées Compactes)** : Affiche le titre de l'exercice sur la première ligne, puis le Type humain de l'exercice en bas à gauche et la chaîne `Chapitre // Niveau X` en bas à droite (ex: `Matérialité // Niveau 1`), où le chapitre correspond à l'un des 5 thèmes officiels (*Matérialité*, *Activité*, *Sécurité*, *Structure*, *Combinaison*).
