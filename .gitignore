@@ -1,0 +1,13 @@
+.DS_Store
+.gemini/
+.github/
+/.sync.ffs_db
+/vendor/
+gha-creds-*.json
+node_modules/
+pwa/node_modules/
+pwa/dist/
+/pwa/.vscode
+/.antigravitycli
+*.zip
+pwa/src/utils/desktop.ini
