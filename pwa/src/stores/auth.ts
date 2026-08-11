@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { alertController } from '@ionic/vue';
-import { SimpleJwtLogin } from 'simple-jwt-login';
 import { App } from '@capacitor/app';
 import { useQuery } from '@tanstack/vue-query';
 import { queryClient } from '../queryClient';
@@ -150,7 +149,29 @@ export const useAuthStore = defineStore(
 
 		const getSiteRootUrl = () => {
 			const url = import.meta.env.VITE_API_BASE_URL || '';
-			return url.replace( /\/wp-json\/?$/, '' );
+			const base = url.replace( /\/wp-json\/?.*$/, '' );
+			// En production, VITE_API_BASE_URL = "/wp-json" (relatif)
+			// => base = "" => on utilise l'origine courante du navigateur
+			if ( ! base || base.startsWith( '/' ) ) {
+				return ( typeof window !== 'undefined' ? window.location.origin : '' ) + base;
+			}
+			return base;
+		};
+
+		// Mapping fidèle au SDK original simple-jwt-login (src/simplejwtlogin.ts)
+		// buildUrl() = host + "/?rest_route=" + namespace
+		// namespace   = "/simple-jwt-login/v1"
+		// Méthodes : authenticate=POST /auth, refreshToken=POST /auth/refresh,
+		//            validateToken=GET /auth/validate, revokeToken=POST /auth/revoke
+		const JWT_NAMESPACE = '/simple-jwt-login/v1';
+		const JWT_CONFIG: Record<
+			string,
+			{ route: string; method: 'GET' | 'POST' }
+		> = {
+			authenticate: { route: '/auth', method: 'POST' },
+			refreshToken: { route: '/auth/refresh', method: 'POST' },
+			validateToken: { route: '/auth/validate', method: 'GET' },
+			revokeToken: { route: '/auth/revoke', method: 'POST' },
 		};
 
 		const callSdk = async (
@@ -161,17 +182,70 @@ export const useAuthStore = defineStore(
 				| 'refreshToken',
 			params: any
 		): Promise< any > => {
-			return new Promise( ( resolve, reject ) => {
-				const client = new SimpleJwtLogin( getSiteRootUrl() );
-				client.withCallback( ( response: any, status: number ) => {
-					if ( status === 200 || status === 201 ) {
-						resolve( response );
-					} else {
-						reject( response );
-					}
-				} );
-				client[ method ]( params );
-			} );
+			const config = JWT_CONFIG[ method ];
+			if ( ! config ) {
+				throw new Error( `Endpoint JWT inconnu : ${ method }` );
+			}
+
+			// Reproduit exactement buildUrl() du SDK :
+			// host + "/?rest_route=" + namespace + route
+			const baseUrl = getSiteRootUrl();
+			const restRoute = JWT_NAMESPACE + config.route;
+			const url = new URL( `${ baseUrl }/?rest_route=${ encodeURIComponent( restRoute ) }` );
+
+			const fetchOptions: RequestInit = {
+				method: config.method,
+				headers: {
+					'Content-type': 'application/json;charset=UTF-8',
+				},
+			};
+
+			if ( params && typeof params === 'object' ) {
+				if ( config.method === 'GET' ) {
+					// GET : paramètres en query string (comme le SDK original)
+					Object.entries( params ).forEach( ( [ key, value ] ) => {
+						if ( value !== undefined && value !== null ) {
+							url.searchParams.append( key, String( value ) );
+						}
+					} );
+				} else {
+					// POST : paramètres en body JSON (comme le SDK original)
+					fetchOptions.body = JSON.stringify( params );
+				}
+			}
+
+			const controller = new AbortController();
+			const timeoutId = setTimeout( () => controller.abort(), 10000 );
+			fetchOptions.signal = controller.signal;
+
+			try {
+				const response = await fetch( url.toString(), fetchOptions );
+				clearTimeout( timeoutId );
+
+				const isJson = response.headers
+					.get( 'content-type' )
+					?.includes( 'application/json' );
+				const data = isJson
+					? await response.json()
+					: await response.text();
+
+				if ( response.ok ) {
+					return data;
+				} else {
+					throw {
+						error: 'true',
+						status: response.status,
+						response: data,
+						data:
+							typeof data === 'object'
+								? data
+								: { message: data },
+					};
+				}
+			} catch ( err: any ) {
+				clearTimeout( timeoutId );
+				throw err;
+			}
 		};
 
 		const tryRefreshToken = async (): Promise< string | null > => {
