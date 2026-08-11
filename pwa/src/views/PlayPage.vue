@@ -196,7 +196,11 @@ const getWorkerUrl = () => {
     ? '/stockfish/stockfish.js'
     : new URL(/* @vite-ignore */ '../stockfish/stockfish.js', import.meta.url).href;
 };
-
+	const getWasmUrl = () => {
+		return import.meta.env.DEV
+			? '/stockfish/stockfish.wasm'
+			: new URL(/* @vite-ignore */ '../stockfish/stockfish.wasm', import.meta.url).href;
+	};
 const stockfishConfig = computed<StockfishConfig>(() => {
   const playerCol = boardConfig.orientation;
   return {
@@ -206,7 +210,7 @@ const stockfishConfig = computed<StockfishConfig>(() => {
     blackElo: playerCol === 'white' ? gameSettings.level : undefined,
     stockfishMoveTime: 2000,
     workerUrl: getWorkerUrl(),
-    wasmUrl: authStore.wasmUrl || undefined,
+    wasmUrl: getWasmUrl(),
   };
 });
 

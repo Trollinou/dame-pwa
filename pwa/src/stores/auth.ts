@@ -511,7 +511,7 @@ export const useAuthStore = defineStore(
 		const isRoiActive = ref(
 			localStorage.getItem( 'dame_roi_active' ) !== 'false'
 		);
-		const wasmUrl = ref( localStorage.getItem( 'dame_wasm_url' ) || '' );
+
 		const currentSeason = ref(
 			localStorage.getItem( 'dame_current_season' ) || ''
 		);
@@ -530,13 +530,13 @@ export const useAuthStore = defineStore(
 				if ( response.ok ) {
 					const data = await response.json();
 					isRoiActive.value = !! data.roi_active;
-					wasmUrl.value = data.wasm_url || '';
+		
 					currentSeason.value = data.current_season || '';
 					localStorage.setItem(
 						'dame_roi_active',
 						String( isRoiActive.value )
 					);
-					localStorage.setItem( 'dame_wasm_url', wasmUrl.value );
+		
 					localStorage.setItem( 'dame_current_season', currentSeason.value );
 
 					if ( isRoiActive.value ) {
@@ -606,7 +606,7 @@ export const useAuthStore = defineStore(
 			selectIdentity,
 			checkIdentities,
 			isRoiActive,
-			wasmUrl,
+
 			currentSeason,
 			fetchPwaConfig,
 			validateSession,
