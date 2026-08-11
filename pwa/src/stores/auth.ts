@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { queryClient } from '../queryClient';
 import router from '../router';
 import { safeFetch } from '@/utils/safeFetch';
+import { SimpleJwtLogin, LocalStorageTokenStorage } from 'simple-jwt-login';
 
 // Import des autres stores pour nettoyage
 import { useAgendaStore } from './agenda';
@@ -147,106 +148,32 @@ export const useAuthStore = defineStore(
 			);
 		};
 
-		const getSiteRootUrl = () => {
-			const url = import.meta.env.VITE_API_BASE_URL || '';
-			const base = url.replace( /\/wp-json\/?.*$/, '' );
-			// En production, VITE_API_BASE_URL = "/wp-json" (relatif)
-			// => base = "" => on utilise l'origine courante du navigateur
-			if ( ! base || base.startsWith( '/' ) ) {
-				return ( typeof window !== 'undefined' ? window.location.origin : '' ) + base;
-			}
-			return base;
-		};
-
-		// Mapping fidèle au SDK original simple-jwt-login (src/simplejwtlogin.ts)
-		// buildUrl() = host + "/?rest_route=" + namespace
-		// namespace   = "/simple-jwt-login/v1"
-		// Méthodes : authenticate=POST /auth, refreshToken=POST /auth/refresh,
-		//            validateToken=GET /auth/validate, revokeToken=POST /auth/revoke
-		const JWT_NAMESPACE = '/simple-jwt-login/v1';
-		const JWT_CONFIG: Record<
-			string,
-			{ route: string; method: 'GET' | 'POST' }
-		> = {
-			authenticate: { route: '/auth', method: 'POST' },
-			refreshToken: { route: '/auth/refresh', method: 'POST' },
-			validateToken: { route: '/auth/validate', method: 'GET' },
-			revokeToken: { route: '/auth/revoke', method: 'POST' },
-		};
-
-		const callSdk = async (
-			method:
-				| 'authenticate'
-				| 'validateToken'
-				| 'revokeToken'
-				| 'refreshToken',
-			params: any
-		): Promise< any > => {
-			const config = JWT_CONFIG[ method ];
-			if ( ! config ) {
-				throw new Error( `Endpoint JWT inconnu : ${ method }` );
-			}
-
-			// Reproduit exactement buildUrl() du SDK :
-			// host + "/?rest_route=" + namespace + route
-			const baseUrl = getSiteRootUrl();
-			const restRoute = JWT_NAMESPACE + config.route;
-			const url = new URL( `${ baseUrl }/?rest_route=${ encodeURIComponent( restRoute ) }` );
-
-			const fetchOptions: RequestInit = {
-				method: config.method,
-				headers: {
-					'Content-type': 'application/json;charset=UTF-8',
+		// ─── SDK simple-jwt-login ─────────────────────────────────────────────────
+		const jwtSdk = new SimpleJwtLogin(
+			( () => {
+				const url = import.meta.env.VITE_API_BASE_URL || '';
+				const base = url.replace( /\/wp-json\/?.*$/, '' );
+				// En production, VITE_API_BASE_URL = "/wp-json" (relatif)
+				// => base = "" => on utilise l'origine courante du navigateur
+				if ( ! base || base.startsWith( '/' ) ) {
+					return ( typeof window !== 'undefined' ? window.location.origin : '' ) + base;
+				}
+				return base;
+			} )(),
+			{
+				tokenStorage: new LocalStorageTokenStorage( 'dame' ),
+				refreshBeforeExpirySeconds: 60,
+				onTokenRefreshed: ( jwt ) => {
+					token.value = jwt;
+					localStorage.setItem( 'dame_jwt_token', jwt );
 				},
-			};
-
-			if ( params && typeof params === 'object' ) {
-				if ( config.method === 'GET' ) {
-					// GET : paramètres en query string (comme le SDK original)
-					Object.entries( params ).forEach( ( [ key, value ] ) => {
-						if ( value !== undefined && value !== null ) {
-							url.searchParams.append( key, String( value ) );
-						}
-					} );
-				} else {
-					// POST : paramètres en body JSON (comme le SDK original)
-					fetchOptions.body = JSON.stringify( params );
-				}
 			}
+		);
 
-			const controller = new AbortController();
-			const timeoutId = setTimeout( () => controller.abort(), 10000 );
-			fetchOptions.signal = controller.signal;
-
-			try {
-				const response = await fetch( url.toString(), fetchOptions );
-				clearTimeout( timeoutId );
-
-				const isJson = response.headers
-					.get( 'content-type' )
-					?.includes( 'application/json' );
-				const data = isJson
-					? await response.json()
-					: await response.text();
-
-				if ( response.ok ) {
-					return data;
-				} else {
-					throw {
-						error: 'true',
-						status: response.status,
-						response: data,
-						data:
-							typeof data === 'object'
-								? data
-								: { message: data },
-					};
-				}
-			} catch ( err: any ) {
-				clearTimeout( timeoutId );
-				throw err;
-			}
-		};
+		// Sync SDK depuis le token Pinia existant au démarrage (clé dame_jwt_token)
+		if ( token.value ) {
+			jwtSdk.setTokens( token.value );
+		}
 
 		const tryRefreshToken = async (): Promise< string | null > => {
 			if ( ! token.value ) {
@@ -254,17 +181,11 @@ export const useAuthStore = defineStore(
 				return null;
 			}
 			try {
-				console.log( 'Attempting to refresh token...' );
-				const response = await callSdk( 'refreshToken', {
-					JWT: token.value,
-				} );
-				const newJwtToken =
-					response?.jwt || ( response?.data && response?.data?.jwt );
-				if ( newJwtToken ) {
-					token.value = newJwtToken;
-					localStorage.setItem( 'dame_jwt_token', token.value );
-					console.log( 'Token refreshed successfully.' );
-					return token.value;
+				const newJwt = await jwtSdk.getValidJwt();
+				if ( newJwt ) {
+					token.value = newJwt;
+					localStorage.setItem( 'dame_jwt_token', newJwt );
+					return newJwt;
 				}
 				return null;
 			} catch ( refreshError: any ) {
@@ -282,9 +203,7 @@ export const useAuthStore = defineStore(
 				return;
 			}
 			try {
-				const response = await callSdk( 'validateToken', {
-					JWT: token.value,
-				} );
+				const response = await jwtSdk.validateToken( { JWT: token.value } );
 				if ( response && response.success === false ) {
 					await tryRefreshToken();
 				}
@@ -384,13 +303,13 @@ export const useAuthStore = defineStore(
 					authParams.username = username;
 				}
 
-				const data = await callSdk( 'authenticate', authParams );
+				const authResponse = await jwtSdk.authenticate( authParams );
 
-				const jwtToken = data.jwt || ( data.data && data.data.jwt );
+				const jwtToken = authResponse.data?.jwt;
 
 				if ( jwtToken ) {
 					token.value = jwtToken;
-					localStorage.setItem( 'dame_jwt_token', token.value );
+					localStorage.setItem( 'dame_jwt_token', jwtToken );
 
 					// Récupérer le profil complet via l'API WordPress standard
 					let roles: string[] = [];
@@ -426,9 +345,7 @@ export const useAuthStore = defineStore(
 								roles.length === 1 &&
 								roles.includes( 'subscriber' )
 							) {
-								await callSdk( 'revokeToken', {
-									JWT: token.value,
-								} ).catch( () => {} );
+								await jwtSdk.revokeToken( { JWT: token.value } ).catch( () => {} );
 								token.value = '';
 								localStorage.removeItem( 'dame_jwt_token' );
 								throw new Error(
@@ -462,11 +379,7 @@ export const useAuthStore = defineStore(
 					// 2. Vérification des identités (familles)
 					await checkIdentities( token.value );
 				} else {
-					throw new Error(
-						data.message ||
-							( data.data && data.data.message ) ||
-							"Erreur d'identifiants"
-					);
+					throw new Error( "Erreur d'identifiants" );
 				}
 			} catch ( error: any ) {
 				console.error( 'Erreur de connexion:', error );
@@ -547,12 +460,13 @@ export const useAuthStore = defineStore(
 
 		const logout = () => {
 			if ( token.value ) {
-				callSdk( 'revokeToken', { JWT: token.value } ).catch( ( e ) => {
+				jwtSdk.revokeToken( { JWT: token.value } ).catch( ( e ) => {
 					console.warn(
 						'Erreur lors de la révocation du jeton sur le serveur:',
 						e
 					);
 				} );
+				jwtSdk.clearTokens();
 			}
 
 			try {
