@@ -5,6 +5,18 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.0] - 2026-08-11
+### Sécurité
+- **Suppression de la dépendance `simple-jwt-login` (npm)** :
+  - Retrait du package npm `simple-jwt-login@0.1.5` qui utilisait des requêtes `XMLHttpRequest` **synchrones** sur le thread principal, déclenchant un avertissement de dépréciation navigateur.
+  - Remplacement complet par une implémentation native `fetch` asynchrone dans `pwa/src/stores/auth.ts` (méthode `callSdk`), fidèle au comportement exact du SDK d'origine :
+    - `authenticate` → `POST /?rest_route=/simple-jwt-login/v1/auth` (params en body JSON)
+    - `refreshToken` → `POST /?rest_route=/simple-jwt-login/v1/auth/refresh` (params en body JSON)
+    - `validateToken` → `GET /?rest_route=/simple-jwt-login/v1/auth/validate` (params en query string)
+    - `revokeToken` → `POST /?rest_route=/simple-jwt-login/v1/auth/revoke` (params en body JSON)
+  - Gestion robuste de `VITE_API_BASE_URL` relative (`.env.production = /wp-json`) via `window.location.origin` comme base de fallback pour la construction d'URL.
+  - Timeout de 10 secondes via `AbortController` sur chaque appel JWT.
+
+
 ### Ajouté
 - **Migration de l'installeur PWA dans `dame-pwa`** :
   - Transfert complet des styles CSS (`assets/css/public-pwa-installer.css`) et des scripts JS (`assets/js/public-pwa-installer.js`) de la bannière d'installation PWA depuis le plugin parent `dame`.

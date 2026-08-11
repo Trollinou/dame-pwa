@@ -65,7 +65,7 @@ class Plugin {
 	 * @return string
 	 */
 	public function get_pwa_url(): string {
-		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/';
+		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/index.html';
 	}
 
 	/**
@@ -86,8 +86,7 @@ class Plugin {
 		// 1. Redirection vers l'index.html de la PWA
 		if ( 'pwa' === $request_uri ) {
 			$pwa_url = $this->get_pwa_url();
-			nocache_headers();
-			wp_safe_redirect( $pwa_url, 302 );
+			wp_safe_redirect( $pwa_url, 301 );
 			exit;
 		}
 
