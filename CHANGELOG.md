@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [1.0.0] - 2026-08-11
 ### Ajouté
+- **Migration de l'installeur PWA dans `dame-pwa`** :
+  - Transfert complet des styles CSS (`assets/css/public-pwa-installer.css`) et des scripts JS (`assets/js/public-pwa-installer.js`) de la bannière d'installation PWA depuis le plugin parent `dame`.
+  - Enregistrement autonome de la bannière et du Service Worker via la nouvelle classe `DAME_PWA\Assets\FrontendAssets`.
+  - Resolution des 404 sur les manifests et scripts via l'ajout de `<base href="./" />`, la redirection 302 avec headers `nocache` et la suppression du lien manifest manuel redondant.
 - **Intégration directe de Stockfish dans la PWA (`vite.config.ts`, `PlayPage.vue`, `auth.ts`)** :
   - Copie et livraison automatique des fichiers `stockfish.js` et `stockfish.wasm` depuis `node_modules/eg-chessboard/dist/` lors de la build Vite avec `vite-plugin-static-copy`.
   - Conservation stricte des noms originaux pour garantir la liaison du module WebAssembly UCI.

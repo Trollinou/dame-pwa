@@ -43,6 +43,9 @@ class Plugin {
 	 * Run the plugin logic.
 	 */
 	public function run(): void {
+		// Enregistre les assets frontend (bannière d'installation PWA)
+		( new \DAME_PWA\Assets\FrontendAssets() )->init();
+
 		// Enregistre l'URL de la PWA auprès du plugin principal DAME
 		add_filter( 'dame_pwa_url', [ $this, 'get_pwa_url' ] );
 
@@ -62,7 +65,7 @@ class Plugin {
 	 * @return string
 	 */
 	public function get_pwa_url(): string {
-		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/index.html';
+		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/';
 	}
 
 	/**
@@ -83,7 +86,8 @@ class Plugin {
 		// 1. Redirection vers l'index.html de la PWA
 		if ( 'pwa' === $request_uri ) {
 			$pwa_url = $this->get_pwa_url();
-			wp_safe_redirect( $pwa_url, 301 );
+			nocache_headers();
+			wp_safe_redirect( $pwa_url, 302 );
 			exit;
 		}
 

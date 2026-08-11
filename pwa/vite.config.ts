@@ -20,12 +20,10 @@ export default defineConfig({
 				{
 					src: '../node_modules/eg-chessboard/dist/stockfish.js',
 					dest: 'stockfish',
-					rename: (name, ext) => `../../../${name}.${ext}`,
 				},
 				{
 					src: '../node_modules/eg-chessboard/dist/stockfish.wasm',
 					dest: 'stockfish',
-					rename: (name, ext) => `../../../${name}.${ext}`,
 				},
 			],
 		}),
