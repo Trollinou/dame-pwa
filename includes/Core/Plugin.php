@@ -47,16 +47,16 @@ class Plugin {
 		( new \DAME_PWA\Assets\FrontendAssets() )->init();
 
 		// Enregistre l'URL de la PWA auprès du plugin principal DAME
-		add_filter( 'dame_pwa_url', [ $this, 'get_pwa_url' ] );
+		add_filter( 'dame_pwa_url', array( $this, 'get_pwa_url' ) );
 
 		// Intercepte les requêtes pour servir la PWA ou le manifest
-		add_action( 'template_redirect', [ $this, 'handle_pwa_routing' ] );
+		add_action( 'template_redirect', array( $this, 'handle_pwa_routing' ) );
 
 		// Injecte la balise du manifest dans le <head> de WordPress
-		add_action( 'wp_head', [ $this, 'inject_pwa_manifest_link' ] );
+		add_action( 'wp_head', array( $this, 'inject_pwa_manifest_link' ) );
 
 		// Notice d'administration si le plugin parent DAME n'est pas présent/actif
-		add_action( 'admin_notices', [ $this, 'check_parent_plugin_notice' ] );
+		add_action( 'admin_notices', array( $this, 'check_parent_plugin_notice' ) );
 	}
 
 	/**
@@ -72,12 +72,15 @@ class Plugin {
 	 * Handles PWA routes and dynamic manifest output.
 	 */
 	public function handle_pwa_routing(): void {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Déclencheur public en lecture seule via paramètre GET.
 		if ( isset( $_GET['dame-manifest'] ) ) {
 			$this->serve_dynamic_manifest();
 		}
 
-		$home_path   = trim( (string) parse_url( home_url(), PHP_URL_PATH ), '/' );
-		$request_uri = trim( (string) parse_url( (string) $_SERVER['REQUEST_URI'], PHP_URL_PATH ), '/' );
+		$raw_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+
+		$home_path   = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+		$request_uri = trim( (string) wp_parse_url( $raw_request_uri, PHP_URL_PATH ), '/' );
 
 		if ( ! empty( $home_path ) && 0 === strpos( $request_uri, $home_path ) ) {
 			$request_uri = trim( substr( $request_uri, strlen( $home_path ) ), '/' );
@@ -103,29 +106,38 @@ class Plugin {
 		if ( ob_get_length() ) {
 			ob_clean();
 		}
+
+		$site_icon_192 = get_site_icon_url( 192 );
+		$site_icon_512 = get_site_icon_url( 512 );
+
+		$icon_192_url = ! empty( $site_icon_192 ) ? $site_icon_192 : \DAME_PWA_PLUGIN_URL . 'pwa/dist/assets/icon/icon-192.png';
+		$icon_512_url = ! empty( $site_icon_512 ) ? $site_icon_512 : \DAME_PWA_PLUGIN_URL . 'pwa/dist/assets/icon/icon-512.png';
+
 		header( 'Content-Type: application/manifest+json; charset=utf-8' );
-		echo wp_json_encode( [
-			'name'             => get_bloginfo( 'name' ),
-			'short_name'       => get_bloginfo( 'name' ),
-			'start_url'        => home_url( '/pwa' ),
-			'display'          => 'standalone',
-			'background_color' => '#ffffff',
-			'theme_color'      => '#ffffff',
-			'icons'            => [
-				[
-					'src'     => get_site_icon_url( 192 ) ?: \DAME_PWA_PLUGIN_URL . 'pwa/dist/assets/icon/icon-192.png',
-					'sizes'   => '192x192',
-					'type'    => 'image/png',
-					'purpose' => 'any maskable',
-				],
-				[
-					'src'     => get_site_icon_url( 512 ) ?: \DAME_PWA_PLUGIN_URL . 'pwa/dist/assets/icon/icon-512.png',
-					'sizes'   => '512x512',
-					'type'    => 'image/png',
-					'purpose' => 'any maskable',
-				],
-			],
-		] );
+		echo wp_json_encode(
+			array(
+				'name'             => get_bloginfo( 'name' ),
+				'short_name'       => get_bloginfo( 'name' ),
+				'start_url'        => home_url( '/pwa' ),
+				'display'          => 'standalone',
+				'background_color' => '#ffffff',
+				'theme_color'      => '#ffffff',
+				'icons'            => array(
+					array(
+						'src'     => $icon_192_url,
+						'sizes'   => '192x192',
+						'type'    => 'image/png',
+						'purpose' => 'any maskable',
+					),
+					array(
+						'src'     => $icon_512_url,
+						'sizes'   => '512x512',
+						'type'    => 'image/png',
+						'purpose' => 'any maskable',
+					),
+				),
+			)
+		);
 		exit;
 	}
 

@@ -45,6 +45,9 @@ class FrontendAssets {
 			true
 		);
 
+		$site_icon_192 = get_site_icon_url( 192 );
+		$icon_192_url  = ! empty( $site_icon_192 ) ? $site_icon_192 : \DAME_PWA_PLUGIN_URL . 'pwa/dist/assets/icon/icon-192.png';
+
 		wp_localize_script(
 			'dame-pwa-public-installer',
 			'damePwaInstaller',
@@ -52,7 +55,7 @@ class FrontendAssets {
 				'swUrl'    => \DAME_PWA_PLUGIN_URL . 'pwa/dist/sw.js',
 				'pwaScope' => \DAME_PWA_PLUGIN_URL . 'pwa/dist/',
 				'siteName' => get_bloginfo( 'name' ),
-				'siteIcon' => get_site_icon_url( 192 ) ?: \DAME_PWA_PLUGIN_URL . 'pwa/dist/assets/icon/icon-192.png',
+				'siteIcon' => $icon_192_url,
 				'pwaUrl'   => home_url( '/pwa' ),
 			)
 		);
