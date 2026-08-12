@@ -6,7 +6,7 @@
  * Requires at least: 7.0.1
  * Requires PHP:      8.4
  * Author:            Etienne Gagnon
- * Text Domain: dame-pwa
+ * Text Domain:       dame-pwa
  * Domain Path:       /languages
  * Depends:           dame
  *
