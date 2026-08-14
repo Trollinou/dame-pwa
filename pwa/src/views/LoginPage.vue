@@ -102,6 +102,9 @@ const credentials = reactive({
  * Gère la soumission du formulaire
  */
 const handleSubmit = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
   authStore.login(credentials.username, credentials.password);
 };
 

@@ -7,6 +7,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [1.0.1] - 2026-08-14
 
 ### Corrigé
+- **Gestion des erreurs d'authentification (`pwa/src/stores/auth.ts`)** :
+  - Extraction et décodage du payload JSON retourné par le SDK `simple-jwt-login` lors d'erreurs HTTP 400 (`HTTP Error: 400 - {...}`) afin d'afficher des alertes claires et traduites (ex: "Identifiants incorrects.") en cas de mauvais identifiant ou mot de passe.
+- **Gestion des annulations de requêtes TanStack Query (`pwa/src/stores/agenda.ts`)** :
+  - Silence des exceptions `CancelledError` lors de l'invalidation / purge légitime des requêtes de l'agenda pendant une connexion.
+- **Accessibilité & Focus à la connexion (`pwa/src/views/LoginPage.vue`)** :
+  - Retrait anticipé du focus (`blur()`) lors de la soumission du formulaire pour éviter l'avertissement de blocage `aria-hidden` lors de la transition d'écran Ionic.
 - **Étanchéité du cache TanStack Query & Pinia par statut d'authentification (`pwa/src/stores/agenda.ts`, `pwa/src/stores/auth.ts`)** :
   - Intégration du jeton JWT dans les clés de cache `fetchBatch` et `fetchMonthEvents` pour éviter le partage de requêtes et de données mis en cache entre sessions anonymes, abonnés et administrateurs.
   - Purge automatique du cache `queryClient.removeQueries({ queryKey: ['agenda'] })` lors de la déconnexion (`clearData()`), de la connexion réussie (`login()`) ou du changement d'identité rattachée (`selectIdentity()`).

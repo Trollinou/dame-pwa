@@ -415,7 +415,23 @@ export const useAuthStore = defineStore(
 						errorMessage = error.response || errorMessage;
 					}
 				} else if ( error && error.message ) {
-					errorMessage = error.message;
+					// Le SDK simple-jwt-login lève des erreurs du type "HTTP Error: 400 - {"code":..., "message":"..."}"
+					const match = error.message.match(
+						/^HTTP Error: \d+ - (.*)$/
+					);
+					if ( match && match[ 1 ] ) {
+						try {
+							const parsed = JSON.parse( match[ 1 ] );
+							errorMessage =
+								parsed.message ||
+								( parsed.data && parsed.data.message ) ||
+								match[ 1 ];
+						} catch {
+							errorMessage = match[ 1 ];
+						}
+					} else {
+						errorMessage = error.message;
+					}
 				}
 
 				const alert = await alertController.create( {

@@ -187,7 +187,12 @@ export const useAgendaStore = defineStore(
 						return cached;
 					}
 				}
-				if ( error.name !== 'AbortError' && navigator.onLine ) {
+				if (
+					error.name !== 'AbortError' &&
+					error.name !== 'CancelledError' &&
+					error?.message !== 'CancelledError' &&
+					navigator.onLine
+				) {
 					console.error( `Erreur fetchBatch ${ direction }:`, error );
 				}
 				return null;
