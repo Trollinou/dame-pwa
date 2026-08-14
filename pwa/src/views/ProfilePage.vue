@@ -123,11 +123,11 @@
           </div>
           
           <div class="prompt-actions">
-            <ion-button expand="block" color="primary" router-link="/login" class="ion-margin-bottom">
+            <ion-button expand="block" color="primary" @click="goToLogin" class="ion-margin-bottom">
               <ion-icon slot="start" :icon="logInOutline"></ion-icon>
               Se connecter
             </ion-button>
-            <ion-button expand="block" fill="outline" color="primary" router-link="/register">
+            <ion-button expand="block" fill="outline" color="primary" @click="goToRegister">
               <ion-icon slot="start" :icon="personAddOutline"></ion-icon>
               Créer un compte
             </ion-button>
@@ -152,7 +152,8 @@ import {
   IonLabel,
   IonList,
   useIonRouter,
-  onIonViewWillEnter
+  onIonViewWillEnter,
+  onIonViewWillLeave
 } from '@ionic/vue';
 import {
   personCircleOutline,
@@ -213,6 +214,20 @@ const hasMultipleIdentities = computed(() => {
   return identitiesCount.value > 1;
 });
 
+const goToLogin = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  router.push('/login');
+};
+
+const goToRegister = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  router.push('/register');
+};
+
 const changeIdentity = () => {
   router.push('/select-person');
 };
@@ -225,6 +240,12 @@ const goToAdmin = () => {
 const handleLogout = () => {
   authStore.logout();
 };
+
+onIonViewWillLeave(() => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+});
 </script>
 
 <style scoped>
