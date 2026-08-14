@@ -1,66 +1,98 @@
 <template>
   <div>
-    <!-- Infinite Scroll TOP (Historique) -->
-    <ion-infinite-scroll
-      v-if="!searchQuery && hasMorePast"
-      position="top"
-      @ionInfinite="$emit('load-more-past', $event)"
-      :disabled="!hasMorePast || isLoading"
-    >
-      <ion-infinite-scroll-content
-        loading-spinner="dots"
-        loading-text="Chargement de l'historique..."
-      >
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
-
-    <!-- État de chargement initial -->
-    <div v-if="isLoading && events.length === 0" class="ion-text-center ion-padding">
-      <ion-spinner name="crescent"></ion-spinner>
-      <p>Chargement de l'agenda...</p>
+    <!-- Barre de bascule du mode de vue (Liste vs Calendrier) -->
+    <div class="agenda-view-mode-toggle ion-padding-bottom">
+      <ion-segment :value="viewMode" @ionChange="changeViewMode($event.detail.value as 'list' | 'calendar')">
+        <ion-segment-button value="list">
+          <ion-icon :icon="listOutline"></ion-icon>
+          <ion-label>Liste</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="calendar">
+          <ion-icon :icon="calendarOutline"></ion-icon>
+          <ion-label>Calendrier</ion-label>
+        </ion-segment-button>
+      </ion-segment>
     </div>
 
-    <!-- Liste des événements -->
-    <ion-list v-else-if="filteredEvents.length > 0">
-      <ion-item
-        v-for="event in filteredEvents"
-        :key="event.id"
-        :id="'event-' + event.id"
-        button
-        @click="$emit('go-to-detail', event.id)"
-        :class="{ 'past-event': isPast(event) }"
-      >
-        <ion-label>
-          <h2 :class="{ 'upcoming-title': !isPast(event) }" v-safe-html="event.title.rendered"></h2>
-          <p>{{ formatEventDate(event) }}</p>
-        </ion-label>
-        <ion-badge v-if="isToday(event)" color="warning" slot="end">Actuellement</ion-badge>
-      </ion-item>
-    </ion-list>
+    <!-- Mode 1 : Vue Calendrier (Style iOS) -->
+    <AgendaCalendarView
+      v-if="viewMode === 'calendar'"
+      :events="filteredEvents"
+      :today-str="todayStr"
+      @go-to-detail="$emit('go-to-detail', $event)"
+    />
 
-    <!-- Aucun résultat -->
-    <div v-else class="ion-text-center ion-padding">
-      <p v-if="searchQuery">Aucun événement ne correspond à "{{ searchQuery }}".</p>
-      <p v-else>Aucun événement trouvé.</p>
+    <!-- Mode 2 : Vue Liste infinie -->
+    <div v-else>
+      <!-- Infinite Scroll TOP (Historique) -->
+      <ion-infinite-scroll
+        v-if="!searchQuery && hasMorePast"
+        position="top"
+        @ionInfinite="$emit('load-more-past', $event)"
+        :disabled="!hasMorePast || isLoading"
+      >
+        <ion-infinite-scroll-content
+          loading-spinner="dots"
+          loading-text="Chargement de l'historique..."
+        >
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+
+      <!-- État de chargement initial -->
+      <div v-if="isLoading && events.length === 0" class="ion-text-center ion-padding">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Chargement de l'agenda...</p>
+      </div>
+
+      <!-- Liste des événements -->
+      <ion-list v-else-if="filteredEvents.length > 0">
+        <ion-item
+          v-for="event in filteredEvents"
+          :key="event.id"
+          :id="'event-' + event.id"
+          button
+          @click="$emit('go-to-detail', event.id)"
+          :class="{ 'past-event': isPast(event) }"
+        >
+          <!-- Indicateur de couleur de catégorie -->
+          <div
+            v-if="event.categories_data && event.categories_data.length > 0"
+            class="list-category-indicator"
+            :style="{ backgroundColor: event.categories_data[0].color }"
+          ></div>
+
+          <ion-label class="ion-padding-start">
+            <h2 :class="{ 'upcoming-title': !isPast(event) }" v-safe-html="event.title.rendered"></h2>
+            <p>{{ formatEventDate(event) }}</p>
+          </ion-label>
+          <ion-badge v-if="isToday(event)" color="warning" slot="end">Actuellement</ion-badge>
+        </ion-item>
+      </ion-list>
+
+      <!-- Aucun résultat -->
+      <div v-else class="ion-text-center ion-padding">
+        <p v-if="searchQuery">Aucun événement ne correspond à "{{ searchQuery }}".</p>
+        <p v-else>Aucun événement trouvé.</p>
+      </div>
+
+      <!-- Infinite Scroll BOTTOM (Futur) -->
+      <ion-infinite-scroll
+        v-if="!searchQuery && hasMoreUpcoming"
+        @ionInfinite="$emit('load-more-upcoming', $event)"
+        :disabled="!hasMoreUpcoming || isLoading"
+      >
+        <ion-infinite-scroll-content
+          loading-spinner="dots"
+          loading-text="Chargement des événements futurs..."
+        >
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     </div>
-
-    <!-- Infinite Scroll BOTTOM (Futur) -->
-    <ion-infinite-scroll
-      v-if="!searchQuery && hasMoreUpcoming"
-      @ionInfinite="$emit('load-more-upcoming', $event)"
-      :disabled="!hasMoreUpcoming || isLoading"
-    >
-      <ion-infinite-scroll-content
-        loading-spinner="dots"
-        loading-text="Chargement des événements futurs..."
-      >
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import {
   IonSpinner,
   IonList,
@@ -69,9 +101,14 @@ import {
   IonBadge,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  IonSegment,
+  IonSegmentButton,
+  IonIcon
 } from '@ionic/vue';
+import { listOutline, calendarOutline } from 'ionicons/icons';
 import type { AgendaEvent } from '@/stores/agenda';
 import { removeAccents } from '@/utils/stringUtils';
+import AgendaCalendarView from './AgendaCalendarView.vue';
 
 const props = defineProps<{
   searchQuery: string;
@@ -87,6 +124,18 @@ defineEmits<{
   (e: 'load-more-past', event: any): void;
   (e: 'load-more-upcoming', event: any): void;
 }>();
+
+// Persistance du mode de vue dans localStorage (Défaut: 'calendar')
+const STORAGE_KEY = 'dame_agenda_view_mode';
+const savedMode = (localStorage.getItem(STORAGE_KEY) as 'list' | 'calendar') || 'calendar';
+const viewMode = ref<'list' | 'calendar'>(savedMode);
+
+const changeViewMode = (mode: 'list' | 'calendar') => {
+  if (mode) {
+    viewMode.value = mode;
+    localStorage.setItem(STORAGE_KEY, mode);
+  }
+};
 
 const filteredEvents = computed(() => {
   if (!props.searchQuery.trim()) return props.events;
@@ -138,6 +187,9 @@ const formatEventDate = (event: AgendaEvent): string => {
 </script>
 
 <style scoped>
+.agenda-view-mode-toggle {
+  margin-top: 4px;
+}
 ion-list { margin-top: 8px; }
 h2 { font-weight: bold; }
 p { color: var(--ion-color-medium); }
@@ -145,4 +197,10 @@ p { color: var(--ion-color-medium); }
 .past-event h2 { font-weight: normal; }
 .upcoming-title { color: var(--ion-color-primary); }
 ion-badge { margin-left: 8px; }
+.list-category-indicator {
+  width: 4px;
+  height: 28px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
 </style>

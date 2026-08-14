@@ -27,9 +27,12 @@ export const useReferenceDataStore = defineStore( 'referenceData', () => {
 		queryKey: [ 'reference', 'regions' ],
 		queryFn: async () => {
 			const apiUrl = import.meta.env.VITE_API_BASE_URL;
-			const response = await safeFetch( `${ apiUrl }/dame/v1/data/regions`, {
-				headers: getHeaders(),
-			} );
+			const response = await safeFetch(
+				`${ apiUrl }/dame/v1/data/regions`,
+				{
+					headers: getHeaders(),
+				}
+			);
 			if ( ! response.ok ) {
 				throw new Error( 'Erreur fetchRegions' );
 			}

@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
 export interface ExerciceConfig {
 	shapes?: any[];
-	[key: string]: any;
+	[ key: string ]: any;
 }
 
 export interface Contenu {
@@ -53,7 +53,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 			headers.Authorization = `Bearer ${ token }`;
 		}
 		if ( authStore.selectedIdentity?.id ) {
-			headers['X-Selected-Identity'] = authStore.selectedIdentity.id;
+			headers[ 'X-Selected-Identity' ] = authStore.selectedIdentity.id;
 		}
 		return headers;
 	};
@@ -85,10 +85,9 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	} );
 
 	// 2. Query de Progression
-	const {
-		data: queryProgression,
-		refetch: refetchProgression,
-	} = useQuery< number[] >( {
+	const { data: queryProgression, refetch: refetchProgression } = useQuery<
+		number[]
+	>( {
 		queryKey: computed( () => [
 			'progression',
 			authStore.selectedIdentity?.id || 'default',
@@ -111,33 +110,33 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	} );
 
 	// 3. Query du Contenu Actuel
-	const {
-		data: queryContenu,
-		isLoading: isContenuLoading,
-	} = useQuery< Contenu | null >( {
-		queryKey: computed( () => [
-			'contenu',
-			contenuActuelId.value,
-			authStore.selectedIdentity?.id || 'default',
-		] ),
-		enabled: computed( () => contenuActuelId.value !== null ),
-		queryFn: async () => {
-			if ( ! contenuActuelId.value ) return null;
-			const apiUrl = import.meta.env.VITE_API_BASE_URL;
-			const response = await safeFetch(
-				`${ apiUrl }/roi/v1/contenu/${ contenuActuelId.value }`,
-				{ method: 'GET', headers: getAuthHeaders() },
-				5000
-			);
-
-			if ( ! response.ok ) {
-				throw new Error(
-					`Impossible de charger le contenu ${ contenuActuelId.value }.`
+	const { data: queryContenu, isLoading: isContenuLoading } =
+		useQuery< Contenu | null >( {
+			queryKey: computed( () => [
+				'contenu',
+				contenuActuelId.value,
+				authStore.selectedIdentity?.id || 'default',
+			] ),
+			enabled: computed( () => contenuActuelId.value !== null ),
+			queryFn: async () => {
+				if ( ! contenuActuelId.value ) {
+					return null;
+				}
+				const apiUrl = import.meta.env.VITE_API_BASE_URL;
+				const response = await safeFetch(
+					`${ apiUrl }/roi/v1/contenu/${ contenuActuelId.value }`,
+					{ method: 'GET', headers: getAuthHeaders() },
+					5000
 				);
-			}
-			return response.json();
-		},
-	} );
+
+				if ( ! response.ok ) {
+					throw new Error(
+						`Impossible de charger le contenu ${ contenuActuelId.value }.`
+					);
+				}
+				return response.json();
+			},
+		} );
 
 	// Computed properties
 	const parcours = computed( () => queryParcours.value || [] );
@@ -246,7 +245,9 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 
 	const prefetchCoursContenus = ( coursId: number ): void => {
 		const coursTarget = parcours.value.find( ( c ) => c.id === coursId );
-		if ( ! coursTarget || ! coursTarget.playlist ) return;
+		if ( ! coursTarget || ! coursTarget.playlist ) {
+			return;
+		}
 
 		const identityId = authStore.selectedIdentity?.id || 'default';
 		const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -260,7 +261,9 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 						{ method: 'GET', headers: getAuthHeaders() },
 						5000
 					);
-					if ( ! response.ok ) return null;
+					if ( ! response.ok ) {
+						return null;
+					}
 					return response.json();
 				},
 				staleTime: 1000 * 60 * 60,

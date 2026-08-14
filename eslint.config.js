@@ -1,14 +1,13 @@
-const wordpress = require( '@wordpress/eslint-plugin' );
+import wordpress from '@wordpress/eslint-plugin';
 
-module.exports = [
+export default [
 	{
 		ignores: [
 			'node_modules/**',
 			'vendor/**',
 			'build/**',
 			'dist/**',
-			'jules-scratch/**',
-			'pwa/**',
+			'pwa/dist/**',
 			'assets/js/*.min.js',
 		],
 	},
@@ -47,7 +46,13 @@ module.exports = [
 			'no-alert': 'off',          // Autorise alert() et confirm()
 			'no-console': [ 'warn', { allow: [ 'warn', 'error' ] } ],       // Avertit pour log() mais autorise warn() et error()
 			'eqeqeq': 'warn',           // Avertit au lieu de bloquer pour les == au lieu de ===
-			'no-unused-vars': 'warn',   // Avertit pour les variables non utilisées au lieu de bloquer
+			'no-unused-vars': [ 'warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' } ],   // Avertit pour les variables non utilisées (sauf préfixées par _)
+			'react-hooks/rules-of-hooks': 'off', // Projet Vue.js (pas React)
+			'react-hooks/exhaustive-deps': 'off',
+			'react/react-in-jsx-scope': 'off',
+			'import/no-extraneous-dependencies': 'off',
+			'@typescript-eslint/no-shadow': 'off',
+			'@wordpress/no-unused-vars-before-return': 'off',
 		},
 	},
 ];

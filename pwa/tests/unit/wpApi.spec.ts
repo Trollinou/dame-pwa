@@ -35,9 +35,14 @@ describe( 'wpApi utility', () => {
 
 		expect( result ).toEqual( mockData );
 		expect( safeFetchSpy ).toHaveBeenCalledTimes( 1 );
-		expect( safeFetchSpy.mock.calls[ 0 ][ 0 ] ).toContain( '/wp/v2/items?per_page=100&page=1' );
+		expect( safeFetchSpy.mock.calls[ 0 ][ 0 ] ).toContain(
+			'/wp/v2/items?per_page=100&page=1'
+		);
 
-		const headers = safeFetchSpy.mock.calls[ 0 ][ 1 ]?.headers as Record< string, string >;
+		const headers = safeFetchSpy.mock.calls[ 0 ][ 1 ]?.headers as Record<
+			string,
+			string
+		>;
 		expect( headers?.Authorization ).toBe( 'Bearer test-token-123' );
 	} );
 
@@ -74,7 +79,12 @@ describe( 'wpApi utility', () => {
 			'/wp/v2/items?per_page=100'
 		);
 
-		expect( result ).toEqual( [ { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 } ] );
+		expect( result ).toEqual( [
+			{ id: 1 },
+			{ id: 2 },
+			{ id: 3 },
+			{ id: 4 },
+		] );
 		expect( safeFetchSpy ).toHaveBeenCalledTimes( 2 );
 	} );
 
@@ -85,8 +95,8 @@ describe( 'wpApi utility', () => {
 			statusText: 'Internal Server Error',
 		} as any );
 
-		await expect(
-			fetchWpCollection( '/wp/v2/items' )
-		).rejects.toThrow( 'Erreur API REST (500 Internal Server Error)' );
+		await expect( fetchWpCollection( '/wp/v2/items' ) ).rejects.toThrow(
+			'Erreur API REST (500 Internal Server Error)'
+		);
 	} );
 } );

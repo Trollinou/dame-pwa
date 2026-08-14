@@ -1,17 +1,19 @@
+/* eslint-disable no-console */
 /**
  * StockfishManager - Manages two Stockfish Web Workers (Evaluation & Opponent).
  */
+
 export class StockfishManager {
 	private workerUrl: string;
 	private evalWorker: Worker | null = null;
 	private opponentWorker: Worker | null = null;
 
 	// Callbacks
-	private onBestMove: ( ( bestMove: string ) => void ) | null = null;
+	private onBestMove: ( ( _bestMove: string ) => void ) | null = null;
 	private onEvaluation:
-		| ( ( scoreType: string, scoreValue: number ) => void )
+		| ( ( _scoreType: string, _scoreValue: number ) => void )
 		| null = null;
-	private onHint: ( ( bestMove: string ) => void ) | null = null;
+	private onHint: ( ( _bestMove: string ) => void ) | null = null;
 
 	// Stabilité du moteur d'évaluation
 	private lastBestMove = '';
@@ -27,9 +29,9 @@ export class StockfishManager {
 	}
 
 	setCallbacks( callbacks: {
-		onBestMove?: ( bestMove: string ) => void;
-		onEvaluation?: ( scoreType: string, scoreValue: number ) => void;
-		onHint?: ( bestMove: string ) => void;
+		onBestMove?: ( _bestMove: string ) => void;
+		onEvaluation?: ( _scoreType: string, _scoreValue: number ) => void;
+		onHint?: ( _bestMove: string ) => void;
 	} ) {
 		if ( callbacks.onBestMove ) {
 			this.onBestMove = callbacks.onBestMove;

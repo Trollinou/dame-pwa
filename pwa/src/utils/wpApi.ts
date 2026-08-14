@@ -14,9 +14,9 @@ export interface FetchWpCollectionOptions extends RequestInit {
  * 3. La gestion transparente du rafraîchissement des tokens via `safeFetch`.
  * 4. La validation stricte du statut HTTP (`res.ok`) sur TOUTES les pages.
  *
- * @param path Chemin relatif (ex: `/wp/v2/adherents?per_page=100`) ou URL complète.
+ * @param path    Chemin relatif (ex: `/wp/v2/adherents?per_page=100`) ou URL complète.
  * @param options Options d'invalidation / headers complémentaires.
- * @returns Promesse de tableau contenant l'ensemble des éléments récoltés.
+ * @return Promesse de tableau contenant l'ensemble des éléments récoltés.
  */
 export async function fetchWpCollection< T >(
 	path: string,
@@ -25,9 +25,7 @@ export async function fetchWpCollection< T >(
 	const { timeout = 5000, ...fetchOptions } = options;
 
 	const apiBase = import.meta.env?.VITE_API_BASE_URL || '';
-	const baseUrl = path.startsWith( 'http' )
-		? path
-		: `${ apiBase }${ path }`;
+	const baseUrl = path.startsWith( 'http' ) ? path : `${ apiBase }${ path }`;
 
 	// Récupération du jeton JWT actuel si disponible
 	const token =
@@ -70,21 +68,25 @@ export async function fetchWpCollection< T >(
 
 	// 2. Si plusieurs pages existent, charger les pages 2..totalPages
 	if ( totalPages > 1 ) {
-		const cleanBaseUrl = baseUrl.replace( /([?&])page=\d+&?/, '$1' ).replace( /[?&]$/, '' );
+		const cleanBaseUrl = baseUrl
+			.replace( /([?&])page=\d+&?/, '$1' )
+			.replace( /[?&]$/, '' );
 		const separator = cleanBaseUrl.includes( '?' ) ? '&' : '?';
 
 		const pagePromises = [];
 		for ( let p = 2; p <= totalPages; p++ ) {
 			const pageUrl = `${ cleanBaseUrl }${ separator }page=${ p }`;
 			pagePromises.push(
-				safeFetch( pageUrl, requestOptions, timeout ).then( async ( res ) => {
-					if ( ! res.ok ) {
-						throw new Error(
-							`Erreur API REST page ${ p } (${ res.status } ${ res.statusText })`
-						);
+				safeFetch( pageUrl, requestOptions, timeout ).then(
+					async ( res ) => {
+						if ( ! res.ok ) {
+							throw new Error(
+								`Erreur API REST page ${ p } (${ res.status } ${ res.statusText })`
+							);
+						}
+						return ( await res.json() ) as T[];
 					}
-					return ( await res.json() ) as T[];
-				} )
+				)
 			);
 		}
 

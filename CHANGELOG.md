@@ -6,7 +6,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Ajouté
+- **Représentation alternative de l'Agenda (Vue Calendrier style iOS)** (`pwa/src/components/agenda/AgendaCalendarView.vue`, `pwa/src/components/agenda/AgendaSegmentView.vue`) :
+  - Ajout du composant `AgendaCalendarView` proposant une grille mensuelle 7 colonnes avec navigation de mois et bouton "Aujourd'hui".
+  - Affichage sous les numéros de jours de puces colorées indiquant les catégories des événements du jour.
+  - Sélection d'un jour pour afficher immédiatement la liste des événements associés en dessous de la grille avec bande de couleur de catégorie, plage horaire, titre et lieu.
+  - Sélecteur de mode de vue (Liste ☰ / Calendrier 📅) dans l'Agenda avec sauvegarde de la préférence dans `localStorage` (`dame_agenda_view_mode`).
+
 ### Modifié
+- **Nettoyage et conformité ESLint** (`eslint.config.js`, composables, utils et tests) :
+  - Désactivation des règles React inappropriées (`react-hooks/*`) dans la config ESLint Vue.
+  - Correction de l'auto-formatting Prettier / WordPress standards et résolution intégrale des erreurs et warnings.
 - **Correction d'échelle et d'affichage mobile Android High-DPI (Samsung S24)** (`pwa/index.html`, `pwa/src/theme/variables.css`) :
   - Remplacement du `meta viewport` restrictif (`maximum-scale=1.0, user-scalable=no`) par une configuration fluide standard (`width=device-width, initial-scale=1.0, viewport-fit=cover`) afin de rétablir le calcul correct des pixels virtuels CSS sur Android WebView / Chrome.
   - Ajout des règles `-webkit-text-size-adjust: 100%; text-size-adjust: 100%;` pour bloquer l'auto-inflation sauvage du texte et garantir l'adaptabilité du composant `eg-chessboard`.

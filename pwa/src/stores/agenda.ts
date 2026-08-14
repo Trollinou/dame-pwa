@@ -3,6 +3,13 @@ import { ref } from 'vue';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQueryClient } from '@tanstack/vue-query';
 
+export interface AgendaEventCategory {
+	id: number;
+	name: string;
+	slug: string;
+	color: string;
+}
+
 export interface AgendaEvent {
 	id: number;
 	modified: string;
@@ -11,6 +18,8 @@ export interface AgendaEvent {
 		raw: string;
 	};
 	_dame_agenda_description_html?: string;
+	categories_data?: AgendaEventCategory[];
+	dame_agenda_category?: number[];
 	meta: {
 		_dame_start_date: string;
 		_dame_end_date: string;

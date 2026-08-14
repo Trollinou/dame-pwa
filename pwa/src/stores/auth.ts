@@ -156,7 +156,11 @@ export const useAuthStore = defineStore(
 				// En production, VITE_API_BASE_URL = "/wp-json" (relatif)
 				// => base = "" => on utilise l'origine courante du navigateur
 				if ( ! base || base.startsWith( '/' ) ) {
-					return ( typeof window !== 'undefined' ? window.location.origin : '' ) + base;
+					return (
+						( typeof window !== 'undefined'
+							? window.location.origin
+							: '' ) + base
+					);
 				}
 				return base;
 			} )(),
@@ -190,8 +194,14 @@ export const useAuthStore = defineStore(
 				return null;
 			} catch ( refreshError: any ) {
 				console.warn( 'Token refresh failed:', refreshError );
-				const msg = String( refreshError?.data?.message || refreshError?.message || '' ).toLowerCase();
-				if ( msg.includes( 'expired' ) || msg.includes( 'invalid' ) || msg.includes( 'revoked' ) ) {
+				const msg = String(
+					refreshError?.data?.message || refreshError?.message || ''
+				).toLowerCase();
+				if (
+					msg.includes( 'expired' ) ||
+					msg.includes( 'invalid' ) ||
+					msg.includes( 'revoked' )
+				) {
 					logout();
 				}
 				return null;
@@ -203,7 +213,9 @@ export const useAuthStore = defineStore(
 				return;
 			}
 			try {
-				const response = await jwtSdk.validateToken( { JWT: token.value } );
+				const response = await jwtSdk.validateToken( {
+					JWT: token.value,
+				} );
 				if ( response && response.success === false ) {
 					await tryRefreshToken();
 				}
@@ -345,7 +357,9 @@ export const useAuthStore = defineStore(
 								roles.length === 1 &&
 								roles.includes( 'subscriber' )
 							) {
-								await jwtSdk.revokeToken( { JWT: token.value } ).catch( () => {} );
+								await jwtSdk
+									.revokeToken( { JWT: token.value } )
+									.catch( () => {} );
 								token.value = '';
 								localStorage.removeItem( 'dame_jwt_token' );
 								throw new Error(
@@ -419,9 +433,13 @@ export const useAuthStore = defineStore(
 			queryKey: [ 'identities', token ],
 			enabled: computed( () => !! token.value ),
 			queryFn: async () => {
-				if ( ! token.value ) return [];
+				if ( ! token.value ) {
+					return [];
+				}
 				const response = await safeFetch(
-					`${ import.meta.env.VITE_API_BASE_URL }/dame/v1/my-identities`,
+					`${
+						import.meta.env.VITE_API_BASE_URL
+					}/dame/v1/my-identities`,
 					{
 						headers: { Authorization: `Bearer ${ token.value }` },
 					}
@@ -440,9 +458,9 @@ export const useAuthStore = defineStore(
 			return res.data || [];
 		};
 
-		const checkIdentities = async ( token?: string ) => {
+		const checkIdentities = async ( currentToken?: string ) => {
 			try {
-				if ( token ) {
+				if ( currentToken ) {
 					// Utilisation du jeton si nécessaire
 				}
 				const identities = await fetchMyIdentities();
@@ -503,7 +521,7 @@ export const useAuthStore = defineStore(
 		const currentSeason = ref(
 			localStorage.getItem( 'dame_current_season' ) || ''
 		);
-		const apprentissageAllowedRoles = ref<string[]>(
+		const apprentissageAllowedRoles = ref< string[] >(
 			JSON.parse(
 				localStorage.getItem( 'dame_apprentissage_allowed_roles' ) ||
 					'["administrator", "staff", "entraineur", "editor"]'
@@ -518,33 +536,45 @@ export const useAuthStore = defineStore(
 				if ( response.ok ) {
 					const data = await response.json();
 					isRoiActive.value = !! data.roi_active;
-		
+
 					currentSeason.value = data.current_season || '';
 					localStorage.setItem(
 						'dame_roi_active',
 						String( isRoiActive.value )
 					);
-		
-					localStorage.setItem( 'dame_current_season', currentSeason.value );
+
+					localStorage.setItem(
+						'dame_current_season',
+						currentSeason.value
+					);
 
 					if ( isRoiActive.value ) {
 						try {
 							const roiResponse = await safeFetch(
-								`${ import.meta.env.VITE_API_BASE_URL }/roi/v1/config`
+								`${
+									import.meta.env.VITE_API_BASE_URL
+								}/roi/v1/config`
 							);
 							if ( roiResponse.ok ) {
 								const roiData = await roiResponse.json();
-								if ( Array.isArray( roiData.apprentissage_allowed_roles ) ) {
-									apprentissageAllowedRoles.value = roiData.apprentissage_allowed_roles;
+								if (
+									Array.isArray(
+										roiData.apprentissage_allowed_roles
+									)
+								) {
+									apprentissageAllowedRoles.value =
+										roiData.apprentissage_allowed_roles;
 									localStorage.setItem(
 										'dame_apprentissage_allowed_roles',
-										JSON.stringify( roiData.apprentissage_allowed_roles )
+										JSON.stringify(
+											roiData.apprentissage_allowed_roles
+										)
 									);
 								}
 							}
 						} catch ( roiError ) {
 							console.warn(
-								"Impossible de charger la configuration de ROI, utilisation de la configuration par défaut :",
+								'Impossible de charger la configuration de ROI, utilisation de la configuration par défaut :',
 								roiError
 							);
 						}

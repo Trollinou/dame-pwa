@@ -1,4 +1,6 @@
+/* eslint-disable no-console */
 import { describe, it, expect, vi } from 'vitest';
+
 import { vSafeHtml } from '@/directives/safeHtml';
 import * as sanitizeModule from '@/utils/sanitize';
 

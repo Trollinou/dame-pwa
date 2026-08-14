@@ -10,8 +10,8 @@ export class ChessClock {
 	public timerTenths = 0;
 	private timerInterval: any = null;
 
-	public onTick: ( ( wtime: number, btime: number ) => void ) | null = null;
-	public onTimeOut: ( ( flaggedColor: 'white' | 'black' ) => void ) | null =
+	public onTick: ( ( _wtime: number, _btime: number ) => void ) | null = null;
+	public onTimeOut: ( ( _flaggedColor: 'white' | 'black' ) => void ) | null =
 		null;
 
 	constructor() {
@@ -24,92 +24,123 @@ export class ChessClock {
 	 */
 	public setPreset( preset: ClockPreset ): void {
 		this.preset = preset;
-		if ( preset === '1+0' ) {
-			this.wtime = 60000;
-			this.btime = 60000;
-			this.winc = 0;
-			this.binc = 0;
-		} else if ( preset === '3+2' ) {
-			this.wtime = 180000;
-			this.btime = 180000;
-			this.winc = 2000;
-			this.binc = 2000;
-		} else if ( preset === '5+0' ) {
-			this.wtime = 300000;
-			this.btime = 300000;
-			this.winc = 0;
-			this.binc = 0;
-		} else if ( preset === '10+5' ) {
-			this.wtime = 600000;
-			this.btime = 600000;
-			this.winc = 5000;
-			this.binc = 5000;
-		} else if ( preset === '15+10' ) {
-			this.wtime = 900000;
-			this.btime = 900000;
-			this.winc = 10000;
-			this.binc = 10000;
-		} else {
-			this.wtime = 0;
-			this.btime = 0;
-			this.winc = 0;
-			this.binc = 0;
+
+		switch ( preset ) {
+			case '1+0':
+				this.wtime = 60000;
+				this.btime = 60000;
+				this.winc = 0;
+				this.binc = 0;
+				break;
+			case '3+2':
+				this.wtime = 180000;
+				this.btime = 180000;
+				this.winc = 2000;
+				this.binc = 2000;
+				break;
+			case '5+0':
+				this.wtime = 300000;
+				this.btime = 300000;
+				this.winc = 0;
+				this.binc = 0;
+				break;
+			case '10+5':
+				this.wtime = 600000;
+				this.btime = 600000;
+				this.winc = 5000;
+				this.binc = 5000;
+				break;
+			case '15+10':
+				this.wtime = 900000;
+				this.btime = 900000;
+				this.winc = 10000;
+				this.binc = 10000;
+				break;
+			case 'none':
+			default:
+				this.wtime = 0;
+				this.btime = 0;
+				this.winc = 0;
+				this.binc = 0;
+				break;
 		}
+
+		this.activeColor = null;
+		this.stop();
 	}
 
-	private lastTickTime = 0;
-
 	/**
-	 * Starts the tick interval using real-time calculation to avoid throttling issues.
+	 * Starts the clock timer.
 	 */
 	public start(): void {
 		if ( this.timerInterval ) {
 			return;
 		}
 
-		this.lastTickTime = performance.now();
 		this.timerInterval = setInterval( () => {
-			const now = performance.now();
-			const elapsed = now - this.lastTickTime;
-			this.lastTickTime = now;
-
-			// Increment game total duration roughly by the interval steps
-			this.timerTenths += Math.round( elapsed / 100 );
-
-			if ( this.preset !== 'none' && this.activeColor ) {
-				if ( this.activeColor === 'white' ) {
-					this.wtime = Math.max( 0, this.wtime - elapsed );
-					if ( this.wtime <= 0 ) {
-						this.stop();
-						if ( this.onTimeOut ) {
-							this.onTimeOut( 'white' );
-						}
-					}
-				} else {
-					this.btime = Math.max( 0, this.btime - elapsed );
-					if ( this.btime <= 0 ) {
-						this.stop();
-						if ( this.onTimeOut ) {
-							this.onTimeOut( 'black' );
-						}
-					}
-				}
-			}
-
-			if ( this.onTick ) {
-				this.onTick( this.wtime, this.btime );
-			}
+			this.tick();
 		}, 100 );
 	}
 
 	/**
-	 * Stops the tick interval.
+	 * Stops the clock timer.
 	 */
 	public stop(): void {
 		if ( this.timerInterval ) {
 			clearInterval( this.timerInterval );
 			this.timerInterval = null;
 		}
+	}
+
+	/**
+	 * Handles a clock tick every 100ms.
+	 */
+	private tick(): void {
+		if ( ! this.activeColor ) {
+			return;
+		}
+
+		if ( this.activeColor === 'white' ) {
+			this.wtime = Math.max( 0, this.wtime - 100 );
+			if ( this.wtime === 0 ) {
+				this.stop();
+				if ( this.onTimeOut ) {
+					this.onTimeOut( 'white' );
+				}
+			}
+		} else {
+			this.btime = Math.max( 0, this.btime - 100 );
+			if ( this.btime === 0 ) {
+				this.stop();
+				if ( this.onTimeOut ) {
+					this.onTimeOut( 'black' );
+				}
+			}
+		}
+
+		if ( this.onTick ) {
+			this.onTick( this.wtime, this.btime );
+		}
+	}
+
+	/**
+	 * Switches turn and applies increment.
+	 * @param colorToMove
+	 */
+	public switchTurn( colorToMove: 'white' | 'black' ): void {
+		if ( this.preset === 'none' ) {
+			return;
+		}
+
+		// Apply increment to player who just finished their move
+		if ( this.activeColor === 'white' ) {
+			this.wtime += this.winc;
+		} else if ( this.activeColor === 'black' ) {
+			this.btime += this.binc;
+		}
+
+		this.activeColor = colorToMove;
+		this.start();
 	}
 
 	/**

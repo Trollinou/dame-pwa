@@ -43,7 +43,8 @@ export function getFormattedCapturedPieces(
 
 	const captured = boardApi.getCapturedPieces() || { white: [], black: [] };
 	const pieceToSymbol = ( p: unknown ) => {
-		const type = typeof p === 'string' ? p : ( p as { type?: string } )?.type;
+		const type =
+			typeof p === 'string' ? p : ( p as { type?: string } )?.type;
 		if ( ! type ) {
 			return '';
 		}
@@ -99,5 +100,5 @@ export function getGameOverReason( boardApi: BoardCore | null ): string {
 		return '';
 	}
 
-	return boardApi.getGameOverReason('fr');
+	return boardApi.getGameOverReason( 'fr' );
 }

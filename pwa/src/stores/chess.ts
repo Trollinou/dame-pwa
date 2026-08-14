@@ -93,7 +93,9 @@ export const useChessStore = defineStore(
 					throw new Error( 'Erreur de sauvegarde serveur' );
 				}
 
-				queryClient.invalidateQueries( { queryKey: [ 'saved-games' ] } );
+				queryClient.invalidateQueries( {
+					queryKey: [ 'saved-games' ],
+				} );
 			} catch ( error ) {
 				console.warn(
 					"Échec de l'envoi immédiat, mise en file d'attente hors ligne:",

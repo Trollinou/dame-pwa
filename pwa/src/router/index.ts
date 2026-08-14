@@ -8,11 +8,11 @@ import LeClubPage from '../views/LeClubPage.vue';
 import BenevolatPage from '../views/BenevolatPage.vue';
 import MessagesPage from '../views/MessagesPage.vue';
 import AdminLayout from '../views/AdminLayout.vue';
-const TournamentPage = () => import('../views/TournamentPage.vue');
-const GenericPage = () => import('../views/GenericPage.vue');
+const TournamentPage = () => import( '../views/TournamentPage.vue' );
+const GenericPage = () => import( '../views/GenericPage.vue' );
 import { useAuthStore } from '@/stores/auth';
 
-const routes: Array<RouteRecordRaw> = [
+const routes: Array< RouteRecordRaw > = [
 	{
 		path: '/',
 		redirect: '/tabs/home',
@@ -36,7 +36,7 @@ const routes: Array<RouteRecordRaw> = [
 			},
 			{
 				path: 'home',
-				component: () => import('../views/PublicHomePage.vue'),
+				component: () => import( '../views/PublicHomePage.vue' ),
 			},
 			{
 				path: 'agenda',
@@ -44,12 +44,12 @@ const routes: Array<RouteRecordRaw> = [
 			},
 			{
 				path: 'apprentissage',
-				component: () => import('../views/ApprentissageHubPage.vue'),
+				component: () => import( '../views/ApprentissageHubPage.vue' ),
 				meta: { requiresAuth: true, requiresApprentissageAccess: true },
 			},
 			{
 				path: 'profil',
-				component: () => import('../views/ProfilePage.vue'),
+				component: () => import( '../views/ProfilePage.vue' ),
 			},
 		],
 	},
@@ -65,7 +65,7 @@ const routes: Array<RouteRecordRaw> = [
 			},
 			{
 				path: 'dashboard',
-				component: () => import('../views/HomePage.vue'),
+				component: () => import( '../views/HomePage.vue' ),
 			},
 			{
 				path: 'members',
@@ -74,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
 			{
 				path: 'members/:id',
 				name: 'MemberDetail',
-				component: () => import('@/views/MemberDetailPage.vue'),
+				component: () => import( '@/views/MemberDetailPage.vue' ),
 			},
 			{
 				path: 'contact',
@@ -83,7 +83,7 @@ const routes: Array<RouteRecordRaw> = [
 			{
 				path: 'contact/:id',
 				name: 'ContactDetail',
-				component: () => import('@/views/ContactDetailPage.vue'),
+				component: () => import( '@/views/ContactDetailPage.vue' ),
 			},
 			{
 				path: 'message',
@@ -92,7 +92,7 @@ const routes: Array<RouteRecordRaw> = [
 			{
 				path: 'message/:id',
 				name: 'MessageDetail',
-				component: () => import('@/views/MessageDetailPage.vue'),
+				component: () => import( '@/views/MessageDetailPage.vue' ),
 			},
 			{
 				path: 'benevolat',
@@ -101,24 +101,24 @@ const routes: Array<RouteRecordRaw> = [
 			{
 				path: 'benevolat/:id',
 				name: 'BenevolatDetail',
-				component: () => import('@/views/BenevolatDetailPage.vue'),
+				component: () => import( '@/views/BenevolatDetailPage.vue' ),
 			},
 		],
 	},
 	// Routes publiques secondaires hors Tabs
 	{
 		path: '/news',
-		component: () => import('../views/NewsPage.vue'),
+		component: () => import( '../views/NewsPage.vue' ),
 	},
 	{
 		path: '/news/:id',
 		name: 'NewsDetail',
-		component: () => import('../views/NewsDetailPage.vue'),
+		component: () => import( '../views/NewsDetailPage.vue' ),
 	},
 	{
 		path: '/agenda/:id',
 		name: 'AgendaDetail',
-		component: () => import('@/views/AgendaDetailPage.vue'),
+		component: () => import( '@/views/AgendaDetailPage.vue' ),
 	},
 	{
 		path: '/tournoi',
@@ -132,7 +132,7 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/benevolat/participation/:id',
 		name: 'BenevolatVote',
 		meta: { requiresAuth: true },
-		component: () => import('@/views/BenevolatVotePage.vue'),
+		component: () => import( '@/views/BenevolatVotePage.vue' ),
 	},
 	{
 		path: '/page/:id',
@@ -141,40 +141,40 @@ const routes: Array<RouteRecordRaw> = [
 	},
 	{
 		path: '/register',
-		component: () => import('../views/RegisterPage.vue'),
+		component: () => import( '../views/RegisterPage.vue' ),
 	},
 	{
 		path: '/pre-inscription',
-		component: () => import('../views/PreInscriptionPage.vue'),
+		component: () => import( '../views/PreInscriptionPage.vue' ),
 	},
 	{
 		path: '/select-person',
-		component: () => import('../views/SelectPersonPage.vue'),
+		component: () => import( '../views/SelectPersonPage.vue' ),
 		meta: { requiresAuth: true },
 	},
 	{
 		path: '/contenu/:id',
-		component: () => import('../views/ContenuPage.vue'),
+		component: () => import( '../views/ContenuPage.vue' ),
 		meta: { requiresAuth: true, requiresApprentissageAccess: true },
 	},
 	{
 		path: '/cours/:id',
-		component: () => import('../views/CoursPage.vue'),
+		component: () => import( '../views/CoursPage.vue' ),
 		meta: { requiresAuth: true, requiresApprentissageAccess: true },
 	},
 ];
 
-const router = createRouter({
+const router = createRouter( {
 	history: createWebHashHistory(),
 	routes,
-});
+} );
 
 // Navigation Guard (Vue Router 4 style)
-router.beforeEach((to) => {
+router.beforeEach( ( to ) => {
 	const authStore = useAuthStore();
 
 	// 1. Vérification de l'authentification de base
-	if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+	if ( to.meta.requiresAuth && ! authStore.isAuthenticated ) {
 		return {
 			path: '/login',
 			query: {
@@ -184,7 +184,7 @@ router.beforeEach((to) => {
 	}
 
 	// 2. Vérification des droits d'administration
-	if (to.meta.requiresAdmin && !authStore.isAdmin) {
+	if ( to.meta.requiresAdmin && ! authStore.isAdmin ) {
 		return {
 			path: '/tabs/home',
 			query: { message: 'Accès refusé : Droits insuffisants.' },
@@ -192,7 +192,7 @@ router.beforeEach((to) => {
 	}
 
 	// 2b. Vérification adhérent
-	if (to.meta.requiresAdherent && !authStore.isAdherent) {
+	if ( to.meta.requiresAdherent && ! authStore.isAdherent ) {
 		return {
 			path: '/tabs/home',
 			query: { message: 'Accès réservé aux adhérents.' },
@@ -200,22 +200,28 @@ router.beforeEach((to) => {
 	}
 
 	// 3. Vérification de l'activation du module de jeu (requiert ROI)
-	const chessRoutes = ['/tabs/play', '/tabs/analysis'];
-	if (chessRoutes.includes(to.path) && !authStore.isRoiActive) {
+	const chessRoutes = [ '/tabs/play', '/tabs/analysis' ];
+	if ( chessRoutes.includes( to.path ) && ! authStore.isRoiActive ) {
 		return {
 			path: '/tabs/home',
 		};
 	}
 
 	// 4. Vérification de l'accès au module Apprentissage
-	if (to.meta.requiresApprentissageAccess && !authStore.canAccessApprentissage) {
+	if (
+		to.meta.requiresApprentissageAccess &&
+		! authStore.canAccessApprentissage
+	) {
 		return {
 			path: '/tabs/home',
-			query: { message: "Vous n'avez pas l'autorisation d'accéder au module Apprentissage." },
+			query: {
+				message:
+					"Vous n'avez pas l'autorisation d'accéder au module Apprentissage.",
+			},
 		};
 	}
 
 	return true;
-});
+} );
 
 export default router;
