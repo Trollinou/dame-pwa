@@ -204,6 +204,23 @@ export const useAgendaStore = defineStore(
 		};
 
 		/**
+		 * Trie un tableau d'événements par date de début et heure de début
+		 * @param list
+		 */
+		const sortEvents = ( list: AgendaEvent[] ): AgendaEvent[] => {
+			return [ ...list ].sort( ( a, b ) => {
+				const dateA = a.meta?._dame_start_date || '';
+				const dateB = b.meta?._dame_start_date || '';
+				if ( dateA !== dateB ) {
+					return dateA.localeCompare( dateB );
+				}
+				const timeA = a.meta?._dame_start_time || '';
+				const timeB = b.meta?._dame_start_time || '';
+				return timeA.localeCompare( timeB );
+			} );
+		};
+
+		/**
 		 * Rafraîchit les données de base (utilisé par Home et Pull-to-refresh)
 		 */
 		const fetchAgenda = async () => {
@@ -239,9 +256,12 @@ export const useAgendaStore = defineStore(
 				// On remplace le bloc futur par les données fraîches
 				const mergedEvents = [ ...pastEventsInCache, ...data ];
 
-				// Sécurité anti-doublons
-				events.value = mergedEvents.filter(
-					( v, i, a ) => a.findIndex( ( t ) => t.id === v.id ) === i
+				// Sécurité anti-doublons et tri chronologique
+				events.value = sortEvents(
+					mergedEvents.filter(
+						( v, i, a ) =>
+							a.findIndex( ( t ) => t.id === v.id ) === i
+					)
 				);
 
 				upcomingPage.value = 1;
@@ -309,9 +329,11 @@ export const useAgendaStore = defineStore(
 						const data: AgendaEvent[] = await response.json();
 
 						const mergedEvents = [ ...events.value, ...data ];
-						events.value = mergedEvents.filter(
-							( v, i, a ) =>
-								a.findIndex( ( t ) => t.id === v.id ) === i
+						events.value = sortEvents(
+							mergedEvents.filter(
+								( v, i, a ) =>
+									a.findIndex( ( t ) => t.id === v.id ) === i
+							)
 						);
 
 						return data;

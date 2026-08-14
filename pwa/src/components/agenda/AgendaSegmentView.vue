@@ -138,12 +138,25 @@ const changeViewMode = (mode: 'list' | 'calendar') => {
 };
 
 const filteredEvents = computed(() => {
-  if (!props.searchQuery.trim()) return props.events;
-  const query = removeAccents(props.searchQuery.toLowerCase());
-  return props.events.filter((event) =>
-    removeAccents((event.title?.raw || '').toLowerCase()).includes(query)
-  );
+  let list = props.events;
+  if (props.searchQuery.trim()) {
+    const query = removeAccents(props.searchQuery.toLowerCase());
+    list = props.events.filter((event) =>
+      removeAccents((event.title?.raw || '').toLowerCase()).includes(query)
+    );
+  }
+  return [...list].sort((a, b) => {
+    const dateA = a.meta?._dame_start_date || '';
+    const dateB = b.meta?._dame_start_date || '';
+    if (dateA !== dateB) {
+      return dateA.localeCompare(dateB);
+    }
+    const timeA = a.meta?._dame_start_time || '';
+    const timeB = b.meta?._dame_start_time || '';
+    return timeA.localeCompare(timeB);
+  });
 });
+
 
 const isPast = (event: AgendaEvent): boolean => {
   const referenceDate = event.meta?._dame_end_date || event.meta?._dame_start_date || '';

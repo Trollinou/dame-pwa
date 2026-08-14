@@ -14,7 +14,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Sélecteur de mode de vue (Liste ☰ / Calendrier 📅) dans l'Agenda avec sauvegarde de la préférence dans `localStorage` (`dame_agenda_view_mode`).
 
 ### Modifié
+- **Tri chronologique strict de l'agenda** (`pwa/src/stores/agenda.ts`, `AgendaSegmentView.vue`) :
+  - Ajout d'une fonction `sortEvents` triant systématiquement tous les événements par date (`_dame_start_date`) et heure (`_dame_start_time`) lors des opérations de fusion (`fetchBatch`, `fetchAgenda`, `fetchMonthEvents`).
+  - Garantie que la vue liste consécutive aux navigations dans le calendrier conserve un ordre chronologique parfait.
 - **Nettoyage et conformité ESLint** (`eslint.config.js`, composables, utils et tests) :
+
   - Désactivation des règles React inappropriées (`react-hooks/*`) dans la config ESLint Vue.
   - Correction de l'auto-formatting Prettier / WordPress standards et résolution intégrale des erreurs et warnings.
 - **Correction d'échelle et d'affichage mobile Android High-DPI (Samsung S24)** (`pwa/index.html`, `pwa/src/theme/variables.css`) :
