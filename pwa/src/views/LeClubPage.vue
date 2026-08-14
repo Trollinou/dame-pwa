@@ -37,13 +37,14 @@
         </ion-segment>
       </ion-toolbar>
 
-      <ion-toolbar>
+      <ion-toolbar v-if="selectedSegment !== 'agenda' || agendaViewMode === 'list'">
         <ion-searchbar
           v-model="searchQuery"
           :placeholder="searchPlaceholder"
           animated
         ></ion-searchbar>
       </ion-toolbar>
+
     </ion-header>
 
     <ion-content :fullscreen="true" ref="contentRef" class="ion-padding">
@@ -152,8 +153,12 @@ const changeAgendaViewMode = (mode: 'list' | 'calendar') => {
   if (mode) {
     agendaViewMode.value = mode;
     localStorage.setItem(STORAGE_KEY, mode);
+    if (mode === 'calendar') {
+      searchQuery.value = '';
+    }
   }
 };
+
 
 
 const goToDetail = (id: number) => {

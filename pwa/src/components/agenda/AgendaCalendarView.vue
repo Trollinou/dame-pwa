@@ -93,8 +93,7 @@
       </ion-list>
 
       <div v-else class="no-events-placeholder ion-text-center ion-padding">
-        <p v-if="searchQuery">Aucun événement ne correspond à "{{ searchQuery }}" pour cette date.</p>
-        <p v-else>Aucun événement prévu pour cette date.</p>
+        <p>Aucun événement prévu pour cette date.</p>
       </div>
     </div>
   </div>
@@ -109,8 +108,8 @@ import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
 const props = defineProps<{
   events: AgendaEvent[];
   todayStr: string;
-  searchQuery?: string;
 }>();
+
 
 
 defineEmits<{

@@ -3,11 +3,11 @@
     <!-- Mode 1 : Vue Calendrier (Style iOS) -->
     <AgendaCalendarView
       v-if="viewMode === 'calendar'"
-      :events="filteredEvents"
+      :events="events"
       :today-str="todayStr"
-      :search-query="searchQuery"
       @go-to-detail="$emit('go-to-detail', $event)"
     />
+
 
     <!-- Mode 2 : Vue Liste infinie -->
     <div v-else>

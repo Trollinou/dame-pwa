@@ -17,10 +17,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Correction de la recherche textuelle de l'Agenda** (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`) :
   - Remplacement de la vérification restrictive sur `title.raw` par une recherche multicritère sur `title.rendered`, `title.raw`, `location_name`, `agenda_description` et `categories_data`.
   - Intégration et filtrage dynamique du champ de recherche sur les vues **Liste** ET **Calendrier** avec affichage d'un message adapté si aucun résultat.
-- **Intégration du sélecteur de vue Agenda dans l'en-tête natif** (`LeClubPage.vue`, `AgendaSegmentView.vue`) :
+- **Intégration du sélecteur de vue Agenda dans l'en-tête natif et gestion de la recherche** (`LeClubPage.vue`, `AgendaSegmentView.vue`, `AgendaCalendarView.vue`) :
+  - Masquage automatique de la barre de recherche lorsque le mode **Calendrier** est actif.
+  - Réinitialisation automatique du terme de recherche (`searchQuery = ''`) lors de la bascule en mode Calendrier pour afficher tous les événements du mois sans filtre résiduel.
   - Déplacement du segment de sous-navigation Liste/Calendrier directement dans une `<ion-toolbar>` au sein du `<ion-header>` natif de `LeClubPage.vue`.
   - Élimination totale de tout interstice ou fuite visuelle lors du défilement des événements (le contenu défile 100% en dessous de l'en-tête fixe).
   - Utilisation de `layout="icon-start"` pour la disposition compacte (icône à gauche du texte).
+
 
 
 - **Tri chronologique strict de l'agenda** (`pwa/src/stores/agenda.ts`, `AgendaSegmentView.vue`) :
