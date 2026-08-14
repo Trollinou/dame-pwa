@@ -1,18 +1,19 @@
 <template>
   <div>
     <!-- Barre de bascule du mode de vue (Liste vs Calendrier) -->
-    <div class="agenda-view-mode-toggle ion-padding-bottom">
+    <div class="agenda-view-mode-toggle">
       <ion-segment :value="viewMode" @ionChange="changeViewMode($event.detail.value as 'list' | 'calendar')">
-        <ion-segment-button value="list">
+        <ion-segment-button value="list" layout="icon-start">
           <ion-icon :icon="listOutline"></ion-icon>
           <ion-label>Liste</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="calendar">
+        <ion-segment-button value="calendar" layout="icon-start">
           <ion-icon :icon="calendarOutline"></ion-icon>
           <ion-label>Calendrier</ion-label>
         </ion-segment-button>
       </ion-segment>
     </div>
+
 
     <!-- Mode 1 : Vue Calendrier (Style iOS) -->
     <AgendaCalendarView
@@ -213,10 +214,13 @@ const formatEventDate = (event: AgendaEvent): string => {
   top: 0;
   z-index: 20;
   background-color: var(--ion-background-color, #ffffff);
-  padding-top: 4px;
-  padding-bottom: 8px;
-  margin-top: 0;
+  margin-top: -16px;
+  margin-left: -16px;
+  margin-right: -16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--ion-color-light-shade, #e0e0e0);
 }
+
 
 ion-list { margin-top: 8px; }
 h2 { font-weight: bold; }

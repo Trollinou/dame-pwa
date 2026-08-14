@@ -17,9 +17,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Correction de la recherche textuelle de l'Agenda** (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`) :
   - Remplacement de la vérification restrictive sur `title.raw` par une recherche multicritère sur `title.rendered`, `title.raw`, `location_name`, `agenda_description` et `categories_data`.
   - Intégration et filtrage dynamique du champ de recherche sur les vues **Liste** ET **Calendrier** avec affichage d'un message adapté si aucun résultat.
-- **Fixation de la barre de bascule de vue Agenda** (`AgendaSegmentView.vue`) :
+- **Fixation et disposition compacte du sélecteur de vue Agenda** (`AgendaSegmentView.vue`) :
+  - Ajout de `layout="icon-start"` sur `<ion-segment-button>` pour basculer en mode compact (icône à gauche du texte).
+  - Suppression de l'interstice sous la toolbar d'en-tête et application des marges négatives (`margin: -16px -16px 0 -16px`) avec `position: sticky; top: 0; z-index: 20;` pour plaquer le sélecteur contre l'en-tête et bloquer l'effet d'élément défilant dans l'interstice.
 
-  - Application du style `position: sticky; top: 0; z-index: 20;` sur le sélecteur Liste/Calendrier pour le maintenir toujours visible en haut de l'écran lors du défilement des événements ou du chargement de l'historique passé.
 - **Tri chronologique strict de l'agenda** (`pwa/src/stores/agenda.ts`, `AgendaSegmentView.vue`) :
 
   - Ajout d'une fonction `sortEvents` triant systématiquement tous les événements par date (`_dame_start_date`) et heure (`_dame_start_time`) lors des opérations de fusion (`fetchBatch`, `fetchAgenda`, `fetchMonthEvents`).
