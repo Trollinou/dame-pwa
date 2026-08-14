@@ -2,6 +2,9 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button default-href="/tabs/home"></ion-back-button>
+        </ion-buttons>
         <ion-title>Connexion Echiquier Lédonien</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -51,8 +54,14 @@
             </ion-button>
             
             <div class="ion-text-center ion-margin-top">
-              <ion-button fill="clear" router-link="/tabs/register" color="medium">
+              <ion-button fill="clear" @click="goToRegister" color="medium">
                 Pas encore de compte ? S'inscrire
+              </ion-button>
+            </div>
+
+            <div class="ion-text-center">
+              <ion-button fill="clear" @click="handleCancel" color="medium">
+                Annuler
               </ion-button>
             </div>
           </form>
@@ -74,15 +83,18 @@ import {
   IonInput,
   IonButton,
   IonIcon,
+  IonButtons,
+  IonBackButton,
   onIonViewWillLeave
 } from '@ionic/vue';
 import { informationCircleOutline } from 'ionicons/icons';
 import { reactive, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 const { isLoading } = storeToRefs(authStore);
 
@@ -106,6 +118,24 @@ const handleSubmit = () => {
     document.activeElement.blur();
   }
   authStore.login(credentials.username, credentials.password);
+};
+
+const goToRegister = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  router.push('/tabs/register');
+};
+
+const handleCancel = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  if (window.history.length > 1) {
+    router.back();
+  } else {
+    router.push('/tabs/home');
+  }
 };
 
 /**

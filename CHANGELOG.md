@@ -11,6 +11,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Extraction et décodage du payload JSON retourné par le SDK `simple-jwt-login` lors d'erreurs HTTP 400 (`HTTP Error: 400 - {...}`) afin d'afficher des alertes claires et traduites (ex: "Identifiants incorrects.") en cas de mauvais identifiant ou mot de passe.
 - **Gestion des annulations de requêtes TanStack Query (`pwa/src/stores/agenda.ts`)** :
   - Silence des exceptions `CancelledError` lors de l'invalidation / purge légitime des requêtes de l'agenda pendant une connexion.
+- **Navigation & Annulation sur l'écran de connexion (`pwa/src/views/LoginPage.vue`)** :
+  - Ajout du bouton flèche de retour standard dans le header (`ion-back-button`) avec redirection par défaut vers `/tabs/home`.
+  - Ajout d'un bouton explicite "Annuler" sous le formulaire de connexion.
 - **Accessibilité & Focus à la connexion (`pwa/src/views/LoginPage.vue`)** :
   - Retrait anticipé du focus (`blur()`) lors de la soumission du formulaire pour éviter l'avertissement de blocage `aria-hidden` lors de la transition d'écran Ionic.
 - **Étanchéité du cache TanStack Query & Pinia par statut d'authentification (`pwa/src/stores/agenda.ts`, `pwa/src/stores/auth.ts`)** :
