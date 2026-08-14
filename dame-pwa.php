@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: DAME - PWA
- * Description: Interface Progressive Web App pour le gestionnaire d'adhérents et l'apprentissage.
- * Version: 1.0.0
+ * Plugin Name:       DAME - PWA
+ * Description:       Interface Progressive Web App pour le gestionnaire d'adhérents et l'apprentissage.
+ * Version:           1.0.0
  * Requires at least: 7.0.1
  * Requires PHP:      8.4
  * Author:            Etienne Gagnon

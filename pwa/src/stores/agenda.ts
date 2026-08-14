@@ -250,6 +250,85 @@ export const useAgendaStore = defineStore(
 			}
 		};
 
+		/**
+		 * Récupère les événements d'un mois spécifique
+		 * @param year  Année (ex: 2026)
+		 * @param month Mois 0-indexed (0 = Janvier, 11 = Décembre)
+		 */
+		const fetchMonthEvents = async ( year: number, month: number ) => {
+			const startDate = `${ year }-${ String( month + 1 ).padStart(
+				2,
+				'0'
+			) }-01`;
+			const lastDay = new Date( year, month + 1, 0 ).getDate();
+			const endDate = `${ year }-${ String( month + 1 ).padStart(
+				2,
+				'0'
+			) }-${ String( lastDay ).padStart( 2, '0' ) }`;
+
+			isLoading.value = true;
+			try {
+				return await queryClient.fetchQuery( {
+					queryKey: [ 'agenda', 'month', year, month ],
+					queryFn: async () => {
+						if ( ! navigator.onLine ) {
+							throw new Error( 'Offline' );
+						}
+
+						const token = localStorage.getItem( 'dame_jwt_token' );
+						const baseUrl = `${
+							import.meta.env.VITE_API_BASE_URL
+						}/wp/v2/agenda`;
+						const queryParams = [
+							'per_page=100',
+							'context=view',
+							'orderby=meta_value',
+							'meta_key=_dame_start_date',
+							'order=asc',
+							`after_date=${ startDate }`,
+							`before_date=${ endDate }`,
+						].join( '&' );
+
+						const headers: Record< string, string > = {
+							'Content-Type': 'application/json',
+						};
+						if ( token ) {
+							headers.Authorization = `Bearer ${ token }`;
+						}
+
+						const response = await safeFetch(
+							`${ baseUrl }?${ queryParams }`,
+							{ method: 'GET', headers },
+							4000
+						);
+
+						if ( ! response.ok ) {
+							return [];
+						}
+
+						const data: AgendaEvent[] = await response.json();
+
+						const mergedEvents = [ ...events.value, ...data ];
+						events.value = mergedEvents.filter(
+							( v, i, a ) =>
+								a.findIndex( ( t ) => t.id === v.id ) === i
+						);
+
+						return data;
+					},
+					staleTime: 1000 * 60 * 5,
+				} );
+			} catch ( error: any ) {
+				if ( error.message === 'Offline' ) {
+					return events.value;
+				}
+				console.error( 'Erreur fetchMonthEvents:', error );
+				return null;
+			} finally {
+				isLoading.value = false;
+			}
+		};
+
 		const clearData = () => {
 			events.value = [];
 			hasMoreUpcoming.value = true;
@@ -268,9 +347,11 @@ export const useAgendaStore = defineStore(
 			getTodayLocal,
 			fetchBatch,
 			fetchAgenda,
+			fetchMonthEvents,
 			clearData,
 		};
 	},
+
 	{
 		persist: true,
 	}

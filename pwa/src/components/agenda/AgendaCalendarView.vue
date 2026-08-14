@@ -100,10 +100,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { IonButton, IonIcon, IonList, IonItem, IonLabel } from '@ionic/vue';
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
-import type { AgendaEvent } from '@/stores/agenda';
+import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
 
 const props = defineProps<{
   events: AgendaEvent[];
@@ -114,6 +114,8 @@ defineEmits<{
   (e: 'go-to-detail', id: number): void;
 }>();
 
+const agendaStore = useAgendaStore();
+
 const weekdays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 // Date de référence (Mois/Année affiché)
@@ -121,8 +123,18 @@ const now = new Date();
 const currentYear = ref(now.getFullYear());
 const currentMonth = ref(now.getMonth()); // 0-indexed (0 = Janvier)
 
+// Déclenche le chargement des événements du mois à l'initialisation et à chaque changement de mois
+watch(
+  [currentYear, currentMonth],
+  ([newYear, newMonth]) => {
+    agendaStore.fetchMonthEvents(newYear, newMonth);
+  },
+  { immediate: true }
+);
+
 // Date sélectionnée (par défaut aujourd'hui)
 const selectedDateStr = ref(props.todayStr || formatDateToIsoStr(now));
+
 
 const monthNames = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',

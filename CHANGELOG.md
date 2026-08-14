@@ -4,7 +4,7 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2026-08-14
 
 ### Ajouté
 - **Représentation alternative de l'Agenda (Vue Calendrier style iOS)** (`pwa/src/components/agenda/AgendaCalendarView.vue`, `pwa/src/components/agenda/AgendaSegmentView.vue`) :
