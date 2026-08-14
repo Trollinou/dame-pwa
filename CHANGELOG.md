@@ -14,7 +14,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Sélecteur de mode de vue (Liste ☰ / Calendrier 📅) dans l'Agenda avec sauvegarde de la préférence dans `localStorage` (`dame_agenda_view_mode`).
 
 ### Modifié
+- **Correction de la recherche textuelle de l'Agenda** (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`) :
+  - Remplacement de la vérification restrictive sur `title.raw` par une recherche multicritère sur `title.rendered`, `title.raw`, `location_name`, `agenda_description` et `categories_data`.
+  - Intégration et filtrage dynamique du champ de recherche sur les vues **Liste** ET **Calendrier** avec affichage d'un message adapté si aucun résultat.
 - **Fixation de la barre de bascule de vue Agenda** (`AgendaSegmentView.vue`) :
+
   - Application du style `position: sticky; top: 0; z-index: 20;` sur le sélecteur Liste/Calendrier pour le maintenir toujours visible en haut de l'écran lors du défilement des événements ou du chargement de l'historique passé.
 - **Tri chronologique strict de l'agenda** (`pwa/src/stores/agenda.ts`, `AgendaSegmentView.vue`) :
 

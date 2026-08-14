@@ -19,8 +19,10 @@
       v-if="viewMode === 'calendar'"
       :events="filteredEvents"
       :today-str="todayStr"
+      :search-query="searchQuery"
       @go-to-detail="$emit('go-to-detail', $event)"
     />
+
 
     <!-- Mode 2 : Vue Liste infinie -->
     <div v-else>
@@ -141,9 +143,14 @@ const filteredEvents = computed(() => {
   let list = props.events;
   if (props.searchQuery.trim()) {
     const query = removeAccents(props.searchQuery.toLowerCase());
-    list = props.events.filter((event) =>
-      removeAccents((event.title?.raw || '').toLowerCase()).includes(query)
-    );
+    list = props.events.filter((event) => {
+      const title = event.title?.rendered || event.title?.raw || '';
+      const location = event.meta?._dame_location_name || '';
+      const desc = event.meta?._dame_agenda_description || '';
+      const categories = event.categories_data?.map((c) => c.name).join(' ') || '';
+      const fullText = `${title} ${location} ${desc} ${categories}`;
+      return removeAccents(fullText.toLowerCase()).includes(query);
+    });
   }
   return [...list].sort((a, b) => {
     const dateA = a.meta?._dame_start_date || '';
@@ -156,6 +163,7 @@ const filteredEvents = computed(() => {
     return timeA.localeCompare(timeB);
   });
 });
+
 
 
 const isPast = (event: AgendaEvent): boolean => {
