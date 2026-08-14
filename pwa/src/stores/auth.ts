@@ -146,6 +146,8 @@ export const useAuthStore = defineStore(
 				'dame_selected_identity',
 				JSON.stringify( identity )
 			);
+			// Purge du cache agenda pour recharger avec les droits de la nouvelle identité
+			useAgendaStore().clearData();
 		};
 
 		// ─── SDK simple-jwt-login ─────────────────────────────────────────────────
@@ -389,6 +391,9 @@ export const useAuthStore = defineStore(
 						'dame_user',
 						JSON.stringify( user.value )
 					);
+
+					// Purger tout cache anonyme antérieur lors de la connexion réussie
+					useAgendaStore().clearData();
 
 					// 2. Vérification des identités (familles)
 					await checkIdentities( token.value );

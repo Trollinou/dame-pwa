@@ -4,6 +4,17 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-08-14
+
+### Corrigé
+- **Étanchéité du cache TanStack Query & Pinia par statut d'authentification (`pwa/src/stores/agenda.ts`, `pwa/src/stores/auth.ts`)** :
+  - Intégration du jeton JWT dans les clés de cache `fetchBatch` et `fetchMonthEvents` pour éviter le partage de requêtes et de données mis en cache entre sessions anonymes, abonnés et administrateurs.
+  - Purge automatique du cache `queryClient.removeQueries({ queryKey: ['agenda'] })` lors de la déconnexion (`clearData()`), de la connexion réussie (`login()`) ou du changement d'identité rattachée (`selectIdentity()`).
+- **Unification du chargement de l'Agenda (`LeClubPage.vue`, `pwa/src/stores/agenda.ts`)** :
+  - Remplacement du requêtage manuel et de la logique de fusion dans `LeClubPage.vue` par un appel centralisé à `agendaStore.fetchAgenda()`.
+- **Sécurisation du cache du Bénévolat (`pwa/src/stores/benevolat.ts`)** :
+  - Suppression automatique des requêtes utilisateur `['benevolat', 'user-vote']` lors de la réinitialisation des stores (`clearData()`).
+
 ## [1.0.0] - 2026-08-14
 
 ### Ajouté

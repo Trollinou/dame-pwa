@@ -77,14 +77,22 @@ export const useAgendaStore = defineStore(
 			}
 
 			try {
+				const token = localStorage.getItem( 'dame_jwt_token' );
+				const isAuth = !! token;
+
 				return await queryClient.fetchQuery( {
-					queryKey: [ 'agenda', direction, referenceDate, page ],
+					queryKey: [
+						'agenda',
+						direction,
+						referenceDate,
+						page,
+						isAuth ? token : 'public',
+					],
 					queryFn: async () => {
 						if ( ! navigator.onLine ) {
 							throw new Error( 'Offline' );
 						}
 
-						const token = localStorage.getItem( 'dame_jwt_token' );
 						const context = 'view';
 						const perPage = 20;
 
@@ -166,11 +174,14 @@ export const useAgendaStore = defineStore(
 				} );
 			} catch ( error: any ) {
 				if ( error.message === 'Offline' ) {
+					const token = localStorage.getItem( 'dame_jwt_token' );
+					const isAuth = !! token;
 					const cached = queryClient.getQueryData< AgendaEvent[] >( [
 						'agenda',
 						direction,
 						referenceDate,
 						page,
+						isAuth ? token : 'public',
 					] );
 					if ( cached ) {
 						return cached;
@@ -288,14 +299,22 @@ export const useAgendaStore = defineStore(
 
 			isLoading.value = true;
 			try {
+				const token = localStorage.getItem( 'dame_jwt_token' );
+				const isAuth = !! token;
+
 				return await queryClient.fetchQuery( {
-					queryKey: [ 'agenda', 'month', year, month ],
+					queryKey: [
+						'agenda',
+						'month',
+						year,
+						month,
+						isAuth ? token : 'public',
+					],
 					queryFn: async () => {
 						if ( ! navigator.onLine ) {
 							throw new Error( 'Offline' );
 						}
 
-						const token = localStorage.getItem( 'dame_jwt_token' );
 						const baseUrl = `${
 							import.meta.env.VITE_API_BASE_URL
 						}/wp/v2/agenda`;
@@ -357,6 +376,7 @@ export const useAgendaStore = defineStore(
 			hasMorePast.value = true;
 			upcomingPage.value = 1;
 			pastPage.value = 1;
+			queryClient.removeQueries( { queryKey: [ 'agenda' ] } );
 		};
 
 		return {

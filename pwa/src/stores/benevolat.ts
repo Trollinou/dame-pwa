@@ -167,6 +167,7 @@ export const useBenevolatStore = defineStore( 'benevolat', () => {
 
 	const clearData = () => {
 		userVotedIds.value = [];
+		queryClient.removeQueries( { queryKey: [ 'benevolat', 'user-vote' ] } );
 	};
 
 	return {
