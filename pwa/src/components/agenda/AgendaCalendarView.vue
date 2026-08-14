@@ -1,5 +1,5 @@
 <template>
-  <div class="agenda-calendar-view">
+  <div class="agenda-calendar-view" @touchstart="onTouchStart" @touchend="onTouchEnd">
     <!-- En-tête Navigation Mois -->
     <div class="calendar-header ion-padding-horizontal">
       <div class="month-title-wrapper">
@@ -82,12 +82,7 @@
 
           <ion-label class="ion-padding-start">
             <h2 class="event-title" v-safe-html="event.title.rendered"></h2>
-            <p class="event-time-location">
-              <span class="time-range">{{ formatEventTime(event) }}</span>
-              <span v-if="event.meta?._dame_location_name" class="location-name">
-                • {{ event.meta._dame_location_name }}
-              </span>
-            </p>
+            <p class="event-time-location">{{ formatEventTime(event) }}</p>
           </ion-label>
         </ion-item>
       </ion-list>
@@ -98,6 +93,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
@@ -309,13 +305,48 @@ const formatEventTime = (event: AgendaEvent): string => {
   const endTime = meta?._dame_end_time;
   const isAllDay = meta?._dame_all_day === 1;
 
-  if (isAllDay || (!startTime && !endTime)) {
-    return 'Toute la journée';
+  let timeStr = 'Jour entier';
+  if (startTime && endTime && !isAllDay) {
+    timeStr = `De ${startTime} à ${endTime}`;
+  } else if (startTime && !isAllDay) {
+    timeStr = startTime;
   }
-  if (startTime && endTime) {
-    return `${startTime} - ${endTime}`;
+
+  const location = meta?._dame_location_name;
+  if (location) {
+    timeStr += ` • ${location}`;
   }
-  return startTime || '';
+  return timeStr;
+};
+
+// Gestion des gestes tactiles (Swipe gauche/droite pour naviguer dans les mois)
+let touchStartX = 0;
+let touchStartY = 0;
+
+const onTouchStart = (e: TouchEvent) => {
+  if (e.touches && e.touches.length > 0) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }
+};
+
+const onTouchEnd = (e: TouchEvent) => {
+  if (e.changedTouches && e.changedTouches.length > 0) {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+
+    // Seuil de déclenchement : glissement horizontal > 40px avec déviation verticale < 40px
+    if (Math.abs(diffX) > 40 && Math.abs(diffY) < 40) {
+      if (diffX < 0) {
+        nextMonth(); // Swipe vers la gauche -> Mois suivant
+      } else {
+        prevMonth(); // Swipe vers la droite -> Mois précédent
+      }
+    }
+  }
 };
 </script>
 
@@ -324,6 +355,7 @@ const formatEventTime = (event: AgendaEvent): string => {
   display: flex;
   flex-direction: column;
   user-select: none;
+  touch-action: pan-y;
 }
 
 /* En-tête mois */
@@ -331,27 +363,30 @@ const formatEventTime = (event: AgendaEvent): string => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
+  padding: 0 4px;
 }
 .month-title-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .month-title {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 700;
   text-transform: capitalize;
 }
 .today-button {
-  --padding-start: 6px;
-  --padding-end: 6px;
-  font-size: 0.85rem;
+  --padding-start: 4px;
+  --padding-end: 4px;
+  font-size: 0.8rem;
+  height: 24px;
 }
-.month-nav-buttons {
-  display: flex;
-  align-items: center;
+.month-nav-buttons ion-button {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  height: 28px;
 }
 
 /* Entête jours de semaine */
@@ -360,11 +395,11 @@ const formatEventTime = (event: AgendaEvent): string => {
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   border-bottom: 1px solid var(--ion-color-light-shade, #e0e0e0);
-  padding-bottom: 6px;
-  margin-bottom: 4px;
+  padding-bottom: 2px;
+  margin-bottom: 2px;
 }
 .weekday-cell {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--ion-color-medium);
   text-transform: uppercase;
@@ -374,16 +409,16 @@ const formatEventTime = (event: AgendaEvent): string => {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 1px;
 }
 .day-cell {
-  aspect-ratio: 1 / 1.1;
+  aspect-ratio: 1 / 0.85;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 4px;
-  border-radius: 8px;
+  padding-top: 1px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
@@ -395,13 +430,13 @@ const formatEventTime = (event: AgendaEvent): string => {
 }
 
 .day-number-wrapper {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 .day-cell.is-selected .day-number-wrapper {
@@ -417,73 +452,83 @@ const formatEventTime = (event: AgendaEvent): string => {
 /* Pastilles / Dots d'événements */
 .event-dots-container {
   display: flex;
-  gap: 3px;
-  margin-top: 3px;
-  min-height: 6px;
+  gap: 2px;
+  margin-top: 1px;
+  min-height: 5px;
   align-items: center;
 }
 .event-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 2.5px;
 }
 
 /* Evénements du jour sélectionné */
 .selected-day-events {
   border-top: 1px solid var(--ion-color-light-shade, #e0e0e0);
-  padding-top: 12px;
+  padding-top: 4px;
+  margin-top: 4px;
 }
 .selected-day-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  padding: 0 4px;
 }
 .selected-day-header h3 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 0.92rem;
   font-weight: 600;
   text-transform: capitalize;
 }
 .event-count-badge {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   background-color: var(--ion-color-light-shade, #eee);
   color: var(--ion-color-dark);
-  padding: 2px 8px;
-  border-radius: 12px;
+  padding: 1px 6px;
+  border-radius: 10px;
   font-weight: 500;
 }
 .day-event-list {
   background: transparent;
+  padding: 0;
+  margin: 0;
 }
 .day-event-item {
   position: relative;
-  --inner-padding-start: 12px;
-  margin-bottom: 6px;
-  border-radius: 8px;
+  --min-height: 40px;
+  --padding-start: 4px;
+  --inner-padding-end: 4px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  margin-bottom: 3px;
+  border-radius: 6px;
 }
 .category-color-bar {
   position: absolute;
   left: 0;
-  top: 6px;
-  bottom: 6px;
+  top: 4px;
+  bottom: 4px;
   width: 4px;
   border-radius: 2px;
 }
 .event-title {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  margin-bottom: 2px;
+  margin: 0 0 1px 0;
+  line-height: 1.2;
 }
 .event-time-location {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--ion-color-medium);
-}
-.location-name {
-  font-weight: 500;
+  margin: 0;
+  line-height: 1.1;
 }
 .no-events-placeholder p {
   color: var(--ion-color-medium);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  margin: 4px 0;
 }
 </style>
+

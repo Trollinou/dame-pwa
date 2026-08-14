@@ -49,13 +49,8 @@
 
     <ion-content :fullscreen="true" ref="contentRef" class="ion-padding">
       <div class="safe-area-wrapper">
-        <ion-header collapse="condense">
-          <ion-toolbar>
-            <ion-title size="large">{{ pageTitle }}</ion-title>
-          </ion-toolbar>
-        </ion-header>
-
         <!-- ONGLET 0 : ACTUALITES -->
+
         <ActualitesSegmentView
           v-if="selectedSegment === 'actualites'"
           :search-query="searchQuery"

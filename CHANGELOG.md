@@ -17,12 +17,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Correction de la recherche textuelle de l'Agenda** (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`) :
   - Remplacement de la vérification restrictive sur `title.raw` par une recherche multicritère sur `title.rendered`, `title.raw`, `location_name`, `agenda_description` et `categories_data`.
   - Intégration et filtrage dynamique du champ de recherche sur les vues **Liste** ET **Calendrier** avec affichage d'un message adapté si aucun résultat.
-- **Intégration du sélecteur de vue Agenda dans l'en-tête natif et gestion de la recherche** (`LeClubPage.vue`, `AgendaSegmentView.vue`, `AgendaCalendarView.vue`) :
-  - Masquage automatique de la barre de recherche lorsque le mode **Calendrier** est actif.
-  - Réinitialisation automatique du terme de recherche (`searchQuery = ''`) lors de la bascule en mode Calendrier pour afficher tous les événements du mois sans filtre résiduel.
-  - Déplacement du segment de sous-navigation Liste/Calendrier directement dans une `<ion-toolbar>` au sein du `<ion-header>` natif de `LeClubPage.vue`.
-  - Élimination totale de tout interstice ou fuite visuelle lors du défilement des événements (le contenu défile 100% en dessous de l'en-tête fixe).
-  - Utilisation de `layout="icon-start"` pour la disposition compacte (icône à gauche du texte).
+- **Optimisation de l'affichage Calendrier et navigation par swipe** (`LeClubPage.vue`, `AgendaCalendarView.vue`) :
+  - Suppression du bloc de titre condensé (`<ion-header collapse="condense">`) dans `LeClubPage.vue` pour libérer ~60px de hauteur utile et fixer le titre "Agenda" dans la toolbar supérieure sans besoin de scroller.
+  - Compactage de la grille des jours (`aspect-ratio: 1 / 0.85`, pastilles de 5px, marges minimales) et réduction de la hauteur des éléments de liste pour afficher au moins 3 événements simultanément sans scroller.
+  - Formatage court des sous-titres d'événements ("Jour entier" au lieu de "Toute la journée", horaires et intitulé du lieu séparés par des puces).
+  - Prise en charge des gestes tactiles **Swipe horizontal** (`@touchstart` / `@touchend`) sur le calendrier pour naviguer intuitivement vers le mois précédent (swipe vers la droite) ou suivant (swipe vers la gauche).
+
 
 
 
