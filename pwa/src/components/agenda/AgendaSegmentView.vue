@@ -201,8 +201,15 @@ const formatEventDate = (event: AgendaEvent): string => {
 
 <style scoped>
 .agenda-view-mode-toggle {
-  margin-top: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--ion-background-color, #ffffff);
+  padding-top: 4px;
+  padding-bottom: 8px;
+  margin-top: 0;
 }
+
 ion-list { margin-top: 8px; }
 h2 { font-weight: bold; }
 p { color: var(--ion-color-medium); }

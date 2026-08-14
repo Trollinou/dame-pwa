@@ -14,7 +14,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Sélecteur de mode de vue (Liste ☰ / Calendrier 📅) dans l'Agenda avec sauvegarde de la préférence dans `localStorage` (`dame_agenda_view_mode`).
 
 ### Modifié
+- **Fixation de la barre de bascule de vue Agenda** (`AgendaSegmentView.vue`) :
+  - Application du style `position: sticky; top: 0; z-index: 20;` sur le sélecteur Liste/Calendrier pour le maintenir toujours visible en haut de l'écran lors du défilement des événements ou du chargement de l'historique passé.
 - **Tri chronologique strict de l'agenda** (`pwa/src/stores/agenda.ts`, `AgendaSegmentView.vue`) :
+
   - Ajout d'une fonction `sortEvents` triant systématiquement tous les événements par date (`_dame_start_date`) et heure (`_dame_start_time`) lors des opérations de fusion (`fetchBatch`, `fetchAgenda`, `fetchMonthEvents`).
   - Garantie que la vue liste consécutive aux navigations dans le calendrier conserve un ordre chronologique parfait.
 - **Nettoyage et conformité ESLint** (`eslint.config.js`, composables, utils et tests) :
