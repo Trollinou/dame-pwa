@@ -7,6 +7,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Modifié
+- **Correction d'échelle et d'affichage mobile Android High-DPI (Samsung S24)** (`pwa/index.html`, `pwa/src/theme/variables.css`) :
+  - Remplacement du `meta viewport` restrictif (`maximum-scale=1.0, user-scalable=no`) par une configuration fluide standard (`width=device-width, initial-scale=1.0, viewport-fit=cover`) afin de rétablir le calcul correct des pixels virtuels CSS sur Android WebView / Chrome.
+  - Ajout des règles `-webkit-text-size-adjust: 100%; text-size-adjust: 100%;` pour bloquer l'auto-inflation sauvage du texte et garantir l'adaptabilité du composant `eg-chessboard`.
 - **Intégration locale du SDK `simple-jwt-login` v1.0.0** (`pwa/src/stores/auth.ts`) :
   - Ajout de `"simple-jwt-login": "file:../js-sdk"` en dépendance locale dans `package.json` (même pattern que `eg-chessboard`).
   - Remplacement de l'implémentation manuelle `callSdk()` (~120 lignes : `getSiteRootUrl`, `JWT_NAMESPACE`, `JWT_CONFIG`, `AbortController`, parsing manuel) par les méthodes typées du SDK : `jwtSdk.authenticate()`, `jwtSdk.validateToken()`, `jwtSdk.revokeToken()`, `jwtSdk.getValidJwt()`.
