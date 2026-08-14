@@ -11,6 +11,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Extraction et décodage du payload JSON retourné par le SDK `simple-jwt-login` lors d'erreurs HTTP 400 (`HTTP Error: 400 - {...}`) afin d'afficher des alertes claires et traduites (ex: "Identifiants incorrects.") en cas de mauvais identifiant ou mot de passe.
 - **Gestion des annulations de requêtes TanStack Query (`pwa/src/stores/agenda.ts`)** :
   - Silence des exceptions `CancelledError` lors de l'invalidation / purge légitime des requêtes de l'agenda pendant une connexion.
+- **Ouverture des cartes et applications d'itinéraire (`AgendaDetailPage.vue`, `ContactDetailPage.vue`)** :
+  - Remplacement de la liaison `:href` par un déclencheur explicite (`openMap()`) utilisant les schémas d'URL natifs (`maps://` sous iOS, `geo:` sous Android, Google Maps sous Web) avec inclusion du nom du lieu pour un guidage GPS fiable.
 - **Navigation & Annulation sur l'écran de connexion (`pwa/src/views/LoginPage.vue`)** :
   - Ajout du bouton flèche de retour standard dans le header (`ion-back-button`) avec redirection par défaut vers `/tabs/home`.
   - Ajout d'un bouton explicite "Annuler" sous le formulaire de connexion.

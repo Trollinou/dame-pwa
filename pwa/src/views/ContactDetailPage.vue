@@ -100,9 +100,8 @@
                   <ion-button 
                     slot="end" 
                     fill="clear" 
-                    :href="mapUrl" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                    @click="openMap"
+                    aria-label="Ouvrir l'adresse dans l'application de carte"
                   >
                     <ion-icon slot="icon-only" :icon="locationOutline"></ion-icon>
                   </ion-button>
@@ -177,26 +176,32 @@ const contact = computed(() => {
 });
 
 /**
- * Génère l'URL de la carte selon la plateforme
+ * Ouvre l'adresse dans l'application de navigation ou Google Maps
  */
-const mapUrl = computed(() => {
-  if (!contact.value || !contact.value.meta) return '#';
-  
+const openMap = () => {
+  if (!contact.value || !contact.value.meta) return;
+
   const m = contact.value.meta;
-  const fullAddress = `${m._dame_contact_address_1 || ''} ${m._dame_contact_postcode || ''} ${m._dame_contact_city || ''}`.trim();
-  
-  if (!fullAddress) return '#';
+  const addressParts = [
+    m._dame_contact_address_1,
+    m._dame_contact_address_2,
+    m._dame_contact_postcode,
+    m._dame_contact_city
+  ].filter(Boolean);
+
+  const fullAddress = addressParts.join(' ').trim();
+  if (!fullAddress) return;
 
   const encodedAddress = encodeURIComponent(fullAddress);
 
   if (isPlatform('ios')) {
-    return `http://maps.apple.com/?q=${encodedAddress}`;
+    window.open(`maps://maps.apple.com/?q=${encodedAddress}`, '_system');
   } else if (isPlatform('android')) {
-    return `geo:0,0?q=${encodedAddress}`;
+    window.open(`geo:0,0?q=${encodedAddress}`, '_system');
   } else {
-    return `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   }
-});
+};
 
 /**
  * Formate le genre pour l'affichage

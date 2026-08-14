@@ -79,9 +79,8 @@
                 <ion-button 
                   slot="end" 
                   fill="clear" 
-                  :href="mapUrl" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                  @click="openMap"
+                  aria-label="Ouvrir l'adresse dans l'application de carte"
                 >
                   <ion-icon slot="icon-only" :icon="locationOutline"></ion-icon>
                 </ion-button>
@@ -173,27 +172,34 @@ const event = computed(() => {
 });
 
 /**
- * Génère l'URL de la carte selon la plateforme (iOS, Android, Web)
+ * Ouvre l'adresse dans l'application de navigation ou Google Maps
  */
-const mapUrl = computed(() => {
-  if (!event.value) return '#';
-  
+const openMap = () => {
+  if (!event.value) return;
+
   const meta = event.value.meta;
-  const fullAddress = `${meta._dame_address || ''} ${meta._dame_postal_code || ''} ${meta._dame_city || ''}`.trim();
-  
-  if (!fullAddress) return '#';
+  // Construire l'adresse la plus complète possible
+  const addressParts = [
+    meta._dame_location_name,
+    meta._dame_address,
+    meta._dame_postal_code,
+    meta._dame_city
+  ].filter(Boolean);
+
+  const fullAddress = addressParts.join(' ').trim();
+  if (!fullAddress) return;
 
   const encodedAddress = encodeURIComponent(fullAddress);
 
   if (isPlatform('ios')) {
-    return `http://maps.apple.com/?q=${encodedAddress}`;
+    window.open(`maps://maps.apple.com/?q=${encodedAddress}`, '_system');
   } else if (isPlatform('android')) {
-    return `geo:0,0?q=${encodedAddress}`;
+    window.open(`geo:0,0?q=${encodedAddress}`, '_system');
   } else {
-    // Fallback Web / Desktop
-    return `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    // Navigateur web / PC
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   }
-});
+};
 
 /**
  * Analyse la description pour remplacer les shortcodes HelloAsso par des boutons
