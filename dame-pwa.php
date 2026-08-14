@@ -3,8 +3,14 @@
  * Plugin Name: DAME - PWA
  * Description: Interface Progressive Web App pour le gestionnaire d'adhérents et l'apprentissage.
  * Version: 1.0.0
- * Author: Étienne Gagnon
- * Text Domain: dame-pwa
+ * Requires at least: 7.0.1
+ * Requires PHP:      8.4
+ * Author:            Etienne Gagnon
+ * Text Domain:       dame-pwa
+ * Domain Path:       /languages
+ * Depends:           dame
+ *
+ * @package DAME_PWA
  */
 
 declare(strict_types=1);
@@ -21,22 +27,24 @@ define( 'DAME_PWA_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 /**
  * Autoloader SPL pour le namespace DAME_PWA\
  */
-spl_autoload_register( function ( string $class ): void {
-	$prefix   = 'DAME_PWA\\';
-	$base_dir = DAME_PWA_PLUGIN_DIR . 'includes/';
+spl_autoload_register(
+	function ( string $class_name ): void {
+		$prefix   = 'DAME_PWA\\';
+		$base_dir = DAME_PWA_PLUGIN_DIR . 'includes/';
 
-	$len = strlen( $prefix );
-	if ( 0 !== strncmp( $prefix, $class, $len ) ) {
-		return;
+		$len = strlen( $prefix );
+		if ( 0 !== strncmp( $prefix, $class_name, $len ) ) {
+				return;
+		}
+
+		$relative_class = substr( $class_name, $len );
+		$file           = $base_dir . str_replace( '\\', '/', $relative_class ) . '.php';
+
+		if ( file_exists( $file ) ) {
+			require_once $file;
+		}
 	}
-
-	$relative_class = substr( $class, $len );
-	$file           = $base_dir . str_replace( '\\', '/', $relative_class ) . '.php';
-
-	if ( file_exists( $file ) ) {
-		require_once $file;
-	}
-} );
+);
 
 // Inclusion de Composer si disponible
 if ( file_exists( DAME_PWA_PLUGIN_DIR . 'vendor/autoload.php' ) ) {

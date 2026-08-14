@@ -27,6 +27,7 @@
     "chessops": "^0.15.1",
     "dompurify": "^3.4.13",
     "eg-chessboard": "file:../eg-chessboard",
+    "simple-jwt-login": "file:../js-sdk",
     "ionicons": "^8.1.0",
     "pinia": "^4.0.2",
     "pinia-plugin-persistedstate": "^4.7.1",

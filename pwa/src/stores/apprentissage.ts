@@ -68,6 +68,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 			'parcours',
 			authStore.selectedIdentity?.id || 'default',
 		] ),
+		enabled: computed( () => authStore.isAuthenticated ),
 		queryFn: async () => {
 			const apiUrl = import.meta.env.VITE_API_BASE_URL;
 			const response = await safeFetch(
@@ -92,6 +93,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 			'progression',
 			authStore.selectedIdentity?.id || 'default',
 		] ),
+		enabled: computed( () => authStore.isAuthenticated ),
 		queryFn: async () => {
 			const apiUrl = import.meta.env.VITE_API_BASE_URL;
 			const response = await safeFetch(
