@@ -23,6 +23,20 @@
         </ion-segment>
       </ion-toolbar>
 
+      <!-- Sous-barre Mode de vue Agenda (Liste / Calendrier) -->
+      <ion-toolbar v-if="selectedSegment === 'agenda'">
+        <ion-segment :value="agendaViewMode" @ionChange="changeAgendaViewMode($event.detail.value as 'list' | 'calendar')">
+          <ion-segment-button value="list" layout="icon-start">
+            <ion-icon :icon="listOutline"></ion-icon>
+            <ion-label>Liste</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="calendar" layout="icon-start">
+            <ion-icon :icon="calendarOutline"></ion-icon>
+            <ion-label>Calendrier</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-toolbar>
+
       <ion-toolbar>
         <ion-searchbar
           v-model="searchQuery"
@@ -50,6 +64,7 @@
         <!-- ONGLET 1 : AGENDA -->
         <AgendaSegmentView
           v-else-if="selectedSegment === 'agenda'"
+          :view-mode="agendaViewMode"
           :search-query="searchQuery"
           :events="events"
           :is-loading="isLoading"
@@ -60,6 +75,7 @@
           @load-more-past="loadMorePast"
           @load-more-upcoming="loadMoreUpcoming"
         />
+
 
         <!-- ONGLET 2 : TOURNOIS -->
         <TournoisSegmentView
@@ -94,9 +110,12 @@ import {
   IonSegment,
   IonSegmentButton,
   IonLabel,
+  IonIcon,
   onIonViewWillEnter
 } from '@ionic/vue';
+import { listOutline, calendarOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
+
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
 import { useTournamentStore } from '@/stores/tournament';
 import { useBenevolatStore, type Benevolat } from '@/stores/benevolat';
@@ -123,6 +142,19 @@ const { selectedSegment, searchQuery, pageTitle, searchPlaceholder, onSegmentCha
 const contentRef = ref();
 const todayStr = agendaStore.getTodayLocal();
 const tournamentError = ref<string | null>(null);
+
+// Persistance du mode de vue Agenda dans localStorage (Défaut: 'calendar')
+const STORAGE_KEY = 'dame_agenda_view_mode';
+const savedMode = (localStorage.getItem(STORAGE_KEY) as 'list' | 'calendar') || 'calendar';
+const agendaViewMode = ref<'list' | 'calendar'>(savedMode);
+
+const changeAgendaViewMode = (mode: 'list' | 'calendar') => {
+  if (mode) {
+    agendaViewMode.value = mode;
+    localStorage.setItem(STORAGE_KEY, mode);
+  }
+};
+
 
 const goToDetail = (id: number) => {
   router.push('/agenda/' + id);

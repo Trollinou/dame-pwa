@@ -1,20 +1,5 @@
 <template>
   <div>
-    <!-- Barre de bascule du mode de vue (Liste vs Calendrier) -->
-    <div class="agenda-view-mode-toggle">
-      <ion-segment :value="viewMode" @ionChange="changeViewMode($event.detail.value as 'list' | 'calendar')">
-        <ion-segment-button value="list" layout="icon-start">
-          <ion-icon :icon="listOutline"></ion-icon>
-          <ion-label>Liste</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="calendar" layout="icon-start">
-          <ion-icon :icon="calendarOutline"></ion-icon>
-          <ion-label>Calendrier</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </div>
-
-
     <!-- Mode 1 : Vue Calendrier (Style iOS) -->
     <AgendaCalendarView
       v-if="viewMode === 'calendar'"
@@ -23,7 +8,6 @@
       :search-query="searchQuery"
       @go-to-detail="$emit('go-to-detail', $event)"
     />
-
 
     <!-- Mode 2 : Vue Liste infinie -->
     <div v-else>
@@ -95,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import {
   IonSpinner,
   IonList,
@@ -104,16 +88,13 @@ import {
   IonBadge,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonSegment,
-  IonSegmentButton,
-  IonIcon
 } from '@ionic/vue';
-import { listOutline, calendarOutline } from 'ionicons/icons';
 import type { AgendaEvent } from '@/stores/agenda';
 import { removeAccents } from '@/utils/stringUtils';
 import AgendaCalendarView from './AgendaCalendarView.vue';
 
 const props = defineProps<{
+  viewMode: 'list' | 'calendar';
   searchQuery: string;
   events: AgendaEvent[];
   isLoading: boolean;
@@ -128,17 +109,6 @@ defineEmits<{
   (e: 'load-more-upcoming', event: any): void;
 }>();
 
-// Persistance du mode de vue dans localStorage (Défaut: 'calendar')
-const STORAGE_KEY = 'dame_agenda_view_mode';
-const savedMode = (localStorage.getItem(STORAGE_KEY) as 'list' | 'calendar') || 'calendar';
-const viewMode = ref<'list' | 'calendar'>(savedMode);
-
-const changeViewMode = (mode: 'list' | 'calendar') => {
-  if (mode) {
-    viewMode.value = mode;
-    localStorage.setItem(STORAGE_KEY, mode);
-  }
-};
 
 const filteredEvents = computed(() => {
   let list = props.events;
@@ -209,20 +179,8 @@ const formatEventDate = (event: AgendaEvent): string => {
 </script>
 
 <style scoped>
-.agenda-view-mode-toggle {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background-color: var(--ion-background-color, #ffffff);
-  margin-top: -16px;
-  margin-left: -16px;
-  margin-right: -16px;
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--ion-color-light-shade, #e0e0e0);
-}
-
-
 ion-list { margin-top: 8px; }
+
 h2 { font-weight: bold; }
 p { color: var(--ion-color-medium); }
 .past-event { opacity: 0.6; }
