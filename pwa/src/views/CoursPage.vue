@@ -3,11 +3,11 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/tabs/apprentissage"></ion-back-button>
+          <ion-back-button default-href="/apprentissage/cours"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ decodeHtmlEntities(cours?.titre) || 'Cours' }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button router-link="/tabs/apprentissage" router-direction="back">
+          <ion-button router-link="/apprentissage/cours" router-direction="back">
             <ion-icon slot="icon-only" :icon="homeOutline"></ion-icon>
           </ion-button>
         </ion-buttons>

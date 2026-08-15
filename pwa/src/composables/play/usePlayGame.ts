@@ -18,23 +18,19 @@ export function usePlayGame() {
 	const oupsCount = ref( 0 );
 	const helpCount = ref( 0 );
 	const lastSuggestedMove = ref( '' );
-	const showMaterialIndicator = ref( true );
 
 	const gameStatus = reactive( {
 		message: '',
 		color: 'medium',
 	} );
 
+	const savedLevel = localStorage.getItem( 'dame_pwa_play_elo' );
+	const initialLevel = savedLevel ? parseInt( savedLevel, 10 ) : 1320;
+
 	const gameSettings = reactive( {
+		gameMode: '1player' as '1player' | '2players',
 		playerColor: 'white' as 'white' | 'black' | 'random',
-		clockPreset: 'none' as
-			| 'none'
-			| '1+0'
-			| '3+2'
-			| '5+0'
-			| '10+5'
-			| '15+10',
-		level: 1320,
+		level: isNaN( initialLevel ) ? 1320 : initialLevel,
 	} );
 
 	const boardConfig = reactive( {
@@ -85,7 +81,7 @@ export function usePlayGame() {
 				boardConfig.orientation,
 				gameSettings.level
 			);
-			router.push( '/tabs/analysis' );
+			router.push( '/analysis' );
 		}
 	};
 
@@ -156,7 +152,7 @@ export function usePlayGame() {
 
 	const handleGameOver = (
 		type: 'checkmate' | 'stalemate' | 'draw',
-		timerSeconds: number
+		timerSeconds: number = 0
 	) => {
 		if ( boardConfig.viewOnly ) {
 			return;
@@ -166,7 +162,9 @@ export function usePlayGame() {
 		gameStatus.message = `${ symbol } ${ getGameOverReason( boardApi ) }`;
 		gameStatus.color = isDraw ? 'medium' : 'danger';
 		boardConfig.viewOnly = true;
-		chessStore.saveCompletedGame( timerSeconds );
+		if ( gameSettings.gameMode === '1player' ) {
+			chessStore.saveCompletedGame( timerSeconds );
+		}
 	};
 
 	return {
@@ -179,7 +177,6 @@ export function usePlayGame() {
 		oupsCount,
 		helpCount,
 		lastSuggestedMove,
-		showMaterialIndicator,
 		gameStatus,
 		gameSettings,
 		boardConfig,

@@ -45,7 +45,6 @@ const routes: Array< RouteRecordRaw > = [
 			{
 				path: 'apprentissage',
 				component: () => import( '../views/ApprentissageHubPage.vue' ),
-				meta: { requiresAuth: true, requiresApprentissageAccess: true },
 			},
 			{
 				path: 'profil',
@@ -151,6 +150,22 @@ const routes: Array< RouteRecordRaw > = [
 		path: '/select-person',
 		component: () => import( '../views/SelectPersonPage.vue' ),
 		meta: { requiresAuth: true },
+	},
+	{
+		path: '/play',
+		name: 'Play',
+		component: () => import( '../views/PlayPage.vue' ),
+	},
+	{
+		path: '/analysis',
+		name: 'Analysis',
+		component: () => import( '../views/AnalysisPage.vue' ),
+	},
+	{
+		path: '/apprentissage/cours',
+		name: 'ApprentissageCoursList',
+		component: () => import( '../views/ApprentissageCoursListPage.vue' ),
+		meta: { requiresAuth: true, requiresApprentissageAccess: true },
 	},
 	{
 		path: '/contenu/:id',

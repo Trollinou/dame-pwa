@@ -2,7 +2,6 @@ import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 // https://vitejs.dev/config/
 export default defineConfig( {
@@ -14,18 +13,6 @@ export default defineConfig( {
 					isCustomElement: ( tag ) => tag.startsWith( 'cg-' ),
 				},
 			},
-		} ),
-		viteStaticCopy( {
-			targets: [
-				{
-					src: '../node_modules/eg-chessboard/dist/stockfish.js',
-					dest: 'stockfish',
-				},
-				{
-					src: '../node_modules/eg-chessboard/dist/stockfish.wasm',
-					dest: 'stockfish',
-				},
-			],
 		} ),
 		VitePWA( {
 			registerType: 'autoUpdate',

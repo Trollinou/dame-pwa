@@ -4,6 +4,35 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-08-15
+
+### Ajouté
+- **Hub Apprentissage & Pratique (`ApprentissageHubPage.vue`)** :
+  - Accueil à deux panneaux séparant l'accès aux cours théoriques et l'accès à l'échiquier de jeu.
+  - Ruban diagonal **"En dev"** sur le panneau des cours théoriques avec accès réservé aux profils autorisés (administrateurs, entraîneurs) pendant la phase de conception.
+- **Intégration du moteur Stockfish 18 WebAssembly** :
+  - Déploiement des binaires `stockfish.js` et `stockfish.wasm` dans `pwa/public/stockfish/`.
+  - Configuration du type MIME `application/wasm` via `.htaccess` et secours PHP dans `Plugin.php`.
+  - Gestion du temps de réflexion dynamique de l'IA calculé selon le niveau Elo (`Elo * 1.4 ms`).
+  - Mémorisation locale (`localStorage`) du niveau d'Elo choisi pour les prochaines sessions.
+- **Vue d'analyse de partie (`AnalysisPage.vue`)** :
+  - Enregistrement de la route `/analysis` et reconnexion au bouton "Analyser" de la barre d'actions.
+  - Revue coup par coup, tableau structuré des coups joués et navigation (`Premier`, `Précédent`, `Suivant`, `Dernier`).
+
+### Modifié & Harmonisé
+- **Refonte et harmonisation visuelle de l'Espace de Jeu (`PlayPage.vue`, `PlayInfoBar.vue`, `PlayActionsPanel.vue`)** :
+  - Épuration complète de l'échiquier : suppression des barres superflues ("Adversaire" / "Toi"), du matériel et des pendules / chronomètres.
+  - En-tête blanc/neutre iOS standard avec bouton `< Back` bleu.
+  - Carte d'information méta style "Exercice" avec typographie soignée et badge d'Elo.
+  - Marges latérales et espacements aérés calés sur le standard de l'application (`max-width: 600px`, `class="ion-padding"`).
+  - Barre d'actions avec boutons épurés `outline`, icônes modernes et badges de compteurs discrets.
+- **Harmonisation visuelle de l'Analyse (`AnalysisPage.vue`)** :
+  - En-tête blanc/neutre iOS standard, carte méta récapitulative du nombre de coups, échiquier aéré avec coins arrondis et ombre douce.
+
+### Corrigé
+- **Gestion de fin de partie et échec et mat (`PlayPage.vue`)** :
+  - Correction du déclenchement prématuré de `undoLastMove()` lors de la détection du mat, garantissant que la pièce victorieuse reste sur sa case finale.
+
 ## [1.0.1] - 2026-08-14
 
 ### Corrigé

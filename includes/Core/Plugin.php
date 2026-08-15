@@ -52,6 +52,9 @@ class Plugin {
 		// Intercepte les requêtes pour servir la PWA ou le manifest
 		add_action( 'template_redirect', array( $this, 'handle_pwa_routing' ) );
 
+		// Assure que les fichiers .wasm sont servis avec le bon Content-Type si interceptés
+		add_action( 'init', array( $this, 'handle_wasm_mime_type' ) );
+
 		// Injecte la balise du manifest dans le <head> de WordPress
 		add_action( 'wp_head', array( $this, 'inject_pwa_manifest_link' ) );
 
@@ -139,6 +142,29 @@ class Plugin {
 			)
 		);
 		exit;
+	}
+
+	/**
+	 * Ensures .wasm static files are served with the proper Content-Type application/wasm
+	 * if requested through WordPress URL rewrites.
+	 */
+	public function handle_wasm_mime_type(): void {
+		$raw_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$path    = (string) wp_parse_url( $raw_uri, PHP_URL_PATH );
+
+		if ( str_ends_with( $path, 'stockfish.wasm' ) ) {
+			$file_path = \DAME_PWA_PLUGIN_DIR . 'pwa/dist/stockfish/stockfish.wasm';
+			if ( file_exists( $file_path ) ) {
+				if ( ob_get_length() ) {
+					ob_clean();
+				}
+				header( 'Content-Type: application/wasm' );
+				header( 'Content-Length: ' . filesize( $file_path ) );
+				header( 'Cache-Control: public, max-age=2592000' );
+				readfile( $file_path );
+				exit;
+			}
+		}
 	}
 
 	/**

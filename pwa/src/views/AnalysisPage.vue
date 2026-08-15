@@ -1,17 +1,33 @@
 <template>
   <ion-page>
     <ion-header :translucent="true">
-      <ion-toolbar color="tertiary">
+      <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/tabs/play"></ion-back-button>
+          <ion-back-button default-href="/play"></ion-back-button>
         </ion-buttons>
         <ion-title>Analyse de la partie</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true" :scroll-y="false">
-      <div class="analysis-layout safe-area-wrapper ion-padding-horizontal">
-        
+    <ion-content :fullscreen="true" :scroll-y="false" class="ion-padding">
+      <div class="analysis-layout safe-area-wrapper">
+        <!-- Carte d'information méta -->
+        <div class="analysis-meta-card" v-if="isReady">
+          <div class="meta-main">
+            <div class="meta-left">
+              <h2 class="player-title">Revue de partie</h2>
+              <p class="game-type-subtitle">
+                Historique coup par coup // {{ historyMoves.length }} tours joués
+              </p>
+            </div>
+            <div class="meta-right">
+              <span class="ply-badge">
+                Coup {{ currentPly }} / {{ totalPlyCount }}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div class="main-container" :class="{ 'landscape-mode': isLandscape }">
           <div class="board-section">
             <div class="board-container">
@@ -19,7 +35,6 @@
               <TheChessboard 
                 v-if="isReady"
                 :key="`board-${isLandscape ? 'l' : 'p'}-${renderKey}`"
-                fit-container
                 :board-config="boardConfig" 
                 @board-created="handleBoardCreated"
                 @move="handleMove"
@@ -176,6 +191,12 @@ const updateMoveHistory = () => {
   historyMoves.value = moves;
 };
 
+const totalPlyCount = computed(() => {
+  if (!boardApi) return 0;
+  const rawHistory = boardApi.getHistory();
+  return rawHistory ? rawHistory.length : 0;
+});
+
 /**
  * Nombre de colonnes (tours) par ligne
  */
@@ -288,8 +309,8 @@ onIonViewWillLeave(() => {
 
 <style scoped>
 .safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .analysis-layout {
@@ -298,7 +319,59 @@ onIonViewWillLeave(() => {
   height: 100%;
   justify-content: flex-start;
   overflow: hidden;
-  padding-bottom: 10px; /* Ajoute un léger espace au-dessus de la barre d'onglets */
+  padding-bottom: 10px;
+}
+
+/* --- Carte d'information méta --- */
+.analysis-meta-card {
+  background: var(--ion-card-background, #ffffff);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ion-color-step-100, #e9ecef);
+}
+
+.meta-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ion-text-color, #111827);
+  letter-spacing: -0.2px;
+}
+
+.game-type-subtitle {
+  font-size: 0.78rem;
+  color: var(--ion-color-primary, #3880ff);
+  font-weight: 600;
+  margin: 2px 0 0 0;
+}
+
+.meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ply-badge {
+  background: var(--ion-color-tertiary, #7044ff);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
 }
 
 .main-container {
@@ -314,31 +387,40 @@ onIonViewWillLeave(() => {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 30px;
-  max-width: none;
+  gap: 20px;
+  max-width: 100%;
 }
 
 .board-section {
-  display: block; /* Stabilité des clics en mode portrait */
+  display: block;
   width: 100%;
+  padding: 6px 0 10px 0;
 }
 
 .landscape-mode .board-section {
   flex: 0 0 auto;
+  width: auto;
+  padding: 0;
 }
 
 .board-container {
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto; /* Centrage horizontal natif */
+  max-width: 100%;
+  margin: 0 auto;
   flex-shrink: 0;
   position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Agrandissement adaptatif tablettes Portrait (évite tout tronquage/débordement vertical) */
 @media (min-width: 768px) and (orientation: portrait) {
   .board-container {
-    max-width: min(720px, 60vh);
+    max-width: min(680px, 58vh);
+  }
+
+  .board-section {
+    padding: 14px 0;
   }
 }
 
