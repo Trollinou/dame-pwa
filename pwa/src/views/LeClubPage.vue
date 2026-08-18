@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick, watch, defineAsyncComponent } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -119,10 +119,10 @@ import { useAuthStore } from '@/stores/auth';
 import { useNewsStore } from '@/stores/news';
 import { storeToRefs } from 'pinia';
 import { useAgendaSearch } from '@/composables/agenda/useAgendaSearch';
-import ActualitesSegmentView from '@/components/agenda/ActualitesSegmentView.vue';
-import AgendaSegmentView from '@/components/agenda/AgendaSegmentView.vue';
-import TournoisSegmentView from '@/components/agenda/TournoisSegmentView.vue';
-import BenevolatSegmentView from '@/components/agenda/BenevolatSegmentView.vue';
+const ActualitesSegmentView = defineAsyncComponent(() => import('@/components/agenda/ActualitesSegmentView.vue'));
+const AgendaSegmentView = defineAsyncComponent(() => import('@/components/agenda/AgendaSegmentView.vue'));
+const TournoisSegmentView = defineAsyncComponent(() => import('@/components/agenda/TournoisSegmentView.vue'));
+const BenevolatSegmentView = defineAsyncComponent(() => import('@/components/agenda/BenevolatSegmentView.vue'));
 
 const router = useRouter();
 const route = useRoute();
