@@ -4,7 +4,7 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.3] - 2026-08-18
 
 ### Ajouté & Amélioré
 - **Synchronisation réactive du tour de jeu (`PlayPage.vue`, `usePlayGame.ts`)** :
