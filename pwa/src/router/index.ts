@@ -1,15 +1,6 @@
 import { createRouter, createWebHashHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue';
-import LoginPage from '../views/LoginPage.vue';
-import MembersPage from '../views/MembersPage.vue';
-import ContactsPage from '../views/ContactsPage.vue';
-import LeClubPage from '../views/LeClubPage.vue';
-import BenevolatPage from '../views/BenevolatPage.vue';
-import MessagesPage from '../views/MessagesPage.vue';
-import AdminLayout from '../views/AdminLayout.vue';
-const TournamentPage = () => import( '../views/TournamentPage.vue' );
-const GenericPage = () => import( '../views/GenericPage.vue' );
 import { useAuthStore } from '@/stores/auth';
 
 const routes: Array< RouteRecordRaw > = [
@@ -19,7 +10,7 @@ const routes: Array< RouteRecordRaw > = [
 	},
 	{
 		path: '/login',
-		component: LoginPage,
+		component: () => import( '../views/LoginPage.vue' ),
 	},
 	{
 		path: '/tabs/login',
@@ -40,7 +31,7 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'agenda',
-				component: LeClubPage,
+				component: () => import( '../views/LeClubPage.vue' ),
 			},
 			{
 				path: 'apprentissage',
@@ -56,7 +47,7 @@ const routes: Array< RouteRecordRaw > = [
 	// Nouveau groupe de routes d'administration protégé avec un layout dédié
 	{
 		path: '/admin',
-		component: AdminLayout,
+		component: () => import( '../views/AdminLayout.vue' ),
 		meta: { requiresAuth: true, requiresAdmin: true },
 		children: [
 			{
@@ -69,7 +60,7 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'members',
-				component: MembersPage,
+				component: () => import( '../views/MembersPage.vue' ),
 			},
 			{
 				path: 'members/:id',
@@ -78,7 +69,7 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'contact',
-				component: ContactsPage,
+				component: () => import( '../views/ContactsPage.vue' ),
 			},
 			{
 				path: 'contact/:id',
@@ -87,7 +78,7 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'message',
-				component: MessagesPage,
+				component: () => import( '../views/MessagesPage.vue' ),
 			},
 			{
 				path: 'message/:id',
@@ -96,7 +87,7 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'benevolat',
-				component: BenevolatPage,
+				component: () => import( '../views/BenevolatPage.vue' ),
 			},
 			{
 				path: 'benevolat/:id',
@@ -122,11 +113,11 @@ const routes: Array< RouteRecordRaw > = [
 	},
 	{
 		path: '/tournoi',
-		component: TournamentPage,
+		component: () => import( '../views/TournamentPage.vue' ),
 	},
 	{
 		path: '/benevolat',
-		component: BenevolatPage,
+		component: () => import( '../views/BenevolatPage.vue' ),
 	},
 	{
 		path: '/benevolat/participation/:id',
@@ -137,7 +128,7 @@ const routes: Array< RouteRecordRaw > = [
 	{
 		path: '/page/:id',
 		name: 'GenericPage',
-		component: GenericPage,
+		component: () => import( '../views/GenericPage.vue' ),
 	},
 	{
 		path: '/register',
