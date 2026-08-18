@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Optimisé
+- **Lazy loading complet du routeur & Code Splitting (`pwa/src/router/index.ts`)** :
+  - Remplacement de tous les imports statiques de vues (`TabsPage`, `LoginPage`, `MembersPage`, `ContactsPage`, `LeClubPage`, `BenevolatPage`, `MessagesPage`, `AdminLayout`) par des imports dynamiques asynchrones (`() => import(...)`).
+  - Réduction de la taille du chunk initial `index-[hash].js` pour les visiteurs et adhérents non-administrateurs, avec mise en cache partagée du composant réutilisable `BenevolatPage` entre les routes publiques et d'administration.
+
 ### Corrigé
 - **Optimisation du stockage local & Suppression de la double persistance (`pwa/src/stores/agenda.ts`)** :
   - Suppression de l'option `persist: true` du store Pinia Agenda afin d'éviter la duplication du tableau des événements dans le `localStorage`. La persistance hors-ligne reste intégralement gérée par TanStack Query (`queryClient.ts` / `DAME_QUERY_CACHE`), éliminant les risques d'engorgement du quota `localStorage` (5-10 Mo) et les blocages au démarrage.

@@ -1,16 +1,17 @@
 import { createRouter, createWebHashHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import TabsPage from '../views/TabsPage.vue';
-import LoginPage from '../views/LoginPage.vue';
-import MembersPage from '../views/MembersPage.vue';
-import ContactsPage from '../views/ContactsPage.vue';
-import LeClubPage from '../views/LeClubPage.vue';
-import BenevolatPage from '../views/BenevolatPage.vue';
-import MessagesPage from '../views/MessagesPage.vue';
-import AdminLayout from '../views/AdminLayout.vue';
+import { useAuthStore } from '@/stores/auth';
+
+const TabsPage = () => import( '../views/TabsPage.vue' );
+const LoginPage = () => import( '../views/LoginPage.vue' );
+const MembersPage = () => import( '../views/MembersPage.vue' );
+const ContactsPage = () => import( '../views/ContactsPage.vue' );
+const LeClubPage = () => import( '../views/LeClubPage.vue' );
+const BenevolatPage = () => import( '../views/BenevolatPage.vue' );
+const MessagesPage = () => import( '../views/MessagesPage.vue' );
+const AdminLayout = () => import( '../views/AdminLayout.vue' );
 const TournamentPage = () => import( '../views/TournamentPage.vue' );
 const GenericPage = () => import( '../views/GenericPage.vue' );
-import { useAuthStore } from '@/stores/auth';
 
 const routes: Array< RouteRecordRaw > = [
 	{
