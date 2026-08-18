@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Ajouté & Amélioré
+- **Synchronisation réactive du tour de jeu (`PlayPage.vue`, `usePlayGame.ts`)** :
+  - Intégration d'`eg-chessboard` v1.5.0 avec écoute de l'événement natif `@turn-change` pour actualiser instantanément l'indicateur et le message du tour (*"C'est au tour des Blancs / Noirs"*).
+  - Introduction d'une référence réactive `turnColor` dans le composable `usePlayGame` mise à jour sur chaque action (coup, annulation, reset).
+- **Mise en cache & Lazy Loading des sous-vues du club (`LeClubPage.vue`)** :
+  - Chargement asynchrone (`defineAsyncComponent`) des composants d'onglets (`ActualitesSegmentView`, `AgendaSegmentView`, `TournoisSegmentView`, `BenevolatSegmentView`).
+  - Préservation de l'état des segments avec `<KeepAlive>` lors de la navigation entre onglets.
+
 ### Optimisé
 - **Lazy loading complet du routeur & Code Splitting (`pwa/src/router/index.ts`)** :
   - Remplacement de tous les imports statiques de vues (`TabsPage`, `LoginPage`, `MembersPage`, `ContactsPage`, `LeClubPage`, `BenevolatPage`, `MessagesPage`, `AdminLayout`) par des imports dynamiques asynchrones (`() => import(...)`).

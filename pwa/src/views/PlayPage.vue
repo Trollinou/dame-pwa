@@ -30,6 +30,7 @@
                 :stockfish-config="stockfishConfig"
                 @board-created="handleBoardCreated"
                 @move="handleMove"
+                @turn-change="(turn, ply) => { turnColor = turn; currentPly = ply; }"
                 @check="handleCheck"
                 @checkmate="() => handleGameOver('checkmate')"
                 @stalemate="() => handleGameOver('stalemate')"
@@ -45,7 +46,7 @@
             :is-landscape="isLandscape"
             :game-status-message="gameStatus.message"
             :game-status-color="gameStatus.color"
-            :turn-color="getTurnColor()"
+            :turn-color="turnColor"
             :is-hint-enabled="isHintEnabled"
             :help-count="helpCount"
             :oups-count="oupsCount"
@@ -108,6 +109,8 @@ const {
   engineLoaded,
   showSettings,
   isHintEnabled,
+  currentPly,
+  turnColor,
   oupsCount,
   helpCount,
   lastSuggestedMove,
@@ -164,11 +167,6 @@ const stockfishConfig = computed<StockfishConfig>(() => {
     wasmUrl: getWasmUrl(),
   };
 });
-
-const getTurnColor = (): 'white' | 'black' => {
-  const api = getBoardApi();
-  return api ? api.getTurnColor() : 'white';
-};
 
 const handleBoardCreated = (api: any) => {
   setBoardApi(api);

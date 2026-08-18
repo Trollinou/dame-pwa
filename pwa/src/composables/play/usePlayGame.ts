@@ -18,6 +18,7 @@ export function usePlayGame() {
 	const oupsCount = ref( 0 );
 	const helpCount = ref( 0 );
 	const lastSuggestedMove = ref( '' );
+	const turnColor = ref< 'white' | 'black' >( 'white' );
 
 	const gameStatus = reactive( {
 		message: '',
@@ -88,6 +89,7 @@ export function usePlayGame() {
 	const refreshDisplay = () => {
 		if ( boardApi ) {
 			currentPly.value = boardApi.getCurrentPlyNumber();
+			turnColor.value = boardApi.getTurnColor();
 		}
 	};
 
@@ -174,6 +176,7 @@ export function usePlayGame() {
 		showSettings,
 		isHintEnabled,
 		currentPly,
+		turnColor,
 		oupsCount,
 		helpCount,
 		lastSuggestedMove,

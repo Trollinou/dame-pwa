@@ -49,53 +49,53 @@
 
     <ion-content :fullscreen="true" ref="contentRef" class="ion-padding">
       <div class="safe-area-wrapper">
-        <!-- ONGLET 0 : ACTUALITES -->
+        <KeepAlive>
+          <!-- ONGLET 0 : ACTUALITES -->
+          <ActualitesSegmentView
+            v-if="selectedSegment === 'actualites'"
+            :search-query="searchQuery"
+            @go-to-news-detail="goToNewsDetail"
+          />
 
-        <ActualitesSegmentView
-          v-if="selectedSegment === 'actualites'"
-          :search-query="searchQuery"
-          @go-to-news-detail="goToNewsDetail"
-        />
+          <!-- ONGLET 1 : AGENDA -->
+          <AgendaSegmentView
+            v-else-if="selectedSegment === 'agenda'"
+            :view-mode="agendaViewMode"
+            :search-query="searchQuery"
+            :events="events"
+            :is-loading="isLoading"
+            :has-more-past="hasMorePast"
+            :has-more-upcoming="hasMoreUpcoming"
+            :today-str="todayStr"
+            @go-to-detail="goToDetail"
+            @load-more-past="loadMorePast"
+            @load-more-upcoming="loadMoreUpcoming"
+          />
 
-        <!-- ONGLET 1 : AGENDA -->
-        <AgendaSegmentView
-          v-else-if="selectedSegment === 'agenda'"
-          :view-mode="agendaViewMode"
-          :search-query="searchQuery"
-          :events="events"
-          :is-loading="isLoading"
-          :has-more-past="hasMorePast"
-          :has-more-upcoming="hasMoreUpcoming"
-          :today-str="todayStr"
-          @go-to-detail="goToDetail"
-          @load-more-past="loadMorePast"
-          @load-more-upcoming="loadMoreUpcoming"
-        />
+          <!-- ONGLET 2 : TOURNOIS -->
+          <TournoisSegmentView
+            v-else-if="selectedSegment === 'tournois'"
+            :search-query="searchQuery"
+            :tournament-error="tournamentError"
+            @go-to-tournament-detail="goToTournamentDetail"
+            @retry="fetchTournaments"
+          />
 
-
-        <!-- ONGLET 2 : TOURNOIS -->
-        <TournoisSegmentView
-          v-else-if="selectedSegment === 'tournois'"
-          :search-query="searchQuery"
-          :tournament-error="tournamentError"
-          @go-to-tournament-detail="goToTournamentDetail"
-          @retry="fetchTournaments"
-        />
-
-        <!-- ONGLET 3 : BENEVOLAT -->
-        <BenevolatSegmentView
-          v-else-if="selectedSegment === 'benevolat'"
-          :search-query="searchQuery"
-          :today-str="todayStr"
-          @view-benevolat="viewBenevolat"
-        />
+          <!-- ONGLET 3 : BENEVOLAT -->
+          <BenevolatSegmentView
+            v-else-if="selectedSegment === 'benevolat'"
+            :search-query="searchQuery"
+            :today-str="todayStr"
+            @view-benevolat="viewBenevolat"
+          />
+        </KeepAlive>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick, watch, defineAsyncComponent } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -119,10 +119,11 @@ import { useAuthStore } from '@/stores/auth';
 import { useNewsStore } from '@/stores/news';
 import { storeToRefs } from 'pinia';
 import { useAgendaSearch } from '@/composables/agenda/useAgendaSearch';
-import ActualitesSegmentView from '@/components/agenda/ActualitesSegmentView.vue';
-import AgendaSegmentView from '@/components/agenda/AgendaSegmentView.vue';
-import TournoisSegmentView from '@/components/agenda/TournoisSegmentView.vue';
-import BenevolatSegmentView from '@/components/agenda/BenevolatSegmentView.vue';
+
+const ActualitesSegmentView = defineAsyncComponent(() => import('@/components/agenda/ActualitesSegmentView.vue'));
+const AgendaSegmentView = defineAsyncComponent(() => import('@/components/agenda/AgendaSegmentView.vue'));
+const TournoisSegmentView = defineAsyncComponent(() => import('@/components/agenda/TournoisSegmentView.vue'));
+const BenevolatSegmentView = defineAsyncComponent(() => import('@/components/agenda/BenevolatSegmentView.vue'));
 
 const router = useRouter();
 const route = useRoute();
