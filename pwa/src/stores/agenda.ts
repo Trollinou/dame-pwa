@@ -398,8 +398,4 @@ export const useAgendaStore = defineStore(
 			clearData,
 		};
 	},
-
-	{
-		persist: true,
-	}
 );
