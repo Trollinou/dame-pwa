@@ -397,9 +397,5 @@ export const useAgendaStore = defineStore(
 			fetchMonthEvents,
 			clearData,
 		};
-	},
-
-	{
-		persist: true,
 	}
 );

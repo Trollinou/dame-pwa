@@ -4,6 +4,12 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Corrigé
+- **Optimisation du stockage local & Suppression de la double persistance (`pwa/src/stores/agenda.ts`)** :
+  - Suppression de l'option `persist: true` du store Pinia Agenda afin d'éviter la duplication du tableau des événements dans le `localStorage`. La persistance hors-ligne reste intégralement gérée par TanStack Query (`queryClient.ts` / `DAME_QUERY_CACHE`), éliminant les risques d'engorgement du quota `localStorage` (5-10 Mo) et les blocages au démarrage.
+
 ## [1.0.2] - 2026-08-15
 
 ### Ajouté
