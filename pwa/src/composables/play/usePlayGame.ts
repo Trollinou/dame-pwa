@@ -1,5 +1,6 @@
 import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import type { BoardCore } from 'eg-chessboard';
 import { useChessStore } from '@/stores/chess';
 import {
 	undoMove as apiUndoMove,
@@ -10,7 +11,7 @@ export function usePlayGame() {
 	const chessStore = useChessStore();
 	const router = useRouter();
 
-	let boardApi: any = null;
+	let boardApi: BoardCore | null = null;
 	const engineLoaded = ref( false );
 	const showSettings = ref( false );
 	const isHintEnabled = ref( false );
@@ -93,7 +94,7 @@ export function usePlayGame() {
 		}
 	};
 
-	const setBoardApi = ( api: any ) => {
+	const setBoardApi = ( api: BoardCore ) => {
 		boardApi = api;
 		if ( chessStore.currentPgn ) {
 			boardApi.loadPgn( chessStore.currentPgn );
@@ -120,7 +121,7 @@ export function usePlayGame() {
 		oupsCount.value++;
 		boardApi.hideMoves();
 
-		apiUndoMove( boardApi, true, boardConfig.orientation );
+		apiUndoMove( boardApi, true );
 		boardConfig.viewOnly = false;
 		if ( boardApi.getIsCheck() ) {
 			const checkColor = boardApi.getInCheckColor();

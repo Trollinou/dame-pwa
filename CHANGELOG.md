@@ -4,6 +4,13 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Amélioré
+- **Centralisation de `playerColor` via l'état `BoardCoreState` (`eg-chessboard`)** :
+  - Mise à jour des utilitaires `undoMove` et `getMaterialDiffDisplay` (`pwa/src/utils/boardApiWrapper.ts`) pour lire automatiquement la couleur du joueur depuis l'état de l'échiquier (`boardApi.getState().playerColor`).
+  - Typage strict du composable `usePlayGame.ts` avec `BoardCore` et allègement de l'appel d'annulation de coup (`undoMove`).
+
 ## [1.0.3] - 2026-08-18
 
 ### Ajouté & Amélioré
