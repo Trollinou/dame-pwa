@@ -1,4 +1,11 @@
-export type ClockPreset = 'none' | '1+0' | '3+2' | '5+0' | '10+5' | '15+10';
+export type ClockPreset =
+	| 'none'
+	| '1+0'
+	| '3+2'
+	| '5+0'
+	| '10+5'
+	| '15+10'
+	| 'classic';
 
 export class ChessClock {
 	public preset: ClockPreset = 'none';
@@ -8,7 +15,7 @@ export class ChessClock {
 	public binc = 0; // ms
 	public activeColor: 'white' | 'black' | null = null;
 	public timerTenths = 0;
-	private timerInterval: any = null;
+	private timerInterval: ReturnType< typeof setInterval > | null = null;
 
 	public onTick: ( ( _wtime: number, _btime: number ) => void ) | null = null;
 	public onTimeOut: ( ( _flaggedColor: 'white' | 'black' ) => void ) | null =
@@ -179,12 +186,12 @@ export class ChessClock {
 		if ( justFinishedColor === 'white' ) {
 			this.wtime += this.winc;
 			// Bonus time at move 40 (+30s) is only applied if explicitly supported by a custom/classic cadence preset.
-			if ( this.preset === ( 'classic' as any ) && plyCount === 80 ) {
+			if ( this.preset === 'classic' && plyCount === 80 ) {
 				this.wtime += 30000;
 			}
 		} else {
 			this.btime += this.binc;
-			if ( this.preset === ( 'classic' as any ) && plyCount === 81 ) {
+			if ( this.preset === 'classic' && plyCount === 81 ) {
 				this.btime += 30000;
 			}
 		}

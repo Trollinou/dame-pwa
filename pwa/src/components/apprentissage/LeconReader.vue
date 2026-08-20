@@ -6,6 +6,7 @@
 import { ref, onMounted, onBeforeUnmount, watch, nextTick, render, createVNode } from 'vue';
 import DiagramViewer from '@/components/shared/DiagramViewer.vue';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
+import type { DrawShape } from 'eg-chessboard';
 
 const props = defineProps<{
   contenuHtml: string;
@@ -23,7 +24,7 @@ const hydraterBlocs = () => {
     const htmlEl = el as HTMLElement;
     const fen = htmlEl.dataset.fen || '';
     const orientation = (htmlEl.dataset.orientation || 'white') as 'white' | 'black';
-    let shapes: any[] = [];
+    let shapes: DrawShape[] = [];
     if (htmlEl.dataset.shapes) {
       try {
         shapes = JSON.parse(htmlEl.dataset.shapes);

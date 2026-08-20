@@ -29,6 +29,7 @@ import { toastController } from '@ionic/vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
 import QcmViewer from '@/components/shared/QcmViewer.vue';
+import type { DrawShape } from 'eg-chessboard';
 
 interface EtapeBase {
   type: 'pgn' | 'qcm';
@@ -37,7 +38,7 @@ interface EtapeBase {
   question?: string;
   choix?: string[];
   bonne_reponse?: number;
-  shapes?: any[];
+  shapes?: DrawShape[];
 }
 
 interface ConfigPartieHeros {

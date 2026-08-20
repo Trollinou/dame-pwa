@@ -164,7 +164,7 @@ import { removeAccents } from '../../../utils/stringUtils';
 const props = withDefaults(
   defineProps<{
     data: TData[];
-    columns: ColumnDef<TData, any>[];
+    columns: ColumnDef<TData, unknown>[];
     isLoading?: boolean;
     enableToolbar?: boolean;
     enableSearch?: boolean;

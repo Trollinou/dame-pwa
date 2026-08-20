@@ -1,11 +1,24 @@
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import {
+	useAuthStore,
+	type Identity,
+	type AssociatedMember,
+} from '@/stores/auth';
 import type { PreInscriptionFormData } from './usePreInscriptionForm';
 
 export interface RegistrationTarget {
 	member_id: number;
 	name: string;
 	relation: string;
+}
+
+export interface PreInscriptionSuccessData {
+	message: string;
+	is_minor?: boolean;
+	payment_url?: string;
+	post_id?: number;
+	download_token?: string;
+	[ key: string ]: unknown;
 }
 
 export function usePreInscriptionApi() {
@@ -18,7 +31,7 @@ export function usePreInscriptionApi() {
 
 	const isSubmitting = ref( false );
 	const errorMessage = ref( '' );
-	const successData = ref< any >( null );
+	const successData = ref< PreInscriptionSuccessData | null >( null );
 
 	/**
 	 * Charge les identités associées au compte utilisateur
@@ -35,7 +48,7 @@ export function usePreInscriptionApi() {
 			const identities = await authStore.fetchMyIdentities();
 			const targets: RegistrationTarget[] = [];
 
-			identities.forEach( ( identity: any ) => {
+			identities.forEach( ( identity: Identity ) => {
 				if (
 					identity.type === 'member' &&
 					identity.member_id > 0 &&
@@ -51,20 +64,22 @@ export function usePreInscriptionApi() {
 					identity.type === 'representative' &&
 					identity.associated_members
 				) {
-					identity.associated_members.forEach( ( child: any ) => {
-						if (
-							! child.already_registered &&
-							! targets.some(
-								( t ) => t.member_id === child.member_id
-							)
-						) {
-							targets.push( {
-								member_id: child.member_id,
-								name: child.firstname || child.name,
-								relation: 'Enfant/Associé',
-							} );
+					identity.associated_members.forEach(
+						( child: AssociatedMember ) => {
+							if (
+								! child.already_registered &&
+								! targets.some(
+									( t ) => t.member_id === child.member_id
+								)
+							) {
+								targets.push( {
+									member_id: child.member_id,
+									name: child.firstname || child.name || '',
+									relation: 'Enfant/Associé',
+								} );
+							}
 						}
-					} );
+					);
 				}
 			} );
 
@@ -133,7 +148,9 @@ export function usePreInscriptionApi() {
 						data[ key ] !== null &&
 						data[ key ] !== undefined
 					) {
-						( form as any )[ formKey ] = data[ key ];
+						( form as unknown as Record< string, unknown > )[
+							formKey
+						] = data[ key ];
 					}
 				} );
 				checkAge();

@@ -136,19 +136,26 @@ import {
 } from 'ionicons/icons';
 import { ref, onMounted, onUnmounted, reactive, watch, computed } from 'vue';
 import TheChessboard from 'eg-chessboard/vue';
+import type { BoardCore } from 'eg-chessboard';
 import 'eg-chessboard/style.css';
 import { useChessStore } from '@/stores/chess';
 
+export interface HistoryMoveItem {
+  number: number;
+  white: { san: string; ply: number };
+  black: { san: string; ply: number } | null;
+}
+
 const chessStore = useChessStore();
-let boardApi: any = null;
+let boardApi: BoardCore | null = null;
 const isReady = ref(false);
 const currentPly = ref(0);
-const historyMoves = ref<any[]>([]);
+const historyMoves = ref<HistoryMoveItem[]>([]);
 const historyScrollContainer = ref<HTMLElement | null>(null);
 
 const isLandscape = ref(window.innerWidth > window.innerHeight);
 const renderKey = ref(0);
-let resizeTimeout: any = null;
+let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const updateOrientation = () => {
   if (resizeTimeout) clearTimeout(resizeTimeout);
@@ -180,12 +187,16 @@ const formatSan = (san: string) => {
 const updateMoveHistory = () => {
   if (!boardApi) return;
   const rawHistory = boardApi.getHistory();
-  const moves: any[] = [];
+  const getSan = (item: string | { san: string }): string =>
+    typeof item === 'string' ? item : item.san;
+  const moves: HistoryMoveItem[] = [];
   for (let i = 0; i < rawHistory.length; i += 2) {
+    const whiteMove = rawHistory[i];
+    const blackMove = rawHistory[i + 1];
     moves.push({
       number: Math.floor(i / 2) + 1,
-      white: { san: rawHistory[i], ply: i + 1 },
-      black: rawHistory[i + 1] ? { san: rawHistory[i + 1], ply: i + 2 } : null
+      white: { san: getSan(whiteMove), ply: i + 1 },
+      black: blackMove ? { san: getSan(blackMove), ply: i + 2 } : null
     });
   }
   historyMoves.value = moves;
@@ -254,7 +265,7 @@ const viewPly = (ply: number) => {
   currentPly.value = ply;
 };
 
-const handleBoardCreated = (api: any) => {
+const handleBoardCreated = (api: BoardCore) => {
   boardApi = api;
   if (chessStore.currentPgn) {
     boardApi.loadPgn(chessStore.currentPgn);

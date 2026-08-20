@@ -23,7 +23,11 @@ export interface Contact {
 		_dame_contact_address_2?: string;
 		_dame_contact_postcode?: string;
 		_dame_contact_city?: string;
-		[ key: string ]: any;
+		_dame_contact_region?: string;
+		_dame_contact_department?: string;
+		_dame_contact_sexe?: string;
+		_dame_contact_notes?: string;
+		[ key: string ]: unknown;
 	};
 }
 

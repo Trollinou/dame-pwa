@@ -1,4 +1,5 @@
 import wordpress from '@wordpress/eslint-plugin';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
 	{
@@ -8,11 +9,15 @@ export default [
 			'build/**',
 			'dist/**',
 			'pwa/dist/**',
+			'pwa/public/**',
 			'assets/js/*.min.js',
 		],
 	},
 	...wordpress.configs.recommended,
 	{
+		plugins: {
+			'@typescript-eslint': tsPlugin,
+		},
 		languageOptions: {
 			globals: {
 				// On déclare les outils globaux de WordPress et du navigateur
@@ -52,6 +57,7 @@ export default [
 			'react/react-in-jsx-scope': 'off',
 			'import/no-extraneous-dependencies': 'off',
 			'@typescript-eslint/no-shadow': 'off',
+			'@typescript-eslint/no-explicit-any': 'error',
 			'@wordpress/no-unused-vars-before-return': 'off',
 		},
 	},

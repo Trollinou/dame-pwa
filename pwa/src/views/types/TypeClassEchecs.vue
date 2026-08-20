@@ -25,11 +25,12 @@ import {
   IonCardTitle
 } from '@ionic/vue';
 import OrderViewer from '@/components/shared/OrderViewer.vue';
+import type { DrawShape } from 'eg-chessboard';
 
 interface PositionItem {
   fen: string;
   couleur_joueur: 'white' | 'black';
-  shapes?: any[];
+  shapes?: DrawShape[];
 }
 
 interface ConfigClassEchecs {

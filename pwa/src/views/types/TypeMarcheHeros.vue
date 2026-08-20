@@ -130,15 +130,15 @@ import DiagramViewer from '@/components/shared/DiagramViewer.vue';
 import PuzzleViewer from '@/components/shared/PuzzleViewer.vue';
 import OrderViewer from '@/components/shared/OrderViewer.vue';
 
-import type { Key } from 'eg-chessboard';
+import type { Key, DrawShape } from 'eg-chessboard';
 
-interface Serie { pgn_data: string; couleur_joueur: 'white' | 'black'; orientation?: 'white' | 'black'; shapes?: any[]; }
+interface Serie { pgn_data: string; couleur_joueur: 'white' | 'black'; orientation?: 'white' | 'black'; shapes?: DrawShape[]; }
 interface ConfigMarcheHeros { mode: '3x5' | '5x3'; series: Serie[]; }
 const props = defineProps<{ config: ConfigMarcheHeros; }>();
 const emit = defineEmits<{ (e: 'success'): void; }>();
 
-interface Diagramme { id: string; fen: string; orientation: 'white' | 'black'; serieIndex: number; ordre: number; }
-interface Solution { fenDepart: string; orientation: 'white' | 'black'; solution: string[]; shapes: any[]; lastMoveHighlight?: Key[]; }
+interface Diagramme { id: string; fen: string; orientation: 'white' | 'black'; serieIndex: number; ordre: number; [key: string]: unknown; }
+interface Solution { fenDepart: string; orientation: 'white' | 'black'; solution: string[]; shapes: DrawShape[]; lastMoveHighlight?: Key[]; }
 
 // État global
 const etapeJeu = ref<'regroupement' | 'ordonnancement' | 'resolution'>('regroupement');
@@ -171,7 +171,7 @@ const solutionCourante = computed(() => {
 // Zoom (Phase 1a)
 // ==========================================
 const zoomedDiagram = ref<Diagramme | null>(null);
-let pressTimer: any = null;
+let pressTimer: ReturnType<typeof setTimeout> | null = null;
 let touchStartX = 0; let touchStartY = 0; let isScrolling = false;
 
 const startTouchTimer = (event: TouchEvent, diagram: Diagramme | null) => {

@@ -4,6 +4,17 @@ import { useAuthStore } from './auth';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
+export interface BenevolatTimeSlot {
+	start: string;
+	end: string;
+	max_participants?: number;
+}
+
+export interface BenevolatDay {
+	date: string;
+	time_slots?: BenevolatTimeSlot[];
+}
+
 export interface Benevolat {
 	id: number;
 	modified: string;
@@ -14,7 +25,7 @@ export interface Benevolat {
 	content?: {
 		rendered: string;
 	};
-	dame_benevolat_data: any[];
+	dame_benevolat_data: BenevolatDay[];
 }
 
 export interface BenevolatReponse {

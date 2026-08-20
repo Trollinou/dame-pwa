@@ -163,7 +163,8 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  onIonViewWillEnter
+  onIonViewWillEnter,
+  type RefresherCustomEvent
 } from '@ionic/vue';
 import {
   calendarOutline,
@@ -171,11 +172,11 @@ import {
   newspaperOutline
 } from 'ionicons/icons';
 import { ref, computed, watch } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore, type Identity, type AssociatedMember } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
-import { useBenevolatStore } from '@/stores/benevolat';
-import { useNewsStore } from '@/stores/news';
+import { useBenevolatStore, type Benevolat } from '@/stores/benevolat';
+import { useNewsStore, type Post } from '@/stores/news';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -209,12 +210,12 @@ const checkUnregisteredTargets = async () => {
   try {
     const identities = await authStore.fetchMyIdentities();
     let hasAny = false;
-      identities.forEach((identity: any) => {
+      identities.forEach((identity: Identity) => {
         if (identity.type === 'member' && identity.member_id > 0 && !identity.already_registered) {
           hasAny = true;
         }
         if (identity.type === 'representative' && identity.associated_members) {
-          identity.associated_members.forEach((child: any) => {
+          identity.associated_members.forEach((child: AssociatedMember) => {
             if (!child.already_registered) {
               hasAny = true;
             }
@@ -250,7 +251,7 @@ const loadAllData = async () => {
 /**
  * Gère le rafraîchissement manuel (Pull-to-refresh)
  */
-const handleRefresh = async (event: any) => {
+const handleRefresh = async (event: RefresherCustomEvent) => {
   await loadAllData();
   event.target.complete();
 };
@@ -305,7 +306,7 @@ const latestBenevolats = computed(() => {
 /**
  * Formate la plage de dates
  */
-const formatBenevolatDates = (benevolat: any): string => {
+const formatBenevolatDates = (benevolat: Benevolat): string => {
   const data = benevolat.dame_benevolat_data;
   
   if (Array.isArray(data) && data.length > 0) {
@@ -323,10 +324,10 @@ const formatBenevolatDates = (benevolat: any): string => {
 /**
  * Vérifie si un appel est expiré
  */
-const isBenevolatExpired = (benevolat: any): boolean => {
+const isBenevolatExpired = (benevolat: Benevolat): boolean => {
   const data = benevolat.dame_benevolat_data;
   if (Array.isArray(data) && data.length > 0) {
-    const dates = data.map((d: any) => d.date).filter(Boolean);
+    const dates = data.map((d) => d.date).filter(Boolean);
     if (dates.length === 0) return false;
     const maxDate = dates.reduce((max: string, d: string) => d > max ? d : max, dates[0]);
     return maxDate < todayStr;
@@ -334,7 +335,7 @@ const isBenevolatExpired = (benevolat: any): boolean => {
   return false;
 };
 
-const getFeaturedImage = (post: any): string | null => {
+const getFeaturedImage = (post: Post): string | null => {
   return post._embedded?.['wp:featuredmedia']?.[0]?.source_url || null;
 };
 

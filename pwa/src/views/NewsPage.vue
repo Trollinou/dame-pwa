@@ -196,7 +196,7 @@ const fetchPosts = async (reset = false) => {
     try {
       await newsStore.fetchPosts();
       return;
-    } catch (err: any) {
+    } catch (err: unknown) {
       handleFetchError(err);
       return;
     }
@@ -242,18 +242,19 @@ const fetchPosts = async (reset = false) => {
     } else {
       newsStore.posts = [...newsStore.posts, ...newPosts];
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     handleFetchError(err);
   } finally {
     newsStore.isLoading = false;
   }
 };
 
-const handleFetchError = (err: any) => {
+const handleFetchError = (err: unknown) => {
   if (!navigator.onLine) {
     error.value = "Vous êtes hors-ligne. Les actualités nécessitent une connexion internet pour être mises à jour.";
   } else {
-    error.value = err.message || "Une erreur est survenue.";
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    error.value = errorObj.message || "Une erreur est survenue.";
   }
 };
 

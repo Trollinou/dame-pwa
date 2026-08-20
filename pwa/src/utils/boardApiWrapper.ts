@@ -1,4 +1,4 @@
-import type { BoardCore, BoardCoreState } from 'eg-chessboard';
+import type { BoardCore } from 'eg-chessboard';
 
 /**
  * Undo moves on the eg-chessboard api.
@@ -16,7 +16,8 @@ export function undoMove(
 		return;
 	}
 	if ( vsComputer ) {
-		const targetPlayerColor = playerColor ?? boardApi.getState().playerColor ?? 'white';
+		const targetPlayerColor =
+			playerColor ?? boardApi.getState().playerColor ?? 'white';
 		const turnColor = boardApi.getTurnColor();
 		if ( turnColor === targetPlayerColor ) {
 			boardApi.undoLastMove();
@@ -85,7 +86,8 @@ export function getMaterialDiffDisplay(
 	if ( diff === 0 ) {
 		return { player: null, opponent: null };
 	}
-	const targetPlayerColor = playerColor ?? boardApi.getState().playerColor ?? 'white';
+	const targetPlayerColor =
+		playerColor ?? boardApi.getState().playerColor ?? 'white';
 	const playerWins = targetPlayerColor === 'white' ? diff > 0 : diff < 0;
 	return {
 		player: playerWins ? Math.abs( diff ) : null,

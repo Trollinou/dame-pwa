@@ -162,11 +162,15 @@ const couleurJoueur = computed<'white' | 'black'>(() => {
 const solutionMove = computed<{ orig: string; dest: string }>(() => {
   const shapes = diagrammeCourant.value.shapes || [];
   const blueArrow = shapes.find(
-    (s) =>
-      ((s as any).brush === 'blue' || (s as any).color === 'blue') &&
-      s.orig &&
-      s.dest &&
-      s.orig !== s.dest
+    (s) => {
+      const shapeObj = s as DrawShape & { color?: string };
+      return (
+        (shapeObj.brush === 'blue' || shapeObj.color === 'blue') &&
+        Boolean(s.orig) &&
+        Boolean(s.dest) &&
+        s.orig !== s.dest
+      );
+    }
   );
 
   if (blueArrow && blueArrow.orig && blueArrow.dest) {

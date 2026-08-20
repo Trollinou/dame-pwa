@@ -79,7 +79,8 @@ import {
   IonLabel,
   IonReorder,
   IonButton,
-  toastController
+  toastController,
+  type ItemReorderCustomEvent
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
@@ -163,7 +164,7 @@ watch(
   { deep: true }
 );
 
-const handleReorder = (event: any) => {
+const handleReorder = (event: ItemReorderCustomEvent) => {
   const movedItem = shuffledEtapes.value.splice(event.detail.from, 1)[0];
   shuffledEtapes.value.splice(event.detail.to, 0, movedItem);
   event.detail.complete();

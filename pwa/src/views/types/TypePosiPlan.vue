@@ -23,6 +23,7 @@ import { computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import InteractiveQcmViewer from '@/components/shared/InteractiveQcmViewer.vue';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import type { DrawShape } from 'eg-chessboard';
 
 interface Choix {
   texte: string;
@@ -41,7 +42,7 @@ interface ConfigPosiPlan {
   fen_depart: string;
   couleur_joueur: 'white' | 'black';
   etapes: Etape[];
-  shapes?: any[];
+  shapes?: DrawShape[];
   metaTitre?: string;
   metaTypeLabel?: string;
   metaChapitreNiveauLabel?: string;

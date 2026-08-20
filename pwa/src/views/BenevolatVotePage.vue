@@ -263,9 +263,10 @@ const submitVote = async () => {
       throw new Error(data.message || 'Erreur lors de l\'envoi.');
     }
     
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorObj = error instanceof Error ? error : new Error(String(error));
     const toast = await toastController.create({
-      message: error.message || 'Une erreur est survenue lors de l\'envoi.',
+      message: errorObj.message || 'Une erreur est survenue lors de l\'envoi.',
       duration: 4000,
       color: 'danger'
     });

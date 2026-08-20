@@ -28,6 +28,7 @@ import { ref, computed, watch } from 'vue';
 import QcmViewer from '@/components/shared/QcmViewer.vue';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
+import type { DrawShape } from 'eg-chessboard';
 
 export interface QcmItem {
   question: string;
@@ -35,7 +36,7 @@ export interface QcmItem {
   choix?: string[];
   bonne_reponse?: number;
   bonneReponse?: number;
-  shapes?: any[];
+  shapes?: DrawShape[];
   fen?: string;
 }
 
@@ -47,7 +48,7 @@ export interface Config100Commandements {
   choix?: string[];
   bonne_reponse?: number;
   bonneReponse?: number;
-  shapes?: any[];
+  shapes?: DrawShape[];
   fen?: string;
   id?: number;
   metaTitre?: string;

@@ -22,7 +22,7 @@ export class StockfishManager {
 	private stabilityCounter = 0;
 	private evalStartTime = 0;
 	private isEvalRunning = false;
-	private opponentTimeout: any = null;
+	private opponentTimeout: ReturnType< typeof setTimeout > | null = null;
 
 	constructor( workerUrl: string ) {
 		this.workerUrl = workerUrl;
@@ -113,7 +113,7 @@ export class StockfishManager {
 
 	private lastPositionCommand = '';
 
-	private evalTimeout: any = null;
+	private evalTimeout: ReturnType< typeof setTimeout > | null = null;
 
 	/**
 	 * Démarre l'analyse d'évaluation sur une position (go infinite)

@@ -43,7 +43,7 @@ export interface Member {
 		_dame_legal_rep_2_email?: string;
 		_dame_legal_rep_2_phone?: string;
 		_dame_legal_rep_2_profession?: string;
-		[ key: string ]: any;
+		[ key: string ]: unknown;
 	};
 }
 

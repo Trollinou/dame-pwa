@@ -50,7 +50,7 @@
                 metaTitre: decodeHtmlEntities(contenuActuel.titre),
                 metaTypeLabel: getContenuTypeLabel(contenuActuel),
                 metaChapitreNiveauLabel: formatChapitreNiveauLabel(contenuActuel.chapitre_nom, contenuActuel.niveau)
-              } as any)"
+              } as Record<string, unknown>)"
               :id="contenuActuel.id"
               :key="contenuActuel.id"
               @success="onSuccess"
@@ -257,10 +257,10 @@ const allerAuSuivant = () => {
   }
 };
 
-const loadContenu = async (idVal: any) => {
+const loadContenu = async (idVal: string | string[] | number) => {
   isLoading.value = true;
   estReussi.value = false;
-  const id = parseInt(Array.isArray(idVal) ? idVal[0] : idVal, 10);
+  const id = typeof idVal === 'number' ? idVal : parseInt(Array.isArray(idVal) ? idVal[0] : idVal, 10);
   if (!isNaN(id)) {
     await apprentissageStore.fetchContenu(id);
     if (apprentissageStore.parcours.length === 0) {

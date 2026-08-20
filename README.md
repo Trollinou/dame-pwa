@@ -26,10 +26,15 @@ L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type 
 ## Développement
 
 ```bash
-# Compilation de la PWA
-cd pwa
-npm run build
+# Vérification des types TypeScript
+npm run type-check
 
-# Linting
+# Linting ESLint
 npm run lint
+
+# Tests unitaires Vitest
+npm run test:unit
+
+# Compilation de la PWA
+npm run build
 ```

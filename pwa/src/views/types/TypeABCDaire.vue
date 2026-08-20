@@ -14,12 +14,14 @@
 <script setup lang="ts">
 import PuzzleViewer from '@/components/shared/PuzzleViewer.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
+import type { DrawShape } from 'eg-chessboard';
+
 interface ConfigABCDaire {
   fen: string;
   solution: string[];
   couleur_joueur: 'white' | 'black';
   id?: number;
-  shapes?: any[];
+  shapes?: DrawShape[];
 }
 
 const props = defineProps<{

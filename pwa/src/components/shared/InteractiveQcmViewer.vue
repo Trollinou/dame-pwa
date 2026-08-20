@@ -62,7 +62,7 @@ import {
   toastController
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
-import type { BoardCore } from 'eg-chessboard';
+import type { BoardCore, DrawShape } from 'eg-chessboard';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
 
 interface Choix {
@@ -83,7 +83,7 @@ const props = withDefaults(
     fenDepart: string;
     couleurJoueur: 'white' | 'black';
     etapes: Etape[];
-    shapes?: any[];
+    shapes?: DrawShape[];
   }>(),
   {
     shapes: () => []

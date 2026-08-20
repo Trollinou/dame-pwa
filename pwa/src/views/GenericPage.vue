@@ -56,10 +56,11 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useInternalLinks } from '@/composables/useInternalLinks';
 import { useTournamentStore } from '@/stores/tournament';
+import type { WpPage } from '@/types/wp';
 
 const route = useRoute();
 const tournamentStore = useTournamentStore();
-const page = ref<any>(null);
+const page = ref<WpPage | null>(null);
 const isLoading = ref(true);
 const error = ref<string | null>(null);
 const { handleInternalLinks } = useInternalLinks();

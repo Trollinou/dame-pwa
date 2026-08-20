@@ -23,7 +23,7 @@
 import { ref } from 'vue';
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
-import type { BoardCore, DrawShape } from 'eg-chessboard';
+import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
 import { toastController } from '@ionic/vue';
 
 const props = defineProps<{
@@ -32,7 +32,7 @@ const props = defineProps<{
   variante: string;
   caseDepart: string;
   caseArrivee: string;
-  shapes: Array<{ orig: string; dest?: string; brush: string; [key: string]: any }> | DrawShape[];
+  shapes: DrawShape[];
 }>();
 
 const emit = defineEmits<{
@@ -45,7 +45,7 @@ const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
 };
 
-const handleMove = async (move: any) => {
+const handleMove = async (move: Move) => {
   if (!boardApi.value) return;
 
   const oppColor = props.couleurJoueur === 'white' ? 'black' : 'white';
@@ -61,7 +61,7 @@ const handleMove = async (move: any) => {
   }
 
   // 2. Variante Stealth (Pas vu, pas pris)
-  if (props.variante === 'stealth' && boardApi.value.isSquareAttacked(move.to, oppColor)) {
+  if (props.variante === 'stealth' && boardApi.value.isSquareAttacked(move.to as Key, oppColor)) {
     const toast = await toastController.create({ message: "Vous avez été repéré !", duration: 2000, color: 'danger', position: 'bottom' });
     await toast.present();
     boardApi.value.setPosition(props.fenDepart);

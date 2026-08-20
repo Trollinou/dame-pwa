@@ -3,10 +3,11 @@ import { ref, computed } from 'vue';
 import { useAuthStore } from './auth';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import type { DrawShape } from 'eg-chessboard';
 
 export interface ExerciceConfig {
-	shapes?: any[];
-	[ key: string ]: any;
+	shapes?: DrawShape[];
+	[ key: string ]: unknown;
 }
 
 export interface Contenu {

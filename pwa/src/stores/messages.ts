@@ -4,6 +4,13 @@ import { useAuthStore } from './auth';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import { fetchWpCollection } from '@/utils/wpApi';
 
+export interface MessageRecipient {
+	name: string;
+	email: string;
+	sent_at: string | null;
+	opened_at: string | null;
+}
+
 export interface Message {
 	id: number;
 	date: string;
@@ -21,12 +28,7 @@ export interface Message {
 			opened: number;
 			rate: number;
 		};
-		recipients: Array< {
-			name: string;
-			email: string;
-			sent_at: string | null;
-			opened_at: string | null;
-		} >;
+		recipients: MessageRecipient[];
 	};
 }
 

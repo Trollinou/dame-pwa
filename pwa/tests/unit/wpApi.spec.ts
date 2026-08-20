@@ -27,7 +27,7 @@ describe( 'wpApi utility', () => {
 				status: 200,
 				headers: new Headers( { 'X-WP-TotalPages': '1' } ),
 				json: async () => mockData,
-			} as any );
+			} as unknown as Response );
 
 		const result = await fetchWpCollection< { id: number; name: string } >(
 			'/wp/v2/items?per_page=100'
@@ -62,7 +62,7 @@ describe( 'wpApi utility', () => {
 						status: 200,
 						headers: new Headers( { 'X-WP-TotalPages': '2' } ),
 						json: async () => page1Data,
-					} as any;
+					} as unknown as Response;
 				}
 				if ( /[?&]page=2(&|$)/.test( urlStr ) ) {
 					return {
@@ -70,7 +70,7 @@ describe( 'wpApi utility', () => {
 						status: 200,
 						headers: new Headers( { 'X-WP-TotalPages': '2' } ),
 						json: async () => page2Data,
-					} as any;
+					} as unknown as Response;
 				}
 				throw new Error( 'Unexpected URL: ' + urlStr );
 			} );
@@ -93,7 +93,7 @@ describe( 'wpApi utility', () => {
 			ok: false,
 			status: 500,
 			statusText: 'Internal Server Error',
-		} as any );
+		} as unknown as Response );
 
 		await expect( fetchWpCollection( '/wp/v2/items' ) ).rejects.toThrow(
 			'Erreur API REST (500 Internal Server Error)'

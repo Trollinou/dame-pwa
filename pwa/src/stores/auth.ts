@@ -18,6 +18,7 @@ import { useBenevolatStore } from './benevolat';
 import { useTournamentStore } from './tournament';
 import { useNewsStore } from './news';
 import { useApprentissageStore } from './apprentissage';
+import type { WpUser } from '@/types/wp';
 
 export interface AssociatedMember {
 	firstname: string;
@@ -75,7 +76,7 @@ export const useAuthStore = defineStore(
 		};
 
 		const token = ref( getStoredToken() );
-		const user = ref< any >( getStoredUser() );
+		const user = ref< WpUser | null >( getStoredUser() );
 		const selectedIdentity = ref< Identity | null >( getStoredIdentity() );
 		const adminMode = ref( false );
 
@@ -130,7 +131,7 @@ export const useAuthStore = defineStore(
 				return false;
 			}
 			const roles = userRoles.value;
-			const normalizedUserRoles = roles.map( ( r: any ) =>
+			const normalizedUserRoles = roles.map( ( r: unknown ) =>
 				typeof r === 'string' ? r.toLowerCase() : ''
 			);
 			return normalizedUserRoles.some( ( role ) =>
@@ -194,10 +195,13 @@ export const useAuthStore = defineStore(
 					return newJwt;
 				}
 				return null;
-			} catch ( refreshError: any ) {
+			} catch ( refreshError: unknown ) {
 				console.warn( 'Token refresh failed:', refreshError );
+				const err = refreshError as
+					| { data?: { message?: string }; message?: string }
+					| undefined;
 				const msg = String(
-					refreshError?.data?.message || refreshError?.message || ''
+					err?.data?.message || err?.message || ''
 				).toLowerCase();
 				if (
 					msg.includes( 'expired' ) ||
@@ -221,10 +225,17 @@ export const useAuthStore = defineStore(
 				if ( response && response.success === false ) {
 					await tryRefreshToken();
 				}
-			} catch ( error: any ) {
+			} catch ( error: unknown ) {
+				const err = error as
+					| {
+							response?: unknown;
+							data?: { message?: string };
+							message?: string;
+					  }
+					| undefined;
 				let rawResponse = '';
-				if ( typeof error?.response === 'string' ) {
-					rawResponse = error.response;
+				if ( typeof err?.response === 'string' ) {
+					rawResponse = err.response;
 				} else if ( typeof error === 'string' ) {
 					rawResponse = error;
 				}
@@ -239,7 +250,7 @@ export const useAuthStore = defineStore(
 
 				console.warn( 'Session validation failed:', error );
 				const msg = String(
-					error?.data?.message || error?.message || rawResponse
+					err?.data?.message || err?.message || rawResponse
 				).toLowerCase();
 				if (
 					msg.includes( 'expired' ) ||
@@ -310,7 +321,11 @@ export const useAuthStore = defineStore(
 				const base64Password = btoa(
 					unescape( encodeURIComponent( password ) )
 				);
-				const authParams: any = { password: base64Password };
+				const authParams: {
+					password: string;
+					email?: string;
+					username?: string;
+				} = { password: base64Password };
 				if ( username.includes( '@' ) ) {
 					authParams.email = username;
 				} else {
@@ -369,10 +384,11 @@ export const useAuthStore = defineStore(
 								);
 							}
 						}
-					} catch ( e: any ) {
+					} catch ( e: unknown ) {
+						const err = e as Error | undefined;
 						if (
-							e.message &&
-							e.message.includes( 'Veuillez valider' )
+							err?.message &&
+							err.message.includes( 'Veuillez valider' )
 						) {
 							throw e;
 						}
@@ -400,23 +416,30 @@ export const useAuthStore = defineStore(
 				} else {
 					throw new Error( "Erreur d'identifiants" );
 				}
-			} catch ( error: any ) {
+			} catch ( error: unknown ) {
 				console.error( 'Erreur de connexion:', error );
 
+				const err = error as
+					| {
+							response?: string;
+							message?: string;
+							data?: { message?: string };
+					  }
+					| undefined;
 				let errorMessage = 'Erreur serveur.';
-				if ( error && error.response ) {
+				if ( err && err.response ) {
 					try {
-						const parsed = JSON.parse( error.response );
+						const parsed = JSON.parse( err.response );
 						errorMessage =
 							parsed.message ||
 							( parsed.data && parsed.data.message ) ||
 							errorMessage;
 					} catch {
-						errorMessage = error.response || errorMessage;
+						errorMessage = err.response || errorMessage;
 					}
-				} else if ( error && error.message ) {
+				} else if ( err && err.message ) {
 					// Le SDK simple-jwt-login lève des erreurs du type "HTTP Error: 400 - {"code":..., "message":"..."}"
-					const match = error.message.match(
+					const match = err.message.match(
 						/^HTTP Error: \d+ - (.*)$/
 					);
 					if ( match && match[ 1 ] ) {
@@ -429,8 +452,8 @@ export const useAuthStore = defineStore(
 						} catch {
 							errorMessage = match[ 1 ];
 						}
-					} else {
-						errorMessage = error.message;
+					} else if ( err.message ) {
+						errorMessage = err.message;
 					}
 				}
 

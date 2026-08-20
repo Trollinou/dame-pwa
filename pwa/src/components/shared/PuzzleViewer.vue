@@ -25,7 +25,7 @@ import { ref, watch } from 'vue';
 import { toastController } from '@ionic/vue';
 import { default as TheChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
-import type { BoardCore, Key, DrawShape } from 'eg-chessboard';
+import type { BoardCore, Key, DrawShape, Move } from 'eg-chessboard';
 
 const props = withDefaults(
   defineProps<{
@@ -57,7 +57,7 @@ watch(() => props.shapes, (newShapes) => {
   }
 }, { deep: true });
 
-const verifierCoup = async (move: any) => {
+const verifierCoup = async (move: Move) => {
   const playerColorShort = props.couleurJoueur === 'white' ? 'w' : 'b';
   
   // Ignore les déplacements si ce n'est pas la bonne couleur

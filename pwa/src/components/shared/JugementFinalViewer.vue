@@ -39,7 +39,7 @@
               :boardConfig="getScenarioBoardConfig()"
               :playerColor="playerColorTyped"
               :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-              @board-created="(api: any) => onScenarioBoardCreated(index, api)"
+              @board-created="(api: BoardCore) => onScenarioBoardCreated(index, api)"
               style="pointer-events: none;"
             />
           </div>
@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, shallowRef, computed, watch, onBeforeUnmount } from 'vue';
 import {
   IonCard,
   IonCardHeader,
@@ -83,6 +83,7 @@ import {
   toastController
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
+import type { BoardCore } from 'eg-chessboard';
 import { Chess } from 'chessops';
 import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
@@ -116,8 +117,8 @@ const emit = defineEmits<{
 }>();
 
 const phase = ref<'observation' | 'explication'>('observation');
-const mainBoardApi = ref<any>(null);
-const boardApis = ref<Map<number, any>>(new Map());
+const mainBoardApi = shallowRef<BoardCore | null>(null);
+const boardApis = shallowRef<Map<number, BoardCore>>(new Map());
 const playbackTimers = ref<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
 const playerColorTyped = computed<'white' | 'black'>(() => {
@@ -136,7 +137,7 @@ const getScenarioBoardConfig = () => ({
   viewOnly: true
 });
 
-const onMainBoardCreated = (api: any) => {
+const onMainBoardCreated = (api: BoardCore) => {
   mainBoardApi.value = api;
   if (props.fenDepart) {
     api.setPosition(props.fenDepart);
@@ -217,7 +218,7 @@ const getMoveSequence = (fenDepart: string, pgnString: string) => {
   }
 };
 
-const startScenarioPlayback = (index: number, api: any) => {
+const startScenarioPlayback = (index: number, api: BoardCore) => {
   clearScenarioTimer(index);
 
   const scenario = props.scenarios[index];
@@ -259,7 +260,7 @@ const startScenarioPlayback = (index: number, api: any) => {
   playbackTimers.value.set(index, initialTimer);
 };
 
-const onScenarioBoardCreated = (index: number, api: any) => {
+const onScenarioBoardCreated = (index: number, api: BoardCore) => {
   boardApis.value.set(index, api);
   startScenarioPlayback(index, api);
 };

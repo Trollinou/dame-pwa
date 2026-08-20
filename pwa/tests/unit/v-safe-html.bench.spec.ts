@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { describe, it, expect, vi } from 'vitest';
+import type { DirectiveBinding, VNode } from 'vue';
 
 import { vSafeHtml } from '@/directives/safeHtml';
 import * as sanitizeModule from '@/utils/sanitize';
@@ -16,7 +17,12 @@ describe( 'v-safe-html performance optimization', () => {
 
 		for ( let i = 0; i < iterations; i++ ) {
 			// @ts-expect-error - simulating Vue life cycle
-			vSafeHtml.updated!( el, binding as any, null as any, null as any );
+			vSafeHtml.updated!(
+				el,
+				binding as unknown as DirectiveBinding,
+				null as unknown as VNode,
+				null as unknown as VNode
+			);
 		}
 
 		const end = performance.now();
@@ -42,7 +48,12 @@ describe( 'v-safe-html performance optimization', () => {
 		const sanitizeSpy = vi.spyOn( sanitizeModule, 'sanitizeHtml' );
 
 		// @ts-expect-error - simulating Vue life cycle
-		vSafeHtml.updated!( el, binding as any, null as any, null as any );
+		vSafeHtml.updated!(
+			el,
+			binding as unknown as DirectiveBinding,
+			null as unknown as VNode,
+			null as unknown as VNode
+		);
 
 		expect( sanitizeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( el.innerHTML ).toContain( 'New' );

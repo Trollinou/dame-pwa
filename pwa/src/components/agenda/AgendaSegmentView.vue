@@ -88,6 +88,7 @@ import {
   IonBadge,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  type InfiniteScrollCustomEvent,
 } from '@ionic/vue';
 import type { AgendaEvent } from '@/stores/agenda';
 import { removeAccents } from '@/utils/stringUtils';
@@ -105,8 +106,8 @@ const props = defineProps<{
 
 defineEmits<{
   (e: 'go-to-detail', id: number): void;
-  (e: 'load-more-past', event: any): void;
-  (e: 'load-more-upcoming', event: any): void;
+  (e: 'load-more-past', event: InfiniteScrollCustomEvent): void;
+  (e: 'load-more-upcoming', event: InfiniteScrollCustomEvent): void;
 }>();
 
 

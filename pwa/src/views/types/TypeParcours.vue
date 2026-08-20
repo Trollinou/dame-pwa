@@ -24,6 +24,7 @@
 import { computed } from 'vue';
 import ParcoursViewer from '@/components/shared/ParcoursViewer.vue';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import type { DrawShape } from 'eg-chessboard';
 
 const props = defineProps<{
   config: {
@@ -33,7 +34,7 @@ const props = defineProps<{
     case_depart: string;
     case_arrivee: string;
     variante: string;
-    shapes?: Array<{ orig: string; dest?: string; brush: string; [key: string]: any }>;
+    shapes?: DrawShape[];
     metaTitre?: string;
     metaTypeLabel?: string;
     metaChapitreNiveauLabel?: string;

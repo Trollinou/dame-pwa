@@ -58,7 +58,7 @@ import {
   IonButton
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
-import type { BoardCore } from 'eg-chessboard';
+import type { BoardCore, DrawShape } from 'eg-chessboard';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 
 const props = withDefaults(
@@ -68,7 +68,7 @@ const props = withDefaults(
     hideQuestion?: boolean;
     choix: string[];
     bonneReponse: number;
-    shapes?: any[];
+    shapes?: DrawShape[];
     currentCard?: number;
     totalCards?: number;
   }>(),

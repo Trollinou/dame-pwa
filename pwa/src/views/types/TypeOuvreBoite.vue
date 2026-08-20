@@ -23,6 +23,7 @@ import { computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import InteractiveQcmViewer from '@/components/shared/InteractiveQcmViewer.vue';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import type { DrawShape } from 'eg-chessboard';
 
 interface Choix {
   texte: string;
@@ -36,7 +37,7 @@ interface ConfigOuvreBoite {
   question: string;
   choix: Choix[];
   bonne_reponse: number;
-  shapes?: any[];
+  shapes?: DrawShape[];
   metaTitre?: string;
   metaTypeLabel?: string;
   metaChapitreNiveauLabel?: string;

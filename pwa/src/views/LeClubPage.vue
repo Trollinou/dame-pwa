@@ -107,7 +107,8 @@ import {
   IonSegmentButton,
   IonLabel,
   IonIcon,
-  onIonViewWillEnter
+  onIonViewWillEnter,
+  type InfiniteScrollCustomEvent
 } from '@ionic/vue';
 import { listOutline, calendarOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
@@ -231,7 +232,7 @@ watch(selectedSegment, (newSeg) => {
   }
 });
 
-const loadMoreUpcoming = async (ev: any) => {
+const loadMoreUpcoming = async (ev: InfiniteScrollCustomEvent) => {
   const target = ev?.target;
   if (!hasMoreUpcoming.value || isLoading.value) {
     if (target) {
@@ -269,7 +270,7 @@ const loadMoreUpcoming = async (ev: any) => {
   }
 };
 
-const loadMorePast = async (ev: any) => {
+const loadMorePast = async (ev: InfiniteScrollCustomEvent) => {
   const target = ev?.target;
   if (!hasMorePast.value || isLoading.value) {
     if (target) {

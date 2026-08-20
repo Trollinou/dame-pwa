@@ -103,7 +103,7 @@ interface OrderItem {
   id: string | number;
   fen: string;
   orientation: 'white' | 'black';
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const props = defineProps<{
@@ -191,7 +191,7 @@ const validerOrdre = async () => {
 
 // Logique de Zoom (Appui long)
 const zoomedItem = ref<OrderItem | null>(null);
-let pressTimer: any = null;
+let pressTimer: ReturnType<typeof setTimeout> | null = null;
 let touchStartX = 0;
 let touchStartY = 0;
 let isScrolling = false;

@@ -6,6 +6,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Amélioré & Sécurisé
+- **Typage strict TypeScript & Éradication intégrale des `any` (`pwa/src/`)** :
+  - Remplacement de plus d'une vingtaine d'occurrences de types `any` dans les composants, vues, stores, composables et utilitaires du frontend PWA.
+  - Création de l'interface transverse WordPress (`pwa/src/types/wp.ts` : `WpPage`, `WpUser`, `WpFeaturedMedia`).
+  - Typage strict des instances de l'échiquier `eg-chessboard` (`BoardCore`, `DrawShape`, `Move`, `Key`).
+  - Typage strict des gestionnaires d'événements Ionic (`RefresherCustomEvent`, `InfiniteScrollCustomEvent`, `ItemReorderCustomEvent`).
+  - Typage précis des stores (`BenevolatDay`, `BenevolatTimeSlot`, `MessageRecipient`, `Identity`, `AssociatedMember`).
+  - Activation de la règle ESLint `@typescript-eslint/no-explicit-any: 'error'` dans `eslint.config.js` pour verrouiller définitivement l'interdiction de tout `any` explicite.
+
 ### Amélioré
 - **Centralisation de `playerColor` via l'état `BoardCoreState` (`eg-chessboard`)** :
   - Mise à jour des utilitaires `undoMove` et `getMaterialDiffDisplay` (`pwa/src/utils/boardApiWrapper.ts`) pour lire automatiquement la couleur du joueur depuis l'état de l'échiquier (`boardApi.getState().playerColor`).

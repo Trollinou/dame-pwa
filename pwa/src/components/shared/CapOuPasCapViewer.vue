@@ -55,7 +55,7 @@ import {
 } from '@ionic/vue';
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
-import type { BoardCore } from 'eg-chessboard';
+import type { BoardCore, DrawShape, Move } from 'eg-chessboard';
 
 export interface QcmChoix {
   texte: string;
@@ -65,7 +65,7 @@ export interface QcmChoix {
 export interface DiagrammeCapOuPasCap {
   fen: string;
   couleur_joueur: 'white' | 'black';
-  shapes?: any[];
+  shapes?: DrawShape[];
   qcm_choix?: QcmChoix[];
   qcm_bonne_reponse?: number;
   move_san?: string;
@@ -170,7 +170,7 @@ const validerQcm = async (index: number) => {
   }
 };
 
-const verifierCoup = async (move: any) => {
+const verifierCoup = async (move: Move) => {
   const diag = diagrammeActuel.value;
   if (!diag || props.typeReponse !== 'move') return;
 

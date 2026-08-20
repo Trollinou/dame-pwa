@@ -49,10 +49,20 @@ export const useReferenceDataStore = defineStore( 'referenceData', () => {
 				);
 			} else if ( Array.isArray( data ) ) {
 				formatted = data
-					.map( ( item: any ) => ( {
-						code: item.code || item.id || item.slug || '',
-						name: item.name || item.label || '',
-					} ) )
+					.map(
+						( item: {
+							code?: string;
+							id?: string | number;
+							slug?: string;
+							name?: string;
+							label?: string;
+						} ) => ( {
+							code: String(
+								item.code || item.id || item.slug || ''
+							),
+							name: String( item.name || item.label || '' ),
+						} )
+					)
 					.filter( ( item ) => item.code && item.name );
 			}
 
@@ -94,10 +104,20 @@ export const useReferenceDataStore = defineStore( 'referenceData', () => {
 				);
 			} else if ( Array.isArray( data ) ) {
 				formatted = data
-					.map( ( item: any ) => ( {
-						code: item.code || item.id || item.slug || '',
-						name: item.name || item.label || '',
-					} ) )
+					.map(
+						( item: {
+							code?: string;
+							id?: string | number;
+							slug?: string;
+							name?: string;
+							label?: string;
+						} ) => ( {
+							code: String(
+								item.code || item.id || item.slug || ''
+							),
+							name: String( item.name || item.label || '' ),
+						} )
+					)
 					.filter( ( item ) => item.code && item.name );
 			}
 

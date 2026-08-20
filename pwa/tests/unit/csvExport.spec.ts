@@ -15,15 +15,15 @@ describe( 'csvExport utility', () => {
 
 		exportToCsv(
 			'test.csv',
-			[ { header: 'Nom', accessor: ( r: any ) => r.name } ],
+			[ { header: 'Nom', accessor: ( r: { name?: string } ) => r.name } ],
 			[]
 		);
 		expect( createObjectUrlSpy ).not.toHaveBeenCalled();
 
 		exportToCsv(
 			'test.csv',
-			[ { header: 'Nom', accessor: ( r: any ) => r.name } ],
-			null as any
+			[ { header: 'Nom', accessor: ( r: { name?: string } ) => r.name } ],
+			null as unknown as { name: string }[]
 		);
 		expect( createObjectUrlSpy ).not.toHaveBeenCalled();
 	} );

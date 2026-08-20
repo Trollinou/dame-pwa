@@ -140,7 +140,7 @@ describe( 'TypeVisionChecs.vue', () => {
 			},
 		} );
 
-		expect( wrapper.text() ).toContain( 'Diagramme 1 / 4' );
+		expect( wrapper.text() ).toContain( 'Carte 1 / 4' );
 
 		// Diagramme 1: e2 -> e4
 		const buttons = wrapper.findAll( '.mock-square-btn' );
@@ -150,12 +150,17 @@ describe( 'TypeVisionChecs.vue', () => {
 		await btnE2?.trigger( 'click' );
 		await btnE4?.trigger( 'click' );
 
-		// Fast-forward timers for revelation delay (400ms move + 1400ms transition)
-		vi.advanceTimersByTime( 2000 );
+		// Fast-forward timers for revelation delay (400ms move)
+		vi.advanceTimersByTime( 500 );
+		await wrapper.vm.$nextTick();
+
+		// Click "Carte suivante" button in footer
+		const nextBtn1 = wrapper.find( '.action-zone ion-button' );
+		await nextBtn1.trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
 		// Now on Diagramme 2
-		expect( wrapper.text() ).toContain( 'Diagramme 2 / 4' );
+		expect( wrapper.text() ).toContain( 'Carte 2 / 4' );
 
 		// Diagramme 2: f1 -> b5
 		const btnF1 = buttons.find( ( b ) => b.text().includes( 'f1' ) );
@@ -164,11 +169,15 @@ describe( 'TypeVisionChecs.vue', () => {
 		await btnF1?.trigger( 'click' );
 		await btnB5?.trigger( 'click' );
 
-		vi.advanceTimersByTime( 2000 );
+		vi.advanceTimersByTime( 500 );
+		await wrapper.vm.$nextTick();
+
+		const nextBtn2 = wrapper.find( '.action-zone ion-button' );
+		await nextBtn2.trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
 		// Diagramme 3
-		expect( wrapper.text() ).toContain( 'Diagramme 3 / 4' );
+		expect( wrapper.text() ).toContain( 'Carte 3 / 4' );
 
 		// Diagramme 3: g1 -> f3
 		const btnG1 = buttons.find( ( b ) => b.text().includes( 'g1' ) );
@@ -177,11 +186,15 @@ describe( 'TypeVisionChecs.vue', () => {
 		await btnG1?.trigger( 'click' );
 		await btnF3?.trigger( 'click' );
 
-		vi.advanceTimersByTime( 2000 );
+		vi.advanceTimersByTime( 500 );
+		await wrapper.vm.$nextTick();
+
+		const nextBtn3 = wrapper.find( '.action-zone ion-button' );
+		await nextBtn3.trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
 		// Diagramme 4
-		expect( wrapper.text() ).toContain( 'Diagramme 4 / 4' );
+		expect( wrapper.text() ).toContain( 'Carte 4 / 4' );
 
 		// Diagramme 4: e4 -> d5
 		const btnD5 = buttons.find( ( b ) => b.text().includes( 'd5' ) );
@@ -189,7 +202,11 @@ describe( 'TypeVisionChecs.vue', () => {
 		await btnE4?.trigger( 'click' );
 		await btnD5?.trigger( 'click' );
 
-		vi.advanceTimersByTime( 2000 );
+		vi.advanceTimersByTime( 500 );
+		await wrapper.vm.$nextTick();
+
+		const nextBtn4 = wrapper.find( '.action-zone ion-button' );
+		await nextBtn4.trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
 		// Exercise finished -> success emitted

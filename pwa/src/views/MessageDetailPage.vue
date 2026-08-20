@@ -141,7 +141,7 @@ import {
 } from 'ionicons/icons';
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useMessageStore } from '@/stores/messages';
+import { useMessageStore, type MessageRecipient } from '@/stores/messages';
 
 const route = useRoute();
 const messageStore = useMessageStore();
@@ -171,7 +171,7 @@ const formatDateTime = (dateStr: string) => {
 /**
  * Retourne l'icône selon l'état du destinataire
  */
-const getRecipientIcon = (recipient: any) => {
+const getRecipientIcon = (recipient: MessageRecipient) => {
   if (recipient.opened_at) return checkmarkCircle;
   if (recipient.sent_at) return paperPlane;
   return timeOutline;
@@ -180,7 +180,7 @@ const getRecipientIcon = (recipient: any) => {
 /**
  * Retourne la couleur selon l'état du destinataire
  */
-const getRecipientColor = (recipient: any) => {
+const getRecipientColor = (recipient: MessageRecipient) => {
   if (recipient.opened_at) return 'success';
   if (recipient.sent_at) return 'medium';
   return 'warning';

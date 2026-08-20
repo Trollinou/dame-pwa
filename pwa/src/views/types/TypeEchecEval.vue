@@ -26,11 +26,12 @@ import { computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import EvalViewer, { type QuestionEval } from '@/components/shared/EvalViewer.vue';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import type { DrawShape } from 'eg-chessboard';
 
 export interface ConfigEchecEval {
   fen_depart: string;
   couleur_joueur: 'white' | 'black';
-  shapes?: any[];
+  shapes?: DrawShape[];
   theme: string;
   questions: QuestionEval[];
   solution_moves: string[];

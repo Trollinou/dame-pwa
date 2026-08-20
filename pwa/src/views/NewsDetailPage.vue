@@ -57,12 +57,12 @@ import { cloudOfflineOutline } from 'ionicons/icons';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useInternalLinks } from '@/composables/useInternalLinks';
-import { useNewsStore } from '@/stores/news';
+import { useNewsStore, type Post } from '@/stores/news';
 import { safeFetch } from '@/utils/safeFetch';
 
 const route = useRoute();
 const newsStore = useNewsStore();
-const post = ref<any>(null);
+const post = ref<Post | null>(null);
 const isLoading = ref(true);
 const error = ref<string | null>(null);
 const { handleInternalLinks } = useInternalLinks();
@@ -138,12 +138,13 @@ const fetchPost = async () => {
       }
       throw new Error("Impossible de charger l'article.");
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erreur fetchPost:", err);
     if (!navigator.onLine) {
       error.value = "Vous êtes hors-ligne. Cet article n'est pas encore disponible en cache.";
     } else {
-      error.value = err.message || "Une erreur réseau est survenue. Veuillez vérifier votre connexion.";
+      const errorObj = err instanceof Error ? err : new Error(String(err));
+      error.value = errorObj.message || "Une erreur réseau est survenue. Veuillez vérifier votre connexion.";
     }
   } finally {
     isLoading.value = false;

@@ -89,7 +89,7 @@ import {
 } from '@ionic/vue';
 import TheChessboard from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
-import type { StockfishConfig } from 'eg-chessboard';
+import type { StockfishConfig, BoardCore, Move } from 'eg-chessboard';
 import { useAuthStore } from '@/stores/auth';
 import { useChessStore } from '@/stores/chess';
 import { useBoardOrientation } from '@/composables/play/useBoardOrientation';
@@ -168,11 +168,11 @@ const stockfishConfig = computed<StockfishConfig>(() => {
   };
 });
 
-const handleBoardCreated = (api: any) => {
+const handleBoardCreated = (api: BoardCore) => {
   setBoardApi(api);
 };
 
-const handleMove = (moveInfo?: any) => {
+const handleMove = (moveInfo?: Move) => {
   const api = getBoardApi();
   if (!api) return;
 
