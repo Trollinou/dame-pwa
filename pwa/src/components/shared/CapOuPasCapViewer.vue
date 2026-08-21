@@ -17,6 +17,8 @@
         :boardConfig="boardConfig"
         :playerColor="diagrammeActuel?.couleur_joueur || 'white'"
         :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+        :piece-set="chessPreferences.pieceSet"
+        :board-theme="chessPreferences.boardTheme"
         @board-created="onBoardCreated"
         @move="verifierCoup"
       />
@@ -56,6 +58,9 @@ import {
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
 import type { BoardCore, DrawShape, Move } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface QcmChoix {
   texte: string;

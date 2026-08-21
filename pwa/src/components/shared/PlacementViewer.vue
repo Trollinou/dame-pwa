@@ -10,6 +10,8 @@
       <eg-chessboard
         :boardConfig="{ fen: fenDepart }"
         :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+        :piece-set="chessPreferences.pieceSet"
+        :board-theme="chessPreferences.boardTheme"
         @board-created="onBoardCreated"
         @square-click="verifierPlacement"
       />
@@ -23,6 +25,9 @@ import { IonCard, IonCardHeader, IonCardTitle, toastController } from '@ionic/vu
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
 import type { BoardCore } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+
+const chessPreferences = useChessPreferencesStore();
 
 const props = defineProps<{
   consigne?: string;

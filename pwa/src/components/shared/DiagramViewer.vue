@@ -11,6 +11,8 @@
           viewOnly: true
         }"
         :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+        :piece-set="chessPreferences.pieceSet"
+        :board-theme="chessPreferences.boardTheme"
       />
     </div>
   </div>
@@ -20,6 +22,9 @@
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import type { DrawShape } from 'eg-chessboard';
 import 'eg-chessboard/style.css';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+
+const chessPreferences = useChessPreferencesStore();
 
 const props = withDefaults(
   defineProps<{

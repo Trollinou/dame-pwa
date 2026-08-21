@@ -12,6 +12,8 @@
         :board-config="{
           drawable: { enabled: false }
         }"
+        :piece-set="chessPreferences.pieceSet"
+        :board-theme="chessPreferences.boardTheme"
         @board-created="onBoardCreated"
         @move="handleMove"
       />
@@ -24,7 +26,10 @@ import { ref } from 'vue';
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { toastController } from '@ionic/vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 const props = defineProps<{
   fenDepart: string;

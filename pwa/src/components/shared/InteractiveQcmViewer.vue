@@ -10,6 +10,8 @@
         :boardConfig="{ viewOnly: true }"
         :playerColor="couleurJoueur"
         :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+        :piece-set="chessPreferences.pieceSet"
+        :board-theme="chessPreferences.boardTheme"
         @board-created="onBoardCreated"
       />
     </div>
@@ -63,7 +65,10 @@ import {
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 interface Choix {
   texte: string;

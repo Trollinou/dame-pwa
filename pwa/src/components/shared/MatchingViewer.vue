@@ -38,6 +38,8 @@
                 :boardConfig="{ fen: echiquiersMelanges[index].fen, viewOnly: true, coordinates: false }"
                 :playerColor="echiquiersMelanges[index].couleur_joueur"
                 :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+                :piece-set="chessPreferences.pieceSet"
+                :board-theme="chessPreferences.boardTheme"
               />
             </div>
           </div>
@@ -107,6 +109,9 @@ import {
   toastController
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+
+const chessPreferences = useChessPreferencesStore();
 
 interface Paire {
   fen: string;

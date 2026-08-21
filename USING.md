@@ -32,3 +32,19 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - Pour les membres connectés : enregistrement et envoi automatique de la partie PGN vers le plugin ROI.
    - **Mode 2 Joueurs (Pass & Play)** :
      - Jeu local sur le même écran pour deux joueurs humains, moteur d'analyse IA désactivé.
+
+## Module Profil & Personnalisation de l'Échiquier
+
+Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), une section dédiée permet de personnaliser l'apparence de l'échiquier pour l'ensemble de la PWA :
+
+1. **Sélecteur 3D - Style des Pièces** :
+   - Carrousel 3D rotatif à 8 faces représentant les styles vectoriels disponibles : *Staunton* (défaut), *Mérida*, *Cburnett*, *Alpha*, *Cardinal*, *Dubrovny*, *Maestro*, *Staunty*.
+   - Rotation par glisser/déposer tactile (swipe/drag), boutons fléchés ou clics directs sur les cartes.
+2. **Sélecteur 3D - Fond de l'Échiquier** :
+   - Carrousel 3D rotatif à 8 faces présentant les nuances et textures d'arrière-plan : *Bois Classique* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Érable Doré*.
+3. **Prévisualisation en Temps Réel** :
+   - Échiquier complet en position initiale actualisé instantanément selon la combinaison sélectionnée.
+4. **Validation & Persistance** :
+   - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
+   - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison classique (Staunton & Bois).
+   - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).

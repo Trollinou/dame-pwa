@@ -41,6 +41,8 @@
             :playerColor="couleurJoueur"
             :preserve-shapes-on-position-change="true"
             :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+            :piece-set="chessPreferences.pieceSet"
+            :board-theme="chessPreferences.boardTheme"
             @board-created="onBoardCreated"
             @square-click="gererClicCase"
           />
@@ -64,9 +66,12 @@ import { ref, computed, watch } from 'vue';
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
 import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { parseFenPieces, getActiveColorFromFen } from '@/utils/fenUtils';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface DiagrammeConfig {
   fen: string;

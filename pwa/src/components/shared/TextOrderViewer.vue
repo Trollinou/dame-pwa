@@ -15,6 +15,8 @@
           :boardConfig="boardConfig"
           :playerColor="couleurJoueurTyped"
           :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+          :piece-set="chessPreferences.pieceSet"
+          :board-theme="chessPreferences.boardTheme"
         />
       </div>
 
@@ -83,7 +85,10 @@ import {
   type ItemReorderCustomEvent
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface EtapeTexte {
   id: number;

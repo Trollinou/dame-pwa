@@ -87,6 +87,9 @@
             </ion-list>
           </div>
 
+          <!-- Personnalisation des pièces et du fond de l'échiquier -->
+          <ChessThemeCustomizer />
+
           <!-- Actions de profil -->
           <div class="actions-container">
             <ion-button 
@@ -171,6 +174,7 @@ import {
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import ChessThemeCustomizer from '@/components/profile/ChessThemeCustomizer.vue';
 
 const router = useRouter();
 const ionRouter = useIonRouter();

@@ -13,6 +13,8 @@
         }"
         :playerColor="couleurJoueur"
         :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+        :piece-set="chessPreferences.pieceSet"
+        :board-theme="chessPreferences.boardTheme"
         @board-created="onBoardCreated"
         @move="verifierCoup"
       />
@@ -26,6 +28,9 @@ import { toastController } from '@ionic/vue';
 import { default as TheChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
 import type { BoardCore, Key, DrawShape, Move } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+
+const chessPreferences = useChessPreferencesStore();
 
 const props = withDefaults(
   defineProps<{

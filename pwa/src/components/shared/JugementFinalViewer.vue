@@ -16,6 +16,8 @@
             :boardConfig="mainBoardConfig"
             :playerColor="playerColorTyped"
             :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+            :piece-set="chessPreferences.pieceSet"
+            :board-theme="chessPreferences.boardTheme"
             @board-created="onMainBoardCreated"
           />
         </div>
@@ -39,6 +41,8 @@
               :boardConfig="getScenarioBoardConfig()"
               :playerColor="playerColorTyped"
               :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+              :piece-set="chessPreferences.pieceSet"
+              :board-theme="chessPreferences.boardTheme"
               @board-created="(api: BoardCore) => onScenarioBoardCreated(index, api)"
               style="pointer-events: none;"
             />
@@ -84,11 +88,14 @@ import {
 } from '@ionic/vue';
 import EgChessboard from 'eg-chessboard/vue';
 import type { BoardCore } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { Chess } from 'chessops';
 import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { parsePgn } from 'chessops/pgn';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface ScenarioJugementFinal {
   pgn: string;

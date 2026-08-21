@@ -6,6 +6,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-21
+
+### Ajouté
+- **Personnalisation globale du thème de fond et du jeu de pièces de l'échiquier** :
+  - Création du store Pinia persistant `useChessPreferencesStore` (`pwa/src/stores/chessPreferences.ts`) mémorisant les choix `pieceSet` et `boardTheme`.
+  - Intégration des 8 jeux de pièces vectoriels (`staunton`, `merida`, `cburnett`, `alpha`, `cardinal`, `dubrovny`, `maestro`, `staunty`) et des 8 thèmes de plateau (`brown`, `blue`, `green`, `ic`, `grey`, `purple`, `wood`, `maple`) d'`eg-chessboard`.
+  - Composant interactif compact `ChessThemeCustomizer.vue` (`pwa/src/components/profile/ChessThemeCustomizer.vue`) avec double rouleau rotatif inline direct (`wheel-picker`), prévisualisation en direct de l'échiquier en position initiale, bouton d'enregistrement avec toast de confirmation et bouton de rétablissement des valeurs par défaut.
+  - Intégration directe dans le profil adhérent (`pwa/src/views/ProfilePage.vue`).
+  - Propagation globale et réactive des préférences sur l'ensemble des 16 composants et viewers d'échiquier de la PWA (`PlayPage`, `AnalysisPage`, `PuzzleViewer`, `DiagramViewer`, `CapOuPasCapViewer`, `EvalViewer`, `InteractiveQcmViewer`, `JugementFinalViewer`, `MatchingViewer`, `ParcoursViewer`, `PgnViewer`, `PlacementViewer`, `QcmViewer`, `QuiSuisJeViewer`, `TextOrderViewer`, `VisionViewer`).
+
 ### Amélioré & Sécurisé
 - **Typage strict TypeScript & Éradication intégrale des `any` (`pwa/src/`)** :
   - Remplacement de plus d'une vingtaine d'occurrences de types `any` dans les composants, vues, stores, composables et utilitaires du frontend PWA.

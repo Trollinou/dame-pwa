@@ -13,6 +13,8 @@
             orientation: couleurJoueur
           }"
           :playerColor="couleurJoueur"
+          :piece-set="chessPreferences.pieceSet"
+          :board-theme="chessPreferences.boardTheme"
         />
       </div>
 
@@ -71,8 +73,11 @@ import { toastController, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCa
 import EgChessboard from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
 import type { DrawShape } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import PuzzleViewer from './PuzzleViewer.vue';
 import PgnViewer from './PgnViewer.vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface QuestionEval {
   texte: string;

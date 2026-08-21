@@ -51,6 +51,8 @@
           <eg-chessboard
             :boardConfig="{ fen: '8/8/8/8/8/8/8/8 w - - 0 1', viewOnly: true }"
             :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+            :piece-set="chessPreferences.pieceSet"
+            :board-theme="chessPreferences.boardTheme"
             @square-click="verifierCase"
           />
         </div>
@@ -91,6 +93,9 @@ import {
 import { helpCircleOutline, bulbOutline } from 'ionicons/icons';
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface QcmChoix {
   texte: string;

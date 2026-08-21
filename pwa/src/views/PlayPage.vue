@@ -28,6 +28,8 @@
                 :board-config="boardConfig"
                 :player-color="boardConfig.playerColor"
                 :stockfish-config="stockfishConfig"
+                :piece-set="chessPreferences.pieceSet"
+                :board-theme="chessPreferences.boardTheme"
                 @board-created="handleBoardCreated"
                 @move="handleMove"
                 @turn-change="(turn, ply) => { turnColor = turn; currentPly = ply; }"
@@ -92,6 +94,7 @@ import 'eg-chessboard/style.css';
 import type { StockfishConfig, BoardCore, Move } from 'eg-chessboard';
 import { useAuthStore } from '@/stores/auth';
 import { useChessStore } from '@/stores/chess';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { useBoardOrientation } from '@/composables/play/useBoardOrientation';
 import { usePlayGame } from '@/composables/play/usePlayGame';
 import PlayInfoBar from '@/components/play/PlayInfoBar.vue';
@@ -100,6 +103,7 @@ import PlaySettingsModal from '@/components/play/PlaySettingsModal.vue';
 
 const authStore = useAuthStore();
 const chessStore = useChessStore();
+const chessPreferences = useChessPreferencesStore();
 
 const { isLandscape, renderKey } = useBoardOrientation();
 

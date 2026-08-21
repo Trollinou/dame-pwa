@@ -5,6 +5,8 @@
         mode="study"
         :boardConfig="pgnBoardConfig"
         :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
+        :piece-set="chessPreferences.pieceSet"
+        :board-theme="chessPreferences.boardTheme"
         @board-created="onBoardCreated"
       />
     </div>
@@ -47,7 +49,10 @@ import { IonButton, IonIcon } from '@ionic/vue';
 import { playBackOutline, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import EgChessboard from 'eg-chessboard/vue';
 import type { BoardCore } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 const props = defineProps<{
   pgnString?: string;
