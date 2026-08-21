@@ -3,8 +3,20 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import fs from 'node:fs';
+
+const packageJson = JSON.parse(
+	fs.readFileSync(
+		fileURLToPath( new URL( '../package.json', import.meta.url ) ),
+		'utf-8'
+	)
+);
+
 // https://vitejs.dev/config/
 export default defineConfig( {
+	define: {
+		__APP_VERSION__: JSON.stringify( packageJson.version ),
+	},
 	base: './', // Chemins relatifs pour les assets (indispensable pour WordPress)
 	plugins: [
 		vue( {

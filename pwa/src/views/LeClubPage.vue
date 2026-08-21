@@ -70,6 +70,7 @@
             @go-to-detail="goToDetail"
             @load-more-past="loadMorePast"
             @load-more-upcoming="loadMoreUpcoming"
+            @retry="agendaStore.fetchAgenda()"
           />
 
           <!-- ONGLET 2 : TOURNOIS -->

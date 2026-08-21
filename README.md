@@ -12,6 +12,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
   - `src/views/AnalysisPage.vue` : Revue et analyse coup par coup de la dernière partie jouée.
   - `src/components/agenda/` : Composants de la vue Agenda (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`).
   - `src/stores/agenda.ts` : Store Pinia gérant la récupération des événements de l'agenda et leurs catégories.
+  - `src/queryClient.ts` : Configuration de TanStack Query avec persistance et invalidation automatique des caches de requêtes lors des montées de version PWA.
 
 ## Espace de Jeu & Apprentissage
 

@@ -6,6 +6,19 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-08-23
+
+### Corrigé & Fiabilisé
+- **Fiabilisation des mises à jour PWA & Persistance de session** :
+  - Invalidation automatique du cache persistant TanStack Query (`DAME_QUERY_CACHE`) lors de la détection d'une nouvelle version de bundle applicatif sans déconnecter l'utilisateur ni effacer son token de session.
+  - Découplage du jeton JWT brut dans les clés de cache de l'Agenda (`stores/agenda.ts`) au profit d'un état discriminant `'auth' | 'public'` pour éviter les duplications et désynchronisations lors du renouvellement de token ou au retour d'arrière-plan.
+  - Nettoyage et sécurisation de la session (`stores/auth.ts`) : déconnexion systématique en cas d'échec de renouvellement de jeton JWT (`tryRefreshToken`), en préservant uniquement la session lors des coupures réseau temporaires.
+  - Repli gracieux automatique en mode public lors des erreurs 401/403 de l'Agenda afin d'assurer l'affichage des événements sans blocage.
+  - Correction de l'emplacement du composant `ion-refresher` (Pull-to-refresh) en enfant direct de `ion-content` sur la page d'accueil publique (`PublicHomePage.vue`).
+  - Dynamisation de la date du jour `todayStr` via un `computed()` réactif (`agendaStore.getTodayLocal()`) pour fiabiliser le filtrage des événements à venir sur l'accueil public.
+  - Ajout d'un bouton explicite "Actualiser l'agenda" dans la vue de l'agenda (`AgendaSegmentView.vue`).
+  - Augmentation du timeout réseau de 4s à 8s sur les requêtes d'agenda pour sécuriser les connexions mobiles lentes.
+
 ## [1.1.0] - 2026-08-21
 
 ### Ajouté

@@ -56,10 +56,15 @@
         </ion-item>
       </ion-list>
 
-      <!-- Aucun résultat -->
+      <!-- Aucun résultat ou échec de chargement -->
       <div v-else class="ion-text-center ion-padding">
         <p v-if="searchQuery">Aucun événement ne correspond à "{{ searchQuery }}".</p>
-        <p v-else>Aucun événement trouvé.</p>
+        <div v-else>
+          <p>Aucun événement disponible pour le moment.</p>
+          <ion-button fill="outline" size="small" @click="$emit('retry')">
+            Actualiser l'agenda
+          </ion-button>
+        </div>
       </div>
 
       <!-- Infinite Scroll BOTTOM (Futur) -->
@@ -86,6 +91,7 @@ import {
   IonItem,
   IonLabel,
   IonBadge,
+  IonButton,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   type InfiniteScrollCustomEvent,
@@ -108,6 +114,7 @@ defineEmits<{
   (e: 'go-to-detail', id: number): void;
   (e: 'load-more-past', event: InfiniteScrollCustomEvent): void;
   (e: 'load-more-upcoming', event: InfiniteScrollCustomEvent): void;
+  (e: 'retry'): void;
 }>();
 
 

@@ -14,12 +14,13 @@
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
+      <!-- Refresher pour le tirage vers le bas (doit être enfant direct de ion-content) -->
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
       <!-- Wrapper respectant la Dynamic Island -->
       <div class="safe-area-wrapper">
-        <!-- Refresher pour le tirage vers le bas -->
-        <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
-          <ion-refresher-content></ion-refresher-content>
-        </ion-refresher>
 
         <ion-header collapse="condense">
           <ion-toolbar>
@@ -187,18 +188,7 @@ const newsStore = useNewsStore();
 const latestPosts = computed(() => newsStore.posts.slice(0, 3));
 const isLoadingNews = computed(() => newsStore.isLoading);
 
-/**
- * Calcul de la date locale au format YYYY-MM-DD
- */
-const getTodayStr = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-const todayStr = getTodayStr();
+const todayStr = computed(() => agendaStore.getTodayLocal());
 
 const hasUnregisteredTargets = ref(!authStore.isAuthenticated);
 
@@ -286,7 +276,7 @@ const upcomingEvents = computed(() => {
 
 const isPast = (event: AgendaEvent): boolean => {
   const referenceDate = event.meta?._dame_end_date || event.meta?._dame_start_date || '';
-  return referenceDate < todayStr;
+  return referenceDate < todayStr.value;
 };
 
 /**
@@ -330,7 +320,7 @@ const isBenevolatExpired = (benevolat: Benevolat): boolean => {
     const dates = data.map((d) => d.date).filter(Boolean);
     if (dates.length === 0) return false;
     const maxDate = dates.reduce((max: string, d: string) => d > max ? d : max, dates[0]);
-    return maxDate < todayStr;
+    return maxDate < todayStr.value;
   }
   return false;
 };
@@ -382,11 +372,11 @@ const isToday = (event: AgendaEvent): boolean => {
 
   // Cas 1 : Événement sur une période (plusieurs jours)
   if (endDate && startDate !== endDate) {
-    return todayStr >= startDate && todayStr <= endDate;
+    return todayStr.value >= startDate && todayStr.value <= endDate;
   }
 
   // Cas 2 : Événement sur une seule journée
-  return startDate === todayStr;
+  return startDate === todayStr.value;
 };
 
 const goToNews = (id: number) => router.push(`/news/${id}`);

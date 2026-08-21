@@ -84,6 +84,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 					direction,
 					referenceDate,
 					page,
+					isAuth ? 'auth' : 'public',
 				],
 				queryFn: async () => {
 					if ( ! navigator.onLine ) {
@@ -119,11 +120,30 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 						headers.Authorization = `Bearer ${ token }`;
 					}
 
-					const response = await safeFetch(
+					let response = await safeFetch(
 						`${ baseUrl }?${ queryParams }`,
 						{ method: 'GET', headers },
-						4000
+						8000
 					);
+
+					// Repli gracieux : Si 401/403 avec un token invalide, on retente en mode public sans bloquer l'agenda
+					if (
+						( response.status === 401 ||
+							response.status === 403 ) &&
+						token
+					) {
+						console.warn(
+							'Accès agenda authentifié refusé, tentative de chargement public...'
+						);
+						response = await safeFetch(
+							`${ baseUrl }?${ queryParams }`,
+							{
+								method: 'GET',
+								headers: { 'Content-Type': 'application/json' },
+							},
+							8000
+						);
+					}
 
 					if ( ! response.ok ) {
 						if ( response.status === 400 ) {
@@ -178,7 +198,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 					direction,
 					referenceDate,
 					page,
-					isAuth ? token : 'public',
+					isAuth ? 'auth' : 'public',
 				] );
 				if ( cached ) {
 					return cached;
@@ -308,6 +328,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 					'month',
 					year,
 					month,
+					isAuth ? 'auth' : 'public',
 				],
 				queryFn: async () => {
 					if ( ! navigator.onLine ) {
@@ -334,11 +355,26 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 						headers.Authorization = `Bearer ${ token }`;
 					}
 
-					const response = await safeFetch(
+					let response = await safeFetch(
 						`${ baseUrl }?${ queryParams }`,
 						{ method: 'GET', headers },
-						4000
+						8000
 					);
+
+					if (
+						( response.status === 401 ||
+							response.status === 403 ) &&
+						token
+					) {
+						response = await safeFetch(
+							`${ baseUrl }?${ queryParams }`,
+							{
+								method: 'GET',
+								headers: { 'Content-Type': 'application/json' },
+							},
+							8000
+						);
+					}
 
 					if ( ! response.ok ) {
 						return [];
