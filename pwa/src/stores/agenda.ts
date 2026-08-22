@@ -84,7 +84,6 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 					direction,
 					referenceDate,
 					page,
-					isAuth ? token : 'public',
 				],
 				queryFn: async () => {
 					if ( ! navigator.onLine ) {
@@ -309,7 +308,6 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 					'month',
 					year,
 					month,
-					isAuth ? token : 'public',
 				],
 				queryFn: async () => {
 					if ( ! navigator.onLine ) {

@@ -203,11 +203,8 @@ export const useAuthStore = defineStore(
 				const msg = String(
 					err?.data?.message || err?.message || ''
 				).toLowerCase();
-				if (
-					msg.includes( 'expired' ) ||
-					msg.includes( 'invalid' ) ||
-					msg.includes( 'revoked' )
-				) {
+				// Déconnecter SAUF si erreur réseau temporaire
+				if (!msg.includes('network') && !msg.includes('offline') && !msg.includes('fetch')) {
 					logout();
 				}
 				return null;
