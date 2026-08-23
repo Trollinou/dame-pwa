@@ -8,10 +8,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Ajouté & Amélioré
 - **Affichage Split-View (Master-Detail 1/3 - 2/3) en mode Paysage sur Tablette & Ordinateur** :
-  - Mise en place d'un composant réutilisable `SplitMasterDetail.vue` et du composable réactif `useIsTabletLandscape.ts` activé sur grand écran ($\ge 992\text{px}$) et sur tablette en mode paysage ($\ge 768\text{px}$ landscape).
-  - **Actualités (`ActualitesSegmentView.vue`)** : Colonne 1/3 liste des cartes à gauche avec surbrillance active, colonne 2/3 affichage complet de l'article avec composant `NewsDetailContent.vue`. Sélection automatique du premier article.
+  - Conditionnement de la media query (`min-width: 1024px` ou `min-width: 768px and min-height: 600px in landscape`) pour réserver le Split-View aux véritables tablettes et ordinateurs, tout en préservant la vue pleine largeur naturelle sur iPhone et smartphones en mode paysage.
+  - **Actualités (`ActualitesSegmentView.vue`)** : Allègement des cartes de la liste latérale (suppression des extraits de texte verbeux, vignettes compactes et titres percutants) permettant d'afficher 3 à 4 articles simultanément.
+  - **Tournois (`TournoisSegmentView.vue`)** : Remplacement des grandes cartes génériques par une liste compacte et dense d'éléments avec icône trophée, titre et statut.
   - **Agenda Liste (`AgendaSegmentView.vue`)** : Colonne 1/3 liste des événements chronologiques, colonne 2/3 affichage détaillé (`AgendaDetailContent.vue`) avec bouton GPS/carte et actions. Sélection intelligente de l'événement courant/à venir par défaut.
-  - **Tournois (`TournoisSegmentView.vue`)** : Colonne 1/3 liste des compétitions à gauche, colonne 2/3 détails du tournoi et règlements (`TournamentDetailContent.vue`).
   - **Bénévolat (`BenevolatSegmentView.vue`)** : Colonne 1/3 liste des appels en cours et terminés, colonne 2/3 panneau d'inscription et de vote des créneaux (`BenevolatDetailContent.vue`).
   - **Extraction et mutualisation des vues de détail** : Refactorisation de `NewsDetailPage.vue`, `AgendaDetailPage.vue`, `GenericPage.vue`, `BenevolatDetailPage.vue` et `BenevolatVotePage.vue` pour déléguer leur rendu aux composants purs de contenu sans aucune duplication de code.
 - **Affichage iPad et Écrans larges en Mode Paysage pour l'Agenda (`AgendaCalendarView.vue`)** :

@@ -48,7 +48,7 @@ withDefaults(
 }
 
 /* Mode écran large / Tablette paysage : affichage en grille 1/3 - 2/3 */
-@media (min-width: 992px), ((min-width: 768px) and (orientation: landscape)) {
+@media (min-width: 1024px), ((min-width: 768px) and (min-height: 600px) and (orientation: landscape)) {
   .split-master-detail {
     display: grid;
     grid-template-columns: minmax(320px, 1fr) 2fr;

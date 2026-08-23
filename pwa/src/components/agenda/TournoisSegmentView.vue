@@ -23,33 +23,24 @@
           empty-title="Aucun tournoi sélectionné"
           empty-message="Sélectionnez un tournoi dans la liste pour voir les modalités d'inscription et le règlement."
         >
-          <!-- 1/3 GAUCHE : Cartes des tournois -->
+          <!-- 1/3 GAUCHE : Liste des tournois -->
           <template #master>
-            <div class="tournaments-list">
-              <ion-card
+            <ion-list class="tournaments-list" lines="full">
+              <ion-item
                 v-for="item in filteredTournaments"
                 :key="item.id"
-                :class="['tournament-card', 'ion-no-margin', 'ion-margin-bottom', { 'is-active': isTabletLandscape && item.object_id === selectedTournamentId }]"
                 button
                 @click="handleTournamentClick(item)"
+                :class="['tournament-item', { 'is-active': isTabletLandscape && item.object_id === selectedTournamentId }]"
               >
-                <ion-card-header>
-                  <div class="card-icon-container">
-                    <ion-icon :icon="trophyOutline" color="primary"></ion-icon>
-                  </div>
-                  <ion-card-subtitle>Compétition</ion-card-subtitle>
-                  <ion-card-title v-safe-html="item.title"></ion-card-title>
-                </ion-card-header>
-
-                <ion-card-content>
-                  <p>Découvrez les détails, les horaires et les modalités d'inscription pour ce tournoi.</p>
-                  <div class="cta-container">
-                    <span class="cta-text">Voir les détails</span>
-                    <ion-icon :icon="chevronForwardOutline" size="small"></ion-icon>
-                  </div>
-                </ion-card-content>
-              </ion-card>
-            </div>
+                <ion-icon slot="start" :icon="trophyOutline" color="primary" class="ion-margin-end"></ion-icon>
+                <ion-label>
+                  <h2 v-safe-html="item.title"></h2>
+                  <p>Compétition</p>
+                </ion-label>
+                <ion-icon slot="end" :icon="chevronForwardOutline" color="medium" style="opacity: 0.6; font-size: 1.1rem;"></ion-icon>
+              </ion-item>
+            </ion-list>
           </template>
 
           <!-- 2/3 DROITE : Panneau de détails en mode paysage / desktop -->
@@ -149,36 +140,30 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.tournament-card {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  border: 2px solid transparent;
+.tournaments-list {
+  background: transparent;
 }
 
-.tournament-card.is-active {
-  border-color: var(--ion-color-primary, #3880ff);
-  box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.2);
-  transform: scale(1.01);
+.tournament-item {
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.card-icon-container {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
+.tournament-item.is-active {
+  --background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.12);
+  border-left: 4px solid var(--ion-color-primary, #3880ff);
+  font-weight: 600;
 }
 
-.cta-container {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  color: var(--ion-color-primary);
-  font-weight: 500;
-  margin-top: 10px;
+.tournament-item h2 {
+  font-weight: 600;
+  font-size: 1rem;
 }
 
-.cta-text {
-  margin-right: 4px;
+.tournament-item p {
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
 }
 
 .offline-banner {

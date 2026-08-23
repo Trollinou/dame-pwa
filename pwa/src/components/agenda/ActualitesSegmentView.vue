@@ -22,15 +22,11 @@
                 :src="getFeaturedImage(post) || undefined"
                 :alt="post.title.rendered"
                 class="featured-image"
-                style="width: 100%; height: 180px; object-fit: cover;"
               />
-              <ion-card-header>
+              <ion-card-header class="news-card-header">
                 <ion-card-subtitle>{{ formatDate(post.date) }}</ion-card-subtitle>
-                <ion-card-title v-safe-html="post.title.rendered"></ion-card-title>
+                <ion-card-title class="news-card-title" v-safe-html="post.title.rendered"></ion-card-title>
               </ion-card-header>
-              <ion-card-content>
-                <div v-safe-html="post.excerpt.rendered"></div>
-              </ion-card-content>
             </ion-card>
           </div>
         </template>
@@ -156,5 +152,22 @@ onMounted(() => {
   border-color: var(--ion-color-primary, #3880ff);
   box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.2);
   transform: scale(1.01);
+}
+
+.featured-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.news-card-header {
+  padding: 10px 14px 14px 14px;
+}
+
+.news-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 4px;
 }
 </style>

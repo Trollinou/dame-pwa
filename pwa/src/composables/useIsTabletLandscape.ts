@@ -18,9 +18,9 @@ export function useIsTabletLandscape() {
 
 	onMounted( () => {
 		if ( typeof window !== 'undefined' && window.matchMedia ) {
-			// Détecte soit un écran large (>= 992px), soit une tablette (>= 768px) orientée en paysage
+			// Détecte soit un écran large (>= 1024px), soit une tablette (>= 768px large et >= 600px haut) orientée en paysage
 			mediaQueryList = window.matchMedia(
-				'(min-width: 992px), ((min-width: 768px) and (orientation: landscape))'
+				'(min-width: 1024px), ((min-width: 768px) and (min-height: 600px) and (orientation: landscape))'
 			);
 			isTabletLandscape.value = mediaQueryList.matches;
 
