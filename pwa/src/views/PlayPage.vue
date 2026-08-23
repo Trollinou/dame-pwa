@@ -10,7 +10,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true" :scroll-y="false" class="ion-padding">
-      <div class="game-layout safe-area-wrapper">
+      <div class="game-layout safe-area-wrapper" :class="{ 'landscape-wrapper': isLandscape }">
         <!-- Carte d'Information Style Exercice -->
         <PlayInfoBar
           v-if="engineLoaded"
@@ -279,6 +279,10 @@ onIonViewWillLeave(() => {
   margin: 0 auto;
 }
 
+.landscape-wrapper {
+  max-width: 100% !important;
+}
+
 .game-layout {
   display: flex;
   flex-direction: column;
@@ -300,8 +304,10 @@ onIonViewWillLeave(() => {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
   max-width: 100%;
+  width: 100%;
+  margin: 0 !important;
 }
 
 .board-section {
@@ -312,6 +318,10 @@ onIonViewWillLeave(() => {
 
 .landscape-mode .board-section {
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
   width: auto;
   padding: 0;
 }
@@ -344,13 +354,23 @@ onIonViewWillLeave(() => {
 
 .landscape-mode :deep(.main-wrap) {
   width: 100% !important;
+  height: 100% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  max-width: none !important;
+}
+
+.landscape-mode :deep(.main-board) {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
 }
 
 .landscape-mode .board-container {
-  width: min(65vh, 48vw) !important;
+  width: min(75vh, 50vw) !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
   max-width: 100%;
   margin: 0 auto !important;
   padding: 0 !important;

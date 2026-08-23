@@ -10,7 +10,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true" :scroll-y="false" class="ion-padding">
-      <div class="analysis-layout safe-area-wrapper">
+      <div class="analysis-layout safe-area-wrapper" :class="{ 'landscape-wrapper': isLandscape }">
         <!-- Carte d'information méta -->
         <div class="analysis-meta-card" v-if="isReady">
           <div class="meta-main">
@@ -326,6 +326,10 @@ onIonViewWillLeave(() => {
 .safe-area-wrapper {
   max-width: 600px;
   margin: 0 auto;
+}
+
+.landscape-wrapper {
+  max-width: 100% !important;
 }
 
 .analysis-layout {

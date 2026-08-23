@@ -4,9 +4,12 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2026-08-23
 
 ### Ajouté & Amélioré
+- **Optimisation de l'affichage Échiquier sur iPad et Tablettes en mode Paysage** :
+  - **Partie d'Échecs (`PlayPage.vue`)** : Levée de la contrainte globale de largeur `max-width: 600px` en mode paysage via la classe dynamique `landscape-wrapper`, permettant à l'échiquier d'occuper harmonieusement l'écran (`width: min(75vh, 50vw)`) avec centrage vertical et disposition aérée des commandes de jeu.
+  - **Analyse de partie (`AnalysisPage.vue`)** : Suppression du bridage de largeur en mode paysage, garantissant l'alignement responsive parfait entre le plateau et le panneau latéral de défilement de l'historique des coups.
 - **Affichage Split-View (Master-Detail 1/3 - 2/3) en mode Paysage sur Tablette & Ordinateur** :
   - Conditionnement de la media query (`min-width: 1024px` ou `min-width: 768px and min-height: 600px in landscape`) pour réserver le Split-View aux véritables tablettes et ordinateurs, tout en préservant la vue pleine largeur naturelle sur iPhone et smartphones en mode paysage.
   - **Actualités (`ActualitesSegmentView.vue`)** : Allègement des cartes de la liste latérale (suppression des extraits de texte verbeux, vignettes compactes et titres percutants) permettant d'afficher 3 à 4 articles simultanément.

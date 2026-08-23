@@ -21,6 +21,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 - **Hub Apprentissage** : Accessible à tous depuis la barre d'onglets, il offre un point d'entrée vers les cours théoriques (protégés par adhésion) et vers l'échiquier de jeu (libre d'accès).
 - **Moteur Stockfish** : Embarqué via `eg-chessboard` avec calcul dynamique du temps de réflexion (`Elo * 1.4 ms`) et mémorisation du niveau choisi.
 - **Envoi PGN** : En mode 1 joueur, les parties des adhérents connectés sont enregistrées et synchronisées avec le plugin `roi` (`POST /roi/v1/games`).
+- **Ergonomie iPad & Tablettes (Paysage)** : Adaptation plein écran avec disposition côte-à-côte centrée pour l'échiquier de jeu et la revue d'analyse.
 - **Personnalisation Globale de l'Échiquier** : Store Pinia persistant `useChessPreferencesStore` gérant le jeu de pièces vectoriel (`pieceSet` parmi 8 styles) et le thème d'arrière-plan (`boardTheme` parmi 8 palettes) injectés réactivement sur tous les échiquiers de l'application.
 
 ## Profil & Personnalisation

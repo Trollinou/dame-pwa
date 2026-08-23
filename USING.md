@@ -38,6 +38,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
 
 2. **Partie d'Échecs & Échiquier ♟️** :
    - Accessible librement à tous les visiteurs et adhérents.
+   - **Disposition responsive Paysage (iPad & Tablettes)** : L'échiquier et les panneaux de commandes / historique se placent automatiquement côte à côte sur toute la largeur disponible avec un centrage vertical optimal.
    - **Mode 1 Joueur (vs Stockfish)** :
      - Choix de la couleur (Blancs, Noirs ou Aléatoire).
      - Choix du niveau Elo (mémorisé pour les prochaines parties).
