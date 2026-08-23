@@ -153,6 +153,8 @@ const changeAgendaViewMode = (mode: 'list' | 'calendar') => {
     localStorage.setItem(STORAGE_KEY, mode);
     if (mode === 'calendar') {
       searchQuery.value = '';
+    } else if (mode === 'list') {
+      scrollToCurrentEvent();
     }
   }
 };
@@ -219,6 +221,7 @@ const loadTabContent = () => {
   if (selectedSegment.value === 'actualites') {
     fetchNews();
   } else if (selectedSegment.value === 'agenda') {
+    agendaStore.fetchAgenda();
     scrollToCurrentEvent();
   } else if (selectedSegment.value === 'tournois') {
     fetchTournaments();
@@ -229,6 +232,7 @@ const loadTabContent = () => {
 
 watch(selectedSegment, (newSeg) => {
   if (newSeg === 'agenda') {
+    agendaStore.fetchAgenda();
     scrollToCurrentEvent();
   }
 });
@@ -312,8 +316,8 @@ const loadMorePast = async (ev: InfiniteScrollCustomEvent) => {
 
 const scrollToCurrentEvent = async () => {
   await nextTick();
-  const attemptScroll = (retries = 3) => {
-    if (selectedSegment.value !== 'agenda') return;
+  const attemptScroll = (retries = 5) => {
+    if (selectedSegment.value !== 'agenda' || agendaViewMode.value !== 'list') return;
     const targetEvent = events.value.find((e) => {
       const refDate = e.meta?._dame_end_date || e.meta?._dame_start_date || '';
       return refDate >= todayStr;
@@ -321,9 +325,9 @@ const scrollToCurrentEvent = async () => {
     if (targetEvent) {
       const el = document.getElementById('event-' + targetEvent.id);
       if (el) {
-        el.scrollIntoView({ behavior: 'auto', block: 'center' });
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (retries > 0) {
-        setTimeout(() => attemptScroll(retries - 1), 100);
+        setTimeout(() => attemptScroll(retries - 1), 120);
       }
     }
   };

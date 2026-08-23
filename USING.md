@@ -4,11 +4,14 @@
 
 Le module Agenda propose deux modes de représentation pour visualiser les événements du club :
 
-1. **Mode Liste ☰** : Liste de roulement avec défilement infini pour consulter l'historique et les événements futurs.
+1. **Mode Liste ☰** :
+   - Liste de roulement avec défilement infini pour consulter l'historique et les événements futurs.
+   - **Recentrage automatique** : Se positionne automatiquement sur l'événement actuel du jour ou le prochain événement à venir lors du chargement, du changement d'onglet ou de la bascule vers le mode liste.
 2. **Mode Calendrier (Style iOS) 📅** :
-   - Grille mensuelle affichant les numéros de jours du mois.
+   - Grille mensuelle affichant les numéros de jours du mois avec swipe tactile horizontal pour changer de mois.
    - Puces/pastilles de couleur sous les chiffres représentant les catégories des événements prévus.
-   - Sélection d'une date pour consulter instantanément les événements du jour sélectionné sous le calendrier (horaires, titre, lieu, et accent de couleur).
+   - Sélection d'une date pour consulter instantanément les événements du jour sélectionné sous le calendrier (ou dans le volet latéral droit en affichage tablette/paysage).
+   - **Affichage iPad / Mode Paysage / Écrans larges** : Disposition optimisée en 2 colonnes côte à côte (calendrier complet sans défilement de page à gauche, liste des événements du jour avec défilement autonome à droite).
    - **Persistance** : Le choix d'affichage (Liste ou Calendrier) est sauvegardé dans le navigateur (`localStorage`) pour être conservé lors des futures sessions.
 
 ## Module Apprentissage & Jeu

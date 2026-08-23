@@ -1,62 +1,65 @@
 <template>
   <div class="agenda-calendar-view" @touchstart="onTouchStart" @touchend="onTouchEnd">
-    <!-- En-tête Navigation Mois -->
-    <div class="calendar-header ion-padding-horizontal">
-      <div class="month-title-wrapper">
-        <h2 class="month-title">{{ monthYearTitle }}</h2>
-        <ion-button fill="clear" size="small" class="today-button" @click="goToToday">
-          Aujourd'hui
-        </ion-button>
-      </div>
-
-      <div class="month-nav-buttons">
-        <ion-button fill="clear" size="small" @click="prevMonth" aria-label="Mois précédent">
-          <ion-icon :icon="chevronBackOutline" slot="icon-only"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" size="small" @click="nextMonth" aria-label="Mois suivant">
-          <ion-icon :icon="chevronForwardOutline" slot="icon-only"></ion-icon>
-        </ion-button>
-      </div>
-    </div>
-
-    <!-- Jours de la semaine (L, M, M, J, V, S, D) -->
-    <div class="calendar-weekdays">
-      <div v-for="day in weekdays" :key="day" class="weekday-cell">
-        {{ day }}
-      </div>
-    </div>
-
-    <!-- Grille des jours du mois -->
-    <div class="calendar-grid">
-      <div
-        v-for="(cell, index) in calendarCells"
-        :key="index"
-        class="day-cell"
-        :class="{
-          'other-month': !cell.isCurrentMonth,
-          'is-today': cell.isToday,
-          'is-selected': cell.dateStr === selectedDateStr,
-          'has-events': cell.events.length > 0
-        }"
-        @click="selectDate(cell.dateStr)"
-      >
-        <div class="day-number-wrapper">
-          <span class="day-number">{{ cell.dayNumber }}</span>
+    <!-- Panneau Gauche : Calendrier du Mois -->
+    <div class="calendar-month-panel">
+      <!-- En-tête Navigation Mois -->
+      <div class="calendar-header ion-padding-horizontal">
+        <div class="month-title-wrapper">
+          <h2 class="month-title">{{ monthYearTitle }}</h2>
+          <ion-button fill="clear" size="small" class="today-button" @click="goToToday">
+            Aujourd'hui
+          </ion-button>
         </div>
 
-        <!-- Symbole / Pastilles de couleur sous les chiffres -->
-        <div class="event-dots-container">
-          <span
-            v-for="(color, dotIdx) in cell.categoryColors.slice(0, 4)"
-            :key="dotIdx"
-            class="event-dot"
-            :style="{ backgroundColor: color }"
-          ></span>
+        <div class="month-nav-buttons">
+          <ion-button fill="clear" size="small" @click="prevMonth" aria-label="Mois précédent">
+            <ion-icon :icon="chevronBackOutline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" @click="nextMonth" aria-label="Mois suivant">
+            <ion-icon :icon="chevronForwardOutline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Jours de la semaine (L, M, M, J, V, S, D) -->
+      <div class="calendar-weekdays">
+        <div v-for="day in weekdays" :key="day" class="weekday-cell">
+          {{ day }}
+        </div>
+      </div>
+
+      <!-- Grille des jours du mois -->
+      <div class="calendar-grid">
+        <div
+          v-for="(cell, index) in calendarCells"
+          :key="index"
+          class="day-cell"
+          :class="{
+            'other-month': !cell.isCurrentMonth,
+            'is-today': cell.isToday,
+            'is-selected': cell.dateStr === selectedDateStr,
+            'has-events': cell.events.length > 0
+          }"
+          @click="selectDate(cell.dateStr)"
+        >
+          <div class="day-number-wrapper">
+            <span class="day-number">{{ cell.dayNumber }}</span>
+          </div>
+
+          <!-- Symbole / Pastilles de couleur sous les chiffres -->
+          <div class="event-dots-container">
+            <span
+              v-for="(color, dotIdx) in cell.categoryColors.slice(0, 4)"
+              :key="dotIdx"
+              class="event-dot"
+              :style="{ backgroundColor: color }"
+            ></span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Section Liste des Événements du jour sélectionné -->
+    <!-- Panneau Droit : Liste des Événements du jour sélectionné -->
     <div class="selected-day-events ion-margin-top">
       <div class="selected-day-header ion-padding-horizontal">
         <h3>{{ formattedSelectedDate }}</h3>
@@ -65,30 +68,32 @@
         </span>
       </div>
 
-      <ion-list v-if="selectedDayEvents.length > 0" class="day-event-list">
-        <ion-item
-          v-for="event in selectedDayEvents"
-          :key="event.id"
-          button
-          detail
-          @click="$emit('go-to-detail', event.id)"
-          class="day-event-item"
-        >
-          <!-- Accent couleur catégorie à gauche -->
-          <div
-            class="category-color-bar"
-            :style="{ backgroundColor: getEventPrimaryColor(event) }"
-          ></div>
+      <div class="day-events-scrollable">
+        <ion-list v-if="selectedDayEvents.length > 0" class="day-event-list">
+          <ion-item
+            v-for="event in selectedDayEvents"
+            :key="event.id"
+            button
+            detail
+            @click="$emit('go-to-detail', event.id)"
+            class="day-event-item"
+          >
+            <!-- Accent couleur catégorie à gauche -->
+            <div
+              class="category-color-bar"
+              :style="{ backgroundColor: getEventPrimaryColor(event) }"
+            ></div>
 
-          <ion-label class="ion-padding-start">
-            <h2 class="event-title" v-safe-html="event.title.rendered"></h2>
-            <p class="event-time-location">{{ formatEventTime(event) }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+            <ion-label class="ion-padding-start">
+              <h2 class="event-title" v-safe-html="event.title.rendered"></h2>
+              <p class="event-time-location">{{ formatEventTime(event) }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
 
-      <div v-else class="no-events-placeholder ion-text-center ion-padding">
-        <p>Aucun événement prévu pour cette date.</p>
+        <div v-else class="no-events-placeholder ion-text-center ion-padding">
+          <p>Aucun événement prévu pour cette date.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -356,6 +361,12 @@ const onTouchEnd = (e: TouchEvent) => {
   flex-direction: column;
   user-select: none;
   touch-action: pan-y;
+  gap: 8px;
+}
+
+.calendar-month-panel {
+  display: flex;
+  flex-direction: column;
 }
 
 /* En-tête mois */
@@ -468,6 +479,8 @@ const onTouchEnd = (e: TouchEvent) => {
   border-top: 1px solid var(--ion-color-light-shade, #e0e0e0);
   padding-top: 4px;
   margin-top: 4px;
+  display: flex;
+  flex-direction: column;
 }
 .selected-day-header {
   display: flex;
@@ -489,6 +502,9 @@ const onTouchEnd = (e: TouchEvent) => {
   padding: 1px 6px;
   border-radius: 10px;
   font-weight: 500;
+}
+.day-events-scrollable {
+  overflow-y: auto;
 }
 .day-event-list {
   background: transparent;
@@ -529,6 +545,60 @@ const onTouchEnd = (e: TouchEvent) => {
   color: var(--ion-color-medium);
   font-size: 0.85rem;
   margin: 4px 0;
+}
+
+/* -------------------------------------------------------------------------
+   Disposition 2 colonnes pour Tablettes / iPad en mode Paysage & Écrans larges
+   ------------------------------------------------------------------------- */
+@media (min-width: 768px), (orientation: landscape) and (min-width: 640px) {
+  .agenda-calendar-view {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 16px;
+    height: calc(100vh - 200px);
+    max-height: 520px;
+  }
+
+  .calendar-month-panel {
+    flex: 1 1 50%;
+    max-width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .calendar-grid {
+    flex: 1;
+  }
+
+  .day-cell {
+    aspect-ratio: auto;
+    min-height: 44px;
+    padding-top: 2px;
+  }
+
+  .selected-day-events {
+    flex: 1 1 50%;
+    max-width: 50%;
+    border-top: none;
+    border-left: 1px solid var(--ion-color-light-shade, #e0e0e0);
+    padding-top: 0;
+    padding-left: 12px;
+    margin-top: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .selected-day-header {
+    flex-shrink: 0;
+  }
+
+  .day-events-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+  }
 }
 </style>
 
