@@ -182,6 +182,15 @@ const goToToday = () => {
 
 const selectDate = (dateStr: string) => {
   selectedDateStr.value = dateStr;
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    if (year !== currentYear.value || month !== currentMonth.value) {
+      currentYear.value = year;
+      currentMonth.value = month;
+    }
+  }
 };
 
 interface CalendarCell {

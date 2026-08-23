@@ -18,6 +18,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Mise en place d'une disposition responsive en deux colonnes (50% / 50%) sur tablettes et écrans larges en mode paysage (`@media (min-width: 768px), (orientation: landscape) and (min-width: 640px)`).
   - La moitié gauche accueille le calendrier du mois (en-tête mois, jours de la semaine et grille mensuelle) dimensionné pour être intégralement visible sans aucun défilement vertical de la page.
   - La moitié droite accueille la liste des événements du jour sélectionné avec son propre défilement interne (`overflow-y: auto`).
+- **Navigation fluide dans le Calendrier de l'Agenda (`AgendaCalendarView.vue`)** :
+  - Clic sur un jour hors du mois courant (jours du mois précédent ou suivant affichés pour compléter les semaines) : bascule automatiquement la vue sur le mois ciblé, charge ses événements et sélectionne la date cliquée.
 - **Recentrage automatique & Synchronisation de l'Agenda (`LeClubPage.vue`)** :
   - Déclenchement systématique de `agendaStore.fetchAgenda()` et `scrollToCurrentEvent()` lors de l'accès à l'onglet Agenda ou du changement de segment pour garantir le rafraîchissement complet des événements sans dépendre d'un passage préalable par l'accueil.
   - Déclenchement automatique de `scrollToCurrentEvent()` lors du basculement en vue Liste (`changeAgendaViewMode`).

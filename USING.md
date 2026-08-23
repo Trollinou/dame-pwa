@@ -21,6 +21,7 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
    - Grille mensuelle affichant les numéros de jours du mois avec swipe tactile horizontal pour changer de mois.
    - Puces/pastilles de couleur sous les chiffres représentant les catégories des événements prévus.
    - Sélection d'une date pour consulter instantanément les événements du jour sélectionné sous le calendrier (ou dans le volet latéral droit en affichage tablette/paysage).
+   - **Navigation inter-mois intuitive** : Le clic sur un jour appartenant au mois précédent ou suivant déplace automatiquement l'affichage vers ce mois et sélectionne le jour demandé.
    - **Persistance** : Le choix d'affichage (Liste ou Calendrier) est sauvegardé dans le navigateur (`localStorage`) pour être conservé lors des futures sessions.
 
 ## Module Apprentissage & Jeu
