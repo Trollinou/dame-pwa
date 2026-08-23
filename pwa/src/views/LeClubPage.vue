@@ -340,16 +340,15 @@ onIonViewWillEnter(async () => {
   }
   loadTabContent();
 
-  if (events.value.length === 0) {
-    isLoading.value = true;
-  } else {
+  if (events.value.length > 0) {
     scrollToCurrentEvent();
   }
 
   try {
     await agendaStore.fetchAgenda();
+  } catch (err) {
+    console.error('Erreur chargement agenda:', err);
   } finally {
-    isLoading.value = false;
     scrollToCurrentEvent();
   }
 });

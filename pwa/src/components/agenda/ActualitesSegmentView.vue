@@ -6,28 +6,44 @@
     </div>
 
     <div v-else-if="filteredNews.length > 0">
-      <ion-card
-        v-for="post in filteredNews"
-        :key="post.id"
-        class="news-card ion-no-margin ion-margin-bottom"
-        button
-        @click="$emit('go-to-news-detail', post.id)"
-      >
-        <img
-          v-if="getFeaturedImage(post)"
-          :src="getFeaturedImage(post) || undefined"
-          :alt="post.title.rendered"
-          class="featured-image"
-          style="width: 100%; height: 200px; object-fit: cover;"
-        />
-        <ion-card-header>
-          <ion-card-subtitle>{{ formatDate(post.date) }}</ion-card-subtitle>
-          <ion-card-title v-safe-html="post.title.rendered"></ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div v-safe-html="post.excerpt.rendered"></div>
-        </ion-card-content>
-      </ion-card>
+      <SplitMasterDetail :has-selection="!!selectedPost" empty-title="Aucun article sélectionné" empty-message="Sélectionnez une actualité dans la liste pour lire son contenu.">
+        <!-- 1/3 GAUCHE : Liste des actualités -->
+        <template #master>
+          <div class="news-list">
+            <ion-card
+              v-for="post in filteredNews"
+              :key="post.id"
+              :class="['news-card', 'ion-no-margin', 'ion-margin-bottom', { 'is-active': isTabletLandscape && post.id === selectedPostId }]"
+              button
+              @click="handlePostClick(post)"
+            >
+              <img
+                v-if="getFeaturedImage(post)"
+                :src="getFeaturedImage(post) || undefined"
+                :alt="post.title.rendered"
+                class="featured-image"
+                style="width: 100%; height: 180px; object-fit: cover;"
+              />
+              <ion-card-header>
+                <ion-card-subtitle>{{ formatDate(post.date) }}</ion-card-subtitle>
+                <ion-card-title v-safe-html="post.title.rendered"></ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div v-safe-html="post.excerpt.rendered"></div>
+              </ion-card-content>
+            </ion-card>
+          </div>
+        </template>
+
+        <!-- 2/3 DROITE : Panneau de détails en mode paysage / desktop -->
+        <template #detail>
+          <NewsDetailContent
+            v-if="selectedPost"
+            :post="selectedPost"
+            :post-id="selectedPost.id"
+          />
+        </template>
+      </SplitMasterDetail>
     </div>
 
     <div v-else class="ion-text-center ion-padding">
@@ -38,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import {
   IonSpinner,
   IonCard,
@@ -49,16 +65,22 @@ import {
 } from '@ionic/vue';
 import { useNewsStore, type Post } from '@/stores/news';
 import { removeAccents } from '@/utils/stringUtils';
+import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
+import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
+import NewsDetailContent from '@/components/agenda/detail/NewsDetailContent.vue';
 
 const newsStore = useNewsStore();
+const { isTabletLandscape } = useIsTabletLandscape();
 
 const props = defineProps<{
   searchQuery: string;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'go-to-news-detail', id: number): void;
 }>();
+
+const selectedPostId = ref<number | null>(null);
 
 const filteredNews = computed(() => {
   if (!props.searchQuery.trim()) return newsStore.posts;
@@ -68,6 +90,30 @@ const filteredNews = computed(() => {
   );
 });
 
+const selectedPost = computed(() => {
+  if (!selectedPostId.value) return null;
+  return filteredNews.value.find((p) => p.id === selectedPostId.value) || null;
+});
+
+// Sélectionne automatiquement le 1er article si aucun sélectionné ou filtre modifié
+const autoSelectFirst = () => {
+  if (filteredNews.value.length > 0) {
+    const exists = filteredNews.value.some((p) => p.id === selectedPostId.value);
+    if (!exists) {
+      selectedPostId.value = filteredNews.value[0].id;
+    }
+  } else {
+    selectedPostId.value = null;
+  }
+};
+
+const handlePostClick = (post: Post) => {
+  selectedPostId.value = post.id;
+  if (!isTabletLandscape.value) {
+    emit('go-to-news-detail', post.id);
+  }
+};
+
 const getFeaturedImage = (post: Post): string | null => {
   return post._embedded?.['wp:featuredmedia']?.[0]?.source_url || null;
 };
@@ -76,9 +122,25 @@ const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric',
+    year: 'numeric'
   });
 };
+
+watch(filteredNews, () => {
+  if (isTabletLandscape.value) {
+    autoSelectFirst();
+  }
+});
+
+watch(isTabletLandscape, (landscape) => {
+  if (landscape) {
+    autoSelectFirst();
+  }
+});
+
+onMounted(() => {
+  autoSelectFirst();
+});
 </script>
 
 <style scoped>
@@ -86,5 +148,13 @@ const formatDate = (dateString: string): string => {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  border: 2px solid transparent;
+}
+
+.news-card.is-active {
+  border-color: var(--ion-color-primary, #3880ff);
+  box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.2);
+  transform: scale(1.01);
 }
 </style>

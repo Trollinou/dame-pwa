@@ -254,6 +254,8 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 		} );
 	};
 
+	let isFetchingAgenda = false;
+
 	/**
 	 * Rafraîchit les données de base (utilisé par Home et Pull-to-refresh)
 	 */
@@ -261,12 +263,13 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 		// Si on est déjà en cours de chargement ou hors ligne avec des données, on ignore
 		// Ajout d'une vérification de "fraîcheur" (5 min) pour éviter les erreurs console inutiles
 		if (
-			isLoading.value ||
+			isFetchingAgenda ||
 			( ! navigator.onLine && events.value.length > 0 )
 		) {
 			return;
 		}
 
+		isFetchingAgenda = true;
 		isLoading.value = true;
 		try {
 			const today = getTodayLocal();
@@ -298,6 +301,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 			upcomingPage.value = 1;
 		} finally {
 			isLoading.value = false;
+			isFetchingAgenda = false;
 		}
 	};
 

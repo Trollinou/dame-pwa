@@ -7,6 +7,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Ajouté & Amélioré
+- **Affichage Split-View (Master-Detail 1/3 - 2/3) en mode Paysage sur Tablette & Ordinateur** :
+  - Mise en place d'un composant réutilisable `SplitMasterDetail.vue` et du composable réactif `useIsTabletLandscape.ts` activé sur grand écran ($\ge 992\text{px}$) et sur tablette en mode paysage ($\ge 768\text{px}$ landscape).
+  - **Actualités (`ActualitesSegmentView.vue`)** : Colonne 1/3 liste des cartes à gauche avec surbrillance active, colonne 2/3 affichage complet de l'article avec composant `NewsDetailContent.vue`. Sélection automatique du premier article.
+  - **Agenda Liste (`AgendaSegmentView.vue`)** : Colonne 1/3 liste des événements chronologiques, colonne 2/3 affichage détaillé (`AgendaDetailContent.vue`) avec bouton GPS/carte et actions. Sélection intelligente de l'événement courant/à venir par défaut.
+  - **Tournois (`TournoisSegmentView.vue`)** : Colonne 1/3 liste des compétitions à gauche, colonne 2/3 détails du tournoi et règlements (`TournamentDetailContent.vue`).
+  - **Bénévolat (`BenevolatSegmentView.vue`)** : Colonne 1/3 liste des appels en cours et terminés, colonne 2/3 panneau d'inscription et de vote des créneaux (`BenevolatDetailContent.vue`).
+  - **Extraction et mutualisation des vues de détail** : Refactorisation de `NewsDetailPage.vue`, `AgendaDetailPage.vue`, `GenericPage.vue`, `BenevolatDetailPage.vue` et `BenevolatVotePage.vue` pour déléguer leur rendu aux composants purs de contenu sans aucune duplication de code.
 - **Affichage iPad et Écrans larges en Mode Paysage pour l'Agenda (`AgendaCalendarView.vue`)** :
   - Mise en place d'une disposition responsive en deux colonnes (50% / 50%) sur tablettes et écrans larges en mode paysage (`@media (min-width: 768px), (orientation: landscape) and (min-width: 640px)`).
   - La moitié gauche accueille le calendrier du mois (en-tête mois, jours de la semaine et grille mensuelle) dimensionné pour être intégralement visible sans aucun défilement vertical de la page.
@@ -15,6 +22,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Déclenchement systématique de `agendaStore.fetchAgenda()` et `scrollToCurrentEvent()` lors de l'accès à l'onglet Agenda ou du changement de segment pour garantir le rafraîchissement complet des événements sans dépendre d'un passage préalable par l'accueil.
   - Déclenchement automatique de `scrollToCurrentEvent()` lors du basculement en vue Liste (`changeAgendaViewMode`).
   - Fiabilisation du scroll (`behavior: 'smooth', block: 'start'`) vers l'événement du jour ou le prochain événement à venir.
+
+### Corrigé & Fiabilisé
+- **Fiabilisation du chargement de l'Agenda (`stores/agenda.ts`, `LeClubPage.vue`)** :
+  - Découplage de l'indicateur d'état `isLoading` et du verrou interne de requête (`isFetchingAgenda`) pour éviter l'annulation prématurée de `fetchAgenda()` lors de l'initialisation de la vue.
+  - Nettoyage du hook `onIonViewWillEnter` pour garantir le chargement systématique et fluide des événements sans collision d'état.
 
 ## [1.1.1] - 2026-08-23
 

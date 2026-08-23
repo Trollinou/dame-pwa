@@ -1,17 +1,26 @@
 # Guide d'utilisation DAME-PWA
 
-## Module Agenda
+## Module Le Club (Actualités, Agenda, Tournois, Bénévolat)
 
-Le module Agenda propose deux modes de représentation pour visualiser les événements du club :
+Le module **Le Club** propose une navigation par segments adaptée dynamiquement à la taille de l'écran et à l'orientation :
 
-1. **Mode Liste ☰** :
-   - Liste de roulement avec défilement infini pour consulter l'historique et les événements futurs.
-   - **Recentrage automatique** : Se positionne automatiquement sur l'événement actuel du jour ou le prochain événement à venir lors du chargement, du changement d'onglet ou de la bascule vers le mode liste.
-2. **Mode Calendrier (Style iOS) 📅** :
+1. **Affichage Split-View (1/3 - 2/3) sur Tablette Paysage et Ordinateur** :
+   - **Disposition 1/3 (Gauche)** : Liste fluide des éléments avec carte active mise en valeur lors de la sélection.
+   - **Disposition 2/3 (Droite)** : Panneau latéral dédié affichant le contenu complet et les actions associées.
+   - **Actualités** : Sélection automatique du premier article.
+   - **Agenda (Mode Liste ☰)** : Sélection intelligente par défaut de l'événement courant ou du plus proche à venir.
+   - **Tournois** : Consultation instantanée des modalités, règlements et formulaires HelloAsso.
+   - **Bénévolat** : Sélection des créneaux horaires, formulaire d'inscription direct pour les adhérents ou vue administration des inscrits.
+   - **Double défilement indépendant** : Le scroll de la liste de gauche ne déplace pas le panneau de détail de droite, et inversement.
+
+2. **Affichage Mobile & Portrait** :
+   - Liste des éléments en pleine largeur.
+   - Le clic sur un élément ouvre la page de détail plein écran avec bouton de retour.
+
+3. **Module Agenda - Mode Calendrier (Style iOS) 📅** :
    - Grille mensuelle affichant les numéros de jours du mois avec swipe tactile horizontal pour changer de mois.
    - Puces/pastilles de couleur sous les chiffres représentant les catégories des événements prévus.
    - Sélection d'une date pour consulter instantanément les événements du jour sélectionné sous le calendrier (ou dans le volet latéral droit en affichage tablette/paysage).
-   - **Affichage iPad / Mode Paysage / Écrans larges** : Disposition optimisée en 2 colonnes côte à côte (calendrier complet sans défilement de page à gauche, liste des événements du jour avec défilement autonome à droite).
    - **Persistance** : Le choix d'affichage (Liste ou Calendrier) est sauvegardé dans le navigateur (`localStorage`) pour être conservé lors des futures sessions.
 
 ## Module Apprentissage & Jeu

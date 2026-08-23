@@ -204,7 +204,11 @@ export const useAuthStore = defineStore(
 					err?.data?.message || err?.message || ''
 				).toLowerCase();
 				// Déconnecter SAUF si erreur réseau temporaire
-				if (!msg.includes('network') && !msg.includes('offline') && !msg.includes('fetch')) {
+				if (
+					! msg.includes( 'network' ) &&
+					! msg.includes( 'offline' ) &&
+					! msg.includes( 'fetch' )
+				) {
 					logout();
 				}
 				return null;
