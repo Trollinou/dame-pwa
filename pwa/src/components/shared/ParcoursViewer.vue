@@ -1,19 +1,15 @@
 <template>
   <div class="parcours-viewer-layout">
     <div class="board-container">
-      <eg-chessboard
-        :diagram="{
-          fen: props.fenDepart,
-          shapes: props.shapes as DrawShape[]
-        }"
+      <Chessboard
+        :fen="props.fenDepart"
         :player-color="props.couleurJoueur"
-        :solo-mode="true"
-        :preserve-shapes-on-position-change="true"
+        :orientation="props.couleurJoueur"
+        :shapes="props.shapes as DrawShape[]"
+        :view-only="false"
         :board-config="{
           drawable: { enabled: false }
         }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
         @board-created="onBoardCreated"
         @move="handleMove"
       />
@@ -23,13 +19,10 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { useFeedback } from '@/composables/useFeedback';
 
-const chessPreferences = useChessPreferencesStore();
 const { showSuccess, showError } = useFeedback();
 
 const props = defineProps<{

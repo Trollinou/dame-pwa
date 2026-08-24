@@ -34,12 +34,12 @@
               </span>
             </div>
             <div class="board-mini-container">
-              <eg-chessboard
-                :boardConfig="{ fen: echiquiersMelanges[index].fen, viewOnly: true, coordinates: false }"
-                :playerColor="echiquiersMelanges[index].couleur_joueur"
-                :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-                :piece-set="chessPreferences.pieceSet"
-                :board-theme="chessPreferences.boardTheme"
+              <Chessboard
+                :fen="echiquiersMelanges[index].fen"
+                :player-color="echiquiersMelanges[index].couleur_joueur"
+                :orientation="echiquiersMelanges[index].couleur_joueur"
+                :view-only="true"
+                :coordinates="false"
               />
             </div>
           </div>
@@ -105,13 +105,12 @@ import { ref, computed, onMounted, watch } from 'vue';
 import {
   IonCard,
   IonCardContent,
-  IonButton,
-  toastController
+  IonButton
 } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 interface Paire {
   fen: string;
@@ -272,13 +271,7 @@ const validerAssociations = async () => {
   boardsCorrects.value.push(...newlyCorrect);
 
   if (errorsCount > 0) {
-    const toast = await toastController.create({
-      message: 'Certaines associations sont incorrectes, réessayez !',
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError('Certaines associations sont incorrectes, réessayez !', 2500);
     // Reprendre la sélection sur le premier échiquier vide et non correct
     const firstEmpty = [0, 1, 2, 3].find(
       (idx) => liaisons.value[idx] === undefined && !boardsCorrects.value.includes(idx)
@@ -287,13 +280,7 @@ const validerAssociations = async () => {
       selectionEchiquier.value = firstEmpty;
     }
   } else {
-    const toast = await toastController.create({
-      message: 'Parfait !',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Parfait !', 2000);
     emit('success');
   }
 };

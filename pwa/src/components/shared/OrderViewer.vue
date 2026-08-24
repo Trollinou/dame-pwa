@@ -96,8 +96,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { toastController, IonButton } from '@ionic/vue';
+import { IonButton } from '@ionic/vue';
 import DiagramViewer from '@/components/shared/DiagramViewer.vue';
+import { useFeedback } from '@/composables/useFeedback';
+
+const { showError } = useFeedback();
 
 interface OrderItem {
   id: string | number;
@@ -179,11 +182,7 @@ const validerOrdre = async () => {
   }
 
   if (hasError) {
-    const toast = await toastController.create({
-      message: 'L\'ordre est incorrect. Observez bien les positions !',
-      duration: 3000, color: 'danger', position: 'bottom'
-    });
-    await toast.present();
+    await showError('L\'ordre est incorrect. Observez bien les positions !', 3000);
   } else {
     emit('success');
   }

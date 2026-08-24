@@ -3,18 +3,12 @@
     <!-- Phase 1 : Questions -->
     <div v-if="phase === 'questions'" class="phase-questions">
       <div class="board-container">
-        <eg-chessboard
-          :diagram="{
-            fen: fenDepart,
-            shapes: shapes
-          }"
-          :boardConfig="{
-            viewOnly: true,
-            orientation: couleurJoueur
-          }"
-          :playerColor="couleurJoueur"
-          :piece-set="chessPreferences.pieceSet"
-          :board-theme="chessPreferences.boardTheme"
+        <Chessboard
+          :fen="fenDepart"
+          :shapes="shapes"
+          :orientation="couleurJoueur"
+          :player-color="couleurJoueur"
+          :view-only="true"
         />
       </div>
 
@@ -69,15 +63,14 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { toastController, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { DrawShape } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import PuzzleViewer from './PuzzleViewer.vue';
 import PgnViewer from './PgnViewer.vue';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface QuestionEval {
   texte: string;
@@ -117,13 +110,7 @@ const repondre = async (valeur: string) => {
   const donne = valeur.trim().toLowerCase();
 
   if (donne === attendu) {
-    const toast = await toastController.create({
-      message: 'Bonne réponse !',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Bonne réponse !', 2000);
 
     if (questionIndex.value < props.questions.length - 1) {
       questionIndex.value++;
@@ -131,13 +118,10 @@ const repondre = async (valeur: string) => {
       phase.value = 'tactique';
     }
   } else {
-    const toast = await toastController.create({
-      message: questionActuelle.value.explication || 'Mauvaise réponse, essayez à nouveau.',
-      duration: 3500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(
+      questionActuelle.value.explication || 'Mauvaise réponse, essayez à nouveau.',
+      3500
+    );
   }
 };
 </script>

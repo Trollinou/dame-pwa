@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Ajouté & Amélioré
+- **Harmonisation complète des Viewers d'Exercices (Étape 2 du plan de refactorisation)** :
+  - **Migration vers le composant unifié `<Chessboard>`** : Intégration systématique du wrapper standardisé dans `PuzzleViewer.vue`, `QcmViewer.vue`, `ParcoursViewer.vue`, `VisionViewer.vue`, `CapOuPasCapViewer.vue`, `InteractiveQcmViewer.vue`, `MatchingViewer.vue`, `EvalViewer.vue`, `JugementFinalViewer.vue`, `DiagramViewer.vue` et `PgnViewer.vue`.
+  - **Standardisation des retours utilisateurs via `useFeedback`** : Remplacement des appels directs à `toastController` par les méthodes réactives et typées `showSuccess()` et `showError()` dans tous les viewers d'apprentissage.
+  - **Gestion propre du cycle de vie des échiquiers** : Destruction et nettoyage systématique des instances mémoires des échiquiers à l'unmount des composants.
 - **Indicateur visuel d'état de connexion sur l'onglet Profil (`TabsPage.vue`)** :
   - Remplacement de l'icône statique par un affichage dynamique et réactif selon l'état d'authentification (`authStore.isAuthenticated`).
   - **Connecté** : Icône `personCircle` (icône pleine d'utilisateur) et libellé personnalisé avec le prénom de l'adhérent (ou `Profil`).
@@ -16,7 +20,18 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Anti-rebond de validation** : Débouncing sur `validateSession()` pour harmoniser les déclenchements entre `document.visibilitychange` et `App.appStateChange`.
 
 ### Corrigé & Fiabilisé
-- **Résolution des blocages de session expirée et d'affichage de l'Agenda** :
+- **Gestion des séquences et transitions dans les exercices interactifs** :
+  - **Détection de fin de défilement PGN (`PgnViewer.vue`)** : Détection fiable du dernier coup par stabilisation du ply (`beforePly === afterPly`), assurant le déclenchement de l'événement `@finished` et la transition automatique vers les étapes de résolution interactive (ex: QCM / Puzzle dans `TypePartieHeros.vue`).
+  - **Verrouillage des coups automatiques de l'ordinateur (`PuzzleViewer.vue`)** : Mise en place d'un verrou (`isComputerPlaying`) évitant que le coup automatique joué par l'ordinateur ne soit réinterprété comme un coup du joueur dans la séquence multi-coups (résolution de l'erreur `reading 'from'` sur les exercices de type T10 Échec & Éval et les puzzles tactiques).
+  - **Activation des coordonnées par défaut sur `<Chessboard>` (`Chessboard.vue`)** : Affichage par défaut des repères de colonnes (a-h) et rangées (1-8) sur l'ensemble des échiquiers du module apprentissage (Vision'Checs, Partie du Héros, PosiPlan, etc.), tout en préservant la possibilité de les masquer sur les mini-diagrammes (`MatchingViewer.vue`).
+  - **Harmonisation UI/UX de `InteractiveQcmViewer` et `TypePosiPlan` (`InteractiveQcmViewer.vue`, `TypePosiPlan.vue`)** :
+    - Alignement complet sur la présentation de `QcmViewer` (largeur de carte, typographie et disposition des boutons de choix).
+    - Intégration de la barre de feedback unifiée `SeriesCardFooter` affichant les explications de chaque choix.
+    - Synchronisation dynamique de la consigne et du badge d'étape dans l'en-tête `ExerciseHeader`.
+- **Prise en charge des coups tactiques et préservation des shapes (`TypePartieHeros.vue`, `PuzzleViewer.vue`)** :
+  - **Support du type `puzzle`/`move` dans `TypePartieHeros.vue`** : Prise en charge des étapes nécessitant un déplacement de pièces sur l'échiquier (en plus des étapes PGN et QCM).
+  - **Tolérance & normalisation des coups dans `PuzzleViewer.vue`** : Prise en charge des formats SAN (`Nf3`, `exd5`), LAN (`e2e4`, `g1f3`) et sans ponctuation (`#`, `+`, `=`), évitant tout blocage lorsque le coup attendu est au format UCI ou SAN simplifié.
+  - **Persistance et réaffichage immédiat des shapes sur coup incorrect** : Réapplication automatique des flèches et cercles d'aide (`setShapes`) lors de l'annulation (`undoLastMove`) d'un coup erroné.
   - **Priorisation et persistance du `refresh_token` (`stores/auth.ts`)** : Prise en charge native du `refresh_token` émis par le plugin WordPress *Simple JWT Login v4*, assurant le maintien transparent de la session même après plusieurs jours d'inactivité.
   - **Purge de session expirée (`stores/auth.ts`)** : Ajout d'une vérification proactive d'expiration JWT (`isTokenExpired`) et déconnexion systématique (`logout()`) lorsque le rafraîchissement échoue définitivement, empêchant la persistance d'une session fantôme et l'envoi répété de tokens invalides.
   - **Interception HTTP 400 dans `safeFetch` (`utils/safeFetch.ts`)** : Prise en charge des rejets HTTP 400 émis par le plugin WordPress *Simple JWT Login* sur les requêtes avec en-tête `Authorization`, déclenchant immédiatement le rafraîchissement transparent du jeton et le rejeu de la requête.

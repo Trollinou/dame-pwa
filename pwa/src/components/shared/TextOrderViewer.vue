@@ -11,12 +11,11 @@
 
       <!-- Échiquier de départ -->
       <div class="board-container">
-        <eg-chessboard
-          :boardConfig="boardConfig"
-          :playerColor="couleurJoueurTyped"
-          :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-          :piece-set="chessPreferences.pieceSet"
-          :board-theme="chessPreferences.boardTheme"
+        <Chessboard
+          :fen="props.fenDepart || 'start'"
+          :orientation="couleurJoueurTyped"
+          :player-color="couleurJoueurTyped"
+          :view-only="true"
         />
       </div>
 
@@ -81,14 +80,13 @@ import {
   IonLabel,
   IonReorder,
   IonButton,
-  toastController,
   type ItemReorderCustomEvent
 } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface EtapeTexte {
   id: number;
@@ -179,22 +177,10 @@ const validerOrdre = async () => {
   const estCorrect = shuffledEtapes.value.every((etape, index) => etape.id === index);
 
   if (estCorrect) {
-    const toast = await toastController.create({
-      message: "Excellente réponse ! L'ordre des étapes est parfait.",
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess("Excellente réponse ! L'ordre des étapes est parfait.", 2000);
     phase.value = 'solution';
   } else {
-    const toast = await toastController.create({
-      message: "L'ordre des étapes n'est pas correct, réessayez !",
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError("L'ordre des étapes n'est pas correct, réessayez !", 2500);
   }
 };
 

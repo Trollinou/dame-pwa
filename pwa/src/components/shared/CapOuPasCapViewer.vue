@@ -9,16 +9,13 @@
 
     <!-- Échiquier -->
     <div class="board-container">
-      <eg-chessboard
-        :diagram="{
-          fen: diagrammeActuel?.fen || '',
-          shapes: diagrammeActuel?.shapes || []
-        }"
-        :boardConfig="boardConfig"
-        :playerColor="diagrammeActuel?.couleur_joueur || 'white'"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+      <Chessboard
+        :fen="diagrammeActuel?.fen || ''"
+        :shapes="diagrammeActuel?.shapes || []"
+        :orientation="diagrammeActuel?.couleur_joueur || 'white'"
+        :player-color="diagrammeActuel?.couleur_joueur || 'white'"
+        :view-only="typeReponse === 'qcm'"
+        :highlight-last-move="true"
         @board-created="onBoardCreated"
         @move="verifierCoup"
       />
@@ -52,15 +49,13 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonButton,
-  toastController
+  IonButton
 } from '@ionic/vue';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore, DrawShape, Move } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface QcmChoix {
   texte: string;
@@ -136,13 +131,7 @@ watch(
 );
 
 const avancerOuReussir = async (message: string) => {
-  const toast = await toastController.create({
-    message,
-    duration: 2000,
-    color: 'success',
-    position: 'bottom'
-  });
-  await toast.present();
+  await showSuccess(message, 2000);
 
   if (etapeCourante.value + 1 < props.diagrammes.length) {
     etapeCourante.value++;
@@ -165,13 +154,7 @@ const validerQcm = async (index: number) => {
     await avancerOuReussir(explication);
   } else {
     const explication = choix?.explication || 'Mauvaise réponse !';
-    const toast = await toastController.create({
-      message: explication,
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(explication, 2500);
   }
 };
 
@@ -189,13 +172,7 @@ const verifierCoup = async (move: Move) => {
   } else {
     boardApi.value?.undoLastMove();
     const messageErreur = diag.move_explication || 'Ce n\'est pas le bon coup. Cherchez le mat !';
-    const toast = await toastController.create({
-      message: messageErreur,
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(messageErreur, 2500);
   }
 };
 </script>

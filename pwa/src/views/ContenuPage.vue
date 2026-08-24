@@ -159,7 +159,6 @@ const apprentissageStore = useApprentissageStore();
 const isLoading = ref(true);
 const isPageLoading = computed(() => isLoading.value || apprentissageStore.isContenuLoading);
 const estReussi = ref(false);
-
 const contenuActuel = computed(() => apprentissageStore.contenuActuel);
 
 const coursParentInfo = computed(() => {

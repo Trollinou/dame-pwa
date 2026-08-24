@@ -2,15 +2,10 @@
   <div class="qcm-stage-layout">
     <!-- Échiquier affiché uniquement si une FEN est fournie -->
     <div v-if="fen" class="board-container">
-      <eg-chessboard
-        :diagram="{
-          fen: fen || '',
-          shapes: props.shapes
-        }"
-        :boardConfig="{ viewOnly: true }"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+      <Chessboard
+        :fen="fen"
+        :shapes="props.shapes"
+        :view-only="true"
         @board-created="onBoardCreated"
       />
     </div>
@@ -59,12 +54,12 @@ import {
   IonCardContent,
   IonButton
 } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 const props = withDefaults(
   defineProps<{
@@ -139,8 +134,9 @@ const validerChoix = (index: number) => {
       message: 'Bien joué ! Bonne réponse.'
     };
 
-    // Si pas de série de cartes, émettre la réussite après 800ms
+    // Si pas de série de cartes, afficher le toast et émettre la réussite
     if (!props.totalCards || props.totalCards <= 1) {
+      showSuccess('Bien joué ! Bonne réponse.', 2000);
       setTimeout(() => {
         emit('success');
       }, 800);
@@ -150,6 +146,10 @@ const validerChoix = (index: number) => {
       type: 'danger',
       message: 'Mauvaise réponse, essaie encore !'
     };
+
+    if (!props.totalCards || props.totalCards <= 1) {
+      showError('Mauvaise réponse, essaie encore !', 2000);
+    }
   }
 };
 

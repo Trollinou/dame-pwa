@@ -40,6 +40,7 @@ Encapsule la bibliothèque `eg-chessboard` et centralise la configuration global
 - **Nettoyage automatique du cycle de vie** : Détruit proprement l'instance sous-jacente (`boardApi.destroy()`) à la destruction du composant (`onUnmounted`) pour prévenir les fuites de mémoire.
 - **Props principales** : `fen`, `shapes`, `viewOnly` (défaut: `true`), `orientation`, `playerColor`, `coordinates`, `autoCastling`, `highlightLastMove`, `lastMove`, `stockfishEnabled`, `stockfishConfig`.
 - **Événements supportés** : `@board-created`, `@move`, `@turn-change`, `@check`, `@checkmate`, `@stalemate`, `@draw`, `@stockfish-hint`, `@square-click`, `@shapes-change`, `@promotion`.
+- **Adoption unifiée** : Utilisé de façon homogène par tous les viewers d'apprentissage (`PuzzleViewer`, `QcmViewer`, `ParcoursViewer`, `VisionViewer`, `CapOuPasCapViewer`, `InteractiveQcmViewer`, `MatchingViewer`, `EvalViewer`, `JugementFinalViewer`, `DiagramViewer`, `PgnViewer`, `PlacementViewer`, `QuiSuisJeViewer`).
 
 ```vue
 <template>

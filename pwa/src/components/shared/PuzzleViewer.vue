@@ -1,20 +1,14 @@
 <template>
   <div class="puzzle-viewer-layout">
     <div class="board-container">
-      <TheChessboard 
-        :diagram="{
-          fen: fen,
-          shapes: shapes
-        }"
-        :boardConfig="{ 
-          orientation: couleurJoueur, 
-          highlight: { lastMove: true },
-          lastMove: props.lastMoveHighlight || undefined
-        }"
-        :playerColor="couleurJoueur"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+      <Chessboard
+        :fen="fen"
+        :orientation="couleurJoueur"
+        :player-color="couleurJoueur"
+        :shapes="shapes"
+        :last-move="props.lastMoveHighlight || undefined"
+        :highlight-last-move="true"
+        :view-only="false"
         @board-created="onBoardCreated"
         @move="verifierCoup"
       />
@@ -24,13 +18,11 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { toastController } from '@ionic/vue';
-import { default as TheChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore, Key, DrawShape, Move } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 const props = withDefaults(
   defineProps<{
@@ -51,6 +43,7 @@ const emit = defineEmits<{
 
 const boardApi = ref<BoardCore | null>(null);
 const etapeActuelle = ref(0);
+const isComputerPlaying = ref(false);
 
 const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
@@ -63,28 +56,26 @@ watch(() => props.shapes, (newShapes) => {
 }, { deep: true });
 
 const verifierCoup = async (move: Move) => {
-  const playerColorShort = props.couleurJoueur === 'white' ? 'w' : 'b';
-  
-  // Ignore les déplacements si ce n'est pas la bonne couleur
-  if (move.color !== playerColorShort) {
+  if (isComputerPlaying.value) {
     return;
   }
 
+  // Normalize move comparison
   const coupAttendu = props.solution[etapeActuelle.value];
+  const isCoupCorrect = coupAttendu && (
+    move.san === coupAttendu || 
+    move.lan === coupAttendu || 
+    `${move.from}${move.to}` === coupAttendu ||
+    (move.san && coupAttendu.replace(/[+#x=]/g, '') === move.san.replace(/[+#x=]/g, ''))
+  );
 
-  if (move.san === coupAttendu) {
-    // Le coup est correct
+  if (isCoupCorrect) {
+    // Le coup de l'utilisateur est correct
     etapeActuelle.value++;
 
     // Vérifie si l'exercice est terminé
     if (etapeActuelle.value === props.solution.length) {
-      const toast = await toastController.create({
-        message: 'Félicitations ! Exercice réussi.',
-        duration: 3000,
-        color: 'success',
-        position: 'bottom'
-      });
-      await toast.present();
+      showSuccess('Félicitations ! Exercice réussi.', 3000);
       
       // Petit délai pour laisser l'utilisateur apprécier son dernier coup
       setTimeout(() => {
@@ -94,23 +85,30 @@ const verifierCoup = async (move: Move) => {
     } else {
       // L'exercice continue : l'ordinateur joue sa réponse scriptée
       setTimeout(() => {
-        if (boardApi.value) {
-          boardApi.value.move(props.solution[etapeActuelle.value]);
-          etapeActuelle.value++;
+        if (boardApi.value && props.solution[etapeActuelle.value]) {
+          isComputerPlaying.value = true;
+          try {
+            boardApi.value.move(props.solution[etapeActuelle.value]);
+            etapeActuelle.value++;
+            if (props.shapes && props.shapes.length > 0) {
+              boardApi.value.setShapes(props.shapes);
+            }
+          } finally {
+            // Relâcher le flag après exécution
+            setTimeout(() => {
+              isComputerPlaying.value = false;
+            }, 100);
+          }
         }
       }, 600);
     }
   } else {
-    // Le coup est incorrect : on l'annule
+    // Le coup est incorrect : on l'annule et on restaure les shapes immédiatement
     boardApi.value?.undoLastMove();
-
-    const toast = await toastController.create({
-      message: 'Mauvais coup, cherche encore !',
-      duration: 2000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    if (boardApi.value && props.shapes && props.shapes.length > 0) {
+      boardApi.value.setShapes(props.shapes);
+    }
+    showError('Mauvais coup, cherche encore !', 2000);
   }
 };
 </script>

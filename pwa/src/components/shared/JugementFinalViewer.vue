@@ -12,12 +12,11 @@
       <!-- Grande FEN de départ -->
       <div class="main-board-wrapper">
         <div class="main-board-container">
-          <eg-chessboard
-            :boardConfig="mainBoardConfig"
-            :playerColor="playerColorTyped"
-            :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-            :piece-set="chessPreferences.pieceSet"
-            :board-theme="chessPreferences.boardTheme"
+          <Chessboard
+            :fen="props.fenDepart || 'start'"
+            :orientation="playerColorTyped"
+            :player-color="playerColorTyped"
+            :view-only="true"
             @board-created="onMainBoardCreated"
           />
         </div>
@@ -37,12 +36,11 @@
             <span class="scenario-hint">Toucher pour choisir</span>
           </div>
           <div class="scenario-board-container">
-            <eg-chessboard
-              :boardConfig="getScenarioBoardConfig()"
-              :playerColor="playerColorTyped"
-              :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-              :piece-set="chessPreferences.pieceSet"
-              :board-theme="chessPreferences.boardTheme"
+            <Chessboard
+              :fen="props.fenDepart || 'start'"
+              :orientation="playerColorTyped"
+              :player-color="playerColorTyped"
+              :view-only="true"
               @board-created="(api: BoardCore) => onScenarioBoardCreated(index, api)"
               style="pointer-events: none;"
             />
@@ -83,19 +81,18 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonButton,
-  toastController
+  IonButton
 } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { Chess } from 'chessops';
 import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { parsePgn } from 'chessops/pgn';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface ScenarioJugementFinal {
   pgn: string;
@@ -290,21 +287,9 @@ const selectScenario = async (index: number) => {
   if (scenario.is_correct) {
     clearAllTimers();
     phase.value = 'explication';
-    const toast = await toastController.create({
-      message: "Excellente analyse ! Voici l'explication détaillée.",
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess("Excellente analyse ! Voici l'explication détaillée.", 2000);
   } else {
-    const toast = await toastController.create({
-      message: "Ce n'est pas le meilleur plan, observez encore !",
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError("Ce n'est pas le meilleur plan, observez encore !", 2500);
   }
 };
 

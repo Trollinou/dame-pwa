@@ -1,12 +1,10 @@
 <template>
   <div class="pgn-stage-layout">
     <div class="board-container">
-      <eg-chessboard
+      <Chessboard
         mode="study"
-        :boardConfig="pgnBoardConfig"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+        :orientation="(props.orientation === 'black' ? 'black' : 'white')"
+        :view-only="true"
         @board-created="onBoardCreated"
       />
     </div>
@@ -47,12 +45,9 @@
 import { ref, computed, watch } from 'vue';
 import { IonButton, IonIcon } from '@ionic/vue';
 import { playBackOutline, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
-import EgChessboard from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
-
-const chessPreferences = useChessPreferencesStore();
 
 const props = defineProps<{
   pgnString?: string;
@@ -91,7 +86,7 @@ const loadPgnData = () => {
     syncComment();
 
     const historyState = boardApi.value.getHistoryViewerState();
-    // Si le PGN n'a pas de coups ou 1 seul coup déjà atteint
+    console.log('[PgnViewer] loadPgnData historyState:', historyState);
     if (!historyState.isEnabled) {
       isCompleted.value = true;
     } else {
@@ -125,21 +120,19 @@ const viewPrevious = () => {
 
 const viewNext = () => {
   if (!boardApi.value) return;
-  const historyState = boardApi.value.getHistoryViewerState();
-
-  if (!historyState.isEnabled) {
-    isCompleted.value = true;
-    if (!props.totalCards) {
-      emit('finished');
-    }
-    return;
-  }
+  const historyStateBefore = boardApi.value.getHistoryViewerState();
 
   boardApi.value.viewNext();
   syncComment();
 
-  const newHistoryState = boardApi.value.getHistoryViewerState();
-  if (!newHistoryState.isEnabled) {
+  const historyStateAfter = boardApi.value.getHistoryViewerState();
+
+  const beforePly = historyStateBefore?.plyViewing;
+  const afterPly = historyStateAfter?.plyViewing;
+  const isEnd = historyStateAfter?.isEnabled === false || 
+                (beforePly !== undefined && afterPly !== undefined && beforePly === afterPly);
+
+  if (isEnd) {
     isCompleted.value = true;
     if (!props.totalCards && props.autoCompleteDelay && props.autoCompleteDelay > 0) {
       setTimeout(() => {

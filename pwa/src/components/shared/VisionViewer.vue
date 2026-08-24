@@ -33,16 +33,12 @@
       <!-- Chessboard Panel -->
       <div class="board-panel">
         <div class="board-container">
-          <eg-chessboard
-            :diagram="{
-              fen: fenActuelle,
-              shapes: shapesActuelles
-            }"
-            :playerColor="couleurJoueur"
-            :preserve-shapes-on-position-change="true"
-            :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-            :piece-set="chessPreferences.pieceSet"
-            :board-theme="chessPreferences.boardTheme"
+          <Chessboard
+            :fen="fenActuelle"
+            :shapes="shapesActuelles"
+            :orientation="couleurJoueur"
+            :player-color="couleurJoueur"
+            :view-only="true"
             @board-created="onBoardCreated"
             @square-click="gererClicCase"
           />
@@ -63,8 +59,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { parseFenPieces, getActiveColorFromFen } from '@/utils/fenUtils';
