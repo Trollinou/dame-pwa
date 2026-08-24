@@ -1,6 +1,6 @@
 <template>
-  <div class="parcours-viewer-layout">
-    <div class="board-container">
+  <div class="exercise-viewer-layout">
+    <div class="chessboard-container">
       <Chessboard
         :fen="props.fenDepart"
         :player-color="props.couleurJoueur"
@@ -120,18 +120,3 @@ const handleMove = async (move: Move) => {
 };
 </script>
 
-<style scoped>
-.parcours-viewer-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-}
-</style>

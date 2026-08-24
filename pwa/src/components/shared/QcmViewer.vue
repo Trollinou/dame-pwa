@@ -1,7 +1,7 @@
 <template>
-  <div class="qcm-stage-layout">
+  <div class="exercise-viewer-layout">
     <!-- Échiquier affiché uniquement si une FEN est fournie -->
-    <div v-if="fen" class="board-container">
+    <div v-if="fen" class="chessboard-container">
       <Chessboard
         :fen="fen"
         :shapes="props.shapes"
@@ -10,9 +10,9 @@
       />
     </div>
 
-    <ion-card class="question-card">
+    <ion-card class="exercise-card">
       <ion-card-header v-if="!hideQuestion">
-        <ion-card-title class="question-title">{{ question }}</ion-card-title>
+        <ion-card-title class="exercise-card-header">{{ question }}</ion-card-title>
       </ion-card-header>
 
       <ion-card-content>
@@ -158,44 +158,3 @@ const passerCarteSuivante = () => {
 };
 </script>
 
-<style scoped>
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-  margin-bottom: 12px;
-}
-
-.question-card {
-  margin: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.question-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-  color: var(--ion-color-step-900, #222);
-}
-
-.choice-btn {
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: 500;
-  --border-radius: 8px;
-  min-height: 48px;
-  white-space: normal;
-}
-
-.choice-btn::part(native) {
-  white-space: normal;
-  text-align: left;
-  padding: 12px 16px;
-}
-</style>

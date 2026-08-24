@@ -1,16 +1,16 @@
 <template>
-  <div class="text-order-layout">
+  <div class="exercise-viewer-layout">
     <!-- PHASE 1 : ORDER -->
-    <div v-if="phase === 'order'" class="order-stage">
+    <div v-if="phase === 'order'" class="exercise-stage">
       <!-- Card Consigne -->
-      <ion-card v-if="consigne" class="consigne-card">
+      <ion-card v-if="consigne" class="exercise-card">
         <ion-card-header>
-          <ion-card-title class="consigne-title">{{ consigne }}</ion-card-title>
+          <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
         </ion-card-header>
       </ion-card>
 
       <!-- Échiquier de départ -->
-      <div class="board-container">
+      <div class="chessboard-container">
         <Chessboard
           :fen="props.fenDepart || 'start'"
           :orientation="couleurJoueurTyped"
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Liste des étapes à réordonner -->
-      <ion-card class="list-card">
+      <ion-card class="exercise-card">
         <ion-list>
           <ion-reorder-group :disabled="false" @ionItemReorder="handleReorder">
             <ion-item v-for="etape in shuffledEtapes" :key="etape.id">
@@ -35,7 +35,7 @@
       <ion-button
         expand="block"
         color="primary"
-        class="action-btn ion-margin-top"
+        class="exercise-action-btn ion-margin-top"
         @click="validerOrdre"
       >
         Valider l'ordre
@@ -43,10 +43,10 @@
     </div>
 
     <!-- PHASE 2 : SOLUTION -->
-    <div v-else-if="phase === 'solution'" class="solution-stage">
-      <ion-card class="consigne-card">
+    <div v-else-if="phase === 'solution'" class="exercise-stage">
+      <ion-card class="exercise-card">
         <ion-card-header>
-          <ion-card-title class="consigne-title">💡 Explication détaillée</ion-card-title>
+          <ion-card-title class="exercise-card-header">💡 Explication détaillée</ion-card-title>
         </ion-card-header>
       </ion-card>
 
@@ -59,7 +59,7 @@
       <ion-button
         expand="block"
         color="success"
-        class="finish-btn ion-margin-top"
+        class="exercise-action-btn ion-margin-top"
         @click="finishExercise"
       >
         Terminer l'exercice
@@ -189,58 +189,3 @@ const finishExercise = () => {
 };
 </script>
 
-<style scoped>
-.text-order-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.order-stage,
-.solution-stage {
-  width: 100%;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.consigne-card {
-  width: 100%;
-  margin: 0 0 16px 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.consigne-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto 16px auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-.list-card {
-  width: 100%;
-  margin: 0 0 16px 0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-}
-
-.action-btn,
-.finish-btn {
-  width: 100%;
-  max-width: 320px;
-  font-weight: 600;
-}
-</style>

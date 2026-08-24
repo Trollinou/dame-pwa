@@ -1,9 +1,9 @@
 <template>
-  <div class="jugement-final-layout">
+  <div class="exercise-viewer-layout">
     <!-- Card Consigne -->
-    <ion-card v-if="consigne" class="consigne-card">
+    <ion-card v-if="consigne" class="exercise-card">
       <ion-card-header>
-        <ion-card-title class="consigne-title">{{ consigne }}</ion-card-title>
+        <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
       </ion-card-header>
     </ion-card>
 
@@ -11,7 +11,7 @@
     <div v-if="phase === 'observation'" class="observation-stage">
       <!-- Grande FEN de départ -->
       <div class="main-board-wrapper">
-        <div class="main-board-container">
+        <div class="chessboard-container">
           <Chessboard
             :fen="props.fenDepart || 'start'"
             :orientation="playerColorTyped"
@@ -35,7 +35,7 @@
             <span class="scenario-badge">Plan {{ index + 1 }}</span>
             <span class="scenario-hint">Toucher pour choisir</span>
           </div>
-          <div class="scenario-board-container">
+          <div class="chessboard-container--mini">
             <Chessboard
               :fen="props.fenDepart || 'start'"
               :orientation="playerColorTyped"
@@ -50,10 +50,10 @@
     </div>
 
     <!-- PHASE 2 : EXPLICATION -->
-    <div v-else-if="phase === 'explication'" class="explication-stage">
-      <ion-card class="consigne-card">
+    <div v-else-if="phase === 'explication'" class="exercise-stage">
+      <ion-card class="exercise-card">
         <ion-card-header>
-          <ion-card-title class="consigne-title">💡 Explication du plan gagnant</ion-card-title>
+          <ion-card-title class="exercise-card-header">💡 Explication du plan gagnant</ion-card-title>
         </ion-card-header>
       </ion-card>
 
@@ -66,7 +66,7 @@
       <ion-button
         expand="block"
         color="success"
-        class="finish-btn"
+        class="exercise-action-btn"
         @click="onSuccess"
       >
         Terminer l'exercice
@@ -408,32 +408,5 @@ const onSuccess = () => {
 .scenario-hint {
   font-size: 0.8rem;
   color: var(--ion-color-step-600, #666);
-}
-
-.scenario-board-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 320px;
-  margin: 0 auto 10px auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-/* Phase Explication */
-.explication-stage {
-  width: 100%;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.finish-btn {
-  margin-top: 16px;
-  width: 100%;
-  max-width: 320px;
-  font-weight: 600;
 }
 </style>

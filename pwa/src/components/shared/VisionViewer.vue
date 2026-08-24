@@ -32,7 +32,7 @@
 
       <!-- Chessboard Panel -->
       <div class="board-panel">
-        <div class="board-container">
+        <div class="chessboard-container">
           <Chessboard
             :fen="fenActuelle"
             :shapes="shapesActuelles"
@@ -404,32 +404,5 @@ cg-board.piece-icon-box .piece {
   flex: 1;
   min-width: 0;
   width: 100%;
-}
-
-/* Échiquier strict flat design (AGENTS.md) */
-.board-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-@media (max-width: 768px) {
-  .board-container {
-    max-width: min(100%, calc(100vh - 230px));
-  }
-}
-
-.feedback-banner {
-  border-radius: 8px;
-}
-
-.feedback-text {
-  font-size: 1.05rem;
-  font-weight: 600;
-  padding: 10px;
 }
 </style>

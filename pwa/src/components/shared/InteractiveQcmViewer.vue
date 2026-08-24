@@ -1,7 +1,7 @@
 <template>
-  <div class="interactive-qcm-stage-layout">
+  <div class="exercise-viewer-layout">
     <!-- Échiquier en haut -->
-    <div class="board-container">
+    <div class="chessboard-container">
       <Chessboard
         :fen="props.fenDepart"
         :shapes="props.shapes"
@@ -13,9 +13,9 @@
     </div>
 
     <!-- Carte QCM en bas -->
-    <ion-card class="question-card">
+    <ion-card class="exercise-card">
       <ion-card-header v-if="!hideQuestion && etapeActuelle.question">
-        <ion-card-title class="question-title">
+        <ion-card-title class="exercise-card-header">
           {{ etapeActuelle.question }}
         </ion-card-title>
       </ion-card-header>
@@ -198,45 +198,3 @@ const passerEtapeSuivante = () => {
 };
 </script>
 
-<style scoped>
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-  margin-bottom: 12px;
-}
-
-.question-card {
-  width: 100%;
-  margin: 0 auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.question-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-  color: var(--ion-color-step-900, #222);
-}
-
-.choice-btn {
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: 500;
-  --border-radius: 8px;
-  min-height: 48px;
-  white-space: normal;
-}
-
-.choice-btn::part(native) {
-  white-space: normal;
-  text-align: left;
-  padding: 12px 16px;
-}
-</style>
