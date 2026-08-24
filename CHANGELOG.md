@@ -4,6 +4,26 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Ajouté & Amélioré
+- **Indicateur visuel d'état de connexion sur l'onglet Profil (`TabsPage.vue`)** :
+  - Remplacement de l'icône statique par un affichage dynamique et réactif selon l'état d'authentification (`authStore.isAuthenticated`).
+  - **Connecté** : Icône `personCircle` (icône pleine d'utilisateur) et libellé personnalisé avec le prénom de l'adhérent (ou `Profil`).
+  - **Déconnecté** : Icône `logInOutline` (porte de connexion avec flèche entrante) et libellé `Connexion` pour inciter visuellement à l'authentification.
+- **Gestion optimisée du cycle de vie des sessions et renouvellement transparent (`stores/auth.ts`, `utils/safeFetch.ts`)** :
+  - **Verrou de concurrence (Mutex)** : Mise en place d'un singleton de promesse (`activeRefreshPromise`) empêchant les requêtes concurrentes de consommer plusieurs fois le `refresh_token` à usage unique lors des retours d'inactivité ou des événements multiples.
+  - **Anti-rebond de validation** : Débouncing sur `validateSession()` pour harmoniser les déclenchements entre `document.visibilitychange` et `App.appStateChange`.
+
+### Corrigé & Fiabilisé
+- **Résolution des blocages de session expirée et d'affichage de l'Agenda** :
+  - **Priorisation et persistance du `refresh_token` (`stores/auth.ts`)** : Prise en charge native du `refresh_token` émis par le plugin WordPress *Simple JWT Login v4*, assurant le maintien transparent de la session même après plusieurs jours d'inactivité.
+  - **Purge de session expirée (`stores/auth.ts`)** : Ajout d'une vérification proactive d'expiration JWT (`isTokenExpired`) et déconnexion systématique (`logout()`) lorsque le rafraîchissement échoue définitivement, empêchant la persistance d'une session fantôme et l'envoi répété de tokens invalides.
+  - **Interception HTTP 400 dans `safeFetch` (`utils/safeFetch.ts`)** : Prise en charge des rejets HTTP 400 émis par le plugin WordPress *Simple JWT Login* sur les requêtes avec en-tête `Authorization`, déclenchant immédiatement le rafraîchissement transparent du jeton et le rejeu de la requête.
+  - **Repli automatique de l'Agenda (`stores/agenda.ts`)** : Extension du repli gracieux aux erreurs HTTP 400 (en plus de 401/403) pour basculer automatiquement en requête publique sans en-tête d'autorisation et garantir l'affichage des événements même en cas d'anomalie de token.
+  - **Validation des coups suggérés sur l'Échiquier (`composables/play/usePlayGame.ts`)** : Contrôle du format des cases UCI (`/^[a-h][1-8]$/`) pour éliminer l'erreur SVG `<line> attribute NaN` lors des coups spéciaux ou de fin de partie Stockfish (`bestmove (none)`).
+  - **Correction du badge d'étape des 100 Commandements (`views/types/Type100Commandements.vue`)** : Transmission de la prop `stepBadgeText` au composant `ExerciseHeader` pour l'affichage correct du compteur de questions.
+
 ## [1.2.0] - 2026-08-23
 
 ### Ajouté & Amélioré

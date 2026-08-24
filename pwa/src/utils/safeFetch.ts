@@ -26,9 +26,20 @@ export const safeFetch = async (
 		} );
 		clearTimeout( id );
 
-		// En cas d'erreur 401 (Unauthorized), tentative de rafraîchissement transparent du token JWT
+		// En cas d'erreur 401 (Unauthorized) ou 400 avec jeton d'authentification (rejet Simple-JWT-Login)
+		const headersRecord = ( options.headers || {} ) as Record<
+			string,
+			string
+		>;
+		const hasAuthHeader = Boolean(
+			headersRecord.Authorization || headersRecord.authorization
+		);
+		const isAuthError =
+			response.status === 401 ||
+			( response.status === 400 && hasAuthHeader );
+
 		if (
-			response.status === 401 &&
+			isAuthError &&
 			! isRetry &&
 			typeof localStorage !== 'undefined' &&
 			localStorage.getItem( 'dame_jwt_token' )
@@ -38,12 +49,8 @@ export const safeFetch = async (
 				const newToken = await authStore.tryRefreshToken();
 				if ( newToken ) {
 					// Mettre à jour le header Authorization avec le nouveau token
-					const existingHeaders = ( options.headers || {} ) as Record<
-						string,
-						string
-					>;
 					const newHeaders: Record< string, string > = {
-						...existingHeaders,
+						...headersRecord,
 						Authorization: `Bearer ${ newToken }`,
 					};
 					// Re-jouer la requête de manière transparente avec le nouveau jeton

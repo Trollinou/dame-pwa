@@ -30,7 +30,7 @@
       <!-- Mode PIECE: Palette flex 2x6 -->
       <div v-if="typeReponse === 'piece'" class="palette-wrapper">
         <p class="section-instruction">Sélectionnez la bonne pièce :</p>
-        <div class="palette-container cg-board">
+        <div :class="['palette-container', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'staunton'}`]">
           <button
             v-for="code in pieceCodes"
             :key="code"
@@ -39,7 +39,7 @@
             :aria-label="getPieceLabel(code)"
             @click="verifierPiece(code)"
           >
-            <div :class="getPieceClasses(code)"></div>
+            <piece :class="getPieceClasses(code)"></piece>
           </button>
         </div>
       </div>
@@ -48,11 +48,9 @@
       <div v-else-if="typeReponse === 'square'" class="square-wrapper">
         <p class="section-instruction">Cliquez sur la bonne case de l'échiquier :</p>
         <div class="board-container">
-          <eg-chessboard
-            :boardConfig="{ fen: '8/8/8/8/8/8/8/8 w - - 0 1', viewOnly: true }"
-            :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-            :piece-set="chessPreferences.pieceSet"
-            :board-theme="chessPreferences.boardTheme"
+          <Chessboard
+            fen="8/8/8/8/8/8/8/8 w - - 0 1"
+            :view-only="true"
             @square-click="verifierCase"
           />
         </div>
@@ -87,15 +85,15 @@ import {
   IonCardTitle,
   IonCardContent,
   IonButton,
-  IonIcon,
-  toastController
+  IonIcon
 } from '@ionic/vue';
 import { helpCircleOutline, bulbOutline } from 'ionicons/icons';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
 const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface QcmChoix {
   texte: string;
@@ -187,24 +185,12 @@ const verifierPiece = async (code: string) => {
 
   if (code.toLowerCase() === props.reponsePiece.trim().toLowerCase()) {
     aTrouve.value = true;
-    const toast = await toastController.create({
-      message: 'Bravo ! C\'est la bonne pièce.',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Bravo ! C\'est la bonne pièce.', 2000);
     setTimeout(() => {
       emit('success');
     }, 800);
   } else {
-    const toast = await toastController.create({
-      message: 'Ce n\'est pas la bonne pièce, réessaie !',
-      duration: 2000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError('Ce n\'est pas la bonne pièce, réessaie !', 2000);
   }
 };
 
@@ -213,24 +199,12 @@ const verifierCase = async (square: string) => {
 
   if (square.toLowerCase() === props.reponseCase.trim().toLowerCase()) {
     aTrouve.value = true;
-    const toast = await toastController.create({
-      message: `Bravo ! La case ${square.toUpperCase()} est la bonne réponse.`,
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess(`Bravo ! La case ${square.toUpperCase()} est la bonne réponse.`, 2000);
     setTimeout(() => {
       emit('success');
     }, 800);
   } else {
-    const toast = await toastController.create({
-      message: `La case ${square.toUpperCase()} n'est pas la bonne réponse, réessaie !`,
-      duration: 2000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(`La case ${square.toUpperCase()} n'est pas la bonne réponse, réessaie !`, 2000);
   }
 };
 
@@ -240,25 +214,13 @@ const verifierQcm = async (index: number) => {
   const bonneIndex = props.reponseQcm?.bonne_reponse ?? 0;
   if (index === bonneIndex) {
     aTrouve.value = true;
-    const toast = await toastController.create({
-      message: 'Bravo ! Bonne réponse.',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Bravo ! Bonne réponse.', 2000);
     setTimeout(() => {
       emit('success');
     }, 800);
   } else {
     const explication = props.reponseQcm?.choix?.[index]?.explication || 'Mauvaise réponse, réessaie !';
-    const toast = await toastController.create({
-      message: explication,
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(explication, 2500);
   }
 };
 </script>
@@ -364,6 +326,7 @@ const verifierQcm = async (index: number) => {
   background: var(--ion-color-primary-tint, #e8f0fe);
 }
 
+.palette-container.cg-board piece,
 .palette-container.cg-board .piece {
   position: relative !important;
   width: 100% !important;

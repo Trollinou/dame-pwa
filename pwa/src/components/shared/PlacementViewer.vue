@@ -7,11 +7,9 @@
     </ion-card>
 
     <div class="board-container">
-      <eg-chessboard
-        :boardConfig="{ fen: fenDepart }"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+      <Chessboard
+        :fen="fenDepart"
+        :view-only="true"
         @board-created="onBoardCreated"
         @square-click="verifierPlacement"
       />
@@ -20,14 +18,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { IonCard, IonCardHeader, IonCardTitle, toastController } from '@ionic/vue';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { ref, watch } from 'vue';
+import { IonCard, IonCardHeader, IonCardTitle } from '@ionic/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 const props = defineProps<{
   consigne?: string;
@@ -46,7 +43,20 @@ const aTrouve = ref(false);
 
 const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
+  if (props.fenDepart) {
+    api.setPosition(props.fenDepart);
+  }
 };
+
+watch(
+  () => props.fenDepart,
+  (newFen) => {
+    if (boardApi.value && newFen) {
+      boardApi.value.setPosition(newFen);
+      aTrouve.value = false;
+    }
+  }
+);
 
 const verifierPlacement = async (square: string) => {
   if (aTrouve.value) {
@@ -70,13 +80,7 @@ const verifierPlacement = async (square: string) => {
     aTrouve.value = true;
     
     // 3. Bonne case : Toast vert et émission du succès
-    const toast = await toastController.create({
-      message: 'Parfait !',
-      duration: 3000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Parfait !', 3000);
     
     // Petit délai avant de passer à la suite pour apprécier le placement
     setTimeout(() => {
@@ -85,13 +89,7 @@ const verifierPlacement = async (square: string) => {
     
   } else {
     // 4. Mauvaise case : Toast rouge et retrait de la pièce erronée après 800ms
-    const toast = await toastController.create({
-      message: "Ce n'est pas la bonne case !",
-      duration: 2000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError("Ce n'est pas la bonne case !", 2000);
 
     setTimeout(() => {
       boardApi.value?.removePiece(square);

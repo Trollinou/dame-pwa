@@ -22,14 +22,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { default as EgChessboard } from 'eg-chessboard/vue';
 import 'eg-chessboard/style.css';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
-import { toastController } from '@ionic/vue';
+import { useFeedback } from '@/composables/useFeedback';
 
 const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 const props = defineProps<{
   fenDepart: string;
@@ -48,7 +49,34 @@ const boardApi = ref<BoardCore | null>(null);
 
 const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
+  api.setSoloMode(true);
+  api.setPreserveShapesOnPositionChange(true);
+  if (props.shapes && props.shapes.length > 0) {
+    api.setShapes(props.shapes);
+  }
 };
+
+watch(
+  () => props.shapes,
+  (newShapes) => {
+    if (boardApi.value && newShapes) {
+      boardApi.value.setShapes(newShapes);
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  () => props.fenDepart,
+  (newFen) => {
+    if (boardApi.value && newFen) {
+      boardApi.value.setPosition(newFen);
+      if (props.shapes && props.shapes.length > 0) {
+        boardApi.value.setShapes(props.shapes);
+      }
+    }
+  }
+);
 
 const handleMove = async (move: Move) => {
   if (!boardApi.value) return;
@@ -59,17 +87,21 @@ const handleMove = async (move: Move) => {
   // 1. Règle absolue : Ne pas s'arrêter sur une case rouge
   const isRedSquare = props.shapes.some(s => s.brush === 'red' && s.orig === move.to);
   if (isRedSquare) {
-    const toast = await toastController.create({ message: "Case interdite !", duration: 2000, color: 'danger', position: 'bottom' });
-    await toast.present();
+    await showError("Case interdite !", 2000);
     boardApi.value.setPosition(props.fenDepart);
+    if (props.shapes && props.shapes.length > 0) {
+      boardApi.value.setShapes(props.shapes);
+    }
     return;
   }
 
   // 2. Variante Stealth (Pas vu, pas pris)
   if (props.variante === 'stealth' && boardApi.value.isSquareAttacked(move.to as Key, oppColor)) {
-    const toast = await toastController.create({ message: "Vous avez été repéré !", duration: 2000, color: 'danger', position: 'bottom' });
-    await toast.present();
+    await showError("Vous avez été repéré !", 2000);
     boardApi.value.setPosition(props.fenDepart);
+    if (props.shapes && props.shapes.length > 0) {
+      boardApi.value.setShapes(props.shapes);
+    }
     return;
   }
 
@@ -80,15 +112,16 @@ const handleMove = async (move: Move) => {
       let hasOpponentPieces = false;
       allPieces.forEach(p => { if (p.color === oppColorShort) hasOpponentPieces = true; });
       if (hasOpponentPieces) {
-        const toast = await toastController.create({ message: "Il reste des pièces à manger !", duration: 2000, color: 'danger', position: 'bottom' });
-        await toast.present();
+        await showError("Il reste des pièces à manger !", 2000);
         boardApi.value.setPosition(props.fenDepart);
+        if (props.shapes && props.shapes.length > 0) {
+          boardApi.value.setShapes(props.shapes);
+        }
         return;
       }
     }
     // Succès
-    const toast = await toastController.create({ message: "Parcours réussi !", duration: 2000, color: 'success', position: 'bottom' });
-    await toast.present();
+    await showSuccess("Parcours réussi !", 2000);
     setTimeout(() => emit('success'), 800);
   }
 };

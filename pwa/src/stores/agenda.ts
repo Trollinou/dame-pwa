@@ -126,14 +126,15 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 						8000
 					);
 
-					// Repli gracieux : Si 401/403 avec un token invalide, on retente en mode public sans bloquer l'agenda
+					// Repli gracieux : Si 400/401/403 avec un token invalide, on retente en mode public sans bloquer l'agenda
 					if (
 						( response.status === 401 ||
-							response.status === 403 ) &&
+							response.status === 403 ||
+							response.status === 400 ) &&
 						token
 					) {
 						console.warn(
-							'Accès agenda authentifié refusé, tentative de chargement public...'
+							`Accès agenda authentifié refusé (${ response.status }), tentative de chargement public...`
 						);
 						response = await safeFetch(
 							`${ baseUrl }?${ queryParams }`,
@@ -367,7 +368,8 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 
 					if (
 						( response.status === 401 ||
-							response.status === 403 ) &&
+							response.status === 403 ||
+							response.status === 400 ) &&
 						token
 					) {
 						response = await safeFetch(

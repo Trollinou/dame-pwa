@@ -37,8 +37,9 @@ import '@ionic/vue/css/display.css';
 /* @import '@ionic/vue/css/palettes/dark.class.css'; */
 import '@ionic/vue/css/palettes/dark.system.css';
 
-/* Theme variables */
+/* Theme variables & Shared Components */
 import './theme/variables.css';
+import './theme/shared-components.scss';
 import { registerSW } from 'virtual:pwa-register';
 
 const pinia = createPinia();

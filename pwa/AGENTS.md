@@ -20,21 +20,24 @@
   - Tri typé via `CustomColumnDef<TData>` (`accessorFn` ou `sortingFn` explicites).
 - **Export CSV** : Configuration `DataTableExportConfig` via `exportToCsv` (`src/utils/csvExport.ts`) avec encodage **UTF-8 BOM (`\uFEFF`)** obligatoire.
 
-## 4. Design & Échiquier (`eg-chessboard`)
-- **Échiquiers Standard** : Visuel plat et net (`border-radius: 0;`, `box-shadow: none;`) sur tous les viewers (`PuzzleViewer`, `QcmViewer`, `PgnViewer`, `AnalysisPage`, etc.).
+## 4. Design & Échiquier (`eg-chessboard` / `<Chessboard>`)
+- **Wrapper Maître `<Chessboard>`** : Tout affichage d'échiquier doit impérativement utiliser le wrapper `src/components/shared/Chessboard/Chessboard.vue` plutôt que d'importer directement `TheChessboard` / `eg-chessboard`.
+- **Échiquiers Standard** : Visuel plat et net (`border-radius: 0;`, `box-shadow: none;`) sur tous les viewers (`PuzzleViewer`, `QcmViewer`, `PgnViewer`, `AnalysisPage`, etc.). Utiliser les classes `.chessboard-container` ou `.board-container` (`src/theme/shared-components.scss`).
 - **Exception Cartes Manipulables** (`OrderViewer`, `MatchingViewer`, etc.) : L'échiquier intérieur conserve `border-radius: 0;`, seul le conteneur externe (`.board-wrapper-card`) garde l'aspect carte (bords arrondis, ombres).
 - **Responsive & Ratio** :
   - Interdiction de tronquer/rogner un échiquier. Conserver `aspect-ratio: 1 / 1`.
   - **Portrait** : `max-width: min(720px, 60vh)`.
   - **Paysage** : `width: min(65vh, 48vw); aspect-ratio: 1 / 1;`.
 
-## 5. Composants Partagés (`src/components/shared/`)
-- Logiques réutilisables à placer dans `src/components/shared/` : `DataTable/`, `DiagramViewer.vue`, `PuzzleViewer.vue`, `QcmViewer.vue`, `InteractiveQcmViewer.vue`, `PgnViewer.vue`, `PlacementViewer.vue`, `MatchingViewer.vue`, `OrderViewer.vue`, `ParcoursViewer.vue`, `VisionViewer.vue`.
+## 5. Composants & Composables Partagés (`src/components/shared/` & `src/composables/`)
+- **Composants Partagés** : `Chessboard/`, `DataTable/`, `DiagramViewer.vue`, `PuzzleViewer.vue`, `QcmViewer.vue`, `InteractiveQcmViewer.vue`, `PgnViewer.vue`, `PlacementViewer.vue`, `MatchingViewer.vue`, `OrderViewer.vue`, `ParcoursViewer.vue`, `VisionViewer.vue`.
+- **Feedback & Toasts** : Utiliser systématiquement le composable `useFeedback()` (`src/composables/useFeedback.ts`) pour les notifications utilisateur au lieu d'appeler manuellement `toastController.create()`.
+- **Progression Exercices & Séries** : Utiliser systématiquement le composable `useCardNavigation()` (`src/composables/useCardNavigation.ts`) pour la navigation par carte/étape.
 
 ## 6. État, API & Caching (TanStack Query & Pinia)
 - **Appels HTTP** : Interdiction du `fetch` natif. Utiliser `safeFetch` (`src/utils/safeFetch.ts`) ou `fetchWpCollection` (`src/utils/wpApi.ts`).
 - **Collections Paginées (`fetchWpCollection`)** : Gère l'en-tête JWT (`Authorization: Bearer`), le parcours des pages (`X-WP-TotalPages`) et la fusion des données.
-- **Gestion JWT & HTTP 401** : `safeFetch` intercepte les 401 et tente un `authStore.tryRefreshToken()`. Déconnexion directe (`logout()`) sur un 401 interdite sans tentative de rafraîchissement.
+- **Gestion JWT & Erreurs HTTP 400/401** : `safeFetch` intercepte les 401 et les 400 portant un en-tête `Authorization` pour tenter un `authStore.tryRefreshToken()`. En cas d'échec de renouvellement, déconnexion propre systématique (`logout()`).
 - **Cache (`queryClient` dans `src/queryClient.ts`)** :
   - Mutation : Synchroniser via `queryClient.invalidateQueries()` ou `setQueryData()`.
   - Logout : Purge complète via `queryClient.clear()`.

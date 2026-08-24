@@ -16,14 +16,14 @@
           <span class="panel-title">Pièces sur l'échiquier</span>
         </div>
 
-        <div class="pieces-container">
+        <div :class="['pieces-container', `piece-set-${chessPreferences.pieceSet || 'staunton'}`]">
           <div
             v-for="(item, idx) in piecesExtraites"
             :key="`${idx}-${item.square}`"
             class="piece-row"
           >
             <cg-board class="piece-icon-box">
-              <div :class="['piece', item.role, item.color]"></div>
+              <piece :class="[item.role, item.color]"></piece>
             </cg-board>
             <span class="piece-square">{{ item.square }}</span>
           </div>
@@ -385,6 +385,7 @@ cg-board.piece-icon-box {
   background: transparent !important;
 }
 
+cg-board.piece-icon-box piece,
 cg-board.piece-icon-box .piece {
   position: absolute !important;
   width: 100% !important;

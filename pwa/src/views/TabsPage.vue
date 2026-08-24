@@ -18,9 +18,9 @@
           <ion-label>Apprentissage</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="profil" href="/tabs/profil">
-          <ion-icon :icon="personOutline" />
-          <ion-label>Profil</ion-label>
+        <ion-tab-button tab="profil" href="/tabs/profil" :class="{ 'tab-authenticated': authStore.isAuthenticated }">
+          <ion-icon :icon="authStore.isAuthenticated ? personCircle : logInOutline" />
+          <ion-label>{{ authStore.isAuthenticated ? (authStore.selectedIdentity?.firstname || 'Profil') : 'Connexion' }}</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
@@ -45,7 +45,8 @@ import {
   homeOutline,
   calendarOutline,
   schoolOutline,
-  personOutline
+  personCircle,
+  logInOutline
 } from 'ionicons/icons';
 
 const route = useRoute();

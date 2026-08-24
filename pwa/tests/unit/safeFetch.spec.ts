@@ -47,12 +47,11 @@ describe( 'safeFetch utility', () => {
 
 	test( 'attempts transparent token refresh on 401 Unauthorized status', async () => {
 		await app.runWithContext( async () => {
-			localStorage.setItem( 'dame_jwt_token', 'expired-token' );
-
 			const authStore = useAuthStore();
 			vi.spyOn( authStore, 'tryRefreshToken' ).mockResolvedValue(
 				'new-refreshed-token'
 			);
+			localStorage.setItem( 'dame_jwt_token', 'expired-token' );
 
 			const unauthorizedResponse = new Response( null, { status: 401 } );
 			const successResponse = new Response(
@@ -77,6 +76,52 @@ describe( 'safeFetch utility', () => {
 				?.headers as Record< string, string >;
 			expect( secondCallHeaders?.Authorization ).toBe(
 				'Bearer new-refreshed-token'
+			);
+		} );
+	} );
+
+	test( 'attempts transparent token refresh on 400 Bad Request with Authorization header', async () => {
+		await app.runWithContext( async () => {
+			const authStore = useAuthStore();
+			vi.spyOn( authStore, 'tryRefreshToken' ).mockResolvedValue(
+				'new-refreshed-token-400'
+			);
+			localStorage.setItem( 'dame_jwt_token', 'expired-token' );
+
+			const badRequestAuthResponse = new Response(
+				JSON.stringify( {
+					code: 'jwt_auth_invalid_token',
+					message: 'Expired token',
+				} ),
+				{ status: 400 }
+			);
+			const successResponse = new Response(
+				JSON.stringify( { data: 'secret-after-400' } ),
+				{ status: 200 }
+			);
+
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValueOnce( badRequestAuthResponse )
+				.mockResolvedValueOnce( successResponse );
+
+			vi.stubGlobal( 'fetch', fetchMock );
+
+			const res = await safeFetch(
+				'https://api.example.com/protected-agenda',
+				{
+					headers: { Authorization: 'Bearer expired-token' },
+				}
+			);
+
+			expect( authStore.tryRefreshToken ).toHaveBeenCalledTimes( 1 );
+			expect( fetchMock ).toHaveBeenCalledTimes( 2 );
+			expect( res.status ).toBe( 200 );
+
+			const secondCallHeaders = fetchMock.mock.calls[ 1 ][ 1 ]
+				?.headers as Record< string, string >;
+			expect( secondCallHeaders?.Authorization ).toBe(
+				'Bearer new-refreshed-token-400'
 			);
 		} );
 	} );

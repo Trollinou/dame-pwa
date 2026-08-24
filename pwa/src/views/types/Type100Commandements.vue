@@ -5,6 +5,7 @@
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
       :consigne="qcmActuel?.question"
+      :stepBadgeText="`Question ${qcmIndex + 1} / ${qcmsList.length}`"
     />
 
     <QcmViewer

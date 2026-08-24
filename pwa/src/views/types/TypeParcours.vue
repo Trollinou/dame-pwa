@@ -14,7 +14,7 @@
       :variante="config.variante"
       :caseDepart="config.case_depart"
       :caseArrivee="config.case_arrivee"
-      :shapes="config.shapes || []"
+      :shapes="computedShapes"
       @success="$emit('success')"
     />
   </div>
@@ -52,6 +52,28 @@ const headerMeta = computed(() => {
     typeLabel: props.config?.metaTypeLabel || 'Parcours',
     chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
   };
+});
+
+const computedShapes = computed<DrawShape[]>(() => {
+  const baseShapes: DrawShape[] = props.config?.shapes ? [...props.config.shapes] : [];
+
+  if (props.config?.case_depart) {
+    const dep = props.config.case_depart.toLowerCase() as DrawShape['orig'];
+    const alreadyDep = baseShapes.some((s) => s.orig === dep && !s.dest);
+    if (!alreadyDep) {
+      baseShapes.push({ orig: dep, brush: 'blue' });
+    }
+  }
+
+  if (props.config?.case_arrivee) {
+    const arr = props.config.case_arrivee.toLowerCase() as DrawShape['orig'];
+    const alreadyArr = baseShapes.some((s) => s.orig === arr && !s.dest);
+    if (!alreadyArr) {
+      baseShapes.push({ orig: arr, brush: 'green' });
+    }
+  }
+
+  return baseShapes;
 });
 </script>
 
