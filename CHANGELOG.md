@@ -4,7 +4,7 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.1] - 2026-08-25
 
 ### Ajouté & Amélioré
 - **Centralisation et normalisation des styles SCSS/CSS récurrents (Étape 3 du plan de refactorisation)** :
