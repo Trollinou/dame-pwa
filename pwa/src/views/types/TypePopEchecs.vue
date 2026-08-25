@@ -1,37 +1,23 @@
 <template>
   <div class="exercice-type-popechecs">
-    <ExerciseHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="config.consigne"
-      stepBadgeText="1 / 1"
-    />
-
     <PlacementViewer
-      v-if="config.fen_depart"
-      :consigne="''"
-      :fenDepart="config.fen_depart"
-      :pieceType="config.piece_type"
-      :pieceColor="config.piece_color"
-      :caseCible="config.case_cible"
+      :consigne="config.consigne"
+      :diagrammes="config.diagrammes"
+      :metaTitre="config.metaTitre"
+      :metaTypeLabel="config.metaTypeLabel"
+      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
       @success="gererSucces"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import PlacementViewer from '@/components/shared/PlacementViewer.vue';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import PlacementViewer, { type DiagrammePopEchecs } from '@/components/shared/PlacementViewer.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 
-interface ConfigPopEchecs {
-  consigne: string;
-  fen_depart: string;
-  piece_type: 'p' | 'r' | 'n' | 'b' | 'q' | 'k';
-  piece_color: 'white' | 'black' | 'w' | 'b' | string;
-  case_cible: string;
+export interface ConfigPopEchecs {
+  consigne?: string;
+  diagrammes?: DiagrammePopEchecs[];
   metaTitre?: string;
   metaTypeLabel?: string;
   metaChapitreNiveauLabel?: string;
@@ -45,14 +31,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'success'): void;
 }>();
-
-const headerMeta = computed(() => {
-  return {
-    title: props.config?.metaTitre || 'T2 - Pop-échecs',
-    typeLabel: props.config?.metaTypeLabel || 'Pop-échecs',
-    chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
-  };
-});
 
 const store = useApprentissageStore();
 

@@ -159,3 +159,139 @@ export function getActiveColorFromFen( fen: string ): 'white' | 'black' {
 	}
 	return 'white';
 }
+
+export interface SquarePiece {
+	type: 'p' | 'r' | 'n' | 'b' | 'q' | 'k';
+	color: 'w' | 'b';
+}
+
+/**
+ * Finds the square that has a blue circle shape.
+ * @param shapes
+ */
+export function findBlueCircledSquare(
+	shapes?: Array< { orig?: string; dest?: string; brush?: string; color?: string } >
+): string | null {
+	if ( ! Array.isArray( shapes ) ) {
+		return null;
+	}
+	for ( const shape of shapes ) {
+		if (
+			shape &&
+			shape.orig &&
+			( ! shape.dest || shape.dest === shape.orig ) &&
+			( shape.brush === 'blue' || shape.brush === 'b' || shape.color === 'blue' )
+		) {
+			return shape.orig.toLowerCase();
+		}
+	}
+	return null;
+}
+
+/**
+ * Finds the piece on a specific square in a FEN position.
+ * @param fen
+ * @param square
+ */
+export function findPieceOnSquare( fen: string, square: string ): SquarePiece | null {
+	if ( ! fen || ! square || square.length !== 2 ) {
+		return null;
+	}
+	const files = 'abcdefgh';
+	const fileIndex = files.indexOf( square[ 0 ].toLowerCase() );
+	if ( fileIndex < 0 ) {
+		return null;
+	}
+	const rank = parseInt( square[ 1 ], 10 );
+	const rankIndex = 8 - rank;
+	if ( rankIndex < 0 || rankIndex > 7 ) {
+		return null;
+	}
+	const parts = fen.trim().split( /\s+/ );
+	const placement = parts[ 0 ];
+	if ( ! placement ) {
+		return null;
+	}
+	const rows = placement.split( '/' );
+	const row = rows[ rankIndex ];
+	if ( ! row ) {
+		return null;
+	}
+	let currentFile = 0;
+	for ( let c = 0; c < row.length; c++ ) {
+		const ch = row[ c ];
+		if ( ch >= '1' && ch <= '8' ) {
+			currentFile += parseInt( ch, 10 );
+		} else {
+			if ( currentFile === fileIndex ) {
+				const isWhite = ch === ch.toUpperCase();
+				return {
+					type: ch.toLowerCase() as SquarePiece[ 'type' ],
+					color: isWhite ? 'w' : 'b',
+				};
+			}
+			currentFile++;
+		}
+	}
+	return null;
+}
+
+/**
+ * Removes a piece from a specific square in a FEN string.
+ * @param fen
+ * @param square
+ */
+export function removePieceFromFen( fen: string, square: string ): string {
+	if ( ! fen || ! square || square.length !== 2 ) {
+		return fen;
+	}
+	const files = 'abcdefgh';
+	const fileIndex = files.indexOf( square[ 0 ].toLowerCase() );
+	const rank = parseInt( square[ 1 ], 10 );
+	const rankIndex = 8 - rank;
+	if ( fileIndex < 0 || rankIndex < 0 || rankIndex > 7 ) {
+		return fen;
+	}
+	const parts = fen.trim().split( /\s+/ );
+	const rows = parts[ 0 ].split( '/' );
+	const row = rows[ rankIndex ];
+	if ( ! row ) {
+		return fen;
+	}
+	let currentFile = 0;
+	let newRow = '';
+	for ( let c = 0; c < row.length; c++ ) {
+		const ch = row[ c ];
+		if ( ch >= '1' && ch <= '8' ) {
+			newRow += ch;
+			currentFile += parseInt( ch, 10 );
+		} else {
+			if ( currentFile === fileIndex ) {
+				newRow += '1';
+			} else {
+				newRow += ch;
+			}
+			currentFile++;
+		}
+	}
+	let collapsedRow = '';
+	let emptyCount = 0;
+	for ( let i = 0; i < newRow.length; i++ ) {
+		const ch = newRow[ i ];
+		if ( ch >= '1' && ch <= '8' ) {
+			emptyCount += parseInt( ch, 10 );
+		} else {
+			if ( emptyCount > 0 ) {
+				collapsedRow += emptyCount.toString();
+				emptyCount = 0;
+			}
+			collapsedRow += ch;
+		}
+	}
+	if ( emptyCount > 0 ) {
+		collapsedRow += emptyCount.toString();
+	}
+	rows[ rankIndex ] = collapsedRow;
+	parts[ 0 ] = rows.join( '/' );
+	return parts.join( ' ' );
+}

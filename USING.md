@@ -36,10 +36,15 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - **Maison** (`homeOutline`) : retour rapide à la liste des cours (`/apprentissage/cours`).
      - **Liste** (`listOutline`) : retour au sommaire du cours actif (`/cours/:id`).
    - **Structure des Exercices & Puzzles** :
-      - **En-tête unifié** : Affiche le titre de l'étape, le type d'exercice (QCM, Puzzle, etc.) et la consigne claire.
-      - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, ratio carré parfait (1:1), palettes de sélection de pièces et mini-échiquiers comparatifs harmonisés.
-      - **Navigation en Série** : Badge de progression (`Carte X / Y`) et barre d'avancement interactive au bas de chaque étape.
-      - **Validation & Feedback instantané** : Message clair de réussite ou d'erreur, permettant de débloquer le bouton d'avancement vers la question suivante.
+     - **En-tête unifié (`ExerciseHeader`)** : Affiche le titre de l'étape, le type d'exercice, la consigne contextualisée à la question active et le badge d'étape interactive (`Carte X / Y`).
+     - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
+     - **Exercices Pop'Echecs (Type 2)** :
+       - Série de 4 diagrammes avec consigne propre à chaque position.
+       - Masquage des annotations/formes initiales pendant la phase de réflexion.
+       - Clic sur la case cible : placement de la pièce, validation instantanée, révélation des flèches/formes du diagramme complet.
+       - Retrait automatique avec feedback rouge en cas d'erreur de case.
+     - **Navigation en Série (`SeriesCardFooter`)** : Badge d'étape (`Carte X / Y`), zone de feedback visuel fixe (succès/erreur) et bouton d'avancement débloqué dès la validation de la position.
+     - **Validation finale** : Enregistrement de la réussite dans la progression de l'adhérent à la fin de la série.
 
 2. **Partie d'Échecs & Échiquier ♟️** :
    - Accessible librement à tous les visiteurs et adhérents.
@@ -57,7 +62,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
 Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), une section dédiée permet de personnaliser l'apparence de l'échiquier pour l'ensemble de la PWA :
 
 1. **Sélecteur 3D - Style des Pièces** :
-   - Carrousel 3D rotatif à 8 faces représentant les styles vectoriels disponibles : *Staunton* (défaut), *Mérida*, *Cburnett*, *Alpha*, *Cardinal*, *Dubrovny*, *Maestro*, *Staunty*.
+   - Carrousel 3D rotatif à 8 faces représentant les styles vectoriels disponibles : *Cburnett* (défaut), *Staunton*, *Mérida*, *Alpha*, *Cardinal*, *Dubrovny*, *Maestro*, *Staunty*.
    - Rotation par glisser/déposer tactile (swipe/drag), boutons fléchés ou clics directs sur les cartes.
 2. **Sélecteur 3D - Fond de l'Échiquier** :
    - Carrousel 3D rotatif à 8 faces présentant les nuances et textures d'arrière-plan : *Bois Classique* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Érable Doré*.
@@ -65,5 +70,5 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), une section déd
    - Échiquier complet en position initiale actualisé instantanément selon la combinaison sélectionnée.
 4. **Validation & Persistance** :
    - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
-   - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison classique (Staunton & Bois).
+   - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (Cburnett & Bois Classique).
    - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).

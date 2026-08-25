@@ -4,6 +4,24 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.2.2] - 2026-08-25
+
+### Ajouté & Amélioré
+- **Standardisation des Thèmes & Jeux de Pièces (`chessPreferences.ts`, `ChessThemeCustomizer.vue`, `VisionViewer.vue`, `QuiSuisJeViewer.vue`)** :
+  - **Jeu de pièces par défaut (`cburnett`)** : Alignement sur le standard Lichess / Chess.com et retrait du jeu doublon obsolète `staunton` conformément à `eg-chessboard` 1.6.4.
+  - **Actualisation des options de personnalisation** : Liste des jeux vectoriels disponible enrichie (`cburnett`, `merida`, `alpha`, `cardinal`, `dubrovny`, `maestro`, `staunty`, `fantasy`, `tatiana`).
+  - **Mise à jour de la documentation** : Actualisation de `USING.md` pour refléter la combinaison par défaut *Cburnett* & *Bois Classique*.
+- **Harmonisation des Feedbacks & Navigation par Cartes (`PlacementViewer.vue`, `VisionViewer.vue`)** :
+  - **Suppression des toasts redondants** : Élimination des appels superflus à `useFeedback` (`showSuccess`/`showError`) dans `PlacementViewer.vue` pour centraliser l'information visuelle uniquement sur `SeriesCardFooter`.
+  - **Indicateur d'étape dynamique (`VisionViewer.vue`)** : Ajout du badge d'étape `Carte X / 4` dans `ExerciseHeader` pour harmoniser l'expérience avec `PlacementViewer`.
+- **Support des Exercices Pop'Echecs (Type 2) en Série de 4 Diagrammes (`PlacementViewer.vue`, `TypePopEchecs.vue`, `fenUtils.ts`)** :
+  - **Moteur d'interprétation client** : Détection automatique de la pièce cible à partir du cercle bleu (`brush: 'blue'`), extraction de la position initiale sans la pièce (`removePieceFromFen`) et orientation dynamique selon le trait de la FEN (`getActiveColorFromFen` : Noirs en bas si le trait est aux Noirs).
+  - **Masquage et révélation des annotations** : Les formes et flèches (`shapes`) sont masquées pendant la phase de réflexion, puis entièrement révélées sur l'échiquier dès que l'apprenant clique sur la bonne case cible.
+  - **Gestion de la série interactive** : Intégration d'un en-tête `ExerciseHeader` synchronisé avec la consigne spécifique du diagramme actif et du pied de série `SeriesCardFooter` avec feedback visuel et validation à l'issue des 4 cartes.
+  - **Utilitaires et tests unitaires** : Ajout des fonctions d'analyse FEN/Shapes dans `fenUtils.ts` et couverture de test complète dans `TypePopEchecs.spec.ts`.
+
 ## [1.2.1] - 2026-08-25
 
 ### Ajouté & Amélioré

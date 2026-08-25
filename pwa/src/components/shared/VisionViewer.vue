@@ -6,6 +6,7 @@
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
       :consigne="consigneTexte"
+      :stepBadgeText="`Carte ${indexCourant + 1} / ${diagrammesListe.length}`"
     />
 
     <!-- Main Dual Panel Layout -->
@@ -16,7 +17,7 @@
           <span class="panel-title">Pièces sur l'échiquier</span>
         </div>
 
-        <div :class="['pieces-container', `piece-set-${chessPreferences.pieceSet || 'staunton'}`]">
+        <div :class="['pieces-container', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
           <div
             v-for="(item, idx) in piecesExtraites"
             :key="`${idx}-${item.square}`"

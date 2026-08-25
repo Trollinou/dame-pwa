@@ -156,8 +156,8 @@ const pieceScrollEl = ref<HTMLElement | null>(null);
 const themeScrollEl = ref<HTMLElement | null>(null);
 
 // Valeurs en cours de sélection
-const stagedPieceSet = ref<PieceSet>('staunton');
-const stagedBoardTheme = ref<BoardTheme>('brown');
+const stagedPieceSet = ref<PieceSet>(chessPreferences.pieceSet || 'cburnett');
+const stagedBoardTheme = ref<BoardTheme>(chessPreferences.boardTheme || 'brown');
 
 const scrollToPieceIndex = (index: number, smooth = true) => {
   if (pieceScrollEl.value) {
@@ -212,7 +212,7 @@ const onThemeScroll = () => {
 };
 
 onMounted(() => {
-  stagedPieceSet.value = chessPreferences.pieceSet || 'staunton';
+  stagedPieceSet.value = chessPreferences.pieceSet || 'cburnett';
   stagedBoardTheme.value = chessPreferences.boardTheme || 'brown';
 
   nextTick(() => {
@@ -242,7 +242,7 @@ const handleSavePreferences = () => {
 };
 
 const handleResetDefaults = () => {
-  stagedPieceSet.value = 'staunton';
+  stagedPieceSet.value = 'cburnett';
   stagedBoardTheme.value = 'brown';
   scrollToPieceIndex(0, true);
   scrollToThemeIndex(0, true);

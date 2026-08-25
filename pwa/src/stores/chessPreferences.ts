@@ -17,19 +17,14 @@ export interface BoardThemeOption {
 
 export const AVAILABLE_PIECE_SET_OPTIONS: PieceSetOption[] = [
 	{
-		id: 'staunton',
-		label: 'Staunton',
-		description: 'Style 3D réaliste classique avec reflets',
+		id: 'cburnett',
+		label: 'Cburnett',
+		description: 'Design vectoriel moderne flat Lichess / Chess.com (défaut)',
 	},
 	{
 		id: 'merida',
 		label: 'Mérida',
 		description: 'Standard classique des diagrammes et livres',
-	},
-	{
-		id: 'cburnett',
-		label: 'Cburnett',
-		description: 'Design vectoriel moderne flat Lichess',
 	},
 	{
 		id: 'alpha',
@@ -55,6 +50,16 @@ export const AVAILABLE_PIECE_SET_OPTIONS: PieceSetOption[] = [
 		id: 'staunty',
 		label: 'Staunty',
 		description: 'Variante contemporaine épurée',
+	},
+	{
+		id: 'fantasy',
+		label: 'Fantasy',
+		description: 'Style illustré médiéval fantastique',
+	},
+	{
+		id: 'tatiana',
+		label: 'Tatiana',
+		description: 'Pièces élégantes et stylisées',
 	},
 ];
 
@@ -112,7 +117,7 @@ export const AVAILABLE_BOARD_THEME_OPTIONS: BoardThemeOption[] = [
 export const useChessPreferencesStore = defineStore(
 	'chessPreferences',
 	() => {
-		const pieceSet = ref< PieceSet >( 'staunton' );
+		const pieceSet = ref< PieceSet >( 'cburnett' );
 		const boardTheme = ref< BoardTheme >( 'brown' );
 
 		const setPieceSet = ( newSet: PieceSet ) => {
@@ -129,7 +134,7 @@ export const useChessPreferencesStore = defineStore(
 		};
 
 		const resetDefaults = () => {
-			pieceSet.value = 'staunton';
+			pieceSet.value = 'cburnett';
 			boardTheme.value = 'brown';
 		};
 

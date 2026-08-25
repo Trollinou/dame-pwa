@@ -30,7 +30,7 @@
       <!-- Mode PIECE: Palette flex 2x6 -->
       <div v-if="typeReponse === 'piece'" class="palette-wrapper">
         <p class="section-instruction">Sélectionnez la bonne pièce :</p>
-        <div :class="['piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'staunton'}`]">
+        <div :class="['piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
           <button
             v-for="code in pieceCodes"
             :key="code"

@@ -1,6 +1,6 @@
 {
   "name": "dame-pwa",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "PWA de l'Échiquier Lédenien",
   "type": "module",
   "scripts": {
@@ -11,7 +11,8 @@
     "test:unit": "vitest --config pwa/vite.config.ts",
     "test:e2e": "cypress run",
     "lint": "eslint pwa",
-    "package": "node script/package.cjs"
+    "package": "node script/package.cjs",
+    "version-sync": "node scripts/version-sync.cjs"
   },
   "dependencies": {
     "@capacitor/app": "8.1.1",

@@ -30,6 +30,17 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 - Échiquier de prévisualisation réactif en position initiale.
 - Sauvegarde locale persistante des préférences utilisateur répercutée sur tous les viewers d'exercices, cours, analyse et jeu.
 
+## Modèle d'Architecture Découplé (CMS ROI / Moteur Runtime PWA)
+
+L'application suit un principe de découplage strict :
+- **ROI (WordPress)** : Rôle de CMS auteur stockant les standards d'échecs (FEN + Shapes, PGN avec annotations `%csl`/`%cal`/variantes) et les consignes rédigées par l'auteur.
+- **DAME-PWA (Client-Side)** : Moteur d'interprétation interactive via `fenUtils.ts`, `eg-chessboard` et `chessops` :
+  - Détection automatique de la pièce cible à partir du cercle bleu (`brush: 'blue'`).
+  - Dérivation de la `fen_depart` sans la pièce cible.
+  - Calcul dynamique de l'orientation de l'échiquier selon le trait de la position (`getActiveColorFromFen(fen)` : Blancs en bas si trait aux Blancs, Noirs en bas si trait aux Noirs).
+  - Masquage initial des `shapes` pendant la recherche, puis révélation complète dès le placement réussi.
+  - Gestion des séries multi-diagrammes avec `ExerciseHeader` et `SeriesCardFooter`.
+
 ## Composants & Composables Partagés (PWA Frontend)
 
 Pour garantir la cohérence technique, l'application s'appuie sur un socle de composants et composables partagés situés dans `pwa/src/components/shared/` et `pwa/src/composables/` :
@@ -181,7 +192,7 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 
 L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
 
-## Développement
+## Développement & Release
 
 ```bash
 # Vérification des types TypeScript
@@ -193,6 +204,13 @@ npm run lint
 # Tests unitaires Vitest
 npm run test:unit
 
-# Compilation de la PWA
+# 1. Synchronisation et montée de version SemVer (met à jour package.json, PHP, CHANGELOG, etc.)
+npm run version-sync -- 1.3.0
+
+# 2. Compilation de la PWA (injecte la nouvelle version __APP_VERSION__ depuis package.json)
 npm run build
+
+# 3. Création de l'archive de déploiement ZIP (lance automatiquement le build PWA si nécessaire)
+npm run package
 ```
+
