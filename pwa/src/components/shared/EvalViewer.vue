@@ -1,8 +1,8 @@
 <template>
-  <div class="eval-viewer-layout">
+  <div class="exercise-viewer-layout">
     <!-- Phase 1 : Questions -->
-    <div v-if="phase === 'questions'" class="phase-questions">
-      <div class="board-container">
+    <div v-if="phase === 'questions'" class="exercise-stage">
+      <div class="chessboard-container">
         <Chessboard
           :fen="fenDepart"
           :shapes="shapes"
@@ -12,7 +12,7 @@
         />
       </div>
 
-      <ion-card class="question-card">
+      <ion-card class="exercise-card">
         <ion-card-header>
           <ion-card-title class="theme-title">{{ theme }}</ion-card-title>
         </ion-card-header>
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Phase 2 : Tactique -->
-    <div v-else-if="phase === 'tactique'" class="phase-tactique">
+    <div v-else-if="phase === 'tactique'" class="exercise-stage">
       <h3 class="phase-title">À vous de jouer ! Trouvez la séquence.</h3>
       <PuzzleViewer
         :couleurJoueur="couleurJoueur"
@@ -47,13 +47,13 @@
     </div>
 
     <!-- Phase 3 : Solution / PGN -->
-    <div v-else class="phase-solution">
+    <div v-else class="exercise-stage">
       <PgnViewer
         :orientation="couleurJoueur"
         :pgn="pgnExplication"
       />
       <div class="finish-container">
-        <ion-button expand="block" color="success" class="finish-btn" @click="$emit('success')">
+        <ion-button expand="block" color="success" class="exercise-action-btn" @click="$emit('success')">
           Terminer l'exercice
         </ion-button>
       </div>
@@ -127,38 +127,6 @@ const repondre = async (valeur: string) => {
 </script>
 
 <style scoped>
-.eval-viewer-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.phase-questions,
-.phase-tactique,
-.phase-solution {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-.question-card {
-  width: 100%;
-  max-width: 500px;
-  margin-top: 16px;
-}
-
 .theme-title {
   font-size: 1.1rem;
   font-weight: bold;

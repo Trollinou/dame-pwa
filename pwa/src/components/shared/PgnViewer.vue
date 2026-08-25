@@ -1,6 +1,6 @@
 <template>
-  <div class="pgn-stage-layout">
-    <div class="board-container">
+  <div class="exercise-viewer-layout">
+    <div class="chessboard-container">
       <Chessboard
         mode="study"
         :orientation="(props.orientation === 'black' ? 'black' : 'white')"
@@ -146,15 +146,6 @@ const viewNext = () => {
 </script>
 
 <style scoped>
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
 .navigation-controls {
   display: flex;
   justify-content: center;

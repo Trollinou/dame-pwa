@@ -7,6 +7,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Ajouté & Amélioré
+- **Centralisation et normalisation des styles SCSS/CSS récurrents (Étape 3 du plan de refactorisation)** :
+  - **Enrichissement de `pwa/src/theme/shared-components.scss`** : Centralisation modulaire des styles transverses par familles d'éléments (Layouts, Échiquiers, Cartes & En-têtes, Choix QCM, Palettes & Pièces, Bannières & Actions).
+  - **Nomenclature canonique stricte et épurée** :
+    - Layouts : `.exercise-viewer-layout`, `.exercise-stage`.
+    - Échiquiers : `.chessboard-container`, `.chessboard-container--mini` (320px pour appariement et choix de scénarios), `.chessboard-container--small`.
+    - Cartes : `.exercise-card`, `.exercise-card-header`.
+    - QCM : `.qcm-choices`, `.choice-btn`, `.choice-btn--centered` (avec gestion du retour à la ligne natif Ionic via `&::part(native)`).
+    - Palettes & Pièces : `.piece-palette`, `.piece-btn`, `.piece-icon-box` (unification des sélecteurs de pièces vectorielles via `:is(piece, .piece)` et neutralisation du damier d'arrière-plan).
+    - Actions & Feedback : `.feedback-banner`, `.feedback-text`, `.exercise-action-btn`.
+  - **Nettoyage massif des styles scoped redondants** : Élimination totale des blocs `<style scoped>` dupliqués dans l'ensemble des Viewers d'exercices (`PlacementViewer`, `CapOuPasCapViewer`, `PuzzleViewer`, `ParcoursViewer`, `QcmViewer`, `TextOrderViewer`, `InteractiveQcmViewer`, `QuiSuisJeViewer`, `JugementFinalViewer`, `VisionViewer`, `MatchingViewer`, `PgnViewer`, `EvalViewer`).
+  - **Documentation technique et directives agent à jour** : Tableau exhaustif des classes par famille dans `README.md` et mise à jour des règles projet dans `pwa/AGENTS.md`.
 - **Harmonisation complète des Viewers d'Exercices (Étape 2 du plan de refactorisation)** :
   - **Migration vers le composant unifié `<Chessboard>`** : Intégration systématique du wrapper standardisé dans `PuzzleViewer.vue`, `QcmViewer.vue`, `ParcoursViewer.vue`, `VisionViewer.vue`, `CapOuPasCapViewer.vue`, `InteractiveQcmViewer.vue`, `MatchingViewer.vue`, `EvalViewer.vue`, `JugementFinalViewer.vue`, `DiagramViewer.vue` et `PgnViewer.vue`.
   - **Standardisation des retours utilisateurs via `useFeedback`** : Remplacement des appels directs à `toastController` par les méthodes réactives et typées `showSuccess()` et `showError()` dans tous les viewers d'apprentissage.

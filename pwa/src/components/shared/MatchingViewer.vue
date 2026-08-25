@@ -33,7 +33,7 @@
                 <span v-if="boardsCorrects.includes(index)">✓ </span>Option {{ getLetter(liaisons[index]) }}
               </span>
             </div>
-            <div class="board-mini-container">
+            <div class="chessboard-container--mini">
               <Chessboard
                 :fen="echiquiersMelanges[index].fen"
                 :player-color="echiquiersMelanges[index].couleur_joueur"
@@ -382,14 +382,6 @@ const validerAssociations = async () => {
   color: var(--ion-color-success-shade, #24a858);
   padding: 2px 6px;
   border-radius: 4px;
-}
-
-.board-mini-container {
-  width: 100%;
-  aspect-ratio: 1;
-  pointer-events: none;
-  border-radius: 0;
-  overflow: hidden;
 }
 
 /* Liste des Descriptions */

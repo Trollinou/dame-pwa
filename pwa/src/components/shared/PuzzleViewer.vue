@@ -1,6 +1,6 @@
 <template>
-  <div class="puzzle-viewer-layout">
-    <div class="board-container">
+  <div class="exercise-viewer-layout">
+    <div class="chessboard-container">
       <Chessboard
         :fen="fen"
         :orientation="couleurJoueur"
@@ -113,21 +113,3 @@ const verifierCoup = async (move: Move) => {
 };
 </script>
 
-<style scoped>
-.puzzle-viewer-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-</style>

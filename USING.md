@@ -36,9 +36,10 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - **Maison** (`homeOutline`) : retour rapide à la liste des cours (`/apprentissage/cours`).
      - **Liste** (`listOutline`) : retour au sommaire du cours actif (`/cours/:id`).
    - **Structure des Exercices & Puzzles** :
-     - **En-tête unifié** : Affiche le titre de l'étape, le type d'exercice (QCM, Puzzle, etc.) et la consigne claire.
-     - **Navigation en Série** : Badge de progression (`Carte X / Y`) et barre d'avancement interactive au bas de chaque étape.
-     - **Validation & Feedback instantané** : Message clair de réussite ou d'erreur, permettant de débloquer le bouton d'avancement vers la question suivante.
+      - **En-tête unifié** : Affiche le titre de l'étape, le type d'exercice (QCM, Puzzle, etc.) et la consigne claire.
+      - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, ratio carré parfait (1:1), palettes de sélection de pièces et mini-échiquiers comparatifs harmonisés.
+      - **Navigation en Série** : Badge de progression (`Carte X / Y`) et barre d'avancement interactive au bas de chaque étape.
+      - **Validation & Feedback instantané** : Message clair de réussite ou d'erreur, permettant de débloquer le bouton d'avancement vers la question suivante.
 
 2. **Partie d'Échecs & Échiquier ♟️** :
    - Accessible librement à tous les visiteurs et adhérents.
