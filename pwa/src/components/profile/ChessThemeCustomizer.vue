@@ -106,7 +106,7 @@
           @click="handleResetDefaults"
         >
           <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
-          Rétablir les valeurs par défaut (Staunton & Bois)
+          Rétablir les valeurs par défaut (CBurnett & Brown)
         </ion-button>
       </div>
     </div>

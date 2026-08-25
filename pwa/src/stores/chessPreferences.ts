@@ -18,7 +18,7 @@ export interface BoardThemeOption {
 export const AVAILABLE_PIECE_SET_OPTIONS: PieceSetOption[] = [
 	{
 		id: 'cburnett',
-		label: 'Cburnett',
+		label: 'CBurnett',
 		description: 'Design vectoriel moderne flat Lichess / Chess.com (défaut)',
 	},
 	{
@@ -42,31 +42,36 @@ export const AVAILABLE_PIECE_SET_OPTIONS: PieceSetOption[] = [
 		description: 'Inspiré des Olympiades de Dubrovnik 1950',
 	},
 	{
-		id: 'maestro',
-		label: 'Maestro',
-		description: 'Style traditionnel européen robuste',
-	},
-	{
-		id: 'staunty',
-		label: 'Staunty',
-		description: 'Variante contemporaine épurée',
-	},
-	{
 		id: 'fantasy',
 		label: 'Fantasy',
 		description: 'Style illustré médiéval fantastique',
+	},
+	{
+		id: 'firi',
+		label: 'Firi',
+		description: 'Lignes épurées, modernes et ultra-fines',
+	},
+	{
+		id: 'maestro',
+		label: 'Maestro',
+		description: 'Style traditionnel européen robuste',
 	},
 	{
 		id: 'tatiana',
 		label: 'Tatiana',
 		description: 'Pièces élégantes et stylisées',
 	},
+	{
+		id: 'staunty',
+		label: 'Staunty',
+		description: 'Variante contemporaine épurée',
+	},
 ];
 
 export const AVAILABLE_BOARD_THEME_OPTIONS: BoardThemeOption[] = [
 	{
 		id: 'brown',
-		label: 'Bois Classique',
+		label: 'Brown (Bois)',
 		lightColor: '#f0d9b5',
 		darkColor: '#b58863',
 	},
@@ -105,6 +110,12 @@ export const AVAILABLE_BOARD_THEME_OPTIONS: BoardThemeOption[] = [
 		label: 'Noyer Chaud',
 		lightColor: '#d2b48c',
 		darkColor: '#8b5a2b',
+	},
+	{
+		id: 'wood3',
+		label: 'Bois Veiné HD',
+		lightColor: '#b88b4a',
+		darkColor: '#673d1d',
 	},
 	{
 		id: 'maple',

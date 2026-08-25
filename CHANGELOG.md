@@ -6,6 +6,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-08-25
+
+### Modifié & Amélioré
+- **Actualisation des Jeux de Pièces & Thèmes d'Échiquier (`chessPreferences.ts`, `ChessThemeCustomizer.vue`, `USING.md`, `README.md`)** :
+  - **Jeux de pièces vectoriels (10 styles)** : Mise à disposition de la liste complète (`cburnett`, `merida`, `alpha`, `cardinal`, `dubrovny`, `fantasy`, `firi`, `maestro`, `tatiana`, `staunty`) avec `CBurnett` en style par défaut et confirmation du retrait définitif de l'ancien style `staunton`.
+  - **Thèmes de fond d'échiquier (9 palettes)** : Intégration de `wood3` (*Bois Veiné HD*) aux côtés des 8 autres textures/couleurs (`brown`, `blue`, `green`, `ic`, `grey`, `purple`, `wood`, `maple`), avec `Brown (Bois)` en thème par défaut.
+  - **Interface Profil & Customizer** : Mise à jour du libellé d'action pour rétablir les préférences par défaut (*CBurnett & Brown*).
+  - **Synchronisation documentaire** : Mise à jour conjointe de `README.md` et `USING.md`.
+
 ## [1.2.2] - 2026-08-25
 
 ### Ajouté & Amélioré

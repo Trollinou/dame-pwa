@@ -22,11 +22,11 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 - **Moteur Stockfish** : Embarqué via `eg-chessboard` avec calcul dynamique du temps de réflexion (`Elo * 1.4 ms`) et mémorisation du niveau choisi.
 - **Envoi PGN** : En mode 1 joueur, les parties des adhérents connectés sont enregistrées et synchronisées avec le plugin `roi` (`POST /roi/v1/games`).
 - **Ergonomie iPad & Tablettes (Paysage)** : Adaptation plein écran avec disposition côte-à-côte centrée pour l'échiquier de jeu et la revue d'analyse.
-- **Personnalisation Globale de l'Échiquier** : Store Pinia persistant `useChessPreferencesStore` gérant le jeu de pièces vectoriel (`pieceSet` parmi 8 styles) et le thème d'arrière-plan (`boardTheme` parmi 8 palettes) injectés réactivement sur tous les échiquiers de l'application.
+- **Personnalisation Globale de l'Échiquier** : Store Pinia persistant `useChessPreferencesStore` gérant le jeu de pièces vectoriel (`pieceSet` parmi 10 styles, défaut: `cburnett`) et le thème d'arrière-plan (`boardTheme` parmi 9 palettes, défaut: `brown`) injectés réactivement sur tous les échiquiers de l'application.
 
 ## Profil & Personnalisation
 
-- Composant `ChessThemeCustomizer.vue` avec deux carrousels 3D rotatifs pour manipuler et choisir les styles de pièces et fonds d'échiquier.
+- Composant `ChessThemeCustomizer.vue` avec double rouleau rotatif (`wheel-picker`) pour manipuler et choisir les styles de pièces et fonds d'échiquier.
 - Échiquier de prévisualisation réactif en position initiale.
 - Sauvegarde locale persistante des préférences utilisateur répercutée sur tous les viewers d'exercices, cours, analyse et jeu.
 

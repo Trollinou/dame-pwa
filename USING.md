@@ -61,14 +61,13 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
 
 Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), une section dédiée permet de personnaliser l'apparence de l'échiquier pour l'ensemble de la PWA :
 
-1. **Sélecteur 3D - Style des Pièces** :
-   - Carrousel 3D rotatif à 8 faces représentant les styles vectoriels disponibles : *Cburnett* (défaut), *Staunton*, *Mérida*, *Alpha*, *Cardinal*, *Dubrovny*, *Maestro*, *Staunty*.
-   - Rotation par glisser/déposer tactile (swipe/drag), boutons fléchés ou clics directs sur les cartes.
-2. **Sélecteur 3D - Fond de l'Échiquier** :
-   - Carrousel 3D rotatif à 8 faces présentant les nuances et textures d'arrière-plan : *Bois Classique* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Érable Doré*.
+1. **Sélecteur de Pièces (Rouleau Wheel-Picker)** :
+   - Rouleau rotatif présentant les 10 styles vectoriels disponibles : *CBurnett* (défaut), *Mérida*, *Alpha*, *Cardinal*, *Dubrovny*, *Fantasy*, *Firi*, *Maestro*, *Tatiana*, *Staunty*.
+2. **Sélecteur de Fond d'Échiquier (Rouleau Wheel-Picker)** :
+   - Rouleau rotatif présentant les 9 nuances et textures d'arrière-plan : *Brown (Bois)* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Bois Veiné HD*, *Érable Doré*.
 3. **Prévisualisation en Temps Réel** :
    - Échiquier complet en position initiale actualisé instantanément selon la combinaison sélectionnée.
 4. **Validation & Persistance** :
    - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
-   - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (Cburnett & Bois Classique).
+   - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
    - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).
