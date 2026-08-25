@@ -59,15 +59,18 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
 
 ## Module Profil & Personnalisation de l'Échiquier
 
-Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), une section dédiée permet de personnaliser l'apparence de l'échiquier pour l'ensemble de la PWA :
+Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépliable (accordéon) permet de personnaliser l'apparence de l'échiquier pour l'ensemble de la PWA :
 
-1. **Sélecteur de Pièces (Rouleau Wheel-Picker)** :
+1. **Panneau Dépliable & Résumé en Direct** :
+   - En état replié, affiche le style actif en cours (ex. *« Style actif : CBurnett • Bois Classique »*).
+   - Un clic sur l'en-tête déplie les contrôles et l'échiquier sans encombrer la page.
+2. **Sélecteur de Pièces (Rouleau Wheel-Picker)** :
    - Rouleau rotatif présentant les 10 styles vectoriels disponibles : *CBurnett* (défaut), *Mérida*, *Alpha*, *Cardinal*, *Dubrovny*, *Fantasy*, *Firi*, *Maestro*, *Tatiana*, *Staunty*.
-2. **Sélecteur de Fond d'Échiquier (Rouleau Wheel-Picker)** :
+3. **Sélecteur de Fond d'Échiquier (Rouleau Wheel-Picker)** :
    - Rouleau rotatif présentant les 9 nuances et textures d'arrière-plan : *Brown (Bois)* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Bois Veiné HD*, *Érable Doré*.
-3. **Prévisualisation en Temps Réel** :
+4. **Prévisualisation en Temps Réel** :
    - Échiquier complet en position initiale actualisé instantanément selon la combinaison sélectionnée.
-4. **Validation & Persistance** :
+5. **Validation & Persistance** :
    - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
    - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).

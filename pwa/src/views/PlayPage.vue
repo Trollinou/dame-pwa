@@ -38,6 +38,7 @@
                 @stalemate="() => handleGameOver('stalemate')"
                 @draw="() => handleGameOver('draw')"
                 @stockfish-hint="handleStockfishHint"
+                @shapes-change="handleShapesChange"
               />
             </div>
           </div>
@@ -123,6 +124,7 @@ const {
   boardConfig,
   toggleHint,
   handleStockfishHint,
+  handleShapesChange,
   goToAnalysis,
   refreshDisplay,
   undoMove,
@@ -240,12 +242,6 @@ const startNewGame = () => {
     localStorage.setItem('dame_pwa_play_elo', String(gameSettings.level));
   }
   renderKey.value++;
-
-  const api = getBoardApi();
-  if (api) {
-    api.resetBoard();
-    refreshDisplay();
-  }
 };
 
 onMounted(() => {

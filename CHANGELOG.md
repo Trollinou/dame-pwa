@@ -6,6 +6,22 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.4] - 2026-08-25
+
+### Ajouté & Amélioré
+- **Assistance et Suggestions Stockfish dans la Partie (`PlayPage.vue`, `usePlayGame.ts`)** :
+  - **Déclenchement du calcul dès le 1er coup** : Initialisation et lancement explicite de l'analyse Stockfish lors de l'activation du bouton « Aide » au coup 0 (`toggleHint`), garantissant l'apparition de la flèche de suggestion verte sans nécessiter de coup préalable.
+  - **Maintien de la flèche d'aide lors des interactions manuelles (`@shapes-change`)** : Écoute de l'événement de modification des formes de l'échiquier pour redessiner automatiquement la flèche verte du meilleur coup (`lastSuggestedMove`) si une pièce est saisie puis relâchée/désélectionnée sur le plateau.
+  - **Cycle de vie propre de la suggestion** : Persistance de `lastSuggestedMove` durant toute la phase de réflexion du joueur et réinitialisation ciblée dès qu'un coup est validé sur l'échiquier.
+  - **Optimisation de la réinitialisation de partie** : Élimination de l'appel `resetBoard()` redondant lors du démarrage d'une nouvelle partie pour laisser le cycle de rendu Vue réinstancier l'échiquier de façon parfaitement synchronisée.
+
+### Modifié & Amélioré
+- **Ergonomie & Design de l'Écran Profil (`ProfilePage.vue`, `ChessThemeCustomizer.vue`, `USING.md`)** :
+  - **Panneau Accordéon Dépliable** : Mise en place d'un panneau accordéon pour la personnalisation de l'échiquier. En état replié par défaut, un résumé compact du style actif est affiché (*« Style actif : Pièces • Fond »*) avec un chevron rotatif, évitant l'encombrement vertical de l'écran.
+  - **Désactivation des interactions sur la prévisualisation** : Figeage complet des pièces de l'échiquier de prévisualisation (`:board-config="{ viewOnly: true }"`, `pointer-events: none` et `user-select: none`) pour éviter tout déplacement accidentel.
+  - **Harmonisation visuelle des cartes & contrastes** : Unification des styles de cartes (`border-radius: 14px`, `padding: 16px`, bordure fine `1px solid var(--ion-color-step-150)` et ombre douce). Adoucissement de l'Espace Administration et bascule du bouton de déconnexion en style `outline` rouge pour un meilleur équilibre visuel.
+  - **Standardisation de la hauteur des boutons** : Calibrage ergonomique unifié (`--min-height: 48px`, `--border-radius: 10px`, `font-size: 15px`, `font-weight: 600`) pour tous les boutons d'action du profil (Accès Administration, Changement d'identité, Enregistrement des styles, Déconnexion).
+
 ## [1.2.3] - 2026-08-25
 
 ### Modifié & Amélioré

@@ -59,11 +59,16 @@ export function usePlayGame() {
 		isHintEnabled.value = ! isHintEnabled.value;
 		if ( isHintEnabled.value ) {
 			helpCount.value++;
-			if ( boardApi && lastSuggestedMove.value ) {
-				const from = lastSuggestedMove.value.substring( 0, 2 );
-				const to = lastSuggestedMove.value.substring( 2, 4 );
-				if ( isValidSquare( from ) && isValidSquare( to ) ) {
-					boardApi.drawMove( from, to, 'green' );
+			if ( boardApi ) {
+				if ( lastSuggestedMove.value ) {
+					const from = lastSuggestedMove.value.substring( 0, 2 );
+					const to = lastSuggestedMove.value.substring( 2, 4 );
+					if ( isValidSquare( from ) && isValidSquare( to ) ) {
+						boardApi.drawMove( from, to, 'green' );
+					}
+				} else {
+					// Déclenche le calcul Stockfish si non démarré (ex: 1er coup)
+					boardApi.updateStockfishConfig( {} );
 				}
 			}
 		} else if ( boardApi ) {
@@ -78,6 +83,19 @@ export function usePlayGame() {
 			const to = bestMove.substring( 2, 4 );
 			if ( isValidSquare( from ) && isValidSquare( to ) ) {
 				boardApi.drawMove( from, to, 'green' );
+			}
+		}
+	};
+
+	const handleShapesChange = () => {
+		if ( isHintEnabled.value && boardApi && lastSuggestedMove.value ) {
+			const shapes = boardApi.getShapes();
+			if ( ! shapes || shapes.length === 0 ) {
+				const from = lastSuggestedMove.value.substring( 0, 2 );
+				const to = lastSuggestedMove.value.substring( 2, 4 );
+				if ( isValidSquare( from ) && isValidSquare( to ) ) {
+					boardApi.drawMove( from, to, 'green' );
+				}
 			}
 		}
 	};
@@ -194,6 +212,7 @@ export function usePlayGame() {
 		opponentColor,
 		toggleHint,
 		handleStockfishHint,
+		handleShapesChange,
 		goToAnalysis,
 		refreshDisplay,
 		undoMove,

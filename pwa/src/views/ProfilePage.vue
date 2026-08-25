@@ -24,7 +24,7 @@
           </div>
 
           <!-- Section administration (si admin) -->
-          <div v-if="authStore.isAdmin" class="admin-access-card ion-margin-bottom">
+          <div v-if="authStore.isAdmin" class="admin-access-card">
             <div class="admin-access-content">
               <ion-icon :icon="shieldCheckmarkOutline" color="primary" class="admin-icon"></ion-icon>
               <div>
@@ -36,7 +36,7 @@
               expand="block" 
               color="primary" 
               fill="solid" 
-              class="ion-margin-top"
+              class="admin-btn"
               @click="goToAdmin"
             >
               <ion-icon slot="start" :icon="settingsOutline"></ion-icon>
@@ -45,7 +45,7 @@
           </div>
 
           <!-- Informations & ELO (si adhérent) -->
-          <div v-if="authStore.selectedIdentity?.type === 'member'" class="info-card ion-margin-bottom">
+          <div v-if="authStore.selectedIdentity?.type === 'member'" class="info-card">
             <h3 class="card-title">
               <ion-icon :icon="trophyOutline" color="primary"></ion-icon>
               Classements ELO
@@ -67,7 +67,7 @@
           </div>
 
           <!-- Membres Associés / Famille -->
-          <div v-if="hasAssociatedMembers" class="info-card ion-margin-bottom">
+          <div v-if="hasAssociatedMembers" class="info-card">
             <h3 class="card-title">
               <ion-icon :icon="peopleOutline" color="primary"></ion-icon>
               Membres associés
@@ -96,7 +96,7 @@
               v-if="hasMultipleIdentities" 
               expand="block" 
               fill="outline" 
-              class="ion-margin-bottom"
+              class="identity-btn"
               @click="changeIdentity"
             >
               <ion-icon slot="start" :icon="swapHorizontalOutline"></ion-icon>
@@ -107,8 +107,8 @@
             <ion-button 
               expand="block" 
               color="danger" 
-              fill="solid"
-              class="logout-button"
+              fill="outline"
+              class="logout-btn"
               @click="handleLogout"
             >
               <ion-icon slot="start" :icon="logOutOutline"></ion-icon>
@@ -264,13 +264,15 @@ onIonViewWillLeave(() => {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .profile-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px 0 12px;
+  margin: 10px 0 4px;
   text-align: center;
 }
 
@@ -321,42 +323,52 @@ onIonViewWillLeave(() => {
 }
 
 .admin-access-card {
-  background: var(--ion-color-primary-light, #d2e3fc);
-  color: var(--ion-color-primary-shade, #1a5cff);
-  border-radius: 12px;
+  background: rgba(0, 115, 170, 0.04);
+  border-radius: 14px;
   padding: 16px;
-  border: 1px dashed var(--ion-color-primary);
+  border: 1px solid rgba(0, 115, 170, 0.22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .admin-access-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .admin-access-content h3 {
-  margin: 0 0 4px 0;
-  font-size: 16px;
+  margin: 0 0 2px 0;
+  font-size: 15px;
   font-weight: 700;
-  color: var(--ion-color-primary-shade, #1a5cff);
+  color: var(--ion-color-primary-shade, #006596);
 }
 
 .admin-access-content p {
   margin: 0;
-  font-size: 13px;
-  color: var(--ion-color-step-700, #444);
+  font-size: 12px;
+  color: var(--ion-color-step-600, #666);
 }
 
 .admin-icon {
-  font-size: 32px;
+  font-size: 28px;
+  color: var(--ion-color-primary, #0073aa);
   flex-shrink: 0;
+}
+
+.admin-btn {
+  --min-height: 48px;
+  --border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 14px;
 }
 
 .info-card {
   background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 16px;
 }
 
 .card-title {
@@ -366,7 +378,7 @@ onIonViewWillLeave(() => {
   font-size: 15px;
   font-weight: 600;
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .card-title ion-icon {
@@ -413,11 +425,26 @@ onIonViewWillLeave(() => {
 }
 
 .actions-container {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
 }
 
-.logout-button {
-  margin-top: 16px;
+.identity-btn {
+  --min-height: 48px;
+  --border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.logout-btn {
+  --min-height: 48px;
+  --border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  --border-width: 1.5px;
+  margin-top: 0;
 }
 
 .login-prompt {
