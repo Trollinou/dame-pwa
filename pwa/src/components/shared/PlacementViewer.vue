@@ -1,17 +1,15 @@
 <template>
-  <div class="placement-viewer-layout">
-    <ion-card v-if="consigne" class="consigne-card">
+  <div class="exercise-viewer-layout">
+    <ion-card v-if="consigne" class="exercise-card">
       <ion-card-header>
-        <ion-card-title class="consigne-title">{{ consigne }}</ion-card-title>
+        <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
       </ion-card-header>
     </ion-card>
 
-    <div class="board-container">
-      <eg-chessboard
-        :boardConfig="{ fen: fenDepart }"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+    <div class="chessboard-container">
+      <Chessboard
+        :fen="fenDepart"
+        :view-only="true"
         @board-created="onBoardCreated"
         @square-click="verifierPlacement"
       />
@@ -20,14 +18,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { IonCard, IonCardHeader, IonCardTitle, toastController } from '@ionic/vue';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { ref, watch } from 'vue';
+import { IonCard, IonCardHeader, IonCardTitle } from '@ionic/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 const props = defineProps<{
   consigne?: string;
@@ -46,7 +43,20 @@ const aTrouve = ref(false);
 
 const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
+  if (props.fenDepart) {
+    api.setPosition(props.fenDepart);
+  }
 };
+
+watch(
+  () => props.fenDepart,
+  (newFen) => {
+    if (boardApi.value && newFen) {
+      boardApi.value.setPosition(newFen);
+      aTrouve.value = false;
+    }
+  }
+);
 
 const verifierPlacement = async (square: string) => {
   if (aTrouve.value) {
@@ -70,13 +80,7 @@ const verifierPlacement = async (square: string) => {
     aTrouve.value = true;
     
     // 3. Bonne case : Toast vert et émission du succès
-    const toast = await toastController.create({
-      message: 'Parfait !',
-      duration: 3000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Parfait !', 3000);
     
     // Petit délai avant de passer à la suite pour apprécier le placement
     setTimeout(() => {
@@ -85,13 +89,7 @@ const verifierPlacement = async (square: string) => {
     
   } else {
     // 4. Mauvaise case : Toast rouge et retrait de la pièce erronée après 800ms
-    const toast = await toastController.create({
-      message: "Ce n'est pas la bonne case !",
-      duration: 2000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError("Ce n'est pas la bonne case !", 2000);
 
     setTimeout(() => {
       boardApi.value?.removePiece(square);
@@ -100,35 +98,3 @@ const verifierPlacement = async (square: string) => {
 };
 </script>
 
-<style scoped>
-.placement-viewer-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.consigne-card {
-  width: 100%;
-  max-width: 500px;
-  margin-bottom: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.consigne-title {
-  font-size: 1.1rem;
-  line-height: 1.4;
-  text-align: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-</style>

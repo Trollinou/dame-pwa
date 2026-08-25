@@ -182,41 +182,117 @@ export const useAuthStore = defineStore(
 			jwtSdk.setTokens( token.value );
 		}
 
-		const tryRefreshToken = async (): Promise< string | null > => {
-			if ( ! token.value ) {
-				logout();
-				return null;
-			}
+		const decodeJwtPayload = (
+			jwt: string
+		): Record< string, unknown > | null => {
 			try {
-				const newJwt = await jwtSdk.getValidJwt();
-				if ( newJwt ) {
-					token.value = newJwt;
-					localStorage.setItem( 'dame_jwt_token', newJwt );
-					return newJwt;
+				const parts = jwt.split( '.' );
+				if ( parts.length !== 3 ) {
+					return null;
 				}
-				return null;
-			} catch ( refreshError: unknown ) {
-				console.warn( 'Token refresh failed:', refreshError );
-				const err = refreshError as
-					| { data?: { message?: string }; message?: string }
-					| undefined;
-				const msg = String(
-					err?.data?.message || err?.message || ''
-				).toLowerCase();
-				// Déconnecter SAUF si erreur réseau temporaire
-				if (
-					! msg.includes( 'network' ) &&
-					! msg.includes( 'offline' ) &&
-					! msg.includes( 'fetch' )
-				) {
-					logout();
-				}
+				return JSON.parse( atob( parts[ 1 ] ) );
+			} catch {
 				return null;
 			}
 		};
 
+		const getTokenExpiryInfo = ( jwt: string ) => {
+			const payload = decodeJwtPayload( jwt );
+			if ( ! payload || typeof payload.exp !== 'number' ) {
+				return {
+					isExpired: true,
+					secondsLeft: 0,
+					expDate: 'Inconnu/Invalide',
+					payload,
+				};
+			}
+			const nowSeconds = Math.floor( Date.now() / 1000 );
+			const secondsLeft = payload.exp - nowSeconds;
+			return {
+				isExpired: secondsLeft <= 0,
+				secondsLeft,
+				expDate: new Date( payload.exp * 1000 ).toLocaleTimeString(),
+				payload,
+			};
+		};
+
+		const isTokenExpired = ( jwt: string ): boolean => {
+			if ( ! jwt ) {
+				return true;
+			}
+			return getTokenExpiryInfo( jwt ).isExpired;
+		};
+
+		let activeRefreshPromise: Promise< string | null > | null = null;
+
+		const tryRefreshToken = async (): Promise< string | null > => {
+			if ( activeRefreshPromise ) {
+				return activeRefreshPromise;
+			}
+
+			activeRefreshPromise = ( async () => {
+				if ( ! token.value ) {
+					logout();
+					return null;
+				}
+				const storedRefreshToken =
+					typeof localStorage !== 'undefined'
+						? localStorage.getItem( 'dame:refresh_token' )
+						: null;
+
+				try {
+					let refreshResponse;
+					if ( storedRefreshToken ) {
+						refreshResponse = await jwtSdk.refreshToken( {
+							refresh_token: storedRefreshToken,
+						} );
+					} else {
+						refreshResponse = await jwtSdk.refreshToken( {
+							JWT: token.value,
+						} );
+					}
+
+					const newJwt = refreshResponse?.data?.jwt;
+					if ( newJwt ) {
+						token.value = newJwt;
+						localStorage.setItem( 'dame_jwt_token', newJwt );
+						return newJwt;
+					}
+					logout();
+					return null;
+				} catch ( refreshError: unknown ) {
+					const err = refreshError as
+						| { data?: { message?: string }; message?: string }
+						| undefined;
+					const msg = String(
+						err?.data?.message || err?.message || ''
+					).toLowerCase();
+					// Déconnecter SAUF si erreur réseau temporaire
+					if (
+						! msg.includes( 'network' ) &&
+						! msg.includes( 'offline' ) &&
+						! msg.includes( 'fetch' )
+					) {
+						logout();
+					}
+					return null;
+				} finally {
+					activeRefreshPromise = null;
+				}
+			} )();
+
+			return activeRefreshPromise;
+		};
+
 		const validateSession = async () => {
 			if ( ! token.value ) {
+				return;
+			}
+			const info = getTokenExpiryInfo( token.value );
+
+			// Si le token est déjà expiré localement, tenter immédiatement un rafraîchissement
+			if ( info.isExpired ) {
+				await tryRefreshToken();
 				return;
 			}
 			try {
@@ -249,7 +325,6 @@ export const useAuthStore = defineStore(
 					return;
 				}
 
-				console.warn( 'Session validation failed:', error );
 				const msg = String(
 					err?.data?.message || err?.message || rawResponse
 				).toLowerCase();
@@ -633,11 +708,26 @@ export const useAuthStore = defineStore(
 			}
 		};
 
+		let isSessionValidating = false;
+		const debouncedValidateSession = async () => {
+			if ( isSessionValidating ) {
+				return;
+			}
+			isSessionValidating = true;
+			try {
+				await validateSession();
+			} finally {
+				setTimeout( () => {
+					isSessionValidating = false;
+				}, 1000 );
+			}
+		};
+
 		// Écoute du retour au premier plan (Foreground)
 		try {
 			App.addListener( 'appStateChange', ( { isActive } ) => {
 				if ( isActive ) {
-					validateSession();
+					debouncedValidateSession();
 				}
 			} );
 		} catch ( e ) {
@@ -647,13 +737,13 @@ export const useAuthStore = defineStore(
 		if ( typeof document !== 'undefined' ) {
 			document.addEventListener( 'visibilitychange', () => {
 				if ( document.visibilityState === 'visible' ) {
-					validateSession();
+					debouncedValidateSession();
 				}
 			} );
 		}
 
 		// Validation initiale au démarrage du store
-		validateSession();
+		debouncedValidateSession();
 
 		return {
 			token,
@@ -674,6 +764,8 @@ export const useAuthStore = defineStore(
 			fetchPwaConfig,
 			validateSession,
 			tryRefreshToken,
+			isTokenExpired,
+			getTokenExpiryInfo,
 			apprentissageAllowedRoles,
 			canAccessApprentissage,
 			myIdentities,

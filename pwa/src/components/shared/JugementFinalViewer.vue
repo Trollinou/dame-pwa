@@ -1,9 +1,9 @@
 <template>
-  <div class="jugement-final-layout">
+  <div class="exercise-viewer-layout">
     <!-- Card Consigne -->
-    <ion-card v-if="consigne" class="consigne-card">
+    <ion-card v-if="consigne" class="exercise-card">
       <ion-card-header>
-        <ion-card-title class="consigne-title">{{ consigne }}</ion-card-title>
+        <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
       </ion-card-header>
     </ion-card>
 
@@ -11,13 +11,12 @@
     <div v-if="phase === 'observation'" class="observation-stage">
       <!-- Grande FEN de départ -->
       <div class="main-board-wrapper">
-        <div class="main-board-container">
-          <eg-chessboard
-            :boardConfig="mainBoardConfig"
-            :playerColor="playerColorTyped"
-            :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-            :piece-set="chessPreferences.pieceSet"
-            :board-theme="chessPreferences.boardTheme"
+        <div class="chessboard-container">
+          <Chessboard
+            :fen="props.fenDepart || 'start'"
+            :orientation="playerColorTyped"
+            :player-color="playerColorTyped"
+            :view-only="true"
             @board-created="onMainBoardCreated"
           />
         </div>
@@ -36,13 +35,12 @@
             <span class="scenario-badge">Plan {{ index + 1 }}</span>
             <span class="scenario-hint">Toucher pour choisir</span>
           </div>
-          <div class="scenario-board-container">
-            <eg-chessboard
-              :boardConfig="getScenarioBoardConfig()"
-              :playerColor="playerColorTyped"
-              :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-              :piece-set="chessPreferences.pieceSet"
-              :board-theme="chessPreferences.boardTheme"
+          <div class="chessboard-container--mini">
+            <Chessboard
+              :fen="props.fenDepart || 'start'"
+              :orientation="playerColorTyped"
+              :player-color="playerColorTyped"
+              :view-only="true"
               @board-created="(api: BoardCore) => onScenarioBoardCreated(index, api)"
               style="pointer-events: none;"
             />
@@ -52,10 +50,10 @@
     </div>
 
     <!-- PHASE 2 : EXPLICATION -->
-    <div v-else-if="phase === 'explication'" class="explication-stage">
-      <ion-card class="consigne-card">
+    <div v-else-if="phase === 'explication'" class="exercise-stage">
+      <ion-card class="exercise-card">
         <ion-card-header>
-          <ion-card-title class="consigne-title">💡 Explication du plan gagnant</ion-card-title>
+          <ion-card-title class="exercise-card-header">💡 Explication du plan gagnant</ion-card-title>
         </ion-card-header>
       </ion-card>
 
@@ -68,7 +66,7 @@
       <ion-button
         expand="block"
         color="success"
-        class="finish-btn"
+        class="exercise-action-btn"
         @click="onSuccess"
       >
         Terminer l'exercice
@@ -83,19 +81,18 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonButton,
-  toastController
+  IonButton
 } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { Chess } from 'chessops';
 import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { parsePgn } from 'chessops/pgn';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface ScenarioJugementFinal {
   pgn: string;
@@ -290,21 +287,9 @@ const selectScenario = async (index: number) => {
   if (scenario.is_correct) {
     clearAllTimers();
     phase.value = 'explication';
-    const toast = await toastController.create({
-      message: "Excellente analyse ! Voici l'explication détaillée.",
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess("Excellente analyse ! Voici l'explication détaillée.", 2000);
   } else {
-    const toast = await toastController.create({
-      message: "Ce n'est pas le meilleur plan, observez encore !",
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError("Ce n'est pas le meilleur plan, observez encore !", 2500);
   }
 };
 
@@ -423,32 +408,5 @@ const onSuccess = () => {
 .scenario-hint {
   font-size: 0.8rem;
   color: var(--ion-color-step-600, #666);
-}
-
-.scenario-board-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 320px;
-  margin: 0 auto 10px auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-/* Phase Explication */
-.explication-stage {
-  width: 100%;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.finish-btn {
-  margin-top: 16px;
-  width: 100%;
-  max-width: 320px;
-  font-weight: 600;
 }
 </style>

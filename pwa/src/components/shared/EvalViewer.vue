@@ -1,24 +1,18 @@
 <template>
-  <div class="eval-viewer-layout">
+  <div class="exercise-viewer-layout">
     <!-- Phase 1 : Questions -->
-    <div v-if="phase === 'questions'" class="phase-questions">
-      <div class="board-container">
-        <eg-chessboard
-          :diagram="{
-            fen: fenDepart,
-            shapes: shapes
-          }"
-          :boardConfig="{
-            viewOnly: true,
-            orientation: couleurJoueur
-          }"
-          :playerColor="couleurJoueur"
-          :piece-set="chessPreferences.pieceSet"
-          :board-theme="chessPreferences.boardTheme"
+    <div v-if="phase === 'questions'" class="exercise-stage">
+      <div class="chessboard-container">
+        <Chessboard
+          :fen="fenDepart"
+          :shapes="shapes"
+          :orientation="couleurJoueur"
+          :player-color="couleurJoueur"
+          :view-only="true"
         />
       </div>
 
-      <ion-card class="question-card">
+      <ion-card class="exercise-card">
         <ion-card-header>
           <ion-card-title class="theme-title">{{ theme }}</ion-card-title>
         </ion-card-header>
@@ -41,7 +35,7 @@
     </div>
 
     <!-- Phase 2 : Tactique -->
-    <div v-else-if="phase === 'tactique'" class="phase-tactique">
+    <div v-else-if="phase === 'tactique'" class="exercise-stage">
       <h3 class="phase-title">À vous de jouer ! Trouvez la séquence.</h3>
       <PuzzleViewer
         :couleurJoueur="couleurJoueur"
@@ -53,13 +47,13 @@
     </div>
 
     <!-- Phase 3 : Solution / PGN -->
-    <div v-else class="phase-solution">
+    <div v-else class="exercise-stage">
       <PgnViewer
         :orientation="couleurJoueur"
         :pgn="pgnExplication"
       />
       <div class="finish-container">
-        <ion-button expand="block" color="success" class="finish-btn" @click="$emit('success')">
+        <ion-button expand="block" color="success" class="exercise-action-btn" @click="$emit('success')">
           Terminer l'exercice
         </ion-button>
       </div>
@@ -69,15 +63,14 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { toastController, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { DrawShape } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import PuzzleViewer from './PuzzleViewer.vue';
 import PgnViewer from './PgnViewer.vue';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface QuestionEval {
   texte: string;
@@ -117,13 +110,7 @@ const repondre = async (valeur: string) => {
   const donne = valeur.trim().toLowerCase();
 
   if (donne === attendu) {
-    const toast = await toastController.create({
-      message: 'Bonne réponse !',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Bonne réponse !', 2000);
 
     if (questionIndex.value < props.questions.length - 1) {
       questionIndex.value++;
@@ -131,50 +118,15 @@ const repondre = async (valeur: string) => {
       phase.value = 'tactique';
     }
   } else {
-    const toast = await toastController.create({
-      message: questionActuelle.value.explication || 'Mauvaise réponse, essayez à nouveau.',
-      duration: 3500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(
+      questionActuelle.value.explication || 'Mauvaise réponse, essayez à nouveau.',
+      3500
+    );
   }
 };
 </script>
 
 <style scoped>
-.eval-viewer-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.phase-questions,
-.phase-tactique,
-.phase-solution {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-.question-card {
-  width: 100%;
-  max-width: 500px;
-  margin-top: 16px;
-}
-
 .theme-title {
   font-size: 1.1rem;
   font-weight: bold;

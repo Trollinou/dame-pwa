@@ -1,23 +1,18 @@
 <template>
-  <div class="qcm-stage-layout">
+  <div class="exercise-viewer-layout">
     <!-- Échiquier affiché uniquement si une FEN est fournie -->
-    <div v-if="fen" class="board-container">
-      <eg-chessboard
-        :diagram="{
-          fen: fen || '',
-          shapes: props.shapes
-        }"
-        :boardConfig="{ viewOnly: true }"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+    <div v-if="fen" class="chessboard-container">
+      <Chessboard
+        :fen="fen"
+        :shapes="props.shapes"
+        :view-only="true"
         @board-created="onBoardCreated"
       />
     </div>
 
-    <ion-card class="question-card">
+    <ion-card class="exercise-card">
       <ion-card-header v-if="!hideQuestion">
-        <ion-card-title class="question-title">{{ question }}</ion-card-title>
+        <ion-card-title class="exercise-card-header">{{ question }}</ion-card-title>
       </ion-card-header>
 
       <ion-card-content>
@@ -59,12 +54,12 @@ import {
   IonCardContent,
   IonButton
 } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 const props = withDefaults(
   defineProps<{
@@ -139,8 +134,9 @@ const validerChoix = (index: number) => {
       message: 'Bien joué ! Bonne réponse.'
     };
 
-    // Si pas de série de cartes, émettre la réussite après 800ms
+    // Si pas de série de cartes, afficher le toast et émettre la réussite
     if (!props.totalCards || props.totalCards <= 1) {
+      showSuccess('Bien joué ! Bonne réponse.', 2000);
       setTimeout(() => {
         emit('success');
       }, 800);
@@ -150,6 +146,10 @@ const validerChoix = (index: number) => {
       type: 'danger',
       message: 'Mauvaise réponse, essaie encore !'
     };
+
+    if (!props.totalCards || props.totalCards <= 1) {
+      showError('Mauvaise réponse, essaie encore !', 2000);
+    }
   }
 };
 
@@ -158,44 +158,3 @@ const passerCarteSuivante = () => {
 };
 </script>
 
-<style scoped>
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-  margin-bottom: 12px;
-}
-
-.question-card {
-  margin: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.question-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-  color: var(--ion-color-step-900, #222);
-}
-
-.choice-btn {
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: 500;
-  --border-radius: 8px;
-  min-height: 48px;
-  white-space: normal;
-}
-
-.choice-btn::part(native) {
-  white-space: normal;
-  text-align: left;
-  padding: 12px 16px;
-}
-</style>

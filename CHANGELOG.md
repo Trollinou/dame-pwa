@@ -4,6 +4,52 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Ajouté & Amélioré
+- **Centralisation et normalisation des styles SCSS/CSS récurrents (Étape 3 du plan de refactorisation)** :
+  - **Enrichissement de `pwa/src/theme/shared-components.scss`** : Centralisation modulaire des styles transverses par familles d'éléments (Layouts, Échiquiers, Cartes & En-têtes, Choix QCM, Palettes & Pièces, Bannières & Actions).
+  - **Nomenclature canonique stricte et épurée** :
+    - Layouts : `.exercise-viewer-layout`, `.exercise-stage`.
+    - Échiquiers : `.chessboard-container`, `.chessboard-container--mini` (320px pour appariement et choix de scénarios), `.chessboard-container--small`.
+    - Cartes : `.exercise-card`, `.exercise-card-header`.
+    - QCM : `.qcm-choices`, `.choice-btn`, `.choice-btn--centered` (avec gestion du retour à la ligne natif Ionic via `&::part(native)`).
+    - Palettes & Pièces : `.piece-palette`, `.piece-btn`, `.piece-icon-box` (unification des sélecteurs de pièces vectorielles via `:is(piece, .piece)` et neutralisation du damier d'arrière-plan).
+    - Actions & Feedback : `.feedback-banner`, `.feedback-text`, `.exercise-action-btn`.
+  - **Nettoyage massif des styles scoped redondants** : Élimination totale des blocs `<style scoped>` dupliqués dans l'ensemble des Viewers d'exercices (`PlacementViewer`, `CapOuPasCapViewer`, `PuzzleViewer`, `ParcoursViewer`, `QcmViewer`, `TextOrderViewer`, `InteractiveQcmViewer`, `QuiSuisJeViewer`, `JugementFinalViewer`, `VisionViewer`, `MatchingViewer`, `PgnViewer`, `EvalViewer`).
+  - **Documentation technique et directives agent à jour** : Tableau exhaustif des classes par famille dans `README.md` et mise à jour des règles projet dans `pwa/AGENTS.md`.
+- **Harmonisation complète des Viewers d'Exercices (Étape 2 du plan de refactorisation)** :
+  - **Migration vers le composant unifié `<Chessboard>`** : Intégration systématique du wrapper standardisé dans `PuzzleViewer.vue`, `QcmViewer.vue`, `ParcoursViewer.vue`, `VisionViewer.vue`, `CapOuPasCapViewer.vue`, `InteractiveQcmViewer.vue`, `MatchingViewer.vue`, `EvalViewer.vue`, `JugementFinalViewer.vue`, `DiagramViewer.vue` et `PgnViewer.vue`.
+  - **Standardisation des retours utilisateurs via `useFeedback`** : Remplacement des appels directs à `toastController` par les méthodes réactives et typées `showSuccess()` et `showError()` dans tous les viewers d'apprentissage.
+  - **Gestion propre du cycle de vie des échiquiers** : Destruction et nettoyage systématique des instances mémoires des échiquiers à l'unmount des composants.
+- **Indicateur visuel d'état de connexion sur l'onglet Profil (`TabsPage.vue`)** :
+  - Remplacement de l'icône statique par un affichage dynamique et réactif selon l'état d'authentification (`authStore.isAuthenticated`).
+  - **Connecté** : Icône `personCircle` (icône pleine d'utilisateur) et libellé personnalisé avec le prénom de l'adhérent (ou `Profil`).
+  - **Déconnecté** : Icône `logInOutline` (porte de connexion avec flèche entrante) et libellé `Connexion` pour inciter visuellement à l'authentification.
+- **Gestion optimisée du cycle de vie des sessions et renouvellement transparent (`stores/auth.ts`, `utils/safeFetch.ts`)** :
+  - **Verrou de concurrence (Mutex)** : Mise en place d'un singleton de promesse (`activeRefreshPromise`) empêchant les requêtes concurrentes de consommer plusieurs fois le `refresh_token` à usage unique lors des retours d'inactivité ou des événements multiples.
+  - **Anti-rebond de validation** : Débouncing sur `validateSession()` pour harmoniser les déclenchements entre `document.visibilitychange` et `App.appStateChange`.
+
+### Corrigé & Fiabilisé
+- **Gestion des séquences et transitions dans les exercices interactifs** :
+  - **Détection de fin de défilement PGN (`PgnViewer.vue`)** : Détection fiable du dernier coup par stabilisation du ply (`beforePly === afterPly`), assurant le déclenchement de l'événement `@finished` et la transition automatique vers les étapes de résolution interactive (ex: QCM / Puzzle dans `TypePartieHeros.vue`).
+  - **Verrouillage des coups automatiques de l'ordinateur (`PuzzleViewer.vue`)** : Mise en place d'un verrou (`isComputerPlaying`) évitant que le coup automatique joué par l'ordinateur ne soit réinterprété comme un coup du joueur dans la séquence multi-coups (résolution de l'erreur `reading 'from'` sur les exercices de type T10 Échec & Éval et les puzzles tactiques).
+  - **Activation des coordonnées par défaut sur `<Chessboard>` (`Chessboard.vue`)** : Affichage par défaut des repères de colonnes (a-h) et rangées (1-8) sur l'ensemble des échiquiers du module apprentissage (Vision'Checs, Partie du Héros, PosiPlan, etc.), tout en préservant la possibilité de les masquer sur les mini-diagrammes (`MatchingViewer.vue`).
+  - **Harmonisation UI/UX de `InteractiveQcmViewer` et `TypePosiPlan` (`InteractiveQcmViewer.vue`, `TypePosiPlan.vue`)** :
+    - Alignement complet sur la présentation de `QcmViewer` (largeur de carte, typographie et disposition des boutons de choix).
+    - Intégration de la barre de feedback unifiée `SeriesCardFooter` affichant les explications de chaque choix.
+    - Synchronisation dynamique de la consigne et du badge d'étape dans l'en-tête `ExerciseHeader`.
+- **Prise en charge des coups tactiques et préservation des shapes (`TypePartieHeros.vue`, `PuzzleViewer.vue`)** :
+  - **Support du type `puzzle`/`move` dans `TypePartieHeros.vue`** : Prise en charge des étapes nécessitant un déplacement de pièces sur l'échiquier (en plus des étapes PGN et QCM).
+  - **Tolérance & normalisation des coups dans `PuzzleViewer.vue`** : Prise en charge des formats SAN (`Nf3`, `exd5`), LAN (`e2e4`, `g1f3`) et sans ponctuation (`#`, `+`, `=`), évitant tout blocage lorsque le coup attendu est au format UCI ou SAN simplifié.
+  - **Persistance et réaffichage immédiat des shapes sur coup incorrect** : Réapplication automatique des flèches et cercles d'aide (`setShapes`) lors de l'annulation (`undoLastMove`) d'un coup erroné.
+  - **Priorisation et persistance du `refresh_token` (`stores/auth.ts`)** : Prise en charge native du `refresh_token` émis par le plugin WordPress *Simple JWT Login v4*, assurant le maintien transparent de la session même après plusieurs jours d'inactivité.
+  - **Purge de session expirée (`stores/auth.ts`)** : Ajout d'une vérification proactive d'expiration JWT (`isTokenExpired`) et déconnexion systématique (`logout()`) lorsque le rafraîchissement échoue définitivement, empêchant la persistance d'une session fantôme et l'envoi répété de tokens invalides.
+  - **Interception HTTP 400 dans `safeFetch` (`utils/safeFetch.ts`)** : Prise en charge des rejets HTTP 400 émis par le plugin WordPress *Simple JWT Login* sur les requêtes avec en-tête `Authorization`, déclenchant immédiatement le rafraîchissement transparent du jeton et le rejeu de la requête.
+  - **Repli automatique de l'Agenda (`stores/agenda.ts`)** : Extension du repli gracieux aux erreurs HTTP 400 (en plus de 401/403) pour basculer automatiquement en requête publique sans en-tête d'autorisation et garantir l'affichage des événements même en cas d'anomalie de token.
+  - **Validation des coups suggérés sur l'Échiquier (`composables/play/usePlayGame.ts`)** : Contrôle du format des cases UCI (`/^[a-h][1-8]$/`) pour éliminer l'erreur SVG `<line> attribute NaN` lors des coups spéciaux ou de fin de partie Stockfish (`bestmove (none)`).
+  - **Correction du badge d'étape des 100 Commandements (`views/types/Type100Commandements.vue`)** : Transmission de la prop `stepBadgeText` au composant `ExerciseHeader` pour l'affichage correct du compteur de questions.
+
 ## [1.2.0] - 2026-08-23
 
 ### Ajouté & Amélioré

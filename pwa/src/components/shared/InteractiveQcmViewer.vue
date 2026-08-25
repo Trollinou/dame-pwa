@@ -1,25 +1,21 @@
 <template>
-  <div class="interactive-qcm-stage-layout">
+  <div class="exercise-viewer-layout">
     <!-- Échiquier en haut -->
-    <div class="board-container">
-      <eg-chessboard
-        :diagram="{
-          fen: props.fenDepart,
-          shapes: props.shapes
-        }"
-        :boardConfig="{ viewOnly: true }"
-        :playerColor="couleurJoueur"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+    <div class="chessboard-container">
+      <Chessboard
+        :fen="props.fenDepart"
+        :shapes="props.shapes"
+        :orientation="couleurJoueur"
+        :player-color="couleurJoueur"
+        :view-only="true"
         @board-created="onBoardCreated"
       />
     </div>
 
     <!-- Carte QCM en bas -->
-    <ion-card class="question-card">
-      <ion-card-header>
-        <ion-card-title class="question-title">
+    <ion-card class="exercise-card">
+      <ion-card-header v-if="!hideQuestion && etapeActuelle.question">
+        <ion-card-title class="exercise-card-header">
           {{ etapeActuelle.question }}
         </ion-card-title>
       </ion-card-header>
@@ -44,10 +40,10 @@
 
     <!-- Footer de Navigation par Carte -->
     <SeriesCardFooter
-      v-if="props.etapes && props.etapes.length > 1"
       :currentCard="etapeCouranteIndex + 1"
-      :totalCards="props.etapes.length"
+      :totalCards="props.etapes ? props.etapes.length : 1"
       :isSolved="repondu"
+      :feedback="feedback"
       @next="passerEtapeSuivante"
     />
   </div>
@@ -60,15 +56,11 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonButton,
-  toastController
+  IonButton
 } from '@ionic/vue';
-import EgChessboard from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
-import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
-
-const chessPreferences = useChessPreferencesStore();
+import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 
 interface Choix {
   texte: string;
@@ -89,20 +81,24 @@ const props = withDefaults(
     couleurJoueur: 'white' | 'black';
     etapes: Etape[];
     shapes?: DrawShape[];
+    hideQuestion?: boolean;
   }>(),
   {
-    shapes: () => []
+    shapes: () => [],
+    hideQuestion: false
   }
 );
 
 const emit = defineEmits<{
   (e: 'success'): void;
+  (e: 'etape-change', index: number): void;
 }>();
 
 const etapeCouranteIndex = ref(0);
 const boardApi = ref<BoardCore | null>(null);
 const repondu = ref(false);
 const indexChoisi = ref<number | null>(null);
+const feedback = ref<CardFeedback | null>(null);
 
 const etapeActuelle = computed<Etape>(() => {
   return props.etapes[etapeCouranteIndex.value] || {
@@ -127,6 +123,7 @@ watch(() => props.fenDepart, (newFen) => {
   etapeCouranteIndex.value = 0;
   repondu.value = false;
   indexChoisi.value = null;
+  feedback.value = null;
   if (boardApi.value && newFen) {
     boardApi.value.setPosition(newFen);
   }
@@ -153,25 +150,19 @@ const validerChoix = async (index: number) => {
   indexChoisi.value = index;
 
   if (index !== etapeActuelle.value.bonne_reponse) {
-    // Si mauvaise réponse, affiche un toast rouge avec l'explication et n'active pas repondu (permet de réessayer)
-    const toast = await toastController.create({
-      message: etapeActuelle.value.choix[index].explication || 'Mauvaise réponse, essaie encore !',
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    // Si mauvaise réponse, affiche l'explication dans la barre de feedback
+    feedback.value = {
+      type: 'danger',
+      message: etapeActuelle.value.choix[index].explication || 'Mauvaise réponse, essaie encore !'
+    };
     indexChoisi.value = null;
   } else {
     // Si bonne réponse
     repondu.value = true;
-    const toast = await toastController.create({
-      message: etapeActuelle.value.choix[index].explication || 'Bien joué !',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    feedback.value = {
+      type: 'success',
+      message: etapeActuelle.value.choix[index].explication || 'Bien joué ! Bonne réponse.'
+    };
 
     // Joue le coup de l'utilisateur
     if (boardApi.value) {
@@ -199,64 +190,11 @@ const passerEtapeSuivante = () => {
     etapeCouranteIndex.value++;
     repondu.value = false;
     indexChoisi.value = null;
+    feedback.value = null;
+    emit('etape-change', etapeCouranteIndex.value);
   } else {
     emit('success');
   }
 };
 </script>
 
-<style scoped>
-.interactive-qcm-stage-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-  margin-bottom: 12px;
-}
-
-.question-card {
-  width: 100%;
-  margin: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.question-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-  color: var(--ion-color-step-900, #222);
-}
-
-.qcm-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.choice-btn {
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: 500;
-  --border-radius: 8px;
-  min-height: 48px;
-  white-space: normal;
-}
-
-.choice-btn::part(native) {
-  white-space: normal;
-  text-align: left;
-  padding: 12px 16px;
-}
-</style>

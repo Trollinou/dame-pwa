@@ -1,7 +1,7 @@
 <template>
-  <div class="qui-suis-je-viewer-layout">
+  <div class="exercise-viewer-layout">
     <!-- Card des indices -->
-    <ion-card class="indices-card">
+    <ion-card class="exercise-card">
       <ion-card-header>
         <ion-card-title class="indices-title">
           <ion-icon :icon="helpCircleOutline" class="title-icon"></ion-icon>
@@ -30,7 +30,7 @@
       <!-- Mode PIECE: Palette flex 2x6 -->
       <div v-if="typeReponse === 'piece'" class="palette-wrapper">
         <p class="section-instruction">Sélectionnez la bonne pièce :</p>
-        <div class="palette-container cg-board">
+        <div :class="['piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'staunton'}`]">
           <button
             v-for="code in pieceCodes"
             :key="code"
@@ -39,7 +39,7 @@
             :aria-label="getPieceLabel(code)"
             @click="verifierPiece(code)"
           >
-            <div :class="getPieceClasses(code)"></div>
+            <piece :class="getPieceClasses(code)"></piece>
           </button>
         </div>
       </div>
@@ -47,12 +47,10 @@
       <!-- Mode SQUARE: Échiquier vide interactif -->
       <div v-else-if="typeReponse === 'square'" class="square-wrapper">
         <p class="section-instruction">Cliquez sur la bonne case de l'échiquier :</p>
-        <div class="board-container">
-          <eg-chessboard
-            :boardConfig="{ fen: '8/8/8/8/8/8/8/8 w - - 0 1', viewOnly: true }"
-            :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-            :piece-set="chessPreferences.pieceSet"
-            :board-theme="chessPreferences.boardTheme"
+        <div class="chessboard-container">
+          <Chessboard
+            fen="8/8/8/8/8/8/8/8 w - - 0 1"
+            :view-only="true"
             @square-click="verifierCase"
           />
         </div>
@@ -68,7 +66,7 @@
             expand="block"
             fill="solid"
             color="primary"
-            class="qcm-btn"
+            class="choice-btn"
             @click="verifierQcm(index)"
           >
             {{ item.texte }}
@@ -87,15 +85,15 @@ import {
   IonCardTitle,
   IonCardContent,
   IonButton,
-  IonIcon,
-  toastController
+  IonIcon
 } from '@ionic/vue';
 import { helpCircleOutline, bulbOutline } from 'ionicons/icons';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
 const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface QcmChoix {
   texte: string;
@@ -187,24 +185,12 @@ const verifierPiece = async (code: string) => {
 
   if (code.toLowerCase() === props.reponsePiece.trim().toLowerCase()) {
     aTrouve.value = true;
-    const toast = await toastController.create({
-      message: 'Bravo ! C\'est la bonne pièce.',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Bravo ! C\'est la bonne pièce.', 2000);
     setTimeout(() => {
       emit('success');
     }, 800);
   } else {
-    const toast = await toastController.create({
-      message: 'Ce n\'est pas la bonne pièce, réessaie !',
-      duration: 2000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError('Ce n\'est pas la bonne pièce, réessaie !', 2000);
   }
 };
 
@@ -213,24 +199,12 @@ const verifierCase = async (square: string) => {
 
   if (square.toLowerCase() === props.reponseCase.trim().toLowerCase()) {
     aTrouve.value = true;
-    const toast = await toastController.create({
-      message: `Bravo ! La case ${square.toUpperCase()} est la bonne réponse.`,
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess(`Bravo ! La case ${square.toUpperCase()} est la bonne réponse.`, 2000);
     setTimeout(() => {
       emit('success');
     }, 800);
   } else {
-    const toast = await toastController.create({
-      message: `La case ${square.toUpperCase()} n'est pas la bonne réponse, réessaie !`,
-      duration: 2000,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(`La case ${square.toUpperCase()} n'est pas la bonne réponse, réessaie !`, 2000);
   }
 };
 
@@ -240,42 +214,18 @@ const verifierQcm = async (index: number) => {
   const bonneIndex = props.reponseQcm?.bonne_reponse ?? 0;
   if (index === bonneIndex) {
     aTrouve.value = true;
-    const toast = await toastController.create({
-      message: 'Bravo ! Bonne réponse.',
-      duration: 2000,
-      color: 'success',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showSuccess('Bravo ! Bonne réponse.', 2000);
     setTimeout(() => {
       emit('success');
     }, 800);
   } else {
     const explication = props.reponseQcm?.choix?.[index]?.explication || 'Mauvaise réponse, réessaie !';
-    const toast = await toastController.create({
-      message: explication,
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(explication, 2500);
   }
 };
 </script>
 
 <style scoped>
-.qui-suis-je-viewer-layout {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-}
-
-.indices-card {
-  margin: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
 .indices-title {
   display: flex;
   align-items: center;
@@ -329,83 +279,5 @@ const verifierQcm = async (index: number) => {
   text-align: center;
   margin-bottom: 12px;
   color: var(--ion-color-step-800, #333);
-}
-
-/* Palette 2x6 */
-.palette-container {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 12px;
-  background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.piece-btn {
-  aspect-ratio: 1 / 1;
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-light-shade, #ddd);
-  background: var(--ion-color-light, #fafafa);
-  cursor: pointer;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.piece-btn:hover {
-  transform: scale(1.08);
-  border-color: var(--ion-color-primary);
-  background: var(--ion-color-primary-tint, #e8f0fe);
-}
-
-.palette-container.cg-board .piece {
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  top: 0 !important;
-  left: 0 !important;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-/* Échiquier strict flat design (AGENTS.md) */
-.board-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-/* QCM buttons */
-.qcm-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.qcm-btn {
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: 500;
-  --border-radius: 8px;
-  min-height: 48px;
-}
-
-.qcm-btn::part(native) {
-  white-space: normal;
-  text-align: left;
-  padding: 12px 16px;
 }
 </style>

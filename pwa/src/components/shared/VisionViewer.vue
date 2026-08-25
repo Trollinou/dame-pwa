@@ -16,14 +16,14 @@
           <span class="panel-title">Pièces sur l'échiquier</span>
         </div>
 
-        <div class="pieces-container">
+        <div :class="['pieces-container', `piece-set-${chessPreferences.pieceSet || 'staunton'}`]">
           <div
             v-for="(item, idx) in piecesExtraites"
             :key="`${idx}-${item.square}`"
             class="piece-row"
           >
             <cg-board class="piece-icon-box">
-              <div :class="['piece', item.role, item.color]"></div>
+              <piece :class="[item.role, item.color]"></piece>
             </cg-board>
             <span class="piece-square">{{ item.square }}</span>
           </div>
@@ -32,17 +32,13 @@
 
       <!-- Chessboard Panel -->
       <div class="board-panel">
-        <div class="board-container">
-          <eg-chessboard
-            :diagram="{
-              fen: fenActuelle,
-              shapes: shapesActuelles
-            }"
-            :playerColor="couleurJoueur"
-            :preserve-shapes-on-position-change="true"
-            :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-            :piece-set="chessPreferences.pieceSet"
-            :board-theme="chessPreferences.boardTheme"
+        <div class="chessboard-container">
+          <Chessboard
+            :fen="fenActuelle"
+            :shapes="shapesActuelles"
+            :orientation="couleurJoueur"
+            :player-color="couleurJoueur"
+            :view-only="true"
             @board-created="onBoardCreated"
             @square-click="gererClicCase"
           />
@@ -63,8 +59,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { parseFenPieces, getActiveColorFromFen } from '@/utils/fenUtils';
@@ -385,6 +380,7 @@ cg-board.piece-icon-box {
   background: transparent !important;
 }
 
+cg-board.piece-icon-box piece,
 cg-board.piece-icon-box .piece {
   position: absolute !important;
   width: 100% !important;
@@ -408,32 +404,5 @@ cg-board.piece-icon-box .piece {
   flex: 1;
   min-width: 0;
   width: 100%;
-}
-
-/* Échiquier strict flat design (AGENTS.md) */
-.board-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-@media (max-width: 768px) {
-  .board-container {
-    max-width: min(100%, calc(100vh - 230px));
-  }
-}
-
-.feedback-banner {
-  border-radius: 8px;
-}
-
-.feedback-text {
-  font-size: 1.05rem;
-  font-weight: 600;
-  padding: 10px;
 }
 </style>

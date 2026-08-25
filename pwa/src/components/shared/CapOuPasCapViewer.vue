@@ -1,31 +1,28 @@
 <template>
-  <div class="cap-ou-pas-cap-layout">
+  <div class="exercise-viewer-layout">
     <!-- Card de consigne -->
-    <ion-card v-if="consigne" class="consigne-card ion-margin-bottom">
+    <ion-card v-if="consigne" class="exercise-card ion-margin-bottom">
       <ion-card-header>
-        <ion-card-title class="consigne-title">{{ consigne }}</ion-card-title>
+        <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
       </ion-card-header>
     </ion-card>
 
     <!-- Échiquier -->
-    <div class="board-container">
-      <eg-chessboard
-        :diagram="{
-          fen: diagrammeActuel?.fen || '',
-          shapes: diagrammeActuel?.shapes || []
-        }"
-        :boardConfig="boardConfig"
-        :playerColor="diagrammeActuel?.couleur_joueur || 'white'"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+    <div class="chessboard-container">
+      <Chessboard
+        :fen="diagrammeActuel?.fen || ''"
+        :shapes="diagrammeActuel?.shapes || []"
+        :orientation="diagrammeActuel?.couleur_joueur || 'white'"
+        :player-color="diagrammeActuel?.couleur_joueur || 'white'"
+        :view-only="typeReponse === 'qcm'"
+        :highlight-last-move="true"
         @board-created="onBoardCreated"
         @move="verifierCoup"
       />
     </div>
 
     <!-- Choix QCM (uniquement si typeReponse === 'qcm') -->
-    <ion-card v-if="typeReponse === 'qcm' && diagrammeActuel?.qcm_choix" class="choices-card">
+    <ion-card v-if="typeReponse === 'qcm' && diagrammeActuel?.qcm_choix" class="exercise-card">
       <ion-card-content>
         <div class="qcm-choices">
           <ion-button
@@ -34,7 +31,7 @@
             expand="block"
             fill="solid"
             color="primary"
-            class="choice-btn"
+            class="choice-btn choice-btn--centered"
             @click="validerQcm(index)"
           >
             {{ choix.texte }}
@@ -52,15 +49,13 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonButton,
-  toastController
+  IonButton
 } from '@ionic/vue';
-import { default as EgChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore, DrawShape, Move } from 'eg-chessboard';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
-const chessPreferences = useChessPreferencesStore();
+const { showSuccess, showError } = useFeedback();
 
 export interface QcmChoix {
   texte: string;
@@ -136,13 +131,7 @@ watch(
 );
 
 const avancerOuReussir = async (message: string) => {
-  const toast = await toastController.create({
-    message,
-    duration: 2000,
-    color: 'success',
-    position: 'bottom'
-  });
-  await toast.present();
+  await showSuccess(message, 2000);
 
   if (etapeCourante.value + 1 < props.diagrammes.length) {
     etapeCourante.value++;
@@ -165,13 +154,7 @@ const validerQcm = async (index: number) => {
     await avancerOuReussir(explication);
   } else {
     const explication = choix?.explication || 'Mauvaise réponse !';
-    const toast = await toastController.create({
-      message: explication,
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(explication, 2500);
   }
 };
 
@@ -189,74 +172,8 @@ const verifierCoup = async (move: Move) => {
   } else {
     boardApi.value?.undoLastMove();
     const messageErreur = diag.move_explication || 'Ce n\'est pas le bon coup. Cherchez le mat !';
-    const toast = await toastController.create({
-      message: messageErreur,
-      duration: 2500,
-      color: 'danger',
-      position: 'bottom'
-    });
-    await toast.present();
+    await showError(messageErreur, 2500);
   }
 };
 </script>
 
-<style scoped>
-.cap-ou-pas-cap-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.consigne-card {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 0 16px 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.consigne-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 500px;
-  margin: 0 auto 16px auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-.choices-card {
-  width: 100%;
-  max-width: 500px;
-  margin: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.qcm-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.choice-btn {
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: 500;
-  --border-radius: 8px;
-  min-height: 48px;
-}
-
-.choice-btn::part(native) {
-  white-space: normal;
-  text-align: center;
-  padding: 12px 16px;
-}
-</style>

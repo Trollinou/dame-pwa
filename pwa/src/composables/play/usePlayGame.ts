@@ -53,6 +53,8 @@ export function usePlayGame() {
 		boardConfig.orientation === 'white' ? 'black' : 'white'
 	);
 
+	const isValidSquare = ( sq: string ) => /^[a-h][1-8]$/.test( sq );
+
 	const toggleHint = () => {
 		isHintEnabled.value = ! isHintEnabled.value;
 		if ( isHintEnabled.value ) {
@@ -60,7 +62,9 @@ export function usePlayGame() {
 			if ( boardApi && lastSuggestedMove.value ) {
 				const from = lastSuggestedMove.value.substring( 0, 2 );
 				const to = lastSuggestedMove.value.substring( 2, 4 );
-				boardApi.drawMove( from, to, 'green' );
+				if ( isValidSquare( from ) && isValidSquare( to ) ) {
+					boardApi.drawMove( from, to, 'green' );
+				}
 			}
 		} else if ( boardApi ) {
 			boardApi.hideMoves();
@@ -72,7 +76,9 @@ export function usePlayGame() {
 		if ( isHintEnabled.value && boardApi ) {
 			const from = bestMove.substring( 0, 2 );
 			const to = bestMove.substring( 2, 4 );
-			boardApi.drawMove( from, to, 'green' );
+			if ( isValidSquare( from ) && isValidSquare( to ) ) {
+				boardApi.drawMove( from, to, 'green' );
+			}
 		}
 	};
 
