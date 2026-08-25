@@ -22,7 +22,14 @@
 
 ## 4. Design & Échiquier (`eg-chessboard` / `<Chessboard>`)
 - **Wrapper Maître `<Chessboard>`** : Tout affichage d'échiquier doit impérativement utiliser le wrapper `src/components/shared/Chessboard/Chessboard.vue` plutôt que d'importer directement `TheChessboard` / `eg-chessboard`.
-- **Échiquiers Standard** : Visuel plat et net (`border-radius: 0;`, `box-shadow: none;`) sur tous les viewers (`PuzzleViewer`, `QcmViewer`, `PgnViewer`, `AnalysisPage`, etc.). Utiliser les classes `.chessboard-container` ou `.board-container` (`src/theme/shared-components.scss`).
+- **Échiquiers Standard** : Visuel plat et net (`border-radius: 0;`, `box-shadow: none;`) sur tous les viewers (`PuzzleViewer`, `QcmViewer`, `PgnViewer`, `AnalysisPage`, etc.). Utiliser systématiquement la classe canonique `.chessboard-container` (`src/theme/shared-components.scss`).
+- **Styles Partagés & Nomenclature Canonique** (`src/theme/shared-components.scss`) : Interdiction de recréer des styles locaux pour les éléments standard. Utiliser les classes canoniques par famille :
+  - **Layouts** : `.exercise-viewer-layout`, `.exercise-stage`.
+  - **Échiquiers** : `.chessboard-container`, `.chessboard-container--mini`, `.chessboard-container--small`.
+  - **Cartes** : `.exercise-card`, `.exercise-card-header`.
+  - **Choix & QCM** : `.qcm-choices`, `.choice-btn`, `.choice-btn--centered`.
+  - **Palettes** : `.piece-palette`, `.piece-btn`, `.piece-icon-box`.
+  - **Actions & Feedback** : `.feedback-banner`, `.feedback-text`, `.exercise-action-btn`.
 - **Exception Cartes Manipulables** (`OrderViewer`, `MatchingViewer`, etc.) : L'échiquier intérieur conserve `border-radius: 0;`, seul le conteneur externe (`.board-wrapper-card`) garde l'aspect carte (bords arrondis, ombres).
 - **Responsive & Ratio** :
   - Interdiction de tronquer/rogner un échiquier. Conserver `aspect-ratio: 1 / 1`.

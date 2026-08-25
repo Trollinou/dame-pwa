@@ -40,6 +40,7 @@ Encapsule la bibliothèque `eg-chessboard` et centralise la configuration global
 - **Nettoyage automatique du cycle de vie** : Détruit proprement l'instance sous-jacente (`boardApi.destroy()`) à la destruction du composant (`onUnmounted`) pour prévenir les fuites de mémoire.
 - **Props principales** : `fen`, `shapes`, `viewOnly` (défaut: `true`), `orientation`, `playerColor`, `coordinates`, `autoCastling`, `highlightLastMove`, `lastMove`, `stockfishEnabled`, `stockfishConfig`.
 - **Événements supportés** : `@board-created`, `@move`, `@turn-change`, `@check`, `@checkmate`, `@stalemate`, `@draw`, `@stockfish-hint`, `@square-click`, `@shapes-change`, `@promotion`.
+- **Adoption unifiée** : Utilisé de façon homogène par tous les viewers d'apprentissage (`PuzzleViewer`, `QcmViewer`, `ParcoursViewer`, `VisionViewer`, `CapOuPasCapViewer`, `InteractiveQcmViewer`, `MatchingViewer`, `EvalViewer`, `JugementFinalViewer`, `DiagramViewer`, `PgnViewer`, `PlacementViewer`, `QuiSuisJeViewer`).
 
 ```vue
 <template>
@@ -155,11 +156,26 @@ const currentFeedback: CardFeedback = {
 </script>
 ```
 
-### 6. Styles Partagés (`src/theme/shared-components.scss`)
-Normalise le dimensionnement, les ratios et l'apparence des composants interactifs :
-- `.chessboard-container` / `.board-container` : Respect strict du ratio `1 / 1`, bords nets (`border-radius: 0;`), absence d'ombres internes et adaptation dynamique en mode paysage tablette.
-- `.qcm-button` / `.choice-btn` : Boutons de choix ergonomiques pour les QCM et quiz.
-- `.exercise-card` : Structure standard pour les consignes et cartes de questions.
+### 6. Styles & Classes Partagées (`src/theme/shared-components.scss`)
+Nomenclature canonique standardisée à utiliser systématiquement par les développeurs selon les familles d'éléments :
+
+| Famille | Classe Canonique | Usage & Description |
+| :--- | :--- | :--- |
+| **Layouts** | `.exercise-viewer-layout` | Conteneur principal flex centré (largeur 100%) pour les viewers d'exercice. |
+| | `.exercise-stage` | Sous-conteneur de phase ou étape intermédiaire d'exercice (largeur max 600px). |
+| **Échiquiers** | `.chessboard-container` | Conteneur standard (ratio 1:1, `border-radius: 0;`, `box-shadow: none;`, landscape tablette `min(65vh, 48vw)`). |
+| | `.chessboard-container--mini` | Miniaturisation (320px) pour l'appariement (`MatchingViewer`) et les choix de plans (`JugementFinalViewer`). |
+| | `.chessboard-container--small` | Variante compacte pour écrans à faible hauteur / portrait restreint (`calc(100vh - 230px)`). |
+| **Cartes & En-têtes** | `.exercise-card` | Carte standard pour consignes, questions et contenus (bord arrondi 12px, ombre légère). |
+| | `.exercise-card-header` | Titre centré de consigne ou de question (1.15rem, semi-bold). |
+| **Choix & QCM** | `.qcm-choices` | Conteneur vertical de boutons de choix (gap 10px, max 500px). |
+| | `.choice-btn` | Bouton de choix avec retour à la ligne natif Ionic (`&::part(native)` aligné à gauche). |
+| | `.choice-btn--centered` | Variante du bouton de choix avec texte centré. |
+| **Palettes & Pièces** | `.piece-palette` | Grille 2x6 ou 6x2 pour sélection interactive de pièces. |
+| | `.piece-btn` | Bouton carré de pièce avec effet hover/scale. |
+| | `.piece-icon-box` | Conteneur et affichage d'icônes vectorielles de pièces isolées (neutralisation du fond damier). |
+| **Actions & Feedback**| `.feedback-banner`<br>`.feedback-text` | Bannières et textes de feedback dynamique. |
+| | `.exercise-action-btn` | Bouton d'action ou de validation en bas d'étape (max 320px, centré). |
 
 ## API REST & Catégories
 

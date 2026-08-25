@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<ChessboardProps>(), {
   viewOnly: true,
   orientation: 'white',
   highlightLastMove: false,
-  coordinates: false,
+  coordinates: true,
   autoCastling: true,
   stockfishEnabled: false
 });

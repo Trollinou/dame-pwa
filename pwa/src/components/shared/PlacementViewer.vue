@@ -1,12 +1,12 @@
 <template>
-  <div class="placement-viewer-layout">
-    <ion-card v-if="consigne" class="consigne-card">
+  <div class="exercise-viewer-layout">
+    <ion-card v-if="consigne" class="exercise-card">
       <ion-card-header>
-        <ion-card-title class="consigne-title">{{ consigne }}</ion-card-title>
+        <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
       </ion-card-header>
     </ion-card>
 
-    <div class="board-container">
+    <div class="chessboard-container">
       <Chessboard
         :fen="fenDepart"
         :view-only="true"
@@ -98,35 +98,3 @@ const verifierPlacement = async (square: string) => {
 };
 </script>
 
-<style scoped>
-.placement-viewer-layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.consigne-card {
-  width: 100%;
-  max-width: 500px;
-  margin-bottom: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.consigne-title {
-  font-size: 1.1rem;
-  line-height: 1.4;
-  text-align: center;
-}
-
-.board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-}
-</style>

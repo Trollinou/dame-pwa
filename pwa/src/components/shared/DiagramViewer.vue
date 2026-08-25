@@ -1,30 +1,19 @@
 <template>
   <div class="diagram-viewer-container">
     <div class="main-board">
-      <eg-chessboard
-        :diagram="{
-          fen: props.fen,
-          shapes: props.shapes
-        }"
-        :boardConfig="{
-          orientation: props.orientation,
-          viewOnly: true
-        }"
-        :stockfishConfig="{ whiteMode: 'disabled', blackMode: 'disabled' }"
-        :piece-set="chessPreferences.pieceSet"
-        :board-theme="chessPreferences.boardTheme"
+      <Chessboard
+        :fen="props.fen"
+        :shapes="props.shapes"
+        :orientation="props.orientation"
+        :view-only="true"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { default as EgChessboard } from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { DrawShape } from 'eg-chessboard';
-import 'eg-chessboard/style.css';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
-
-const chessPreferences = useChessPreferencesStore();
 
 const props = withDefaults(
   defineProps<{

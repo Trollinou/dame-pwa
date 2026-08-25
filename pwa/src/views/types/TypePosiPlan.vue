@@ -4,8 +4,8 @@
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="config.etapes?.[0]?.question || 'Évaluez la position et choisissez le meilleur plan.'"
-      :stepBadgeText="`Étape 1 / ${config.etapes?.length || 1}`"
+      :consigne="consigneActuelle"
+      :stepBadgeText="`Étape ${etapeCouranteIndex + 1} / ${config.etapes?.length || 1}`"
     />
 
     <InteractiveQcmViewer
@@ -13,13 +13,15 @@
       :couleurJoueur="config.couleur_joueur"
       :etapes="config.etapes"
       :shapes="config.shapes"
+      :hideQuestion="true"
+      @etape-change="(idx) => etapeCouranteIndex = idx"
       @success="onSuccess"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import InteractiveQcmViewer from '@/components/shared/InteractiveQcmViewer.vue';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
@@ -57,6 +59,12 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
+const etapeCouranteIndex = ref(0);
+
+const consigneActuelle = computed(() => {
+  return props.config?.etapes?.[etapeCouranteIndex.value]?.question || 'Évaluez la position et choisissez le meilleur plan.';
+});
+
 const headerMeta = computed(() => {
   return {
     title: props.config?.metaTitre || 'T5 - Posi-Plan',
@@ -76,8 +84,7 @@ const onSuccess = () => {
 <style scoped>
 .exercice-type-posi-plan {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
 }
 </style>
