@@ -71,10 +71,15 @@ watch(
   { deep: true }
 );
 
-const normalizedDiagram = computed(() => ({
-  fen: props.fen ?? 'start',
-  shapes: props.shapes ?? []
-}));
+const normalizedDiagram = computed(() => {
+  if (props.fen === undefined && props.shapes === undefined) {
+    return undefined;
+  }
+  return {
+    fen: props.fen ?? 'start',
+    shapes: props.shapes ?? []
+  };
+});
 
 const normalizedBoardConfig = computed<ChessboardConfig>(() => {
   const baseConfig: ChessboardConfig = {

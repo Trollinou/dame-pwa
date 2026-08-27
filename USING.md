@@ -43,6 +43,14 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - Masquage des annotations/formes initiales pendant la phase de réflexion.
        - Clic sur la case cible : placement de la pièce, validation instantanée, révélation des flèches/formes du diagramme complet.
        - Retrait automatique avec feedback rouge en cas d'erreur de case.
+     - **Exercices ABCDaire Tactique (Type 3)** :
+       - Série de 4 Mini-PGN contenant 1 ou plusieurs coups (attaque, défense, mat, gain matériel).
+       - Orientation automatique de l'échiquier selon le trait de la position initiale (Blancs ou Noirs en bas).
+       - Masquage des formes pendant la recherche et le jeu du coup.
+       - Déplacement direct sur l'échiquier du meilleur coup attendu :
+         - En cas de mauvais coup : annulation immédiate et possibilité de réessayer sans limite.
+         - En cas de bon coup : si l'exercice comporte des coups intermédiaires, l'ordinateur joue sa réplique scriptée (délai de 500ms) et l'apprenant rejoue jusqu'au coup final.
+       - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur).
      - **Navigation en Série (`SeriesCardFooter`)** : Badge d'étape (`Carte X / Y`), zone de feedback visuel fixe (succès/erreur) et bouton d'avancement débloqué dès la validation de la position.
      - **Validation finale** : Enregistrement de la réussite dans la progression de l'adhérent à la fin de la série.
 

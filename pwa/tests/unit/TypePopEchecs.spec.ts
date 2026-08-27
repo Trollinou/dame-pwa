@@ -48,7 +48,8 @@ describe( 'fenUtils - PopEchecs helpers', () => {
 	} );
 
 	test( 'findPieceOnSquare extracts piece type and color correctly', () => {
-		const fen = 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2';
+		const fen =
+			'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2';
 		const pieceF3 = findPieceOnSquare( fen, 'f3' );
 		expect( pieceF3 ).toEqual( { type: 'n', color: 'w' } );
 
@@ -60,13 +61,15 @@ describe( 'fenUtils - PopEchecs helpers', () => {
 	} );
 
 	test( 'removePieceFromFen removes the piece on the given square and collapses empty squares', () => {
-		const fen = 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2';
+		const fen =
+			'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2';
 		const fenWithoutF3 = removePieceFromFen( fen, 'f3' );
 		expect( fenWithoutF3 ).toContain( '8/PPPP1PPP/RNBQKB1R' );
 	} );
 
 	test( 'getActiveColorFromFen detects black orientation when black has turn', () => {
-		const fenBlack = 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2';
+		const fenBlack =
+			'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2';
 		expect( getActiveColorFromFen( fenBlack ) ).toBe( 'black' );
 	} );
 } );
@@ -90,22 +93,30 @@ describe( 'TypePopEchecs.vue', () => {
 						{
 							consigne: 'Placez le Cavalier blanc sur f3.',
 							fen: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2',
-							shapes: [ { orig: 'f3', dest: 'f3', brush: 'blue' } ],
+							shapes: [
+								{ orig: 'f3', dest: 'f3', brush: 'blue' },
+							],
 						},
 						{
 							consigne: 'Placez le Pion noir sur e4.',
 							fen: 'rnbqkbnr/pppp1ppp/8/8/4p3/8/PPPPPPPP/RNBQKBNR b KQkq - 0 2',
-							shapes: [ { orig: 'e4', dest: 'e4', brush: 'blue' } ],
+							shapes: [
+								{ orig: 'e4', dest: 'e4', brush: 'blue' },
+							],
 						},
 						{
 							consigne: 'Placez le Cavalier noir sur c6.',
 							fen: 'r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 1 2',
-							shapes: [ { orig: 'c6', dest: 'c6', brush: 'blue' } ],
+							shapes: [
+								{ orig: 'c6', dest: 'c6', brush: 'blue' },
+							],
 						},
 						{
 							consigne: 'Placez le Pion blanc sur d5.',
 							fen: 'rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3',
-							shapes: [ { orig: 'd5', dest: 'd5', brush: 'blue' } ],
+							shapes: [
+								{ orig: 'd5', dest: 'd5', brush: 'blue' },
+							],
 						},
 					],
 				},
@@ -114,7 +125,9 @@ describe( 'TypePopEchecs.vue', () => {
 
 		// Carte 1
 		expect( wrapper.text() ).toContain( 'Carte 1 / 4' );
-		expect( wrapper.text() ).toContain( 'Placez le Cavalier blanc sur f3.' );
+		expect( wrapper.text() ).toContain(
+			'Placez le Cavalier blanc sur f3.'
+		);
 
 		const buttons = wrapper.findAll( '.mock-square-btn' );
 		const btnF3 = buttons.find( ( b ) => b.text().includes( 'f3' ) );

@@ -170,7 +170,12 @@ export interface SquarePiece {
  * @param shapes
  */
 export function findBlueCircledSquare(
-	shapes?: Array< { orig?: string; dest?: string; brush?: string; color?: string } >
+	shapes?: Array< {
+		orig?: string;
+		dest?: string;
+		brush?: string;
+		color?: string;
+	} >
 ): string | null {
 	if ( ! Array.isArray( shapes ) ) {
 		return null;
@@ -180,7 +185,9 @@ export function findBlueCircledSquare(
 			shape &&
 			shape.orig &&
 			( ! shape.dest || shape.dest === shape.orig ) &&
-			( shape.brush === 'blue' || shape.brush === 'b' || shape.color === 'blue' )
+			( shape.brush === 'blue' ||
+				shape.brush === 'b' ||
+				shape.color === 'blue' )
 		) {
 			return shape.orig.toLowerCase();
 		}
@@ -193,7 +200,10 @@ export function findBlueCircledSquare(
  * @param fen
  * @param square
  */
-export function findPieceOnSquare( fen: string, square: string ): SquarePiece | null {
+export function findPieceOnSquare(
+	fen: string,
+	square: string
+): SquarePiece | null {
 	if ( ! fen || ! square || square.length !== 2 ) {
 		return null;
 	}

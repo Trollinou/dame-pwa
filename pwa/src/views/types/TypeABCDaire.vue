@@ -1,10 +1,14 @@
 <template>
   <div class="exercice-type-abcdaire">
-    <PuzzleViewer
-      v-if="config.fen && config.solution"
+    <ABCDaireTactiqueViewer
+      :consigne="config.consigne"
+      :exercices="config.exercices"
+      :metaTitre="config.metaTitre"
+      :metaTypeLabel="config.metaTypeLabel"
+      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
       :fen="config.fen"
-      :couleurJoueur="config.couleur_joueur || 'white'"
       :solution="config.solution"
+      :couleurJoueur="config.couleur_joueur"
       :shapes="config.shapes"
       @success="gererSucces"
     />
@@ -12,20 +16,27 @@
 </template>
 
 <script setup lang="ts">
-import PuzzleViewer from '@/components/shared/PuzzleViewer.vue';
+import ABCDaireTactiqueViewer, { type ExerciceABCDaire } from '@/components/shared/ABCDaireTactiqueViewer.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import type { DrawShape } from 'eg-chessboard';
 
-interface ConfigABCDaire {
-  fen: string;
-  solution: string[];
-  couleur_joueur: 'white' | 'black';
+export interface ConfigABCDaire {
+  consigne?: string;
+  exercices?: ExerciceABCDaire[];
+  metaTitre?: string;
+  metaTypeLabel?: string;
+  metaChapitreNiveauLabel?: string;
   id?: number;
+  // Rétrocompatibilité
+  fen?: string;
+  solution?: string[];
+  couleur_joueur?: 'white' | 'black';
   shapes?: DrawShape[];
 }
 
 const props = defineProps<{
   config: ConfigABCDaire;
+  id?: number;
 }>();
 
 const emit = defineEmits<{
@@ -35,12 +46,10 @@ const emit = defineEmits<{
 const store = useApprentissageStore();
 
 const gererSucces = () => {
-  // Enregistrer la progression globale de cet exercice
-  if (props.config.id) {
-    store.validerElement(props.config.id);
+  const targetId = props.id || props.config?.id;
+  if (targetId) {
+    store.validerElement(targetId);
   }
-  
-  // Remonter l'événement au composant parent (ExercicePage)
   emit('success');
 };
 </script>

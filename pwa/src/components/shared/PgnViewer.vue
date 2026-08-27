@@ -11,14 +11,17 @@
 
     <!-- Navigation Controls -->
     <div class="navigation-controls">
-      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewStart">
+      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewStart" title="Début">
         <ion-icon slot="icon-only" :icon="playBackOutline"></ion-icon>
       </ion-button>
-      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewPrevious">
+      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewPrevious" title="Précédent">
         <ion-icon slot="icon-only" :icon="chevronBackOutline"></ion-icon>
       </ion-button>
-      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewNext">
+      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewNext" title="Suivant">
         <ion-icon slot="icon-only" :icon="chevronForwardOutline"></ion-icon>
+      </ion-button>
+      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewEnd" title="Fin">
+        <ion-icon slot="icon-only" :icon="playForwardOutline"></ion-icon>
       </ion-button>
     </div>
 
@@ -42,9 +45,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { IonButton, IonIcon } from '@ionic/vue';
-import { playBackOutline, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
+import {
+  playBackOutline,
+  chevronBackOutline,
+  chevronForwardOutline,
+  playForwardOutline
+} from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore } from 'eg-chessboard';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
@@ -67,10 +75,6 @@ const currentComment = ref('');
 const isCompleted = ref(false);
 
 const activePgn = computed(() => props.pgn || props.pgnString || '');
-const pgnBoardConfig = computed(() => ({
-  viewOnly: true,
-  orientation: (props.orientation === 'black' ? 'black' : 'white') as 'white' | 'black'
-}));
 
 const syncComment = () => {
   if (boardApi.value) {
@@ -78,16 +82,25 @@ const syncComment = () => {
   }
 };
 
-const loadPgnData = () => {
+const loadPgnData = async () => {
   if (boardApi.value && activePgn.value) {
-    boardApi.value.setPosition('start');
+    await nextTick();
     boardApi.value.loadPgn(activePgn.value);
-    boardApi.value.viewStart();
     syncComment();
 
+    // Forcer le redessin propre des shapes SVG une fois le DOM stabilisé
+    setTimeout(() => {
+      if (boardApi.value) {
+        const shapes = boardApi.value.getShapes();
+        if (shapes && shapes.length > 0) {
+          boardApi.value.setShapes(shapes);
+        }
+        boardApi.value.redraw(true);
+      }
+    }, 50);
+
     const historyState = boardApi.value.getHistoryViewerState();
-    console.log('[PgnViewer] loadPgnData historyState:', historyState);
-    if (!historyState.isEnabled) {
+    if (!historyState?.isEnabled) {
       isCompleted.value = true;
     } else {
       isCompleted.value = false;
@@ -129,8 +142,9 @@ const viewNext = () => {
 
   const beforePly = historyStateBefore?.plyViewing;
   const afterPly = historyStateAfter?.plyViewing;
-  const isEnd = historyStateAfter?.isEnabled === false || 
-                (beforePly !== undefined && afterPly !== undefined && beforePly === afterPly);
+  const isEnd =
+    historyStateAfter?.isEnabled === false ||
+    (beforePly !== undefined && afterPly !== undefined && beforePly === afterPly);
 
   if (isEnd) {
     isCompleted.value = true;
@@ -141,6 +155,14 @@ const viewNext = () => {
     } else if (!props.totalCards) {
       emit('finished');
     }
+  }
+};
+
+const viewEnd = () => {
+  if (boardApi.value) {
+    boardApi.value.stopViewingHistory();
+    syncComment();
+    isCompleted.value = true;
   }
 };
 </script>

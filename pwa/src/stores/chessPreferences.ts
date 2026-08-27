@@ -19,7 +19,8 @@ export const AVAILABLE_PIECE_SET_OPTIONS: PieceSetOption[] = [
 	{
 		id: 'cburnett',
 		label: 'CBurnett',
-		description: 'Design vectoriel moderne flat Lichess / Chess.com (défaut)',
+		description:
+			'Design vectoriel moderne flat Lichess / Chess.com (défaut)',
 	},
 	{
 		id: 'merida',

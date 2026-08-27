@@ -6,6 +6,18 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-08-27
+
+### Ajouté & Amélioré
+- **Refonte de l'Exercice Type 3 ABCDaire Tactique (`ABCDaireTactiqueViewer.vue`, `TypeABCDaire.vue`)** :
+  - **Exécution Runtime d'une Série de 4 Mini-PGN** : Interprétation client autonome des 4 positions tactiques configurées sous format standard PGN.
+  - **Orientation Dynamique selon le Trait** : Détection du camp au trait dans la FEN de départ et orientation automatique de l'échiquier (trait aux noirs -> noirs en bas).
+  - **Boucle Interactive Joueur / Ordinateur** : Masquage total des formes/shapes durant la phase de jeu, annulation automatique en cas d'erreur sans limite d'essais, réplique automatique de l'ordinateur après un délai naturel de 500ms jusqu'au coup final du PGN.
+  - **Mode Révélation & Relecture PGN (`PgnViewer.vue`)** : Une fois la variante résolue, transition instantanée vers le visualiseur PGN pas-à-pas avec restitution immédiate des commentaires et des formes/shapes (`[%csl ...]`, `[%cal ...]`) sur la position de départ (`ply 0`) et tout au long de la séquence de coups.
+  - **Fiabilisation des watchers d'Échiquier (`Chessboard.vue`)** : Calcul conditionnel de `normalizedDiagram` évitant toute réinitialisation intempestive des formes lors de l'instanciation de visualiseurs autonomes.
+  - **Intégration d'En-tête et Pied de Série Unifiés** : Utilisation des composants transverses `ExerciseHeader` (consigne et badge `Carte X / 4`) et `SeriesCardFooter` (feedback fixe et passage à la carte suivante).
+  - **Rétrocompatibilité Totale** : Prise en charge automatique des anciens enregistrements d'exercices à FEN unique (`fen`, `solution`).
+
 ## [1.2.4] - 2026-08-25
 
 ### Ajouté & Amélioré
