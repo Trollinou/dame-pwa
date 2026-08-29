@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.6] - 2026-08-30
+
+### Corrigé & Amélioré
+- **Exercices Type 3 ABCDaire Tactique (`ABCDaireTactiqueViewer.vue`)** :
+  - **Prise en charge des FEN partielles sans Roi (`PositionError: ERR_KINGS`)** : Sécurisation du décodage de la position initiale (`Chess.fromSetup()`) sans appel bloquant à `.unwrap()`.
+  - **Extraction directe des coups PGN pour positions pédagogiques** : Conservation immédiate des coups et variantes textuels (`san` brut, ex: `1. Nd6+`) même lorsque la FEN initiale décrit une position incomplète ne répondant pas aux règles FIDE complètes.
+  - **Validation fluide des déplacements** : Les coups attendus sont désormais fidèlement reconnus et validés sur l'échiquier interactif sur toutes les positions d'exercices d'entraînement.
+
 ## [1.2.5] - 2026-08-27
 
 ### Ajouté & Amélioré

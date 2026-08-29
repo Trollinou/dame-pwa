@@ -167,15 +167,20 @@ const parsedPgnData = computed(() => {
       const game = games[0];
       const setupFen = game.headers.get('FEN') || fen;
       const setupRes = setupFen && setupFen !== 'start' ? parseFen(setupFen) : null;
-      const pos = setupRes && setupRes.isOk ? Chess.fromSetup(setupRes.value).unwrap() : Chess.default();
+      const chessSetup = setupRes && setupRes.isOk ? Chess.fromSetup(setupRes.value) : null;
+      const pos = chessSetup && chessSetup.isOk ? chessSetup.value : null;
 
       let currentNode = game.moves;
       while (currentNode.children.length > 0) {
         const child = currentNode.children[0];
-        const parsedMove = parseSan(pos, child.data.san);
-        if (parsedMove) {
-          const san = makeSanAndPlay(pos, parsedMove);
-          moves.push({ san: san || child.data.san });
+        if (pos) {
+          const parsedMove = parseSan(pos, child.data.san);
+          if (parsedMove) {
+            const san = makeSanAndPlay(pos, parsedMove);
+            moves.push({ san: san || child.data.san });
+          } else {
+            moves.push({ san: child.data.san });
+          }
         } else {
           moves.push({ san: child.data.san });
         }
@@ -190,7 +195,8 @@ const parsedPgnData = computed(() => {
   if (moves.length === 0) {
     try {
       const setupRes = fen && fen !== 'start' ? parseFen(fen) : null;
-      const pos = setupRes && setupRes.isOk ? Chess.fromSetup(setupRes.value).unwrap() : Chess.default();
+      const chessSetup = setupRes && setupRes.isOk ? Chess.fromSetup(setupRes.value) : null;
+      const pos = chessSetup && chessSetup.isOk ? chessSetup.value : null;
       const textWithoutComments = rawPgn
         .replace(/\[[^\]]*\]/g, '')
         .replace(/\{[^}]*\}/g, '')
@@ -198,11 +204,16 @@ const parsedPgnData = computed(() => {
         .trim();
       const tokens = textWithoutComments.split(/\s+/).filter((t) => t && t !== '...' && t !== '*' && t !== '1-0' && t !== '0-1' && t !== '1/2-1/2');
       for (const token of tokens) {
-        const parsed = parseSan(pos, token);
-        if (parsed) {
-          const san = makeSanAndPlay(pos, parsed);
-          moves.push({ san: san || token });
+        if (pos) {
+          const parsed = parseSan(pos, token);
+          if (parsed) {
+            const san = makeSanAndPlay(pos, parsed);
+            moves.push({ san: san || token });
+            continue;
+          }
         }
+        // Si la position est illégale (ex: FEN sans Roi) ou parseSan échoue, conserver le token brut
+        moves.push({ san: token });
       }
     } catch {
       // Ignorer
