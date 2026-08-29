@@ -6,6 +6,20 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.8] - 2026-08-29
+
+## [1.2.7] - 2026-08-29
+
+## [1.2.6] - 2026-08-27
+
+### Ajouté & Amélioré
+- **Refonte de l'Exercice Type 4 : La Partie dont tu es le Héros (`TypePartieHeros.vue`, `partieHerosParser.ts`)** :
+  - **Découpage Dynamique d'Étude PGN** : Parsing complet d'un PGN d'étude d'échecs (`chessops`) découpant automatiquement la partie en séquences de défilement PGN et en embranchements QCM interactifs.
+  - **Détection Automatique des Choix QCM** : Identification des points de décision via les 3 flèches indicatrices `[%cal ...]` et les 2 variantes associées au coup principal.
+  - **Feedbacks Contextuels Différenciés** : Affichage des explications de l'auteur directement dans le feedback de `SeriesCardFooter` (explication de la variante en rouge en cas d'erreur, explication de la ligne principale en vert en cas de réussite).
+  - **Expérience Utilisateur Unifiée** : Navigation avec défilement pas-à-pas commenté, `ExerciseHeader` dynamique et `SeriesCardFooter` réservant sa zone de feedback pour une stabilité visuelle optimale.
+  - **Rétrocompatibilité Totale** : Prise en charge automatique des anciens formats JSON multi-étapes.
+
 ## [1.2.5] - 2026-08-27
 
 ### Ajouté & Amélioré

@@ -34,12 +34,13 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 
 L'application suit un principe de découplage strict :
 - **ROI (WordPress)** : Rôle de CMS auteur stockant les standards d'échecs (FEN + Shapes, PGN avec annotations `%csl`/`%cal`/variantes) et les consignes rédigées par l'auteur.
-- **DAME-PWA (Client-Side)** : Moteur d'interprétation interactive via `fenUtils.ts`, `eg-chessboard` et `chessops` :
+- **DAME-PWA (Client-Side)** : Moteur d'interprétation interactive via `fenUtils.ts`, `partieHerosParser.ts`, `eg-chessboard` et `chessops` :
   - Détection automatique de la pièce cible à partir du cercle bleu (`brush: 'blue'`).
   - Dérivation de la `fen_depart` sans la pièce cible.
   - Calcul dynamique de l'orientation de l'échiquier selon le trait de la position (`getActiveColorFromFen(fen)` : Blancs en bas si trait aux Blancs, Noirs en bas si trait aux Noirs).
+  - Découpage automatique des études PGN complètes (Type 4 — La Partie dont tu es le Héros) en séquences PGN et embranchements QCM via l'analyse des variantes et des flèches `[%cal ...]`.
   - Masquage initial des `shapes` pendant la recherche, puis révélation complète dès le placement réussi.
-  - Gestion des séries multi-diagrammes avec `ExerciseHeader` et `SeriesCardFooter`.
+  - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
 
 ## Composants & Composables Partagés (PWA Frontend)
 

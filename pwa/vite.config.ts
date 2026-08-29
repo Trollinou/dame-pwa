@@ -56,6 +56,8 @@ export default defineConfig( {
 				],
 			},
 			workbox: {
+				skipWaiting: true,
+				clientsClaim: true,
 				// On s'assure que tous les assets nécessaires sont mis en cache
 				globPatterns: [ '**/*.{js,css,html,ico,png,svg,wasm}' ],
 				// On augmente la limite de taille pour le fichier WASM de Stockfish (environ 7Mo)

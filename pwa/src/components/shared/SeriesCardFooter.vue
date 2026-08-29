@@ -62,12 +62,14 @@ const props = withDefaults(
     nextText?: string;
     finishText?: string;
     pendingHint?: string;
+    badgePrefix?: string;
   }>(),
   {
     feedback: null,
     nextText: 'Carte suivante',
     finishText: 'Terminer l\'exercice',
-    pendingHint: 'Trouvez la solution pour continuer'
+    pendingHint: 'Trouvez la solution pour continuer',
+    badgePrefix: 'Carte'
   }
 );
 

@@ -64,6 +64,11 @@ app.directive( 'safe-html', vSafeHtml );
 
 router.isReady().then( () => {
 	app.mount( '#app' );
-	// Enregistrement du Service Worker pour le support hors-ligne
-	registerSW( { immediate: true } );
+	// Enregistrement du Service Worker pour le support hors-ligne avec mise à jour immédiate
+	registerSW( {
+		immediate: true,
+		onNeedRefresh() {
+			window.location.reload();
+		},
+	} );
 } );
