@@ -6,11 +6,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [1.2.8] - 2026-08-29
-
-## [1.2.7] - 2026-08-29
-
-## [1.2.6] - 2026-08-27
+## [1.2.5] - 2026-08-27
 
 ### Ajouté & Amélioré
 - **Refonte de l'Exercice Type 4 : La Partie dont tu es le Héros (`TypePartieHeros.vue`, `partieHerosParser.ts`)** :
@@ -20,9 +16,6 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Expérience Utilisateur Unifiée** : Navigation avec défilement pas-à-pas commenté, `ExerciseHeader` dynamique et `SeriesCardFooter` réservant sa zone de feedback pour une stabilité visuelle optimale.
   - **Rétrocompatibilité Totale** : Prise en charge automatique des anciens formats JSON multi-étapes.
 
-## [1.2.5] - 2026-08-27
-
-### Ajouté & Amélioré
 - **Refonte de l'Exercice Type 3 ABCDaire Tactique (`ABCDaireTactiqueViewer.vue`, `TypeABCDaire.vue`)** :
   - **Exécution Runtime d'une Série de 4 Mini-PGN** : Interprétation client autonome des 4 positions tactiques configurées sous format standard PGN.
   - **Orientation Dynamique selon le Trait** : Détection du camp au trait dans la FEN de départ et orientation automatique de l'échiquier (trait aux noirs -> noirs en bas).
