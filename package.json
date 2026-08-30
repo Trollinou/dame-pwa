@@ -11,7 +11,7 @@
     "test:unit": "vitest --config pwa/vite.config.ts",
     "test:e2e": "cypress run",
     "lint": "eslint pwa",
-    "package": "node script/package.cjs",
+    "package": "node scripts/package.cjs",
     "version-sync": "node scripts/version-sync.cjs"
   },
   "dependencies": {

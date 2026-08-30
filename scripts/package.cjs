@@ -88,12 +88,13 @@ function isIgnored(relPath) {
     const normalizedPath = relPath.replace(/\\/g, '/');
     if (!normalizedPath) return false;
 
-    // Règles d'exclusion strictes de package.sh + le dossier script/ lui-même
+    // Règles d'exclusion strictes de package.sh + les dossiers scripts/ et script/
     if (normalizedPath === 'dist-temp' || normalizedPath.startsWith('dist-temp/')) return true;
     if (normalizedPath.endsWith('.sh')) return true;
     if (normalizedPath.endsWith('.zip')) return true;
     if (normalizedPath === 'vendor' || normalizedPath.startsWith('vendor/')) return true;
     if (normalizedPath === 'script' || normalizedPath.startsWith('script/')) return true;
+    if (normalizedPath === 'scripts' || normalizedPath.startsWith('scripts/')) return true;
 
     for (const rule of ignoreRules) {
         if (rule.mm.match(normalizedPath)) {
