@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Ajouté & Amélioré
+- **Chronométrage & Cycle de Vie des Exercices (`ContenuPage.vue`, `apprentissage.ts`, composants `Type*.vue`)** :
+  - **Mesure Centralisée du Temps Passé** : Démarrage d'un chronomètre à l'affichage de chaque leçon ou exercice dans `ContenuPage.vue` et transmission de la durée exacte (`time_spent`) en secondes lors de la validation via l'API REST ROI (`validerElement(id, timeSpentSeconds, attemptsCount)`).
+  - **Délégation Événementielle Unifiée** : Suppression des appels prématurés ou redondants à `store.validerElement(id)` dans l'ensemble des sous-composants d'exercices (`TypePopEchecs.vue`, `TypePosiPlan.vue`, `Type100Commandements.vue`, `TypeABCDaire.vue`, `TypeAssociPlan.vue`, `TypeCapOuPasCap.vue`, `TypeDestinationFinale.vue`, `TypeEchecEval.vue`, `TypeJugementFinal.vue`, `TypeOuvreBoite.vue`, `TypePartieHeros.vue`). Les composants émettent désormais exclusivement l'événement `@success` vers le parent `ContenuPage.vue` qui assure la persistance atomique du temps.
+
+- **Fourniture du Web Worker Stockfish (`Plugin.php`)** :
+  - Enregistrement du filtre WordPress `dame_pwa_stockfish_worker_url` et de la méthode `get_stockfish_worker_url()` permettant aux plugins de l'écosystème (comme ROI) d'accéder directement au binaire Stockfish mutualisé dans la PWA sans duplication de fichiers.
+
 ## [1.2.6] - 2026-08-30
 
 ### Corrigé & Amélioré

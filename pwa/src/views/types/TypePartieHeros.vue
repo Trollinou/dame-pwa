@@ -544,7 +544,6 @@ const passerEtapeSuivante = async () => {
   } else {
     // Dernière étape terminée
     await showSuccess('Félicitations ! Vous avez terminé ce scénario !', 3000);
-    store.validerElement(props.id);
     emit('success');
   }
 };

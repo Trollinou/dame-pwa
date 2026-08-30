@@ -215,15 +215,36 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		} );
 	};
 
-	const validerElement = async ( id: number ): Promise< void > => {
+	const validerElement = async (
+		id: number,
+		timeSpentSeconds?: number,
+		attemptsCount?: number
+	): Promise< void > => {
 		try {
 			const apiUrl = import.meta.env.VITE_API_BASE_URL;
+			const body: {
+				element_id: number;
+				time_spent?: number;
+				attempts?: number;
+			} = {
+				element_id: id,
+			};
+			if (
+				typeof timeSpentSeconds === 'number' &&
+				timeSpentSeconds >= 0
+			) {
+				body.time_spent = Math.round( timeSpentSeconds );
+			}
+			if ( typeof attemptsCount === 'number' && attemptsCount >= 1 ) {
+				body.attempts = Math.round( attemptsCount );
+			}
+
 			const response = await safeFetch(
 				`${ apiUrl }/roi/v1/progression`,
 				{
 					method: 'POST',
 					headers: getAuthHeaders(),
-					body: JSON.stringify( { element_id: id } ),
+					body: JSON.stringify( body ),
 				},
 				5000
 			);

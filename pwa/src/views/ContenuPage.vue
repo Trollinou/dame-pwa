@@ -236,16 +236,24 @@ const getComposantExercice = (type: number) => {
   return null;
 };
 
+const startTime = ref<number>(Date.now());
+
+const getElapsedTimeSeconds = (): number => {
+  return Math.max(1, Math.round((Date.now() - startTime.value) / 1000));
+};
+
 const onSuccess = async () => {
   if (contenuActuel.value) {
-    await apprentissageStore.validerElement(contenuActuel.value.id);
+    const elapsed = getElapsedTimeSeconds();
+    await apprentissageStore.validerElement(contenuActuel.value.id, elapsed);
   }
   estReussi.value = true;
 };
 
 const validerLecon = async () => {
   if (contenuActuel.value) {
-    await apprentissageStore.validerElement(contenuActuel.value.id);
+    const elapsed = getElapsedTimeSeconds();
+    await apprentissageStore.validerElement(contenuActuel.value.id, elapsed);
   }
   estReussi.value = true;
 };
@@ -259,6 +267,7 @@ const allerAuSuivant = () => {
 const loadContenu = async (idVal: string | string[] | number) => {
   isLoading.value = true;
   estReussi.value = false;
+  startTime.value = Date.now();
   const id = typeof idVal === 'number' ? idVal : parseInt(Array.isArray(idVal) ? idVal[0] : idVal, 10);
   if (!isNaN(id)) {
     await apprentissageStore.fetchContenu(id);

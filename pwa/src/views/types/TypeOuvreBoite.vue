@@ -73,7 +73,6 @@ const etapesFormatees = computed(() => {
 });
 
 const onSuccess = () => {
-  store.validerElement(props.id);
   emit('success');
 };
 </script>

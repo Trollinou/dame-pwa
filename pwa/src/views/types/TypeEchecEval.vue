@@ -58,10 +58,7 @@ const headerMeta = computed(() => {
   };
 });
 
-const store = useApprentissageStore();
-
 const onSuccess = () => {
-  store.validerElement(props.id);
   emit('success');
 };
 </script>

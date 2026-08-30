@@ -62,7 +62,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - Reprise de la séquence PGN post-QCM directement sur la position résultante (un demi-coup plus tard) avec restitution du commentaire et des formes du coup validé.
        - Progression fluide avec `ExerciseHeader` et `SeriesCardFooter` jusqu'au coup final de la partie et validation de la progression.
      - **Navigation en Série (`SeriesCardFooter`)** : Badge d'étape (`Carte X / Y` ou `Étape X / Y`), zone de feedback visuel fixe (succès/erreur) et bouton d'avancement débloqué dès la validation de la position.
-     - **Validation finale** : Enregistrement de la réussite dans la progression de l'adhérent à la fin de la série.
+     - **Chronométrage & Validation finale** : Mesure en temps réel du temps passé sur la leçon ou l'exercice, puis transmission atomique de la durée (`time_spent`) lors de la validation de la réussite dans la progression de l'adhérent.
 
 2. **Partie d'Échecs & Échiquier ♟️** :
    - Accessible librement à tous les visiteurs et adhérents.

@@ -189,9 +189,10 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 | **Actions & Feedback**| `.feedback-banner`<br>`.feedback-text` | Bannières et textes de feedback dynamique. |
 | | `.exercise-action-btn` | Bouton d'action ou de validation en bas d'étape (max 320px, centré). |
 
-## API REST & Catégories
+## API REST & Hooks Partagés
 
-L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
+*   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
+*   **Filtre Web Worker Stockfish (`dame_pwa_stockfish_worker_url`) :** Fournit l'URL absolue du Web Worker Stockfish (`pwa/dist/stockfish/stockfish.js`) pour mutualiser le moteur d'échecs avec d'autres extensions (ex: plugin `roi`).
 
 ## Développement & Release
 

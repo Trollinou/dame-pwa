@@ -43,13 +43,7 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-const store = useApprentissageStore();
-
 const gererSucces = () => {
-  const targetId = props.id || props.config?.id;
-  if (targetId) {
-    store.validerElement(targetId);
-  }
   emit('success');
 };
 </script>

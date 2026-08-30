@@ -32,10 +32,7 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-const store = useApprentissageStore();
-
 const onSuccess = () => {
-  store.validerElement(props.id);
   emit('success');
 };
 </script>

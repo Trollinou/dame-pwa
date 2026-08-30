@@ -116,10 +116,6 @@ const gererSucces = () => {
   if (!estDernierQcm.value) {
     qcmIndex.value++;
   } else {
-    const targetId = props.id || props.config?.id;
-    if (targetId) {
-      store.validerElement(targetId);
-    }
     emit('success');
   }
 };

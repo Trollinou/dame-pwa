@@ -49,6 +49,9 @@ class Plugin {
 		// Enregistre l'URL de la PWA auprès du plugin principal DAME
 		add_filter( 'dame_pwa_url', array( $this, 'get_pwa_url' ) );
 
+		// Expose l'URL du Web Worker Stockfish pour les modules tiers (comme ROI)
+		add_filter( 'dame_pwa_stockfish_worker_url', array( $this, 'get_stockfish_worker_url' ) );
+
 		// Intercepte les requêtes pour servir la PWA ou le manifest
 		add_action( 'template_redirect', array( $this, 'handle_pwa_routing' ) );
 
@@ -69,6 +72,15 @@ class Plugin {
 	 */
 	public function get_pwa_url(): string {
 		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/index.html';
+	}
+
+	/**
+	 * Returns the URL of the Stockfish Web Worker.
+	 *
+	 * @return string
+	 */
+	public function get_stockfish_worker_url(): string {
+		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/stockfish/stockfish.js';
 	}
 
 	/**
