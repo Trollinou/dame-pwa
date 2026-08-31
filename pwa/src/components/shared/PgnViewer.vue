@@ -20,7 +20,7 @@
       <ion-button fill="outline" color="primary" class="nav-btn" @click="viewNext" title="Suivant">
         <ion-icon slot="icon-only" :icon="chevronForwardOutline"></ion-icon>
       </ion-button>
-      <ion-button fill="outline" color="primary" class="nav-btn" @click="viewEnd" title="Fin">
+      <ion-button v-if="!props.hideEndButton" fill="outline" color="primary" class="nav-btn" @click="viewEnd" title="Fin">
         <ion-icon slot="icon-only" :icon="playForwardOutline"></ion-icon>
       </ion-button>
     </div>
@@ -64,6 +64,7 @@ const props = defineProps<{
   autoCompleteDelay?: number;
   currentCard?: number;
   totalCards?: number;
+  hideEndButton?: boolean;
 }>();
 
 const emit = defineEmits<{

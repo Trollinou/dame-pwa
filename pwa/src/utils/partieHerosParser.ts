@@ -1,7 +1,13 @@
 import { Chess } from 'chessops';
 import { parseFen, makeFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
-import { parsePgn, type PgnNode } from 'chessops/pgn';
+import {
+	parsePgn,
+	type Node,
+	type ChildNode,
+	type PgnNodeData,
+	isChildNode,
+} from 'chessops/pgn';
 import type { DrawShape, Key } from 'eg-chessboard';
 import { getActiveColorFromFen } from './fenUtils';
 
@@ -224,7 +230,7 @@ export function parsePartieHerosPgn(
 		}
 	}
 
-	let node: PgnNode = root;
+	let node: Node< PgnNodeData > | undefined = root;
 
 	while ( node ) {
 		if ( node.children.length === 0 ) {
@@ -260,8 +266,11 @@ export function parsePartieHerosPgn(
 				initialStartingShapes = [];
 			}
 
-			const parentParsed = extractShapesAndComment( node.data?.comments );
-			const mainChild = node.children[ 0 ];
+			const nodeComments = isChildNode( node )
+				? node.data?.comments
+				: undefined;
+			const parentParsed = extractShapesAndComment( nodeComments );
+			const mainChild: ChildNode< PgnNodeData > = node.children[ 0 ];
 			const mainParsed = extractShapesAndComment(
 				mainChild.data?.comments
 			);
@@ -322,7 +331,7 @@ export function parsePartieHerosPgn(
 			node = mainChild;
 		} else {
 			// Défilement normal du coup de la ligne principale
-			const child = node.children[ 0 ];
+			const child: ChildNode< PgnNodeData > = node.children[ 0 ];
 			const parsed = extractShapesAndComment( child.data?.comments );
 			const parsedMove = parseSan( currentPos, child.data.san );
 			if ( parsedMove ) {

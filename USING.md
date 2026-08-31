@@ -37,7 +37,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - **Liste** (`listOutline`) : retour au sommaire du cours actif (`/cours/:id`).
    - **Structure des Exercices & Puzzles** :
      - **En-tête unifié (`ExerciseHeader`)** : Affiche le titre de l'étape, le type d'exercice, la consigne contextualisée à la question active et le badge d'étape interactive (`Carte X / Y`).
-     - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
+     - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, dimensionnement stable et constant sur chaque appareil (non altéré par l'apparition de commentaires ou de boutons de choix), ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
      - **Exercices Pop'Echecs (Type 2)** :
        - Série de 4 diagrammes avec consigne propre à chaque position.
        - Masquage des annotations/formes initiales pendant la phase de réflexion.
@@ -50,10 +50,10 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - Déplacement direct sur l'échiquier du meilleur coup attendu :
          - En cas de mauvais coup : annulation immédiate et possibilité de réessayer sans limite.
          - En cas de bon coup : si l'exercice comporte des coups intermédiaires, l'ordinateur joue sa réplique scriptée (délai de 500ms) et l'apprenant rejoue jusqu'au coup final.
-       - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur).
+       - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées (Début, Précédent, Suivant) avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur), sans bouton d'avance rapide à la fin afin de garantir la lecture pas-à-pas des explications.
      - **Exercices La Partie dont tu es le Héros (Type 4)** :
        - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
-       - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté et embranchements QCM interactifs.
+       - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté pas-à-pas (boutons Début, Précédent, Suivant, sans saut direct à la fin pour garantir l'assimilation des coups et commentaires) et embranchements QCM interactifs.
        - Moments de choix QCM identifiés par les 3 flèches indicatrices `[%cal ...]` et les 2 variantes associées au coup principal.
        - Choix QCM présentés en notation française (R, D, T, F, C) sans numéro de coup parasite.
        - Sélection interactive d'un coup parmi les 3 choix :

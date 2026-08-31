@@ -29,17 +29,22 @@
 .chessboard-container {
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-width: min(500px, 60vh);
+  max-width: 500px;
   margin: 0 auto 16px auto;
   border-radius: 0 !important;
   overflow: hidden;
   box-shadow: none !important;
   position: relative;
+  flex-shrink: 0;
 }
 
 /* Variante compacte / portrait restreint */
 .chessboard-container--small {
-  max-width: min(100%, calc(100vh - 230px));
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 400px;
+  margin: 0 auto 12px auto;
+  flex-shrink: 0;
 }
 
 /* Variantes mini (Matching, Scénarios Jugement Final, etc.) */
@@ -51,14 +56,16 @@
   border-radius: 0 !important;
   overflow: hidden;
   box-shadow: none !important;
+  flex-shrink: 0;
 }
 
 /* Disposition Paysage Tablettes */
 @media (orientation: landscape) and (min-width: 768px) {
   .chessboard-container {
     width: min(65vh, 48vw);
-    max-width: none;
+    max-width: 500px;
     aspect-ratio: 1 / 1;
+    flex-shrink: 0;
   }
 }
 

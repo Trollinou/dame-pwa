@@ -32,6 +32,7 @@
         :key="`recap-${indexCourant}`"
         :pgnString="currentPgnForViewer"
         :orientation="couleurJoueur"
+        :hideEndButton="true"
       />
     </div>
 
@@ -354,11 +355,7 @@ const passerCarteSuivante = () => {
   margin: 10px 0;
 }
 
-.chessboard-container {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-}
+
 
 .animate-fade-in {
   animation: fadeIn 0.2s ease-in-out;

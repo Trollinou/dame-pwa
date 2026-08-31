@@ -6,7 +6,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Corrigé & Amélioré
+- **Normalisation & Stabilité Dimensionnelle des Échiquiers (`shared-components.scss`, `TypePartieHeros.vue`, `PlacementViewer.vue`, `ABCDaireTactiqueViewer.vue`)** :
+  - **Verrouillage contre le rétrécissement Flexbox (`flex-shrink: 0`)** : Empêche la compression verticale et horizontale de l'échiquier lors de l'apparition dynamique de blocs sous-jacents (commentaires de coup PGN, cartes ou boutons de choix QCM).
+  - **Standardisation de la taille maximale (`max-width: 500px`)** : Suppression de la contrainte variable `min(500px, 60vh)` dans la classe globale `.chessboard-container` au profit d'une taille constante sur un appareil donné.
+  - **Suppression des surcharges CSS locales `scoped`** : Nettoyage des redéfinitions locales redondantes dans `TypePartieHeros.vue`, `PlacementViewer.vue` et `ABCDaireTactiqueViewer.vue` assurant une continuité visuelle parfaite lors de la transition entre étapes PGN, FEN et QCM.
+
 ### Ajouté & Amélioré
+- **Navigation PGN & Pédagogie Pas-à-Pas (`PgnViewer.vue`, `ABCDaireTactiqueViewer.vue`, `TypePartieHeros.vue`)** :
+  - **Suppression de l'Avance Rapide en Fin de PGN (Exercices Type 3 & 4)** : Retrait du bouton d'accès direct à la fin du PGN dans le lecteur de récapitulation du Type 3 (ABCDaire) et dans les étapes PGN du Type 4 (Partie du Héros). L'apprenant doit obligatoirement parcourir la séquence coup par coup avec le bouton *Suivant* afin de lire l'ensemble des commentaires, explications et annotations tactiques.
+
 - **Chronométrage & Cycle de Vie des Exercices (`ContenuPage.vue`, `apprentissage.ts`, composants `Type*.vue`)** :
   - **Mesure Centralisée du Temps Passé** : Démarrage d'un chronomètre à l'affichage de chaque leçon ou exercice dans `ContenuPage.vue` et transmission de la durée exacte (`time_spent`) en secondes lors de la validation via l'API REST ROI (`validerElement(id, timeSpentSeconds, attemptsCount)`).
   - **Délégation Événementielle Unifiée** : Suppression des appels prématurés ou redondants à `store.validerElement(id)` dans l'ensemble des sous-composants d'exercices (`TypePopEchecs.vue`, `TypePosiPlan.vue`, `Type100Commandements.vue`, `TypeABCDaire.vue`, `TypeAssociPlan.vue`, `TypeCapOuPasCap.vue`, `TypeDestinationFinale.vue`, `TypeEchecEval.vue`, `TypeJugementFinal.vue`, `TypeOuvreBoite.vue`, `TypePartieHeros.vue`). Les composants émettent désormais exclusivement l'événement `@success` vers le parent `ContenuPage.vue` qui assure la persistance atomique du temps.

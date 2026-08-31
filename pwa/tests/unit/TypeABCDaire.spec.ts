@@ -110,6 +110,10 @@ describe( 'TypeABCDaire.vue', () => {
 
 		// Vérifier la présence du feedback de succès
 		expect( wrapper.text() ).toContain( 'Bravo ! Exercice réussi.' );
+
+		// Vérifier que le bouton Fin n'est pas présent dans le PgnViewer du mode récapitulatif
+		const finBtn = wrapper.find( 'ion-button[title="Fin"]' );
+		expect( finBtn.exists() ).toBe( false );
 	} );
 
 	test( 'gère le format de rétrocompatibilité (fen + solution)', async () => {

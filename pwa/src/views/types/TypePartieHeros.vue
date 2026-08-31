@@ -57,16 +57,6 @@
           >
             <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
           </ion-button>
-          <ion-button
-            fill="outline"
-            color="primary"
-            class="nav-btn"
-            :disabled="isPgnAtEnd"
-            @click="viewPgnEnd"
-            title="Fin"
-          >
-            <ion-icon slot="icon-only" :icon="playForwardOutline" />
-          </ion-button>
         </div>
 
         <!-- Affichage du Commentaire du Coup Courant (uniquement s'il existe) -->
@@ -153,7 +143,6 @@ import {
   playBackOutline,
   chevronBackOutline,
   chevronForwardOutline,
-  playForwardOutline,
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
@@ -419,17 +408,6 @@ const viewPgnNext = () => {
   }
 };
 
-const viewPgnEnd = () => {
-  const stage = etapeActuelle.value as PgnStage;
-  if (!stage || stage.type !== 'pgn' || !stage.moves) return;
-
-  if (stage.moves.length > 0) {
-    currentPgnMoveIndex.value = stage.moves.length - 1;
-    syncPgnBoardPosition();
-  }
-  isPgnCompleted.value = true;
-};
-
 // ==========================================
 // 2. ÉTAT & CONTRÔLE DE L'ÉTAPE QCM
 // ==========================================
@@ -573,11 +551,6 @@ const passerEtapeSuivante = async () => {
   gap: 10px;
 }
 
-.chessboard-container {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-}
 
 /* Contrôles de Navigation PGN */
 .navigation-controls {

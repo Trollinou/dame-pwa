@@ -175,9 +175,9 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 | :--- | :--- | :--- |
 | **Layouts** | `.exercise-viewer-layout` | Conteneur principal flex centré (largeur 100%) pour les viewers d'exercice. |
 | | `.exercise-stage` | Sous-conteneur de phase ou étape intermédiaire d'exercice (largeur max 600px). |
-| **Échiquiers** | `.chessboard-container` | Conteneur standard (ratio 1:1, `border-radius: 0;`, `box-shadow: none;`, landscape tablette `min(65vh, 48vw)`). |
-| | `.chessboard-container--mini` | Miniaturisation (320px) pour l'appariement (`MatchingViewer`) et les choix de plans (`JugementFinalViewer`). |
-| | `.chessboard-container--small` | Variante compacte pour écrans à faible hauteur / portrait restreint (`calc(100vh - 230px)`). |
+| **Échiquiers** | `.chessboard-container` | Conteneur standard (ratio 1:1, max 500px, `flex-shrink: 0`, `border-radius: 0;`, `box-shadow: none;`, landscape tablette `min(65vh, 48vw)`). |
+| | `.chessboard-container--mini` | Miniaturisation (320px, `flex-shrink: 0`) pour l'appariement (`MatchingViewer`) et les choix de plans (`JugementFinalViewer`). |
+| | `.chessboard-container--small` | Variante compacte (400px, `flex-shrink: 0`) pour écrans à faible hauteur / portrait restreint. |
 | **Cartes & En-têtes** | `.exercise-card` | Carte standard pour consignes, questions et contenus (bord arrondi 12px, ombre légère). |
 | | `.exercise-card-header` | Titre centré de consigne ou de question (1.15rem, semi-bold). |
 | **Choix & QCM** | `.qcm-choices` | Conteneur vertical de boutons de choix (gap 10px, max 500px). |
