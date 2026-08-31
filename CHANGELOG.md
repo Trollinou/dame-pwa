@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.7] - 2026-08-31
+
 ### Ajouté & Amélioré
 - **Montée de Version Majeure Ionic 9 (`@ionic/vue` & `@ionic/vue-router` v9.0.1)** (`package.json`, `package-lock.json`, `README.md`) :
   - **Mise à niveau du socle applicatif** : Migration de `@ionic/vue` et `@ionic/vue-router` de la v8.8 vers la v9.0.1.
