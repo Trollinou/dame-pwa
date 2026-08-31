@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Ajouté & Amélioré
+- **Montée de Version Majeure Ionic 9 (`@ionic/vue` & `@ionic/vue-router` v9.0.1)** (`package.json`, `package-lock.json`, `README.md`) :
+  - **Mise à niveau du socle applicatif** : Migration de `@ionic/vue` et `@ionic/vue-router` de la v8.8 vers la v9.0.1.
+  - **Compatibilité pleine et entière avec Vue 3.5, Vue Router 5 et Capacitor 8** : Aucun breaking change sur les formulaires, composants d'échiquier personnalisés et cycle de vie des modales.
+  - **Préservation stricte de l'écosystème WordPress / React 18** : Maintien intact des overrides et dépendances React 18 pour l'outillage de build Gutenberg (`@wordpress/scripts`).
+
 ### Corrigé & Amélioré
 - **Unification du Mode iOS et Optimisation Typographique Android Haute Densité (Pixel 9, S24, POCO, iPhone)** (`main.ts`, `variables.css`, `TabsPage.vue`, `PublicHomePage.vue`) :
   - **Unification globale du mode de rendu (`IonicVue { mode: 'ios' }`)** : Application uniforme du thème `ios` sur tous les appareils et navigateurs, éliminant les disparités de densité et de compacité du thème Material Design (`md`) sur les terminaux Android Stock haute résolution (Google Pixel 9).

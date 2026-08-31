@@ -5,7 +5,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 ## Architecture
 
 - `includes/` : Classes PHP du plugin WordPress (`DAME_PWA`).
-- `pwa/` : Application Ionic 7 + Vue 3 + Pinia + TanStack Query.
+- `pwa/` : Application Ionic 9 + Vue 3 + Pinia + TanStack Query.
   - `src/views/ApprentissageHubPage.vue` : Hub d'accueil à 2 panneaux (Cours théoriques / Espace de Jeu).
   - `src/views/ApprentissageCoursListPage.vue` : Liste des parcours et chapitres réservés aux adhérents.
   - `src/views/PlayPage.vue` : Échiquier interactif 1J (vs Stockfish 18) et 2J (Pass & Play) basé sur `eg-chessboard`.
