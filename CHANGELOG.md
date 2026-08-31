@@ -7,6 +7,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Corrigé & Amélioré
+- **Unification du Mode iOS et Optimisation Typographique Android Haute Densité (Pixel 9, S24, POCO, iPhone)** (`main.ts`, `variables.css`, `TabsPage.vue`, `PublicHomePage.vue`) :
+  - **Unification globale du mode de rendu (`IonicVue { mode: 'ios' }`)** : Application uniforme du thème `ios` sur tous les appareils et navigateurs, éliminant les disparités de densité et de compacité du thème Material Design (`md`) sur les terminaux Android Stock haute résolution (Google Pixel 9).
+  - **Base Typographique Fluide (`font-size: 100%`)** : Définition d'une base fluide compatible avec le moteur *Non-Linear Font Scaling* d'Android 14 et 15.
+  - **Nettoyage des micro-polices et ergonomie d'onglets** : Suppression des tailles en dur restrictives (`9px`) dans la barre de navigation inférieure au profit des standards Ionic harmonisés (`11px` / `22px` pour les icônes).
+  - **Équilibrage de la Page d'Accueil (`PublicHomePage.vue`)** : Rehaussement des métas/descriptions (`0.95rem`), augmentation des vignettes d'actualités (`64px`) et passage de l'affichage des actualités et événements récents à 4 entrées pour une occupation visuelle naturelle sur les écrans modernes longs (20:9).
 - **Normalisation & Stabilité Dimensionnelle des Échiquiers (`shared-components.scss`, `TypePartieHeros.vue`, `PlacementViewer.vue`, `ABCDaireTactiqueViewer.vue`)** :
   - **Verrouillage contre le rétrécissement Flexbox (`flex-shrink: 0`)** : Empêche la compression verticale et horizontale de l'échiquier lors de l'apparition dynamique de blocs sous-jacents (commentaires de coup PGN, cartes ou boutons de choix QCM).
   - **Standardisation de la taille maximale (`max-width: 500px`)** : Suppression de la contrainte variable `min(500px, 60vh)` dans la classe globale `.chessboard-container` au profit d'une taille constante sur un appareil donné.

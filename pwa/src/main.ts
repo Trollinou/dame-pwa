@@ -55,7 +55,9 @@ try {
 }
 
 const app = createApp( App )
-	.use( IonicVue )
+	.use( IonicVue, {
+		mode: 'ios',
+	} )
 	.use( pinia )
 	.use( router )
 	.use( VueQueryPlugin, { queryClient } );

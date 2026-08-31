@@ -83,12 +83,13 @@ ion-tab-button {
 }
 
 ion-icon {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 ion-label {
-  font-size: 9px;
-  letter-spacing: -0.2px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
   white-space: nowrap;
 }
 </style>

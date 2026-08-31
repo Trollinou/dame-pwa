@@ -1,5 +1,14 @@
 # Guide d'utilisation DAME-PWA
 
+## Page d'Accueil & Ergonomie Mobile
+
+L'application Web Progressive (PWA) est calibrée avec une ergonomie unifiée (mode iOS standard) assurant une lisibilité et un confort visuel équivalents sur tous les appareils (iOS, Samsung, Xiaomi et Google Pixel) :
+- **Carte Préinscription Saison** : Accès direct et contextuel au formulaire de préinscription ou de réinscription des adhérents et représentants légaux.
+- **Dernières Nouvelles** : Affichage des 4 actualités les plus récentes du club avec vignettes et dates formatées.
+- **Prochains Événements** : Liste des 4 prochains rendez-vous de l'agenda avec badge signalant les événements en cours.
+- **Appel à Bénévoles** : Consultation des besoins actifs pour les compétitions et manifestations du club.
+- **Barre de Navigation Inférieure** : Accès instantané aux onglets *Accueil*, *Le Club*, *Apprentissage* et *Connexion / Profil* avec libellés nets et icônes tactiles adaptées.
+
 ## Module Le Club (Actualités, Agenda, Tournois, Bénévolat)
 
 Le module **Le Club** propose une navigation par segments adaptée dynamiquement à la taille de l'écran et à l'orientation :

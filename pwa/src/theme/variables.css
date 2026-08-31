@@ -1,5 +1,6 @@
 /* Safe Area Insets pour encoches et Dynamic Island */
-html {
+html, :root {
+  font-size: 100%;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }

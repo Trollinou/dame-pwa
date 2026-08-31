@@ -185,7 +185,7 @@ const agendaStore = useAgendaStore();
 const benevolatStore = useBenevolatStore();
 const newsStore = useNewsStore();
 
-const latestPosts = computed(() => newsStore.posts.slice(0, 3));
+const latestPosts = computed(() => newsStore.posts.slice(0, 4));
 const isLoadingNews = computed(() => newsStore.isLoading);
 
 const todayStr = computed(() => agendaStore.getTodayLocal());
@@ -271,7 +271,7 @@ const fetchLatestNews = async () => {
 const upcomingEvents = computed(() => {
   return agendaStore.events
     .filter(e => !isPast(e))
-    .slice(0, 3);
+    .slice(0, 4);
 });
 
 const isPast = (event: AgendaEvent): boolean => {
@@ -414,17 +414,20 @@ ion-list-header {
 }
 
 h3 {
+  font-size: 1rem;
+  font-weight: 600;
   margin-top: 0;
   margin-bottom: 4px;
 }
 
 p {
   color: var(--ion-color-medium);
-  font-size: 0.85em;
+  font-size: 0.95rem;
+  line-height: 1.35;
 }
 
 ion-thumbnail {
-  --size: 56px;
+  --size: 64px;
 }
 
 /* Styles Accès Rapide */
