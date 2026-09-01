@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.8] - 2026-09-01
+
 ### Ajouté & Amélioré
 - **Adaptation Dynamique en Hauteur (Viewport Height `vh` / `clamp`) & Raccourcis d'Accueil** (`variables.css`, `TabsPage.vue`, `PublicHomePage.vue`, `USING.md`, `README.md`) :
   - **Typographie Fluide Indexée sur la Hauteur (`clamp(16px, 0.92rem + 0.35vh, 18px)`)** : Adaptation proportionnelle à la hauteur d'écran pour compenser la très haute résolution des dalles modernes allongées (Google Pixel 9, Samsung S24+ / Ultra, iPhone Pro Max) sans jamais tasser les écrans plus compacts.
