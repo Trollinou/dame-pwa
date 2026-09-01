@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.9] - 2026-09-01
+
 ### Corrigé & Amélioré
 - **Affichage Synthétique 1-Page de la Page d'Accueil (`PublicHomePage.vue`, `USING.md`, `README.md`)** :
   - **Calibrage compact « 1 coup d'œil »** : Suppression de la rangée de raccourcis d'accès rapide et retour à une limite de 3 éléments par catégorie (3 actualités, 3 événements, appels actifs) afin de garantir une synthèse complète en 1 seule vue sans scroll excessif.
