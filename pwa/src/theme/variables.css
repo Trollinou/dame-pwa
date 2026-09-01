@@ -1,6 +1,7 @@
 /* Safe Area Insets pour encoches et Dynamic Island */
 html, :root {
-  font-size: 100%;
+  /* Échelle adaptative indexée sur la hauteur d'écran : 16px sur écran court, jusqu'à 17.8px sur écran très haut */
+  font-size: clamp(16px, 0.92rem + 0.35vh, 18px);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -14,6 +15,12 @@ img, svg, video {
   --ion-safe-area-right: env(safe-area-inset-right);
   --ion-safe-area-top: env(safe-area-inset-top);
   --ion-safe-area-bottom: env(safe-area-inset-bottom);
+
+  /* Variables d'espacement et dimensionnement dynamiques en hauteur */
+  --app-section-gap: clamp(16px, 2.2vh, 28px);
+  --app-item-min-height: clamp(62px, 7.5vh, 76px);
+  --app-card-padding: clamp(14px, 2vh, 22px);
+  --app-thumbnail-size: clamp(60px, 7.2vh, 72px);
 
   /* Theme Colors aligned with Chapters */
   --ion-color-primary: #0073aa;

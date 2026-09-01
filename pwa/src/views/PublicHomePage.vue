@@ -29,7 +29,7 @@
         </ion-header>
 
         <!-- Carte Préinscription Saison -->
-        <ion-card v-if="!authStore.isAuthenticated || hasUnregisteredTargets" class="pre-inscription-card ion-no-margin ion-margin-bottom">
+        <ion-card v-if="!authStore.isAuthenticated || hasUnregisteredTargets" class="pre-inscription-card ion-no-margin">
           <ion-card-header>
             <ion-card-title style="display: flex; align-items: center; gap: 8px; font-size: 1.15em; font-weight: bold; color: var(--ion-color-primary);">
               ✍️ Préinscription {{ authStore.currentSeason ? authStore.currentSeason : 'Saison' }}
@@ -38,27 +38,59 @@
           <ion-card-content>
             <template v-if="!authStore.isAuthenticated">
               <p>Remplissez votre dossier de préinscription en ligne pour la nouvelle saison.</p>
-              <ion-button expand="block" router-link="/pre-inscription" color="primary" class="ion-margin-top">
+              <ion-button expand="block" router-link="/pre-inscription" color="primary" class="pre-inscription-btn ion-margin-top">
                 Commencer ma préinscription
               </ion-button>
             </template>
             <template v-else-if="authStore.selectedIdentity?.type === 'representative'">
               <p>Effectuez la préinscription de vos enfants associés ou créez une nouvelle fiche.</p>
-              <ion-button expand="block" router-link="/pre-inscription" color="primary" class="ion-margin-top">
+              <ion-button expand="block" router-link="/pre-inscription" color="primary" class="pre-inscription-btn ion-margin-top">
                 Préinscrire / Réinscrire
               </ion-button>
             </template>
             <template v-else>
               <p>Réinscrivez-vous rapidement en confirmant ou mettant à jour vos coordonnées.</p>
-              <ion-button expand="block" router-link="/pre-inscription" color="primary" class="ion-margin-top">
+              <ion-button expand="block" router-link="/pre-inscription" color="primary" class="pre-inscription-btn ion-margin-top">
                 Me réinscrire
               </ion-button>
             </template>
           </ion-card-content>
         </ion-card>
 
+        <!-- Raccourcis d'Accès Rapide -->
+        <div class="quick-access-section">
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col size="4">
+                <ion-card button router-link="/tabs/agenda?tab=tournois" class="quick-card ion-no-margin">
+                  <div class="quick-card-content">
+                    <ion-icon :icon="trophyOutline" class="quick-icon trophy-color"></ion-icon>
+                    <span class="quick-label">Tournois</span>
+                  </div>
+                </ion-card>
+              </ion-col>
+              <ion-col size="4">
+                <ion-card button router-link="/tabs/apprentissage" class="quick-card ion-no-margin">
+                  <div class="quick-card-content">
+                    <ion-icon :icon="schoolOutline" class="quick-icon school-color"></ion-icon>
+                    <span class="quick-label">Jeu & Cours</span>
+                  </div>
+                </ion-card>
+              </ion-col>
+              <ion-col size="4">
+                <ion-card button router-link="/tabs/agenda?tab=agenda" class="quick-card ion-no-margin">
+                  <div class="quick-card-content">
+                    <ion-icon :icon="calendarOutline" class="quick-icon calendar-color"></ion-icon>
+                    <span class="quick-label">Calendrier</span>
+                  </div>
+                </ion-card>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+
         <!-- Section Dernières Nouvelles -->
-        <ion-list lines="full" style="margin: 0;">
+        <ion-list lines="full" class="home-section" style="margin: 0;">
           <ion-list-header>
             <ion-label color="primary">Dernières Nouvelles</ion-label>
             <ion-button fill="clear" router-link="/tabs/agenda?tab=actualites">Actualités</ion-button>
@@ -71,10 +103,10 @@
           <ion-item v-for="post in latestPosts" :key="post.id" button @click="goToNews(post.id)">
             <ion-icon slot="start" :icon="newspaperOutline" color="primary"></ion-icon>
             <ion-thumbnail slot="start" v-if="getFeaturedImage(post)">
-              <img :src="getFeaturedImage(post) || undefined" alt="Thumbnail" style="border-radius: 4px;" />
+              <img :src="getFeaturedImage(post) || undefined" alt="Thumbnail" />
             </ion-thumbnail>
             <ion-label>
-              <h3 v-safe-html="post.title.rendered" class="ion-text-wrap" style="font-weight: 600;"></h3>
+              <h3 v-safe-html="post.title.rendered" class="ion-text-wrap"></h3>
               <p>{{ formatDate(post.date) }}</p>
             </ion-label>
           </ion-item>
@@ -85,7 +117,7 @@
         </ion-list>
 
         <!-- Section Prochains Événements -->
-        <ion-list lines="full" style="margin: 0;">
+        <ion-list lines="full" class="home-section" style="margin: 0;">
           <ion-list-header>
             <ion-label color="primary">Prochains Événements</ion-label>
             <ion-button fill="clear" router-link="/tabs/agenda?tab=agenda">Agenda</ion-button>
@@ -98,7 +130,7 @@
           <ion-item v-for="event in upcomingEvents" :key="event.id" button @click="goToAgenda(event.id)">
             <ion-icon slot="start" :icon="calendarOutline" color="primary"></ion-icon>
             <ion-label>
-              <h3 v-safe-html="event.title.rendered" class="ion-text-wrap" style="font-weight: 600;"></h3>
+              <h3 v-safe-html="event.title.rendered" class="ion-text-wrap"></h3>
               <p>{{ formatEventDate(event) }}</p>
             </ion-label>
             <ion-badge v-if="isToday(event)" color="warning" slot="end">Actuellement</ion-badge>
@@ -110,7 +142,7 @@
         </ion-list>
 
         <!-- Section Appel à bénévoles -->
-        <ion-list lines="full" style="margin: 0;">
+        <ion-list lines="full" class="home-section" style="margin: 0;">
           <ion-list-header>
             <ion-label color="primary">Appel à bénévoles</ion-label>
             <ion-button fill="clear" router-link="/tabs/agenda?tab=benevolat">Bénévolat</ion-button>
@@ -123,7 +155,7 @@
           <ion-item v-for="benevolat in latestBenevolats" :key="benevolat.id" button @click="goToBenevolat(benevolat.id)">
             <ion-icon slot="start" :icon="handRightOutline" color="secondary"></ion-icon>
             <ion-label>
-              <h3 v-safe-html="benevolat.title?.rendered || benevolat.title?.raw || 'Appel en cours'" class="ion-text-wrap" style="font-weight: 600;"></h3>
+              <h3 v-safe-html="benevolat.title?.rendered || benevolat.title?.raw || 'Appel en cours'" class="ion-text-wrap"></h3>
               <p>{{ formatBenevolatDates(benevolat) }}</p>
             </ion-label>
             <div slot="end" style="display: flex; align-items: center; gap: 8px;">
@@ -164,13 +196,18 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
+  IonGrid,
+  IonRow,
+  IonCol,
   onIonViewWillEnter,
   type RefresherCustomEvent
 } from '@ionic/vue';
 import {
   calendarOutline,
   handRightOutline,
-  newspaperOutline
+  newspaperOutline,
+  schoolOutline,
+  trophyOutline
 } from 'ionicons/icons';
 import { ref, computed, watch } from 'vue';
 import { useAuthStore, type Identity, type AssociatedMember } from '@/stores/auth';
@@ -407,17 +444,43 @@ onIonViewWillEnter(() => {
   padding-right: var(--ion-safe-area-right, 0);
 }
 
+.pre-inscription-card {
+  border-radius: 16px;
+  margin-bottom: var(--app-section-gap);
+  border: 1px solid var(--ion-color-step-150, rgba(255, 255, 255, 0.08));
+}
+
+.pre-inscription-btn {
+  --min-height: clamp(48px, 5.5vh, 54px);
+  font-size: 1.05rem;
+  font-weight: 600;
+  --border-radius: 12px;
+}
+
+.home-section {
+  margin-bottom: var(--app-section-gap) !important;
+}
+
 ion-list-header {
   --background: transparent;
-  font-size: 1.1em;
+  font-size: 1.15em;
   font-weight: bold;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+ion-item {
+  --min-height: var(--app-item-min-height);
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
 }
 
 h3 {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   margin-top: 0;
   margin-bottom: 4px;
+  line-height: 1.35;
 }
 
 p {
@@ -427,26 +490,29 @@ p {
 }
 
 ion-thumbnail {
-  --size: 64px;
+  --size: var(--app-thumbnail-size);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-right: 12px;
+}
+
+ion-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Styles Accès Rapide */
 .quick-access-section {
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin: 12px 0 12px 12px;
-  color: var(--ion-color-dark);
+  margin-bottom: var(--app-section-gap);
 }
 
 .quick-card {
   margin: 4px;
   --background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border-radius: 14px;
+  border: 1px solid var(--ion-color-step-150, rgba(255, 255, 255, 0.08));
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .quick-card-content {
@@ -454,13 +520,13 @@ ion-thumbnail {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px 8px;
+  padding: clamp(12px, 1.8vh, 18px) 8px;
   text-align: center;
 }
 
 .quick-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
+  font-size: clamp(28px, 3.5vh, 36px);
+  margin-bottom: 6px;
 }
 
 .news-color {
@@ -471,12 +537,20 @@ ion-thumbnail {
   color: var(--ion-color-warning, #f0b500);
 }
 
+.school-color {
+  color: var(--ion-color-tertiary, #8224e3);
+}
+
+.calendar-color {
+  color: var(--ion-color-primary, #0073aa);
+}
+
 .volunteer-color {
   color: var(--ion-color-secondary, #3dc2ff);
 }
 
 .quick-label {
-  font-size: 0.75em;
+  font-size: clamp(0.78rem, 1.3vh, 0.88rem);
   font-weight: 600;
   color: var(--ion-color-dark);
   white-space: nowrap;

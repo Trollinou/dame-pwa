@@ -15,7 +15,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
   - `src/components/shared/SplitMasterDetail.vue` : Conteneur responsive Master-Detail (1/3 - 2/3) pour tablettes paysage et ordinateurs.
   - `src/stores/agenda.ts` : Store Pinia gérant la récupération des événements de l'agenda et leurs catégories.
   - `src/queryClient.ts` : Configuration de TanStack Query avec persistance et invalidation automatique des caches de requêtes lors des montées de version PWA.
-- **Rendu Visuel Unifié (`mode: 'ios'`) & Typographie Fluide** : Initialisation d'Ionic configurée en mode `ios` global garantissant une lisibilité, des espacements et une ergonomie homogènes sur tous les terminaux mobiles (iOS, Samsung One UI, Xiaomi HyperOS et Android Stock haute densité type Google Pixel 9 sous Android 14/15).
+- **Rendu Visuel Unifié (`mode: 'ios'`) & Adaptation Dynamique en Hauteur (`vh` / `clamp`)** : Initialisation d'Ionic configurée en mode `ios` global associée à une échelle typographique et des variables de mise en page réactives en hauteur (`--app-section-gap`, `--app-item-min-height`, `--app-card-padding`), assurant une occupation à 100 % de l'écran et une lisibilité immédiate sans zoom sur tous les smartphones (iPhone, Samsung One UI, Xiaomi et Pixel 9 sous Android 14/15).
 
 ## Espace de Jeu & Apprentissage
 

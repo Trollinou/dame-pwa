@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Ajouté & Amélioré
+- **Adaptation Dynamique en Hauteur (Viewport Height `vh` / `clamp`) & Raccourcis d'Accueil** (`variables.css`, `TabsPage.vue`, `PublicHomePage.vue`, `USING.md`, `README.md`) :
+  - **Typographie Fluide Indexée sur la Hauteur (`clamp(16px, 0.92rem + 0.35vh, 18px)`)** : Adaptation proportionnelle à la hauteur d'écran pour compenser la très haute résolution des dalles modernes allongées (Google Pixel 9, Samsung S24+ / Ultra, iPhone Pro Max) sans jamais tasser les écrans plus compacts.
+  - **Variables de Mise en Page Dynamiques** : Introduction de `--app-section-gap`, `--app-item-min-height`, `--app-card-padding` et `--app-thumbnail-size` calculés en `vh` / `clamp` pour un étirement naturel et harmonieux de l'ensemble des blocs de l'application.
+  - **Barre d'Onglets Tactile Redimensionnée (`TabsPage.vue`)** : Hauteur portée à `clamp(56px, 6.5vh, 64px)`, icônes à `clamp(24px, 3vh, 28px)` et labels à `clamp(11.5px, 1.4vh, 13px)` en graisse `600`.
+  - **Tuiles de Raccourcis d'Accès Rapide (`PublicHomePage.vue`)** : Rangée de 3 cartes interactives sous la préinscription (🏆 *Tournois*, ♟️ *Jeu & Cours*, 📅 *Calendrier*) enrichissant la page d'accueil et occupant 100 % de l'espace vertical disponible.
+
 ## [1.2.7] - 2026-08-31
 
 ### Ajouté & Amélioré

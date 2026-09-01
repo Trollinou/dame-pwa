@@ -74,6 +74,7 @@ watch(
 <style scoped>
 ion-tab-bar {
   --border: 0;
+  height: clamp(56px, 6.5vh, 64px);
 }
 
 ion-tab-button {
@@ -83,12 +84,12 @@ ion-tab-button {
 }
 
 ion-icon {
-  font-size: 22px;
+  font-size: clamp(24px, 3vh, 28px);
 }
 
 ion-label {
-  font-size: 11px;
-  font-weight: 500;
+  font-size: clamp(11.5px, 1.4vh, 13px);
+  font-weight: 600;
   letter-spacing: -0.1px;
   white-space: nowrap;
 }
