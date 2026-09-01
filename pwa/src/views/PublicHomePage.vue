@@ -57,38 +57,6 @@
           </ion-card-content>
         </ion-card>
 
-        <!-- Raccourcis d'Accès Rapide -->
-        <div class="quick-access-section">
-          <ion-grid class="ion-no-padding">
-            <ion-row>
-              <ion-col size="4">
-                <ion-card button router-link="/tabs/agenda?tab=tournois" class="quick-card ion-no-margin">
-                  <div class="quick-card-content">
-                    <ion-icon :icon="trophyOutline" class="quick-icon trophy-color"></ion-icon>
-                    <span class="quick-label">Tournois</span>
-                  </div>
-                </ion-card>
-              </ion-col>
-              <ion-col size="4">
-                <ion-card button router-link="/tabs/apprentissage" class="quick-card ion-no-margin">
-                  <div class="quick-card-content">
-                    <ion-icon :icon="schoolOutline" class="quick-icon school-color"></ion-icon>
-                    <span class="quick-label">Jeu & Cours</span>
-                  </div>
-                </ion-card>
-              </ion-col>
-              <ion-col size="4">
-                <ion-card button router-link="/tabs/agenda?tab=agenda" class="quick-card ion-no-margin">
-                  <div class="quick-card-content">
-                    <ion-icon :icon="calendarOutline" class="quick-icon calendar-color"></ion-icon>
-                    <span class="quick-label">Calendrier</span>
-                  </div>
-                </ion-card>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </div>
-
         <!-- Section Dernières Nouvelles -->
         <ion-list lines="full" class="home-section" style="margin: 0;">
           <ion-list-header>
@@ -196,18 +164,13 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  IonGrid,
-  IonRow,
-  IonCol,
   onIonViewWillEnter,
   type RefresherCustomEvent
 } from '@ionic/vue';
 import {
   calendarOutline,
   handRightOutline,
-  newspaperOutline,
-  schoolOutline,
-  trophyOutline
+  newspaperOutline
 } from 'ionicons/icons';
 import { ref, computed, watch } from 'vue';
 import { useAuthStore, type Identity, type AssociatedMember } from '@/stores/auth';
@@ -222,7 +185,7 @@ const agendaStore = useAgendaStore();
 const benevolatStore = useBenevolatStore();
 const newsStore = useNewsStore();
 
-const latestPosts = computed(() => newsStore.posts.slice(0, 4));
+const latestPosts = computed(() => newsStore.posts.slice(0, 3));
 const isLoadingNews = computed(() => newsStore.isLoading);
 
 const todayStr = computed(() => agendaStore.getTodayLocal());
@@ -308,7 +271,7 @@ const fetchLatestNews = async () => {
 const upcomingEvents = computed(() => {
   return agendaStore.events
     .filter(e => !isPast(e))
-    .slice(0, 4);
+    .slice(0, 3);
 });
 
 const isPast = (event: AgendaEvent): boolean => {
@@ -500,59 +463,5 @@ ion-thumbnail img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-/* Styles Accès Rapide */
-.quick-access-section {
-  margin-bottom: var(--app-section-gap);
-}
-
-.quick-card {
-  margin: 4px;
-  --background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border-radius: 14px;
-  border: 1px solid var(--ion-color-step-150, rgba(255, 255, 255, 0.08));
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.quick-card-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(12px, 1.8vh, 18px) 8px;
-  text-align: center;
-}
-
-.quick-icon {
-  font-size: clamp(28px, 3.5vh, 36px);
-  margin-bottom: 6px;
-}
-
-.news-color {
-  color: var(--ion-color-primary, #3880ff);
-}
-
-.trophy-color {
-  color: var(--ion-color-warning, #f0b500);
-}
-
-.school-color {
-  color: var(--ion-color-tertiary, #8224e3);
-}
-
-.calendar-color {
-  color: var(--ion-color-primary, #0073aa);
-}
-
-.volunteer-color {
-  color: var(--ion-color-secondary, #3dc2ff);
-}
-
-.quick-label {
-  font-size: clamp(0.78rem, 1.3vh, 0.88rem);
-  font-weight: 600;
-  color: var(--ion-color-dark);
-  white-space: nowrap;
 }
 </style>

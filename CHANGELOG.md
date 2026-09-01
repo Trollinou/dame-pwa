@@ -7,6 +7,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Corrigé & Amélioré
+- **Affichage Synthétique 1-Page de la Page d'Accueil (`PublicHomePage.vue`, `USING.md`, `README.md`)** :
+  - **Calibrage compact « 1 coup d'œil »** : Suppression de la rangée de raccourcis d'accès rapide et retour à une limite de 3 éléments par catégorie (3 actualités, 3 événements, appels actifs) afin de garantir une synthèse complète en 1 seule vue sans scroll excessif.
+  - **Maintien des optimisations typographiques et ergonomiques** : Préservation du mode `ios` unifié, de la base fluide `clamp()`, des vignettes 68px et de la barre d'onglets tactile 58px.
 - **Élimination des Conflits de Precache Workbox (`add-to-cache-list-conflicting-entries`)** (`vite.config.ts`) :
   - **Dédoublonnage des assets statiques** : Suppression de `includeAssets` et activation de `includeManifestIcons: false` dans `VitePWA` pour laisser `workbox.globPatterns` scanner et versionner les icônes et fichiers statiques sans créer de double entrée dans `sw.js`.
   - **Manifest PWA Complet** : Ajout explicite des propriétés `display: 'standalone'`, `start_url: './'`, `scope: './'` et `background_color: '#ffffff'`.
