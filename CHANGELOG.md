@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Corrigé & Amélioré
+- **Élimination des Conflits de Precache Workbox (`add-to-cache-list-conflicting-entries`)** (`vite.config.ts`) :
+  - **Dédoublonnage des assets statiques** : Suppression de `includeAssets` et activation de `includeManifestIcons: false` dans `VitePWA` pour laisser `workbox.globPatterns` scanner et versionner les icônes et fichiers statiques sans créer de double entrée dans `sw.js`.
+  - **Manifest PWA Complet** : Ajout explicite des propriétés `display: 'standalone'`, `start_url: './'`, `scope: './'` et `background_color: '#ffffff'`.
+
 ## [1.2.8] - 2026-09-01
 
 ### Ajouté & Amélioré

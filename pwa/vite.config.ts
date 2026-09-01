@@ -28,18 +28,16 @@ export default defineConfig( {
 		} ),
 		VitePWA( {
 			registerType: 'autoUpdate',
-			includeAssets: [
-				'favicon.ico',
-				'apple-touch-icon.png',
-				'assets/icon/*.png',
-				'stockfish/stockfish.js',
-				'stockfish/stockfish.wasm',
-			],
+			includeManifestIcons: false,
 			manifest: {
 				name: 'Echiquier Lédonien',
 				short_name: 'Echiquier Lédonien',
 				description: 'Echiquier Lédonien PWA',
 				theme_color: '#ffffff',
+				background_color: '#ffffff',
+				display: 'standalone',
+				start_url: './',
+				scope: './',
 				icons: [
 					{
 						src: 'assets/icon/icon-192.png',
