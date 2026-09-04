@@ -28,6 +28,8 @@ export interface AssociatedMember {
 	elo_rapide?: number | string;
 	elo_blitz?: number | string;
 	already_registered?: boolean;
+	has_pre_inscription?: boolean;
+	pre_inscription_id?: number | null;
 }
 
 export interface Identity {
@@ -41,6 +43,8 @@ export interface Identity {
 	elo_blitz?: number | string;
 	associated_members?: AssociatedMember[];
 	already_registered?: boolean;
+	has_pre_inscription?: boolean;
+	pre_inscription_id?: number | null;
 }
 
 export const useAuthStore = defineStore(

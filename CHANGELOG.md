@@ -6,6 +6,19 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-04
+
+### Ajouté & Amélioré
+- **Reprise et mise à jour des préinscriptions existantes (Anti-doublons & Familles)** (`PreInscriptionPage.vue`, `usePreInscriptionApi.ts`, `PreInscriptionIdentitySelector.vue`, `PublicHomePage.vue`) :
+  - **Rechargement prioritaire des préinscriptions en attente** : Lorsque l'adhérent sélectionné possède déjà une préinscription soumise, le formulaire recharge directement ses données récentes au lieu de la fiche de l'année précédente.
+  - **Mise à jour sans doublons** : L'API REST met à jour le dossier en cours (`wp_update_post`) lors d'une nouvelle soumission, évitant les créations multiples pour un même individu.
+  - **Support avancé des responsables légaux (Fratries)** : Chaque enfant est suivi de manière distincte même s'ils partagent la même adresse e-mail familiale. Les nouvelles inscriptions d'enfants en attente apparaissent également dans le sélecteur.
+  - **Indicateurs visuels et libellés dynamiques** :
+    - Badge `📝 Nom (Relation - Préinscription déjà saisie)` dans la liste déroulante du sélecteur.
+    - Bannière informative `ℹ️ Préinscription en cours` signalant que le dossier est en mode modification.
+    - Libellé de validation adapté : « Mettre à jour la préinscription » au lieu de « Valider ma préinscription ».
+  - **Accueil rassurant (`PublicHomePage.vue`)** : Lorsque tous les membres du foyer non inscrits ont déjà une préinscription transmise, la carte d'accueil affiche un message de suivi clair (« Votre dossier de préinscription a bien été transmis et est en cours de traitement ») avec bouton d'accès « Consulter / Modifier ma préinscription ».
+
 ## [1.2.9] - 2026-09-01
 
 ### Corrigé & Amélioré

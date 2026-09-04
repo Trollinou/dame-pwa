@@ -42,6 +42,12 @@
                 Commencer ma préinscription
               </ion-button>
             </template>
+            <template v-else-if="allUnregisteredHavePreInscription">
+              <p>Votre dossier de préinscription a bien été transmis et est en cours de traitement par le club.</p>
+              <ion-button expand="block" router-link="/pre-inscription" color="secondary" class="pre-inscription-btn ion-margin-top">
+                Consulter / Modifier ma préinscription
+              </ion-button>
+            </template>
             <template v-else-if="authStore.selectedIdentity?.type === 'representative'">
               <p>Effectuez la préinscription de vos enfants associés ou créez une nouvelle fiche.</p>
               <ion-button expand="block" router-link="/pre-inscription" color="primary" class="pre-inscription-btn ion-margin-top">
@@ -191,31 +197,47 @@ const isLoadingNews = computed(() => newsStore.isLoading);
 const todayStr = computed(() => agendaStore.getTodayLocal());
 
 const hasUnregisteredTargets = ref(!authStore.isAuthenticated);
+const allUnregisteredHavePreInscription = ref(false);
 
 const checkUnregisteredTargets = async () => {
   if (!authStore.isAuthenticated) {
     hasUnregisteredTargets.value = true;
+    allUnregisteredHavePreInscription.value = false;
     return;
   }
   try {
     const identities = await authStore.fetchMyIdentities();
     let hasAny = false;
-      identities.forEach((identity: Identity) => {
-        if (identity.type === 'member' && identity.member_id > 0 && !identity.already_registered) {
-          hasAny = true;
+    let countUnregistered = 0;
+    let countPreInscribed = 0;
+
+    identities.forEach((identity: Identity) => {
+      if (identity.type === 'member' && identity.member_id > 0 && !identity.already_registered) {
+        hasAny = true;
+        countUnregistered++;
+        if (identity.has_pre_inscription) {
+          countPreInscribed++;
         }
-        if (identity.type === 'representative' && identity.associated_members) {
-          identity.associated_members.forEach((child: AssociatedMember) => {
-            if (!child.already_registered) {
-              hasAny = true;
+      }
+      if (identity.type === 'representative' && identity.associated_members) {
+        identity.associated_members.forEach((child: AssociatedMember) => {
+          if (!child.already_registered) {
+            hasAny = true;
+            countUnregistered++;
+            if (child.has_pre_inscription) {
+              countPreInscribed++;
             }
-          });
-        }
-      });
-      hasUnregisteredTargets.value = hasAny;
+          }
+        });
+      }
+    });
+
+    hasUnregisteredTargets.value = hasAny;
+    allUnregisteredHavePreInscription.value = hasAny && countUnregistered > 0 && countPreInscribed === countUnregistered;
   } catch (err) {
     console.error("Erreur lors de la vérification des adhérents non-inscrits:", err);
     hasUnregisteredTargets.value = true; // Par précaution, afficher la carte
+    allUnregisteredHavePreInscription.value = false;
   }
 };
 

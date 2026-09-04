@@ -10,6 +10,8 @@ export interface RegistrationTarget {
 	member_id: number;
 	name: string;
 	relation: string;
+	has_pre_inscription?: boolean;
+	pre_inscription_id?: number | null;
 }
 
 export interface PreInscriptionSuccessData {
@@ -18,6 +20,7 @@ export interface PreInscriptionSuccessData {
 	payment_url?: string;
 	post_id?: number;
 	download_token?: string;
+	updated?: boolean;
 	[ key: string ]: unknown;
 }
 
@@ -28,6 +31,9 @@ export function usePreInscriptionApi() {
 	const selectedTargetId = ref< number >( 0 );
 	const completedMemberIds = ref< number[] >( [] );
 	const hasLoadedIdentities = ref( false );
+
+	const isExistingPreInscription = ref( false );
+	const currentPreInscriptionId = ref< number | null >( null );
 
 	const isSubmitting = ref( false );
 	const errorMessage = ref( '' );
@@ -58,6 +64,10 @@ export function usePreInscriptionApi() {
 						member_id: identity.member_id,
 						name: identity.name,
 						relation: 'Moi-même',
+						has_pre_inscription: Boolean(
+							identity.has_pre_inscription
+						),
+						pre_inscription_id: identity.pre_inscription_id || null,
 					} );
 				}
 				if (
@@ -69,13 +79,26 @@ export function usePreInscriptionApi() {
 							if (
 								! child.already_registered &&
 								! targets.some(
-									( t ) => t.member_id === child.member_id
+									( t ) =>
+										( t.member_id > 0 &&
+											t.member_id === child.member_id ) ||
+										( Boolean( child.pre_inscription_id ) &&
+											t.pre_inscription_id ===
+												child.pre_inscription_id )
 								)
 							) {
 								targets.push( {
 									member_id: child.member_id,
 									name: child.firstname || child.name || '',
-									relation: 'Enfant/Associé',
+									relation:
+										child.member_id === 0
+											? 'Enfant (Nouvelle inscription)'
+											: 'Enfant/Associé',
+									has_pre_inscription: Boolean(
+										child.has_pre_inscription
+									),
+									pre_inscription_id:
+										child.pre_inscription_id || null,
 								} );
 							}
 						}
@@ -115,6 +138,8 @@ export function usePreInscriptionApi() {
 		checkAge: () => void
 	) => {
 		errorMessage.value = '';
+		isExistingPreInscription.value = false;
+		currentPreInscriptionId.value = null;
 
 		const makeRequest = async () => {
 			return fetch(
@@ -140,6 +165,11 @@ export function usePreInscriptionApi() {
 
 			if ( response.ok ) {
 				const data = await response.json();
+				isExistingPreInscription.value = Boolean(
+					data.is_pre_inscription
+				);
+				currentPreInscriptionId.value = data.pre_inscription_id || null;
+
 				Object.keys( data ).forEach( ( key ) => {
 					const formKey =
 						`dame_${ key }` as keyof PreInscriptionFormData;
@@ -153,6 +183,25 @@ export function usePreInscriptionApi() {
 						] = data[ key ];
 					}
 				} );
+
+				// Pre-fill questionnaire and communication preferences if provided
+				if ( data.health_questionnaire ) {
+					form.dame_health_questionnaire = data.health_questionnaire;
+				}
+				if ( data.refuses_comms !== undefined ) {
+					form.dame_refuses_comms = Boolean( data.refuses_comms );
+				}
+				if ( data.legal_rep_1_refuses_comms !== undefined ) {
+					form.dame_legal_rep_1_refuses_comms = Boolean(
+						data.legal_rep_1_refuses_comms
+					);
+				}
+				if ( data.legal_rep_2_refuses_comms !== undefined ) {
+					form.dame_legal_rep_2_refuses_comms = Boolean(
+						data.legal_rep_2_refuses_comms
+					);
+				}
+
 				checkAge();
 			} else if ( response.status === 401 ) {
 				console.error( 'Session définitivement expirée.' );
@@ -186,10 +235,20 @@ export function usePreInscriptionApi() {
 				headers.Authorization = `Bearer ${ authStore.token }`;
 			}
 
-			const bodyData = {
+			const bodyData: Record< string, unknown > = {
 				...form,
 				dame_consent_checkbox: consentCheckbox ? '1' : '',
 			};
+
+			if ( selectedTargetId.value > 0 ) {
+				bodyData.adherent_id = selectedTargetId.value;
+			}
+			if (
+				currentPreInscriptionId.value &&
+				currentPreInscriptionId.value > 0
+			) {
+				bodyData.pre_inscription_id = currentPreInscriptionId.value;
+			}
 
 			const response = await fetch(
 				`${
@@ -212,10 +271,17 @@ export function usePreInscriptionApi() {
 			}
 
 			successData.value = resData;
+			if ( resData.post_id ) {
+				currentPreInscriptionId.value = resData.post_id;
+				isExistingPreInscription.value = true;
+			}
 
 			if ( selectedTargetId.value > 0 ) {
 				completedMemberIds.value.push( selectedTargetId.value );
 			}
+
+			// Actualisation silencieuse des identités en arrière-plan
+			authStore.fetchMyIdentities().catch( () => {} );
 		} catch ( err ) {
 			console.error( err );
 			errorMessage.value = 'Erreur de connexion au serveur.';
@@ -288,6 +354,8 @@ export function usePreInscriptionApi() {
 		selectedTargetId,
 		completedMemberIds,
 		hasLoadedIdentities,
+		isExistingPreInscription,
+		currentPreInscriptionId,
 		isSubmitting,
 		errorMessage,
 		successData,

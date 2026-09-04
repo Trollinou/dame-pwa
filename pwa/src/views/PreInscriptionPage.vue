@@ -44,6 +44,15 @@
               @select-target="handlePrefillSelection"
             />
 
+            <!-- Bannière d'information préinscription existante -->
+            <div v-if="isExistingPreInscription" class="info-banner ion-margin-bottom ion-padding">
+              <ion-text color="primary">
+                <p style="margin: 0; font-size: 0.95em; line-height: 1.4;">
+                  ℹ️ <strong>Préinscription en cours :</strong> Une préinscription a déjà été enregistrée pour cet adhérent. Les champs sont pré-remplis avec ces données. Vous pouvez les modifier et valider à nouveau pour mettre à jour son dossier sans créer de doublon.
+                </p>
+              </ion-text>
+            </div>
+
             <!-- SECTION 1 : Informations Adhérent -->
             <PreInscriptionMemberSection
               :clothing-sizes="clothingSizes"
@@ -88,7 +97,7 @@
                 :disabled="isSubmitting || !consentCheckbox || !form.dame_health_questionnaire"
               >
                 <ion-spinner v-if="isSubmitting" name="crescent"></ion-spinner>
-                <span v-else>Valider ma préinscription</span>
+                <span v-else>{{ isExistingPreInscription ? 'Mettre à jour la préinscription' : 'Valider ma préinscription' }}</span>
               </ion-button>
 
               <p class="privacy-disclaimer">
@@ -156,6 +165,7 @@ const {
   selectedTargetId,
   completedMemberIds,
   hasLoadedIdentities,
+  isExistingPreInscription,
   isSubmitting,
   errorMessage,
   successData,
@@ -182,6 +192,7 @@ const handlePrefillSelection = (memberId: number) => {
 const onResetForm = () => {
   resetForm();
   selectedTargetId.value = 0;
+  isExistingPreInscription.value = false;
   errorMessage.value = '';
   successData.value = null;
 };
@@ -205,6 +216,12 @@ const onDownloadPdf = (type: 'health' | 'parental') => {
   max-width: 600px;
   margin: 0 auto;
   padding-bottom: 40px;
+}
+
+.info-banner {
+  background: var(--ion-color-light, #f4f5f8);
+  border-left: 4px solid var(--ion-color-primary, #3880ff);
+  border-radius: 8px;
 }
 
 .error-banner {

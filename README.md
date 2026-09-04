@@ -12,7 +12,9 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
   - `src/views/AnalysisPage.vue` : Revue et analyse coup par coup de la dernière partie jouée.
   - `src/components/agenda/` : Composants de la vue Le Club / Agenda (`ActualitesSegmentView.vue`, `AgendaSegmentView.vue`, `TournoisSegmentView.vue`, `BenevolatSegmentView.vue`, `AgendaCalendarView.vue`).
   - `src/components/agenda/detail/` : Composants purs de détail (`NewsDetailContent.vue`, `AgendaDetailContent.vue`, `TournamentDetailContent.vue`, `BenevolatDetailContent.vue`).
-  - `src/components/shared/SplitMasterDetail.vue` : Conteneur responsive Master-Detail (1/3 - 2/3) pour tablettes paysage et ordinateurs.
+  - `src/views/PreInscriptionPage.vue` : Formulaire de préinscription / réinscription en ligne pour la nouvelle saison.
+  - `src/components/preinscription/` : Composants modulaires du formulaire (`PreInscriptionIdentitySelector.vue`, `PreInscriptionMemberSection.vue`, `PreInscriptionLegalRepSection.vue`, `PreInscriptionHealthSection.vue`, `PreInscriptionSuccessCard.vue`).
+  - `src/composables/preinscription/` : Logique métier découplée (`usePreInscriptionApi.ts`, `usePreInscriptionForm.ts`, `useAddressAutocomplete.ts`) avec détection et mise à jour transparente des préinscriptions existantes.
   - `src/stores/agenda.ts` : Store Pinia gérant la récupération des événements de l'agenda et leurs catégories.
   - `src/queryClient.ts` : Configuration de TanStack Query avec persistance et invalidation automatique des caches de requêtes lors des montées de version PWA.
 - **Rendu Visuel Unifié (`mode: 'ios'`) & Adaptation Dynamique en Hauteur (`vh` / `clamp`)** : Initialisation d'Ionic configurée en mode `ios` global associée à une échelle typographique et des variables de mise en page réactives en hauteur (`--app-section-gap`, `--app-item-min-height`, `--app-card-padding`), assurant une occupation à 100 % de l'écran et une lisibilité immédiate sans zoom sur tous les smartphones (iPhone, Samsung One UI, Xiaomi et Pixel 9 sous Android 14/15).

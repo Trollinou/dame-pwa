@@ -19,6 +19,9 @@
             <template v-if="completedMemberIds.includes(opt.member_id)">
               ✅ {{ opt.name }} ({{ opt.relation }} - Rempli)
             </template>
+            <template v-else-if="opt.has_pre_inscription">
+              📝 {{ opt.name }} ({{ opt.relation }} - Préinscription déjà saisie)
+            </template>
             <template v-else>
               {{ opt.name }} ({{ opt.relation }})
             </template>

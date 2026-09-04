@@ -9,6 +9,26 @@ L'application Web Progressive (PWA) est calibrée avec une ergonomie unifiée (m
 - **Appel à Bénévoles** : Consultation des besoins actifs pour les compétitions et manifestations du club.
 - **Barre de Navigation Inférieure** : Accès instantané aux onglets *Accueil*, *Le Club*, *Apprentissage* et *Connexion / Profil* avec libellés nets (`12.5px`), icônes tactiles (`26px`) et hauteur de barre fluide (`58px`).
 
+## Module Préinscriptions & Réinscriptions (Adhérents & Familles)
+
+Le module de préinscription (`/pre-inscription`) permet aux nouveaux visiteurs comme aux adhérents existants de préparer leur dossier pour la saison à venir :
+
+1. **Parcours Adhérent Individuel** :
+   - Si l'adhérent n'est pas encore inscrit pour la saison active, ses coordonnées sont automatiquement pré-remplies.
+   - **Détection de préinscription existante** : Si l'adhérent a déjà transmis son dossier (en attente de validation par les administrateurs du club), le formulaire recharge prioritairement les données de sa préinscription récente plutôt que la fiche de l'année précédente.
+   - **Bannière d'état & mise à jour sans doublon** : Une bannière `ℹ️ Préinscription en cours` informe l'adhérent qu'il modifie son dossier existant. Le bouton d'action devient *« Mettre à jour la préinscription »* et actualise directement le dossier sans générer de fiche superflue.
+
+2. **Parcours Responsable Légal & Multi-Adhérents (Fratries)** :
+   - Un représentant légal connecté accède à une liste déroulante lui permettant de basculer entre :
+     - `-- Nouvelle préinscription (vierge) --` pour inscrire un nouvel enfant.
+     - Chacun de ses enfants rattachés (ex. *Lucas*, *Emma*).
+   - **Distinction garantie par enfant** : Même si tous les enfants partagent la même adresse e-mail familiale, le système distingue rigoureusement chaque profil via l'identifiant adhérent et le couple prénom/date de naissance.
+   - **Statut visuel dans le sélecteur** : Les enfants ayant déjà une préinscription enregistrée affichent l'indicateur `📝 Nom (Enfant/Associé - Préinscription déjà saisie)`.
+   - **Reprise et modification unitaire** : Sélectionner un enfant déjà préinscrit recharge immédiatement sa préinscription en cours et permet de la corriger de façon totalement indépendante de ses frères et sœurs.
+
+3. **Suivi sur la Page d'Accueil** :
+   - Lorsque tous les membres du foyer non inscrits ont soumis leur préinscription, la carte d'accueil affiche un message de confirmation rassurant (*« Votre dossier de préinscription a bien été transmis et est en cours de traitement par le club »*) accompagné du bouton d'accès *« Consulter / Modifier ma préinscription »*.
+
 ## Module Le Club (Actualités, Agenda, Tournois, Bénévolat)
 
 Le module **Le Club** propose une navigation par segments adaptée dynamiquement à la taille de l'écran et à l'orientation :
