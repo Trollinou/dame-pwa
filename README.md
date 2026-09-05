@@ -148,7 +148,7 @@ Barre de navigation et zone de feedback visuel pour les exercices séquentiels o
 - **Célébration visuelle & sensorielle (`useCelebration.ts`)** : Déclenchement automatique d'un feu d'artifice de confettis (`canvas-confetti`) et d'un retour haptique sur smartphone (`@capacitor/haptics`) lors de la validation finale de l'exercice.
 - **Orchestration inter-exercices sans prop-drilling** : Consomme optionnellement `useExerciseNavigation()` (`EXERCISE_NAVIGATION_KEY` injecté par `ContenuPage`) pour déclencher la navigation vers le prochain contenu ou le cours parent.
 - **Ancrage fixe en bas d'écran (Scaffold Mobile & Teleport)** : Téléporté automatiquement via Vue 3 `<Teleport>` ciblant la référence DOM scopée du `<ion-footer>` de `ContenuPage.vue` (via `provide('exerciseFooterPortal', footerPortalRef)`, avec fallback inline pour les tests/vues isolées). Le footer reste 100% immobile sous le pouce au bas de l'écran (y compris sur les exercices à carte unique), laissant `<ion-content>` défiler au centre uniquement si le contenu dépasse la hauteur d'affichage.
-- **Verrouillage pédagogique (`disabled`, `disabledHint`)** : Permet de désactiver le bouton d'avancement tant qu'une action requise (ex: relecture complète du PGN d'explication) n'est pas achevée, avec infobulle explicative.
+- **Verrouillage pédagogique & Célébration au bout de l'exercice (`disabled`, `disabledHint`)** : Permet de désactiver le bouton d'avancement tant qu'une action requise (ex: relecture complète du PGN d'explication) n'est pas achevée. La célébration finale (`isFinalCompleted`) est strictement conditionnée à la levée de tout verrouillage (`!disabled`), garantissant que la victoire (`🎉 Exercice réussi !`) n'est fêtée qu'à la fin complète de l'exercice (défilement du PGN) et non pas dès la dernière interrogation ou QCM.
 - **Indicateur d'attente** : Affiche un indice textuel (`pendingHint`) tant que la carte n'a pas été résolue.
 
 ```vue
@@ -175,7 +175,17 @@ const currentFeedback: CardFeedback = {
 </script>
 ```
 
-### 6. Styles & Classes Partagées (`src/theme/shared-components.scss`)
+### 6. Composant Visualiseur PGN `<PgnViewer>` (`src/components/shared/PgnViewer.vue`)
+Composant de lecture et relecture pas-à-pas de séquences PGN commentées avec formes (shapes SVG) :
+- **Contrôles de navigation contextuels** : Boutons Début (`viewStart`), Précédent (`viewPrevious`), Suivant (`viewNext`) et Fin (`viewEnd`).
+- **Désactivation réactive aux bornes** :
+  - Au début du PGN (`currentPly <= 0`) : les boutons Début et Précédent sont automatiquement désactivés (`disabled`).
+  - Au dernier coup (`currentPly >= totalPly`) : les boutons Suivant et Fin sont automatiquement désactivés (`disabled`).
+  - Sur un PGN sans coup (`totalPly === 0`) : l'ensemble des boutons de navigation est désactivé.
+- **Support des formes et commentaires** : Restitution en temps réel des commentaires pédagogiques (`currentComment`) et des flèches/cases colorées (`setShapes`).
+- **Événement `@finished`** : Émis dès que l'apprenant atteint le dernier coup de la séquence (ou immédiatement si 0 coup).
+
+### 7. Styles & Classes Partagées (`src/theme/shared-components.scss`)
 Nomenclature canonique standardisée à utiliser systématiquement par les développeurs selon les familles d'éléments :
 
 | Famille | Classe Canonique | Usage & Description |

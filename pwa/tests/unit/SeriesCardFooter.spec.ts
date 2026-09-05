@@ -148,6 +148,55 @@ describe( 'SeriesCardFooter.vue', () => {
 		vi.useRealTimers();
 	} );
 
+	test( 'n’active pas la complétion finale (Exercice réussi) si disabled est true sur la dernière carte', async () => {
+		const onNextMock = vi.fn();
+		const onCourseMock = vi.fn();
+
+		const wrapper = mount( SeriesCardFooter, {
+			props: {
+				currentCard: 3,
+				totalCards: 3,
+				isSolved: true,
+				disabled: true,
+				disabledHint: 'Visionnez tous les coups pour continuer',
+			},
+			global: {
+				provide: {
+					[ EXERCISE_NAVIGATION_KEY as symbol ]: {
+						hasNext: computed( () => true ),
+						nextLabel: computed( () => 'Exercice suivant' ),
+						hasCourse: computed( () => true ),
+						courseUrl: computed( () => '/cours/42' ),
+						onNext: onNextMock,
+						onCourse: onCourseMock,
+					},
+				},
+			},
+		} );
+
+		// Pas de badge de célébration immédiate
+		expect( wrapper.find( '.success-resolu-badge' ).exists() ).toBe(
+			false
+		);
+
+		// Le bouton reste en mode standard désactivé
+		const nextBtn = wrapper.findComponent( { name: 'IonButton' } );
+		expect( nextBtn.exists() ).toBe( true );
+		expect( nextBtn.props( 'disabled' ) ).toBe( true );
+
+		await nextBtn.trigger( 'click' );
+		expect( wrapper.emitted( 'next' ) ).toBeFalsy();
+
+		// Passage de disabled à false
+		await wrapper.setProps( { disabled: false } );
+
+		// Maintenant le badge de succès est actif
+		expect( wrapper.find( '.success-resolu-badge' ).exists() ).toBe( true );
+		expect( wrapper.find( '.success-resolu-badge' ).text() ).toContain(
+			'🎉 Exercice réussi !'
+		);
+	} );
+
 	test( 'se téléporte dans exerciseFooterPortal lorsqu’il est fourni via provide', async () => {
 		const targetDiv = document.createElement( 'div' );
 		targetDiv.id = 'test-portal-target';

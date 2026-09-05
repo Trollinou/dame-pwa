@@ -72,4 +72,66 @@ describe( 'TypePartieHeros.vue', () => {
 		expect( nextBtn.exists() ).toBe( true );
 		expect( finBtn.exists() ).toBe( false );
 	} );
+
+	test( 'le PGN final ne passe pas en réussi dès la fin du QCM mais à la fin du PGN', async () => {
+		const wrapper = mount( TypePartieHeros, {
+			props: {
+				config: sampleConfig,
+				id: 44,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		// Étape 1 : PGN (1. Bb5)
+		expect( wrapper.text() ).toContain( 'Étape 1 / 3' );
+		const footer = wrapper.findComponent( { name: 'SeriesCardFooter' } );
+		expect( footer.exists() ).toBe( true );
+		expect( footer.props( 'isSolved' ) ).toBe( false );
+
+		// Visionner le coup 1. Bb5
+		const nextPgnBtn = wrapper.find( 'ion-button[title="Suivant"]' );
+		await nextPgnBtn.trigger( 'click' );
+		expect( footer.props( 'isSolved' ) ).toBe( true );
+
+		// Passer à l'étape suivante (QCM)
+		const nextStageBtn = wrapper.find( '.next-card-btn' );
+		await nextStageBtn.trigger( 'click' );
+		await wrapper.vm.$nextTick();
+
+		// Étape 2 : QCM (choix entre a6 et Cf6)
+		expect( wrapper.text() ).toContain( 'Étape 2 / 3' );
+		const qcmFooter = wrapper.findComponent( { name: 'SeriesCardFooter' } );
+		expect( qcmFooter.props( 'isSolved' ) ).toBe( false );
+
+		// Sélectionner le bon coup (a6)
+		const choiceBtns = wrapper.findAll( '.choice-btn' );
+		expect( choiceBtns.length ).toBeGreaterThanOrEqual( 1 );
+		await choiceBtns[ 0 ].trigger( 'click' );
+		expect( qcmFooter.props( 'isSolved' ) ).toBe( true );
+
+		// Passer à l'étape suivante (PGN final)
+		const toPgnFinalBtn = wrapper.find( '.next-card-btn' );
+		await toPgnFinalBtn.trigger( 'click' );
+		await wrapper.vm.$nextTick();
+
+		// Étape 3 : PGN final
+		expect( wrapper.text() ).toContain( 'Étape 3 / 3' );
+		const finalPgnFooter = wrapper.findComponent( {
+			name: 'SeriesCardFooter',
+		} );
+		// VÉRIFICATION CLÉ : Le PGN final N'EST PAS résolu à son arrivée (isSolved doit être false)
+		expect( finalPgnFooter.props( 'isSolved' ) ).toBe( false );
+		expect( wrapper.text() ).not.toContain( '🎉 Exercice réussi !' );
+
+		// Visionner les coups du PGN final (2. Fa4 puis 2... Cf6)
+		const nextBtnFinal = wrapper.find( 'ion-button[title="Suivant"]' );
+		await nextBtnFinal.trigger( 'click' ); // coup 1 du stage final
+		expect( finalPgnFooter.props( 'isSolved' ) ).toBe( false );
+
+		await nextBtnFinal.trigger( 'click' ); // coup 2 (dernier coup du stage final)
+		// Maintenant que tous les coups du PGN ont été visionnés, l'étape est résolue !
+		expect( finalPgnFooter.props( 'isSolved' ) ).toBe( true );
+	} );
 } );

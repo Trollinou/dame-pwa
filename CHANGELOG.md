@@ -6,7 +6,18 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Corrigé
+- **Célébration de la Victoire au Bout de l'Exercice et non à la Dernière Interrogation (`TypePartieHeros.vue`, `ABCDaireTactiqueViewer.vue`, `SeriesCardFooter.vue`, `TypePartieHeros.spec.ts`, `TypeABCDaire.spec.ts`, `SeriesCardFooter.spec.ts`)** :
+  - **Type 4 (Partie du Héros)** : Correction du passage prématuré en « Exercice réussi » lors de l'arrivée sur l'étape PGN finale après résolution du dernier QCM. Réinitialisation synchrone et hermétique des statuts résiduels (`isPgnCompleted`, `isQcmSolved`, `currentPgnMoveIndex`) dès le changement d'étape (`watch(etapeCouranteIndex)` sans délai `nextTick()`). L'étape PGN finale exige désormais de visionner tous ses coups pour afficher le bandeau de victoire `🎉 Exercice réussi !` et déclencher la célébration festive.
+  - **Type 3 (ABCDaire Tactique)** : Conditionnement strict de la métamorphose de fin d'exercice (`isFinalCompleted`) à `!props.disabled` dans `SeriesCardFooter.vue`. Sur la dernière carte, la réussite du coup tactique active le mode récapitulatif avec le feedback intermédiaire `« Bravo ! Coup correct. »`, maintenant le bouton de terminaison désactivé (`disabled: !isPgnFinished`). Le passage en `🎉 Exercice réussi !` et la pluie de confettis ne sont désormais déclenchés qu'à la fin effective de la lecture du PGN d'explication.
+  - **Couverture de tests unitaires** : Enrichissement des suites `TypePartieHeros.spec.ts`, `TypeABCDaire.spec.ts` et `SeriesCardFooter.spec.ts` validant le report de la victoire au visionnage complet du PGN final.
+
 ### Ajouté & Amélioré
+- **Désactivation Contextuelle des Contrôles de Navigation PGN (`PgnViewer.vue`, `PgnViewer.spec.ts`, `USING.md`, `README.md`)** :
+  - **Désactivation au début du PGN** : Les boutons « Début » et « Précédent » sont automatiquement désactivés (`disabled`) tant que l'utilisateur est sur la position initiale (`ply 0`) ou qu'aucun coup précédent n'est disponible.
+  - **Désactivation à la fin du PGN** : Les boutons « Suivant » et « Fin » sont automatiquement désactivés (`disabled`) dès que le dernier coup de la séquence est atteint (`currentPly >= totalPly`), ou si le PGN ne comporte aucun coup.
+  - **Réactivité bidirectionnelle** : Reculer depuis le dernier coup réactive instantanément le bouton « Suivant », tout comme avancer depuis le début réactive « Début » et « Précédent ».
+  - **Suite de tests unitaires dédiée (`PgnViewer.spec.ts`)** : Validation automatisée des états `disabled` sur la position initiale, lors des coups intermédiaires, au dernier coup, après recul, et sur un PGN vide sans coups.
 - **Architecture Scaffold d'Exercice & Footer Fixe Universel (`SeriesCardFooter.vue`, `ContenuPage.vue`, `shared-components.scss`, `TypePartieHeros.vue`, `PgnViewer.vue`, `QcmViewer.vue`, `ExerciseHeader.vue`, `README.md`)** :
   - **Footer fixe ancré au bas d'écran (`<ion-footer>` & Vue 3 `<Teleport>`)** : Le `SeriesCardFooter` et son bandeau de feedback sont téléportés dans le conteneur natif `<ion-footer>` de `ContenuPage.vue` via une référence DOM réactive scopée (`provide('exerciseFooterPortal', footerPortalRef)`). Cela élimine les conflits de sélecteurs statiques causés par le cache de vues d'`@ionic/vue-router` et garantit l'affichage immédiat du footer lors des transitions entre exercices sans nécessiter de rafraîchissement d'écran.
   - **Support unifié des exercices à carte unique (`QcmViewer.vue`, `PgnViewer.vue`)** : Levée de la condition restrictive `totalCards > 1`, permettant aux exercices composés d'un seul QCM ou d'une seule étape de disposer immédiatement du footer universel, de sa temporisation de célébration et de son bouton d'accès à l'exercice suivant.

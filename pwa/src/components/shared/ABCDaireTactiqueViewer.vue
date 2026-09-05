@@ -264,6 +264,10 @@ watch(indexCourant, () => {
 
 const onPgnFinished = () => {
   isPgnFinished.value = true;
+  feedback.value = {
+    type: 'success',
+    message: 'Bravo ! Exercice réussi.'
+  };
 };
 
 const activerModeRecapitulatif = () => {
@@ -272,7 +276,7 @@ const activerModeRecapitulatif = () => {
   isPgnFinished.value = false;
   feedback.value = {
     type: 'success',
-    message: 'Bravo ! Exercice réussi.'
+    message: 'Bravo ! Coup correct.'
   };
 };
 

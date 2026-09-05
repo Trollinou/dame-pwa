@@ -1,9 +1,11 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { computed } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypeABCDaire from '@/views/types/TypeABCDaire.vue';
+import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 
 // Mock eg-chessboard
 vi.mock( 'eg-chessboard/vue', () => ( {
@@ -108,8 +110,8 @@ describe( 'TypeABCDaire.vue', () => {
 		// Déclencher le coup attendu (Qxg7#)
 		await moveBtn.trigger( 'click' );
 
-		// Vérifier la présence du feedback de succès
-		expect( wrapper.text() ).toContain( 'Bravo ! Exercice réussi.' );
+		// Vérifier la présence du feedback intermédiaire (coup correct mais PGN non terminé)
+		expect( wrapper.text() ).toContain( 'Bravo ! Coup correct.' );
 
 		// Le bouton "Carte suivante" est affiché mais DÉSACTIVÉ tant que le PGN n'a pas été lu jusqu'au bout
 		const footer = wrapper.findComponent( { name: 'SeriesCardFooter' } );
@@ -122,8 +124,9 @@ describe( 'TypeABCDaire.vue', () => {
 		pgnViewer.vm.$emit( 'finished' );
 		await wrapper.vm.$nextTick();
 
-		// Le footer n'est plus désactivé
+		// Le footer n'est plus désactivé et le feedback indique la réussite
 		expect( footer.props( 'disabled' ) ).toBe( false );
+		expect( wrapper.text() ).toContain( 'Bravo ! Exercice réussi.' );
 
 		// Vérifier que le bouton Fin n'est pas présent dans le PgnViewer du mode récapitulatif
 		const finBtn = wrapper.find( 'ion-button[title="Fin"]' );
@@ -150,5 +153,57 @@ describe( 'TypeABCDaire.vue', () => {
 
 		expect( wrapper.text() ).toContain( 'Trouver le meilleur coup.' );
 		expect( wrapper.text() ).toContain( 'Carte 1 / 1' );
+	} );
+
+	test( 'sur la dernière carte, la victoire n’est fêtée qu’à la fin du PGN et pas dès le coup tactique', async () => {
+		const singleCardConfig = {
+			consigne: 'Trouver le meilleur coup.',
+			exercices: [ { pgn: sampleLichessPgn } ],
+			metaTitre: 'Exercice ABCDaire Final',
+			metaTypeLabel: 'ABCDaire Tactique',
+			metaChapitreNiveauLabel: 'Niveau 1',
+		};
+
+		const wrapper = mount( TypeABCDaire, {
+			props: {
+				config: singleCardConfig,
+				id: 45,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_NAVIGATION_KEY as symbol ]: {
+						hasNext: computed( () => false ),
+						nextLabel: computed( () => 'Terminer le cours' ),
+						hasCourse: computed( () => true ),
+						courseUrl: computed( () => '/cours/1' ),
+						onNext: vi.fn(),
+						onCourse: vi.fn(),
+					},
+				},
+			},
+		} );
+
+		// 1. Phase de jeu : jouer le bon coup
+		const moveBtn = wrapper.find( '.mock-move-btn' );
+		await moveBtn.trigger( 'click' );
+
+		// VÉRIFICATION : le mode recap s'affiche mais la victoire N'EST PAS encore fêtée car le PGN n'est pas fini
+		expect( wrapper.text() ).toContain( 'Bravo ! Coup correct.' );
+		expect( wrapper.find( '.success-resolu-badge' ).exists() ).toBe(
+			false
+		);
+
+		// 2. Finir le visionnage du PGN
+		const pgnViewer = wrapper.findComponent( { name: 'PgnViewer' } );
+		expect( pgnViewer.exists() ).toBe( true );
+		pgnViewer.vm.$emit( 'finished' );
+		await wrapper.vm.$nextTick();
+
+		// VÉRIFICATION : maintenant la victoire est fêtée !
+		expect( wrapper.find( '.success-resolu-badge' ).exists() ).toBe( true );
+		expect( wrapper.find( '.success-resolu-badge' ).text() ).toContain(
+			'🎉 Exercice réussi !'
+		);
 	} );
 } );

@@ -159,7 +159,7 @@ let nextButtonTimer: ReturnType<typeof setTimeout> | null = null;
 const isLastCard = computed(() => props.currentCard >= props.totalCards);
 
 const isFinalCompleted = computed(() => {
-  return isLastCard.value && props.isSolved && exerciseNav !== null;
+  return isLastCard.value && props.isSolved && !props.disabled && exerciseNav !== null;
 });
 
 watch(

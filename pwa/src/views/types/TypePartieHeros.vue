@@ -376,10 +376,33 @@ const onPgnBoardCreated = (api: BoardCore) => {
   syncPgnBoardPosition();
 };
 
-const initPgnStage = () => {
-  const stage = etapeActuelle.value as PgnStage;
+const resetStageState = (stage?: PartieHerosStage) => {
+  const current = stage || etapeActuelle.value;
+  if (!current) return;
+
+  if (current.type === 'pgn') {
+    currentPgnMoveIndex.value = -1;
+    isPgnCompleted.value = !current.moves || current.moves.length === 0;
+    selectedChoiceIndex.value = null;
+    isQcmSolved.value = false;
+    qcmFeedback.value = null;
+  } else if (current.type === 'qcm') {
+    selectedChoiceIndex.value = null;
+    isQcmSolved.value = false;
+    qcmFeedback.value = null;
+    activeQcmFen.value = current.fen;
+    currentPgnMoveIndex.value = -1;
+    isPgnCompleted.value = false;
+  }
+};
+
+const initPgnStage = (stage?: PgnStage) => {
+  const current = stage || (etapeActuelle.value as PgnStage);
   currentPgnMoveIndex.value = -1;
-  isPgnCompleted.value = !stage.moves || stage.moves.length === 0;
+  isPgnCompleted.value = !current?.moves || current.moves.length === 0;
+  selectedChoiceIndex.value = null;
+  isQcmSolved.value = false;
+  qcmFeedback.value = null;
   syncPgnBoardPosition();
 };
 
@@ -422,18 +445,20 @@ const onQcmBoardCreated = (api: BoardCore) => {
   initQcmStage();
 };
 
-const initQcmStage = () => {
-  const stage = etapeActuelle.value as QcmStage;
-  if (!stage || stage.type !== 'qcm') return;
+const initQcmStage = (stage?: QcmStage) => {
+  const current = stage || (etapeActuelle.value as QcmStage);
+  if (!current || current.type !== 'qcm') return;
 
   selectedChoiceIndex.value = null;
   isQcmSolved.value = false;
   qcmFeedback.value = null;
-  activeQcmFen.value = stage.fen;
+  activeQcmFen.value = current.fen;
+  currentPgnMoveIndex.value = -1;
+  isPgnCompleted.value = false;
 
   if (qcmBoardApi.value) {
-    qcmBoardApi.value.setPosition(stage.fen);
-    qcmBoardApi.value.setShapes(stage.shapes || []);
+    qcmBoardApi.value.setPosition(current.fen);
+    qcmBoardApi.value.setShapes(current.shapes || []);
     if (typeof qcmBoardApi.value.redraw === 'function') {
       qcmBoardApi.value.redraw(true);
     }
@@ -490,13 +515,21 @@ const validerChoixQcm = (index: number) => {
 // 3. NAVIGATION GLOBALE ENTRE LES ÉTAPES
 // ==========================================
 watch(etapeCouranteIndex, (newIdx) => {
+  const stage = etapesListe.value[newIdx];
+  if (!stage) return;
+  // Réinitialisation synchrone immédiate pour éviter qu'un état solved/completed résiduel ne déclenche prématurément la victoire
+  resetStageState(stage);
   nextTick(() => {
-    const stage = etapesListe.value[newIdx];
-    if (!stage) return;
     if (stage.type === 'pgn') {
-      initPgnStage();
+      syncPgnBoardPosition();
     } else if (stage.type === 'qcm') {
-      initQcmStage();
+      if (qcmBoardApi.value) {
+        qcmBoardApi.value.setPosition(stage.fen);
+        qcmBoardApi.value.setShapes(stage.shapes || []);
+        if (typeof qcmBoardApi.value.redraw === 'function') {
+          qcmBoardApi.value.redraw(true);
+        }
+      }
     }
   });
 });
@@ -505,11 +538,21 @@ watch(
   () => props.config,
   () => {
     etapeCouranteIndex.value = 0;
+    const stage = etapesListe.value[0];
+    if (stage) {
+      resetStageState(stage);
+    }
     nextTick(() => {
-      if (etapeActuelle.value.type === 'pgn') {
-        initPgnStage();
-      } else if (etapeActuelle.value.type === 'qcm') {
-        initQcmStage();
+      if (stage?.type === 'pgn') {
+        syncPgnBoardPosition();
+      } else if (stage?.type === 'qcm') {
+        if (qcmBoardApi.value) {
+          qcmBoardApi.value.setPosition(stage.fen);
+          qcmBoardApi.value.setShapes(stage.shapes || []);
+          if (typeof qcmBoardApi.value.redraw === 'function') {
+            qcmBoardApi.value.redraw(true);
+          }
+        }
       }
     });
   },
