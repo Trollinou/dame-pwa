@@ -126,8 +126,8 @@ describe( 'SeriesCardFooter.vue', () => {
 		);
 		expect( wrapper.find( '.footer-course-btn' ).exists() ).toBe( false );
 
-		// Avance de la temporisation d'1 seconde
-		vi.advanceTimersByTime( 1000 );
+		// Avance de la temporisation de 2,2 secondes
+		vi.advanceTimersByTime( 2200 );
 		await wrapper.vm.$nextTick();
 
 		// Bouton Retour au cours

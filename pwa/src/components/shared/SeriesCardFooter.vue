@@ -159,7 +159,7 @@ watch(
       }
       nextButtonTimer = setTimeout(() => {
         showNextExerciseBtn.value = true;
-      }, 1000);
+      }, 2200);
     } else {
       showNextExerciseBtn.value = false;
       if (nextButtonTimer) {
@@ -177,14 +177,16 @@ onUnmounted(() => {
 });
 
 const effectiveFeedback = computed<CardFeedback | null>(() => {
-  if (props.feedback) {
-    return props.feedback;
-  }
   if (isFinalCompleted.value) {
     return {
       type: 'success',
-      message: '🎉 Exercice réussi !'
+      message: props.feedback?.message
+        ? `🎉 Exercice réussi ! ${props.feedback.message}`
+        : '🎉 Exercice réussi !'
     };
+  }
+  if (props.feedback) {
+    return props.feedback;
   }
   return null;
 });
