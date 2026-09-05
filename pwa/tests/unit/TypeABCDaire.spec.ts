@@ -7,6 +7,11 @@ import { queryClient } from '@/queryClient';
 import TypeABCDaire from '@/views/types/TypeABCDaire.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 
+const fireCelebrationMock = vi.fn();
+vi.mock( '@/composables/useCelebration', () => ( {
+	fireExerciseCelebration: () => fireCelebrationMock(),
+} ) );
+
 // Mock eg-chessboard
 vi.mock( 'eg-chessboard/vue', () => ( {
 	default: {
@@ -44,6 +49,7 @@ vi.mock( 'eg-chessboard/vue', () => ( {
 describe( 'TypeABCDaire.vue', () => {
 	beforeEach( () => {
 		setActivePinia( createPinia() );
+		fireCelebrationMock.mockClear();
 	} );
 
 	const sampleLichessPgn = `[Event "EA_Matérialité_TerminerUnePartie: EA_Niv1_M_TD-1_ABCDéaire Tactique"]
@@ -193,6 +199,7 @@ describe( 'TypeABCDaire.vue', () => {
 		expect( wrapper.find( '.success-resolu-badge' ).exists() ).toBe(
 			false
 		);
+		expect( fireCelebrationMock ).not.toHaveBeenCalled();
 
 		// 2. Finir le visionnage du PGN
 		const pgnViewer = wrapper.findComponent( { name: 'PgnViewer' } );
@@ -205,5 +212,6 @@ describe( 'TypeABCDaire.vue', () => {
 		expect( wrapper.find( '.success-resolu-badge' ).text() ).toContain(
 			'🎉 Exercice réussi !'
 		);
+		expect( fireCelebrationMock ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

@@ -166,9 +166,8 @@ const loadPgnData = async () => {
       }
     }, 50);
 
-    const historyState = boardApi.value.getHistoryViewerState();
-    const totalPlyCount = typeof boardApi.value.getCurrentPlyNumber === 'function' ? boardApi.value.getCurrentPlyNumber() : undefined;
-    if (!historyState?.isEnabled || totalPlyCount === 0) {
+    const totalPlyCount = typeof boardApi.value.getCurrentPlyNumber === 'function' ? boardApi.value.getCurrentPlyNumber() : 0;
+    if (totalPlyCount === 0) {
       isCompleted.value = true;
       notifyFinishedIfEnd();
     } else {

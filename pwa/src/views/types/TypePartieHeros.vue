@@ -65,19 +65,6 @@
             {{ activePgnComment ? '💬 ' + activePgnComment : '' }}
           </p>
         </div>
-
-        <!-- Footer de Navigation par Carte pour Étape PGN -->
-        <SeriesCardFooter
-          :currentCard="etapeCouranteIndex + 1"
-          :totalCards="totalEtapes"
-          :isSolved="isPgnCompleted"
-          :feedback="null"
-          pendingHint="Visionnez tous les coups pour continuer"
-          badgePrefix="Étape"
-          nextText="Étape suivante"
-          finishText="Terminer l'exercice"
-          @next="passerEtapeSuivante"
-        />
       </div>
 
       <!-- 2. Étape de Choix Interactif QCM -->
@@ -113,20 +100,20 @@
             </div>
           </ion-card-content>
         </ion-card>
-
-        <!-- Footer de Navigation par Carte pour Étape QCM -->
-        <SeriesCardFooter
-          :currentCard="etapeCouranteIndex + 1"
-          :totalCards="totalEtapes"
-          :isSolved="isQcmSolved"
-          :feedback="qcmFeedback"
-          pendingHint="Trouvez le meilleur coup pour continuer"
-          badgePrefix="Étape"
-          nextText="Étape suivante"
-          finishText="Terminer l'exercice"
-          @next="passerEtapeSuivante"
-        />
       </div>
+
+      <!-- Footer Unique de Navigation par Carte pour TypePartieHeros -->
+      <SeriesCardFooter
+        :currentCard="etapeCouranteIndex + 1"
+        :totalCards="totalEtapes"
+        :isSolved="isCurrentStageSolved"
+        :feedback="currentStageFeedback"
+        :pendingHint="currentStagePendingHint"
+        badgePrefix="Étape"
+        nextText="Étape suivante"
+        finishText="Terminer l'exercice"
+        @next="passerEtapeSuivante"
+      />
     </div>
   </div>
 </template>
@@ -558,6 +545,30 @@ watch(
   },
   { deep: true }
 );
+
+const isCurrentStageSolved = computed(() => {
+  if (etapeActuelle.value.type === 'pgn') {
+    return isPgnCompleted.value;
+  }
+  if (etapeActuelle.value.type === 'qcm') {
+    return isQcmSolved.value;
+  }
+  return false;
+});
+
+const currentStageFeedback = computed<CardFeedback | null>(() => {
+  if (etapeActuelle.value.type === 'qcm') {
+    return qcmFeedback.value;
+  }
+  return null;
+});
+
+const currentStagePendingHint = computed<string>(() => {
+  if (etapeActuelle.value.type === 'qcm') {
+    return 'Trouvez le meilleur coup pour continuer';
+  }
+  return 'Visionnez tous les coups pour continuer';
+});
 
 const passerEtapeSuivante = async () => {
   if (etapeCouranteIndex.value < totalEtapes.value - 1) {

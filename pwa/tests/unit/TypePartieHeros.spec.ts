@@ -1,9 +1,16 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { computed } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypePartieHeros from '@/views/types/TypePartieHeros.vue';
+import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
+
+const fireCelebrationMock = vi.fn();
+vi.mock( '@/composables/useCelebration', () => ( {
+	fireExerciseCelebration: () => fireCelebrationMock(),
+} ) );
 
 // Mock eg-chessboard
 vi.mock( 'eg-chessboard/vue', () => ( {
@@ -30,6 +37,7 @@ vi.mock( 'eg-chessboard/vue', () => ( {
 describe( 'TypePartieHeros.vue', () => {
 	beforeEach( () => {
 		setActivePinia( createPinia() );
+		fireCelebrationMock.mockClear();
 	} );
 
 	const samplePgn = `[Event "Partie Héros Demo"]
@@ -81,6 +89,16 @@ describe( 'TypePartieHeros.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_NAVIGATION_KEY as symbol ]: {
+						hasNext: computed( () => true ),
+						nextLabel: computed( () => 'Exercice suivant' ),
+						hasCourse: computed( () => true ),
+						courseUrl: computed( () => '/cours/1' ),
+						onNext: vi.fn(),
+						onCourse: vi.fn(),
+					},
+				},
 			},
 		} );
 
@@ -94,6 +112,7 @@ describe( 'TypePartieHeros.vue', () => {
 		const nextPgnBtn = wrapper.find( 'ion-button[title="Suivant"]' );
 		await nextPgnBtn.trigger( 'click' );
 		expect( footer.props( 'isSolved' ) ).toBe( true );
+		expect( fireCelebrationMock ).not.toHaveBeenCalled();
 
 		// Passer à l'étape suivante (QCM)
 		const nextStageBtn = wrapper.find( '.next-card-btn' );
@@ -110,6 +129,8 @@ describe( 'TypePartieHeros.vue', () => {
 		expect( choiceBtns.length ).toBeGreaterThanOrEqual( 1 );
 		await choiceBtns[ 0 ].trigger( 'click' );
 		expect( qcmFooter.props( 'isSolved' ) ).toBe( true );
+		// Pas de célébration lors du succès du QCM
+		expect( fireCelebrationMock ).not.toHaveBeenCalled();
 
 		// Passer à l'étape suivante (PGN final)
 		const toPgnFinalBtn = wrapper.find( '.next-card-btn' );
@@ -121,17 +142,22 @@ describe( 'TypePartieHeros.vue', () => {
 		const finalPgnFooter = wrapper.findComponent( {
 			name: 'SeriesCardFooter',
 		} );
-		// VÉRIFICATION CLÉ : Le PGN final N'EST PAS résolu à son arrivée (isSolved doit être false)
+		// VÉRIFICATION CLÉ : Le PGN final N'EST PAS résolu à son arrivée
 		expect( finalPgnFooter.props( 'isSolved' ) ).toBe( false );
 		expect( wrapper.text() ).not.toContain( '🎉 Exercice réussi !' );
+		// VÉRIFICATION CLÉ : Aucune célébration n'a été déclenchée à l'arrivée sur le PGN final !
+		expect( fireCelebrationMock ).not.toHaveBeenCalled();
 
 		// Visionner les coups du PGN final (2. Fa4 puis 2... Cf6)
 		const nextBtnFinal = wrapper.find( 'ion-button[title="Suivant"]' );
 		await nextBtnFinal.trigger( 'click' ); // coup 1 du stage final
 		expect( finalPgnFooter.props( 'isSolved' ) ).toBe( false );
+		expect( fireCelebrationMock ).not.toHaveBeenCalled();
 
 		await nextBtnFinal.trigger( 'click' ); // coup 2 (dernier coup du stage final)
 		// Maintenant que tous les coups du PGN ont été visionnés, l'étape est résolue !
 		expect( finalPgnFooter.props( 'isSolved' ) ).toBe( true );
+		// VÉRIFICATION CLÉ : La célébration n'a eu lieu qu'une seule et unique fois, au terme du PGN !
+		expect( fireCelebrationMock ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
