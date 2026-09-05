@@ -33,13 +33,23 @@
 - **Exception Cartes Manipulables** (`OrderViewer`, `MatchingViewer`, etc.) : L'échiquier intérieur conserve `border-radius: 0;`, seul le conteneur externe (`.board-wrapper-card`) garde l'aspect carte (bords arrondis, ombres).
 - **Responsive & Ratio** :
   - Interdiction de tronquer/rogner un échiquier. Conserver `aspect-ratio: 1 / 1`.
-  - **Portrait** : `max-width: min(720px, 60vh)`.
+  - **Portrait** : `max-width: min(100%, 38dvh, 440px)`.
   - **Paysage** : `width: min(65vh, 48vw); aspect-ratio: 1 / 1;`.
+- **Architecture d'Affichage des Exercices (Scaffold Mobile)** :
+  - **Header Fixe** : `<ion-header>` maintient la navigation au sommet de la page.
+  - **Corps Scrollable (`ion-content`)** : Accueille l'en-tête `<ExerciseHeader>`, l'échiquier et les interactions (coups, boutons QCM, commentaires). En cas de dépassement, l'ascenseur s'active automatiquement uniquement dans cette zone centrale.
+  - **Footer Fixe Ancré au Bas d'Écran (`SeriesCardFooter`)** : `<ion-footer>` dans `ContenuPage.vue`. `<SeriesCardFooter>` s'y téléporte via `<Teleport>` ciblant un `Ref<HTMLElement | null>` scopé fourni par `provide('exerciseFooterPortal', footerPortalRef)` (et non un sélecteur `#id` global sujet aux collisions de cache de routes Ionic), avec fallback inline (`:disabled="!isTeleportEnabled"`) pour les tests/vues isolées. Garantit un footer 100% stable sous le pouce et respectueux des safe areas mobiles, présent immédiatement y compris sur les exercices à carte unique (`totalCards: 1`).
+  - **Scroll automatique au changement d'exercice** : Réinitialisation immédiate du scroll au sommet (`scrollToTop(0)`) lors de chaque transition de contenu.
+- **Stabilité PGN & Confort de Lecture des Commentaires** :
+  - Interdiction d'utiliser un `v-if` conditionnel détruisant le conteneur de commentaire entre deux coups. Utiliser une boîte avec hauteur minimale réservée (`min-height: 42px; max-height: 120px; box-sizing: border-box; overflow-y: auto;`) et la classe `.comment-empty` (`visibility: hidden; height: 42px;`) en l'absence de commentaire. Cela permet aux explications textuelles de 1 à 5 lignes de s'afficher confortablement sans être tronquées, tout en éliminant les sauts d'interface.
+- **Compacité & Look & Feel QCM** :
+  - Respecter la compacité canonique de `shared-components.scss` : `.exercise-card` (padding contenu réduit 8px 10px), `.qcm-choices` (`gap: 6px`), `.choice-btn` (`min-height: 38px`, texte centré).
 
 ## 5. Composants & Composables Partagés (`src/components/shared/` & `src/composables/`)
 - **Composants Partagés** : `Chessboard/`, `DataTable/`, `DiagramViewer.vue`, `PuzzleViewer.vue`, `QcmViewer.vue`, `InteractiveQcmViewer.vue`, `PgnViewer.vue`, `PlacementViewer.vue`, `MatchingViewer.vue`, `OrderViewer.vue`, `ParcoursViewer.vue`, `VisionViewer.vue`.
 - **Feedback & Toasts** : Utiliser systématiquement le composable `useFeedback()` (`src/composables/useFeedback.ts`) pour les notifications utilisateur au lieu d'appeler manuellement `toastController.create()`.
 - **Progression Exercices & Séries** : Utiliser systématiquement le composable `useCardNavigation()` (`src/composables/useCardNavigation.ts`) pour la navigation par carte/étape.
+- **Pied de Série Unifié** : Utiliser `<SeriesCardFooter>` qui se téléporte automatiquement dans le footer fixe de page.
 
 ## 6. État, API & Caching (TanStack Query & Pinia)
 - **Appels HTTP** : Interdiction du `fetch` natif. Utiliser `safeFetch` (`src/utils/safeFetch.ts`) ou `fetchWpCollection` (`src/utils/wpApi.ts`).

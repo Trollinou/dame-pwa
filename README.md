@@ -147,6 +147,7 @@ Barre de navigation et zone de feedback visuel pour les exercices séquentiels o
 - **Badge d'étape & Métamorphose de fin d'exercice** : Indique l'avancement (`Carte X / Y` ou préfixe personnalisé avec `badgePrefix`). Dès la dernière carte résolue, le badge fait place à un bouton compact *« Cours »* et le bouton d'action devient directement *« Exercice suivant »* (ou *« Terminer le cours »*) avec pulsation lumineuse (`pulseGlow`), évitant tout panel redondant sur mobile.
 - **Célébration visuelle & sensorielle (`useCelebration.ts`)** : Déclenchement automatique d'un feu d'artifice de confettis (`canvas-confetti`) et d'un retour haptique sur smartphone (`@capacitor/haptics`) lors de la validation finale de l'exercice.
 - **Orchestration inter-exercices sans prop-drilling** : Consomme optionnellement `useExerciseNavigation()` (`EXERCISE_NAVIGATION_KEY` injecté par `ContenuPage`) pour déclencher la navigation vers le prochain contenu ou le cours parent.
+- **Ancrage fixe en bas d'écran (Scaffold Mobile & Teleport)** : Téléporté automatiquement via Vue 3 `<Teleport>` ciblant la référence DOM scopée du `<ion-footer>` de `ContenuPage.vue` (via `provide('exerciseFooterPortal', footerPortalRef)`, avec fallback inline pour les tests/vues isolées). Le footer reste 100% immobile sous le pouce au bas de l'écran (y compris sur les exercices à carte unique), laissant `<ion-content>` défiler au centre uniquement si le contenu dépasse la hauteur d'affichage.
 - **Verrouillage pédagogique (`disabled`, `disabledHint`)** : Permet de désactiver le bouton d'avancement tant qu'une action requise (ex: relecture complète du PGN d'explication) n'est pas achevée, avec infobulle explicative.
 - **Indicateur d'attente** : Affiche un indice textuel (`pendingHint`) tant que la carte n'a pas été résolue.
 
@@ -181,13 +182,13 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 | :--- | :--- | :--- |
 | **Layouts** | `.exercise-viewer-layout` | Conteneur principal flex centré (largeur 100%) pour les viewers d'exercice. |
 | | `.exercise-stage` | Sous-conteneur de phase ou étape intermédiaire d'exercice (largeur max 600px). |
-| **Échiquiers** | `.chessboard-container` | Conteneur standard (ratio 1:1, max 500px, `flex-shrink: 0`, `border-radius: 0;`, `box-shadow: none;`, landscape tablette `min(65vh, 48vw)`). |
-| | `.chessboard-container--mini` | Miniaturisation (320px, `flex-shrink: 0`) pour l'appariement (`MatchingViewer`) et les choix de plans (`JugementFinalViewer`). |
-| | `.chessboard-container--small` | Variante compacte (400px, `flex-shrink: 0`) pour écrans à faible hauteur / portrait restreint. |
-| **Cartes & En-têtes** | `.exercise-card` | Carte standard pour consignes, questions et contenus (bord arrondi 12px, ombre légère). |
+| **Échiquiers** | `.chessboard-container` | Conteneur standard responsive (ratio 1:1, portrait `max-width: min(100%, 38dvh, 440px)`, `margin: 0 auto 8px auto`, `flex-shrink: 0`, `border-radius: 0;`, `box-shadow: none;`, landscape tablette `min(65vh, 48vw)`). |
+| | `.chessboard-container--mini` | Miniaturisation (300px, `flex-shrink: 0`) pour l'appariement (`MatchingViewer`) et les choix de plans (`JugementFinalViewer`). |
+| | `.chessboard-container--small` | Variante compacte (360px, `flex-shrink: 0`) pour écrans à faible hauteur / portrait restreint. |
+| **Cartes & En-têtes** | `.exercise-card` | Carte standard pour consignes, questions et contenus (bord arrondi 8px, padding interne `8px 10px`, ombre légère). |
 | | `.exercise-card-header` | Titre centré de consigne ou de question (1.15rem, semi-bold). |
-| **Choix & QCM** | `.qcm-choices` | Conteneur vertical de boutons de choix (gap 10px, max 500px). |
-| | `.choice-btn` | Bouton de choix avec retour à la ligne natif Ionic (`&::part(native)` aligné à gauche). |
+| **Choix & QCM** | `.qcm-choices` | Conteneur vertical de boutons de choix compact (gap 6px, max 500px). |
+| | `.choice-btn` | Bouton de choix compact (`min-height: 38px`, padding `6px 12px`, texte centré, retour à la ligne natif Ionic). |
 | | `.choice-btn--centered` | Variante du bouton de choix avec texte centré. |
 | **Palettes & Pièces** | `.piece-palette` | Grille 2x6 ou 6x2 pour sélection interactive de pièces. |
 | | `.piece-btn` | Bouton carré de pièce avec effet hover/scale. |

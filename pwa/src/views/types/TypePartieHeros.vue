@@ -59,10 +59,10 @@
           </ion-button>
         </div>
 
-        <!-- Affichage du Commentaire du Coup Courant (uniquement s'il existe) -->
-        <div v-if="activePgnComment" class="comment-container">
+        <!-- Affichage du Commentaire du Coup Courant (hauteur constante réservée pour éviter les sauts d'interface) -->
+        <div class="comment-container" :class="{ 'comment-empty': !activePgnComment }">
           <p class="comment-text">
-            💬 {{ activePgnComment }}
+            {{ activePgnComment ? '💬 ' + activePgnComment : '' }}
           </p>
         </div>
 
@@ -530,61 +530,88 @@ const passerEtapeSuivante = async () => {
 <style scoped>
 .exercice-type-partie-heros {
   width: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 100%;
 }
 
 .etape-container {
   width: 100%;
   max-width: 500px;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 100%;
   gap: 12px;
 }
 
 .stage-pgn-wrapper,
 .stage-qcm-wrapper {
   width: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  min-height: 100%;
+  gap: 6px;
 }
-
 
 /* Contrôles de Navigation PGN */
 .navigation-controls {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  align-items: center;
+  gap: 10px;
   margin-top: 4px;
 }
 
 .nav-btn {
   --border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  margin: 0;
+}
+
+.nav-btn ion-icon {
+  font-size: 1.25rem;
 }
 
 /* Bulle de Commentaire */
 .comment-container {
   width: 100%;
   background: var(--ion-color-step-100, #f4f5f8);
-  border-radius: 8px;
+  border-radius: 6px;
   border-left: 4px solid var(--ion-color-primary, #3880ff);
-  padding: 10px 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  min-height: 56px;
-  max-height: 110px;
-  overflow-y: auto;
+  padding: 8px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  min-height: 42px;
+  max-height: 120px;
   box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+}
+
+.comment-empty {
+  visibility: hidden;
+  border-left-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  min-height: 42px;
+  height: 42px;
 }
 
 .comment-text {
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.35;
-  color: var(--ion-color-step-800, #444);
+  width: 100%;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--ion-color-step-800, #333);
 }
 
 .placeholder-text {
@@ -594,21 +621,6 @@ const passerEtapeSuivante = async () => {
 
 /* Carte de Choix QCM */
 .exercise-card {
-  margin: 4px 0 0 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  border-radius: 8px;
-}
-
-.qcm-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.choice-btn {
-  --border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
   margin: 0;
 }
 

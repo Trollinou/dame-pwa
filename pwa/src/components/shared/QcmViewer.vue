@@ -35,7 +35,7 @@
 
     <!-- Footer de Navigation par Carte -->
     <SeriesCardFooter
-      v-if="props.totalCards && props.totalCards > 1 && props.currentCard"
+      v-if="props.totalCards && props.currentCard"
       :currentCard="props.currentCard"
       :totalCards="props.totalCards"
       :isSolved="repondu"
@@ -134,8 +134,8 @@ const validerChoix = (index: number) => {
       message: 'Bien joué ! Bonne réponse.'
     };
 
-    // Si pas de série de cartes, afficher le toast et émettre la réussite
-    if (!props.totalCards || props.totalCards <= 1) {
+    // Si aucune gestion de cartes n'est configurée, fallback toast automatique
+    if (!props.totalCards || !props.currentCard) {
       showSuccess('Bien joué ! Bonne réponse.', 2000);
       setTimeout(() => {
         emit('success');
@@ -147,7 +147,7 @@ const validerChoix = (index: number) => {
       message: 'Mauvaise réponse, essaie encore !'
     };
 
-    if (!props.totalCards || props.totalCards <= 1) {
+    if (!props.totalCards || !props.currentCard) {
       showError('Mauvaise réponse, essaie encore !', 2000);
     }
   }

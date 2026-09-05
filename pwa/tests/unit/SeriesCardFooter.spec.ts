@@ -147,4 +147,34 @@ describe( 'SeriesCardFooter.vue', () => {
 
 		vi.useRealTimers();
 	} );
+
+	test( 'se téléporte dans exerciseFooterPortal lorsqu’il est fourni via provide', async () => {
+		const targetDiv = document.createElement( 'div' );
+		targetDiv.id = 'test-portal-target';
+		document.body.appendChild( targetDiv );
+
+		const portalRef = computed( () => targetDiv );
+
+		mount( SeriesCardFooter, {
+			props: {
+				currentCard: 1,
+				totalCards: 2,
+				isSolved: false,
+			},
+			global: {
+				provide: {
+					exerciseFooterPortal: portalRef,
+				},
+			},
+		} );
+
+		expect(
+			targetDiv.querySelector( '.series-card-footer-container' )
+		).not.toBeNull();
+		expect(
+			targetDiv.querySelector( '.card-badge' )?.textContent
+		).toContain( 'Carte 1 / 2' );
+
+		document.body.removeChild( targetDiv );
+	} );
 } );

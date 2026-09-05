@@ -1,7 +1,7 @@
 <template>
   <div class="exercise-unified-header">
     <!-- Panel 1: Métadonnées Compactes -->
-    <ion-card class="header-card meta-card ion-no-margin ion-margin-bottom">
+    <ion-card class="header-card meta-card ion-no-margin">
       <ion-card-content class="meta-card-content">
         <div class="meta-title">{{ title }}</div>
         <div class="meta-bottom-row">
@@ -12,7 +12,7 @@
     </ion-card>
 
     <!-- Panel 2: Consigne / Question + Badge Compact -->
-    <ion-card v-if="consigne || stepBadgeText" class="header-card consigne-card ion-no-margin ion-margin-bottom">
+    <ion-card v-if="consigne || stepBadgeText" class="header-card consigne-card ion-no-margin">
       <ion-card-content class="consigne-card-content">
         <div class="consigne-row">
           <div class="consigne-text">{{ consigne }}</div>
@@ -45,6 +45,7 @@ defineProps<{
 .header-card {
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 6px;
 }
 
 /* Panel 1: Meta Card */

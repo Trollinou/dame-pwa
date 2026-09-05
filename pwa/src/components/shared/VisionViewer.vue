@@ -274,6 +274,10 @@ const passerCarteSuivante = () => {
 <style scoped>
 .vision-viewer-wrapper {
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 /* Dual Panel Layout */

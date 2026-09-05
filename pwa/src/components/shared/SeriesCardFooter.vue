@@ -1,5 +1,6 @@
 <template>
-  <div class="series-card-footer-container">
+  <Teleport :to="portalTarget || 'body'" :disabled="!isTeleportEnabled">
+    <div :key="`footer-${props.currentCard}-${props.totalCards}`" class="series-card-footer-container">
     <!-- Zone de feedback toujours présente (réservée dès le départ pour éviter tout décalage) -->
     <div
       class="feedback-row"
@@ -89,11 +90,13 @@
         </div>
       </template>
     </div>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, ref, onUnmounted } from 'vue';
+import { computed, watch, ref, onUnmounted, inject } from 'vue';
+import type { Ref } from 'vue';
 import { IonBadge, IonButton, IonIcon } from '@ionic/vue';
 import {
   arrowForwardOutline,
@@ -138,6 +141,17 @@ const emit = defineEmits<{
 }>();
 
 const exerciseNav = useExerciseNavigation();
+const footerPortalRef = inject<Ref<HTMLElement | null> | HTMLElement | null>('exerciseFooterPortal', null);
+
+const portalTarget = computed<HTMLElement | null>(() => {
+  if (!footerPortalRef) return null;
+  if (footerPortalRef && typeof footerPortalRef === 'object' && 'value' in footerPortalRef) {
+    return footerPortalRef.value;
+  }
+  return footerPortalRef as HTMLElement;
+});
+
+const isTeleportEnabled = computed(() => !!portalTarget.value);
 
 const showNextExerciseBtn = ref(false);
 let nextButtonTimer: ReturnType<typeof setTimeout> | null = null;
@@ -218,9 +232,11 @@ const handleFinalNext = () => {
 .series-card-footer-container {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
-  margin-top: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Zone de Feedback Fixe et Pré-réservée */

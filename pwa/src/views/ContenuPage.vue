@@ -17,7 +17,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true" class="ion-padding">
+    <ion-content ref="ionContentRef" :fullscreen="true" class="ion-padding">
       <div class="safe-area-wrapper">
         <ion-header v-if="contenuActuel?.post_type === 'roi_lecon'" collapse="condense">
           <ion-toolbar>
@@ -110,6 +110,11 @@
         </div>
       </div>
     </ion-content>
+
+    <!-- Footer Fixe Unifié pour les Exercices -->
+    <ion-footer v-if="!isPageLoading && contenuActuel?.post_type === 'roi_exercice'" class="exercise-ion-footer">
+      <div ref="footerPortalRef" class="exercise-footer-portal"></div>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -128,9 +133,11 @@ import {
   IonCardTitle,
   IonCardContent,
   IonButton,
-  IonIcon
+  IonIcon,
+  IonFooter
 } from '@ionic/vue';
-import { ref, computed, watch, onUnmounted, provide } from 'vue';
+import { ref, computed, watch, onUnmounted, provide, nextTick } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
@@ -162,6 +169,11 @@ const isLoading = ref(true);
 const isPageLoading = computed(() => isLoading.value || apprentissageStore.isContenuLoading);
 const estReussi = ref(false);
 const contenuActuel = computed(() => apprentissageStore.contenuActuel);
+
+const footerPortalRef = ref<HTMLElement | null>(null);
+const ionContentRef = ref<ComponentPublicInstance | null>(null);
+
+provide('exerciseFooterPortal', footerPortalRef);
 
 const coursParentInfo = computed(() => {
   if (!contenuActuel.value || apprentissageStore.parcours.length === 0) {
@@ -318,6 +330,9 @@ const loadContenu = async (idVal: string | string[] | number) => {
     }
   }
   isLoading.value = false;
+  nextTick(() => {
+    ionContentRef.value?.$el?.scrollToTop?.(0);
+  });
 };
 
 watch(
@@ -348,9 +363,19 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+ion-content::part(scroll) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
 .safe-area-wrapper {
   padding-left: var(--ion-safe-area-left, 0);
   padding-right: var(--ion-safe-area-right, 0);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .spinner-container, .error-container {
@@ -359,11 +384,17 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   min-height: 200px;
+  flex: 1;
 }
 
 .exercice-container {
   max-width: 600px;
   margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .success-card {
@@ -409,5 +440,15 @@ onUnmounted(() => {
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
   transform: translateY(10px);
+}
+
+.exercise-ion-footer {
+  background: var(--ion-background-color, #ffffff);
+  border-top: 1px solid var(--ion-color-step-150, #e0e0e0);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.exercise-footer-portal {
+  width: 100%;
 }
 </style>

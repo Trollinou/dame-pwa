@@ -25,16 +25,16 @@
       </ion-button>
     </div>
 
-    <!-- Comment Display -->
-    <div class="comment-container">
-      <p class="comment-text" :class="{ 'placeholder-text': !currentComment }">
-        {{ currentComment ? '💬 ' + currentComment : 'Aucun commentaire pour cette position.' }}
+    <!-- Comment Display (hauteur fixe et réservée) -->
+    <div class="comment-container" :class="{ 'comment-empty': !currentComment }">
+      <p class="comment-text">
+        {{ currentComment ? '💬 ' + currentComment : '' }}
       </p>
     </div>
 
     <!-- Footer de Navigation par Carte (optionnel si en série) -->
     <SeriesCardFooter
-      v-if="props.totalCards && props.totalCards > 1 && props.currentCard"
+      v-if="props.totalCards && props.currentCard"
       :currentCard="props.currentCard"
       :totalCards="props.totalCards"
       :isSolved="isCompleted"
@@ -181,30 +181,52 @@ const viewEnd = () => {
 .navigation-controls {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  margin-top: 8px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
 }
 .nav-btn {
   --border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  margin: 0;
+}
+.nav-btn ion-icon {
+  font-size: 1.25rem;
 }
 .comment-container {
   width: 100%;
-  margin-top: 12px;
+  margin-top: 6px;
   background: var(--ion-color-step-100, #f4f5f8);
-  border-radius: 8px;
+  border-radius: 6px;
   border-left: 4px solid var(--ion-color-primary, #3880ff);
-  padding: 12px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  height: 72px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  min-height: 42px;
+  max-height: 120px;
+  box-sizing: border-box;
   overflow-y: auto;
+  display: flex;
+  align-items: center;
+}
+.comment-empty {
+  visibility: hidden;
+  border-left-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  min-height: 42px;
+  height: 42px;
 }
 .comment-text {
   margin: 0;
-  font-size: 0.92rem;
+  width: 100%;
+  font-size: 0.88rem;
   line-height: 1.4;
-  color: var(--ion-color-step-800, #444);
+  color: var(--ion-color-step-800, #333);
 }
 .placeholder-text {
   color: var(--ion-color-step-400, #989aa2);
