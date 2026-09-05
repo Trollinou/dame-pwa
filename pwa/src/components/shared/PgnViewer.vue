@@ -83,6 +83,16 @@ const syncComment = () => {
   }
 };
 
+const notifyFinishedIfEnd = () => {
+  if (!props.totalCards && props.autoCompleteDelay && props.autoCompleteDelay > 0) {
+    setTimeout(() => {
+      emit('finished');
+    }, props.autoCompleteDelay);
+  } else if (!props.totalCards) {
+    emit('finished');
+  }
+};
+
 const loadPgnData = async () => {
   if (boardApi.value && activePgn.value) {
     await nextTick();
@@ -101,8 +111,10 @@ const loadPgnData = async () => {
     }, 50);
 
     const historyState = boardApi.value.getHistoryViewerState();
-    if (!historyState?.isEnabled) {
+    const totalPly = typeof boardApi.value.getCurrentPlyNumber === 'function' ? boardApi.value.getCurrentPlyNumber() : undefined;
+    if (!historyState?.isEnabled || totalPly === 0) {
       isCompleted.value = true;
+      notifyFinishedIfEnd();
     } else {
       isCompleted.value = false;
     }
@@ -143,19 +155,15 @@ const viewNext = () => {
 
   const beforePly = historyStateBefore?.plyViewing;
   const afterPly = historyStateAfter?.plyViewing;
+  const totalPly = typeof boardApi.value.getCurrentPlyNumber === 'function' ? boardApi.value.getCurrentPlyNumber() : undefined;
   const isEnd =
     historyStateAfter?.isEnabled === false ||
+    (afterPly !== undefined && totalPly !== undefined && afterPly >= totalPly) ||
     (beforePly !== undefined && afterPly !== undefined && beforePly === afterPly);
 
   if (isEnd) {
     isCompleted.value = true;
-    if (!props.totalCards && props.autoCompleteDelay && props.autoCompleteDelay > 0) {
-      setTimeout(() => {
-        emit('finished');
-      }, props.autoCompleteDelay);
-    } else if (!props.totalCards) {
-      emit('finished');
-    }
+    notifyFinishedIfEnd();
   }
 };
 
@@ -164,6 +172,7 @@ const viewEnd = () => {
     boardApi.value.stopViewingHistory();
     syncComment();
     isCompleted.value = true;
+    notifyFinishedIfEnd();
   }
 };
 </script>

@@ -79,7 +79,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - Déplacement direct sur l'échiquier du meilleur coup attendu :
          - En cas de mauvais coup : annulation immédiate et possibilité de réessayer sans limite.
          - En cas de bon coup : si l'exercice comporte des coups intermédiaires, l'ordinateur joue sa réplique scriptée (délai de 500ms) et l'apprenant rejoue jusqu'au coup final.
-       - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées (Début, Précédent, Suivant) avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur), sans bouton d'avance rapide à la fin afin de garantir la lecture pas-à-pas des explications.
+       - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées (Début, Précédent, Suivant) avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur), sans bouton d'avance rapide à la fin afin de garantir la lecture pas-à-pas des explications. Le bouton *Carte suivante* ou *Terminer l'exercice* du pied de carte (`SeriesCardFooter`) reste inactif (grisé) jusqu'à ce que l'apprenant ait fait défiler tous les coups du PGN jusqu'au dernier.
      - **Exercices La Partie dont tu es le Héros (Type 4)** :
        - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
        - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté pas-à-pas (boutons Début, Précédent, Suivant, sans saut direct à la fin pour garantir l'assimilation des coups et commentaires) et embranchements QCM interactifs.
@@ -90,7 +90,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
          - Choix du coup principal : feedback vert avec l'explication du bon coup, coup joué sur l'échiquier et déblocage de l'étape suivante.
        - Reprise de la séquence PGN post-QCM directement sur la position résultante (un demi-coup plus tard) avec restitution du commentaire et des formes du coup validé.
        - Progression fluide avec `ExerciseHeader` et `SeriesCardFooter` jusqu'au coup final de la partie et validation de la progression.
-     - **Navigation en Série (`SeriesCardFooter`)** : Badge d'étape (`Carte X / Y` ou `Étape X / Y`), zone de feedback visuel fixe (succès/erreur) et bouton d'avancement débloqué dès la validation de la position.
+     - **Navigation en Série (`SeriesCardFooter`)** : Badge d'étape (`Carte X / Y` ou `Étape X / Y`), zone de feedback visuel fixe (succès/erreur), bouton d'avancement débloqué dès la validation de la position et support du verrouillage temporaire (`disabled`) pour imposer la lecture intégrale des explications.
      - **Chronométrage & Validation finale** : Mesure en temps réel du temps passé sur la leçon ou l'exercice, puis transmission atomique de la durée (`time_spent`) lors de la validation de la réussite dans la progression de l'adhérent.
 
 2. **Partie d'Échecs & Échiquier ♟️** :

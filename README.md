@@ -144,8 +144,9 @@ import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
 ### 5. Composant Pied de Série `<SeriesCardFooter>` (`src/components/shared/SeriesCardFooter.vue`)
 Barre de navigation et zone de feedback visuel pour les exercices séquentiels ou séries multi-cartes :
 - **Zone de feedback intégrée** : Affiche les messages dynamiques d'encouragement ou d'erreur (`feedback: { message, type }`) avec icône adaptée.
-- **Badge d'étape** : Indique l'avancement (`Carte X / Y`).
+- **Badge d'étape** : Indique l'avancement (`Carte X / Y` ou préfixe personnalisé avec `badgePrefix`).
 - **Bouton d'action dynamique** : Passe automatiquement de *"Carte suivante"* (`nextText`) à *"Terminer l'exercice"* (`finishText`) sur la dernière étape lorsque `isSolved` est à `true`.
+- **Verrouillage pédagogique (`disabled`, `disabledHint`)** : Permet de désactiver le bouton d'avancement tant qu'une action requise (ex: relecture complète du PGN d'explication) n'est pas achevée, avec infobulle explicative.
 - **Indicateur d'attente** : Affiche un indice textuel (`pendingHint`) tant que la carte n'a pas été résolue.
 
 ```vue
@@ -154,6 +155,7 @@ Barre de navigation et zone de feedback visuel pour les exercices séquentiels o
     :current-card="currentCard"
     :total-cards="totalCards"
     :is-solved="isSolved"
+    :disabled="isPgnReviewPending"
     :feedback="currentFeedback"
     @next="next"
   />

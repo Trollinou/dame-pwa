@@ -33,6 +33,7 @@
         :pgnString="currentPgnForViewer"
         :orientation="couleurJoueur"
         :hideEndButton="true"
+        @finished="onPgnFinished"
       />
     </div>
 
@@ -41,8 +42,10 @@
       :currentCard="indexCourant + 1"
       :totalCards="exercicesListe.length"
       :isSolved="isCardSolved"
+      :disabled="!isPgnFinished"
       :feedback="feedback"
       pendingHint="Trouvez le bon coup pour continuer"
+      disabledHint="Visionnez tous les coups du PGN pour continuer"
       @next="passerCarteSuivante"
     />
   </div>
@@ -91,6 +94,7 @@ const headerMeta = computed(() => ({
 const indexCourant = ref(0);
 const etapeJeu = ref<'playing' | 'recap'>('playing');
 const isCardSolved = ref(false);
+const isPgnFinished = ref(false);
 const isComputerPlaying = ref(false);
 const currentMoveIndex = ref(0);
 const boardApi = ref<BoardCore | null>(null);
@@ -240,6 +244,7 @@ const onBoardCreated = (api: BoardCore) => {
 const initialiserPositionJeu = () => {
   etapeJeu.value = 'playing';
   isCardSolved.value = false;
+  isPgnFinished.value = false;
   isComputerPlaying.value = false;
   currentMoveIndex.value = 0;
   feedback.value = null;
@@ -257,9 +262,14 @@ watch(indexCourant, () => {
   });
 });
 
+const onPgnFinished = () => {
+  isPgnFinished.value = true;
+};
+
 const activerModeRecapitulatif = () => {
   etapeJeu.value = 'recap';
   isCardSolved.value = true;
+  isPgnFinished.value = false;
   feedback.value = {
     type: 'success',
     message: 'Bravo ! Exercice réussi.'
@@ -331,11 +341,15 @@ const verifierCoup = async (move: Move) => {
 };
 
 const passerCarteSuivante = () => {
+  if (!isPgnFinished.value) {
+    return;
+  }
   feedback.value = null;
   if (indexCourant.value < exercicesListe.value.length - 1) {
     indexCourant.value += 1;
     etapeJeu.value = 'playing';
     isCardSolved.value = false;
+    isPgnFinished.value = false;
     isComputerPlaying.value = false;
     currentMoveIndex.value = 0;
   } else {

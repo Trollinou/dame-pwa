@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Ajouté & Amélioré
+- **Verrouillage Pédagogique de la Navigation PGN (`SeriesCardFooter.vue`, `ABCDaireTactiqueViewer.vue`, `PgnViewer.vue`, `USING.md`, `README.md`)** :
+  - **Désactivation conditionnelle du bouton d'avancement (`SeriesCardFooter.vue`)** : Introduction des props `disabled` et `disabledHint` permettant de maintenir le bouton « Carte suivante » ou « Terminer l'exercice » grisé (`opacity: 0.5`, `cursor: not-allowed`) avec infobulle explicative tant que l'action requise n'est pas complétée.
+  - **Parcours obligatoire des explications du PGN (`ABCDaireTactiqueViewer.vue`)** : Dans les exercices de type ABCDaire Tactique (Type 3), après avoir joué le coup ou la séquence tactique gagnante, le bouton d'avancement de carte reste inactif tant que l'apprenant n'a pas fait défiler le PGN d'explication jusqu'à son dernier coup, garantissant la lecture pas-à-pas des commentaires et annotations pédagogiques.
+  - **Détection robuste de fin de PGN (`PgnViewer.vue`)** : Prise en compte du total de demi-coups (`getCurrentPlyNumber()`) dans `viewNext()` et `viewEnd()`, émettant l'événement `@finished` dès que le dernier coup est atteint (ou immédiatement si le PGN ne comporte aucun coup).
+  - **Couverture de tests unitaires** : Ajout de la suite `SeriesCardFooter.spec.ts` et enrichissement de `TypeABCDaire.spec.ts`.
+
 ## [1.3.0] - 2026-09-04
 
 ### Ajouté & Amélioré

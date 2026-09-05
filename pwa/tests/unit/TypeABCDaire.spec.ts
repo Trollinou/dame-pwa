@@ -111,6 +111,20 @@ describe( 'TypeABCDaire.vue', () => {
 		// Vérifier la présence du feedback de succès
 		expect( wrapper.text() ).toContain( 'Bravo ! Exercice réussi.' );
 
+		// Le bouton "Carte suivante" est affiché mais DÉSACTIVÉ tant que le PGN n'a pas été lu jusqu'au bout
+		const footer = wrapper.findComponent( { name: 'SeriesCardFooter' } );
+		expect( footer.exists() ).toBe( true );
+		expect( footer.props( 'disabled' ) ).toBe( true );
+
+		// Simuler la fin de la lecture du PGN par le composant PgnViewer
+		const pgnViewer = wrapper.findComponent( { name: 'PgnViewer' } );
+		expect( pgnViewer.exists() ).toBe( true );
+		pgnViewer.vm.$emit( 'finished' );
+		await wrapper.vm.$nextTick();
+
+		// Le footer n'est plus désactivé
+		expect( footer.props( 'disabled' ) ).toBe( false );
+
 		// Vérifier que le bouton Fin n'est pas présent dans le PgnViewer du mode récapitulatif
 		const finBtn = wrapper.find( 'ion-button[title="Fin"]' );
 		expect( finBtn.exists() ).toBe( false );

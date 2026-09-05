@@ -18,7 +18,7 @@
     <div class="series-card-footer">
       <!-- Badge compact d'étape / carte -->
       <ion-badge color="medium" class="card-badge">
-        Carte {{ currentCard }} / {{ totalCards }}
+        {{ badgePrefix }} {{ currentCard }} / {{ totalCards }}
       </ion-badge>
 
       <!-- Zone d'action interactive -->
@@ -28,8 +28,10 @@
           :color="isLastCard ? 'success' : 'primary'"
           size="small"
           fill="solid"
+          :disabled="disabled"
           class="next-card-btn animate-fade-in"
-          @click="emit('next')"
+          :title="disabled ? disabledHint : buttonLabel"
+          @click="!disabled && emit('next')"
         >
           <span>{{ buttonLabel }}</span>
           <ion-icon slot="end" :icon="isLastCard ? checkmarkCircleOutline : arrowForwardOutline" />
@@ -58,17 +60,21 @@ const props = withDefaults(
     currentCard: number;
     totalCards: number;
     isSolved: boolean;
+    disabled?: boolean;
     feedback?: CardFeedback | null;
     nextText?: string;
     finishText?: string;
     pendingHint?: string;
+    disabledHint?: string;
     badgePrefix?: string;
   }>(),
   {
+    disabled: false,
     feedback: null,
     nextText: 'Carte suivante',
     finishText: 'Terminer l\'exercice',
     pendingHint: 'Trouvez la solution pour continuer',
+    disabledHint: 'Visionnez tous les coups pour continuer',
     badgePrefix: 'Carte'
   }
 );
@@ -194,6 +200,13 @@ const pendingHintText = computed(() => {
   font-size: 0.85rem;
   height: 30px;
   margin: 0;
+}
+
+.next-card-btn[disabled],
+.next-card-btn.button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .pending-hint {
