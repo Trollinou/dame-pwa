@@ -16,33 +16,48 @@
 
     <!-- Bar de cartes compacte -->
     <div class="series-card-footer">
-      <!-- Mode Terminé : Bouton Retour au cours à gauche + Bouton Suivant à droite -->
+      <!-- Mode Terminé -->
       <template v-if="isFinalCompleted">
-        <ion-button
-          fill="outline"
-          size="small"
-          color="medium"
-          class="footer-course-btn animate-fade-in"
-          title="Retour au cours"
-          @click="exerciseNav?.onCourse"
-        >
-          <ion-icon slot="start" :icon="listOutline" />
-          <span>Cours</span>
-        </ion-button>
+        <!-- Pendant la temporisation (laissant le temps de voir la résolution et les confettis) -->
+        <template v-if="!showNextExerciseBtn">
+          <ion-badge color="medium" class="card-badge">
+            {{ badgePrefix }} {{ currentCard }} / {{ totalCards }}
+          </ion-badge>
+          <div class="action-zone">
+            <ion-badge color="success" class="card-badge success-resolu-badge animate-fade-in">
+              🎉 Exercice réussi !
+            </ion-badge>
+          </div>
+        </template>
 
-        <div class="action-zone">
+        <!-- Après la temporisation : Bouton Retour au cours à gauche + Bouton Suivant à droite -->
+        <template v-else>
           <ion-button
-            color="success"
+            fill="outline"
             size="small"
-            fill="solid"
-            :disabled="disabled"
-            class="next-card-btn next-exercise-btn animate-fade-in"
-            @click="handleFinalNext"
+            color="medium"
+            class="footer-course-btn animate-fade-in"
+            title="Retour au cours"
+            @click="exerciseNav?.onCourse"
           >
-            <span>{{ exerciseNav?.nextLabel.value }}</span>
-            <ion-icon slot="end" :icon="exerciseNav?.hasNext.value ? arrowForwardOutline : checkmarkCircleOutline" />
+            <ion-icon slot="start" :icon="listOutline" />
+            <span>Cours</span>
           </ion-button>
-        </div>
+
+          <div class="action-zone">
+            <ion-button
+              color="success"
+              size="small"
+              fill="solid"
+              :disabled="disabled"
+              class="next-card-btn next-exercise-btn animate-fade-in"
+              @click="handleFinalNext"
+            >
+              <span>{{ exerciseNav?.nextLabel.value }}</span>
+              <ion-icon slot="end" :icon="exerciseNav?.hasNext.value ? arrowForwardOutline : checkmarkCircleOutline" />
+            </ion-button>
+          </div>
+        </template>
       </template>
 
       <!-- Mode Standard (en cours d'exercice ou sans contexte injecté) -->
@@ -78,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, watch, ref, onUnmounted } from 'vue';
 import { IonBadge, IonButton, IonIcon } from '@ionic/vue';
 import {
   arrowForwardOutline,
@@ -124,6 +139,9 @@ const emit = defineEmits<{
 
 const exerciseNav = useExerciseNavigation();
 
+const showNextExerciseBtn = ref(false);
+let nextButtonTimer: ReturnType<typeof setTimeout> | null = null;
+
 const isLastCard = computed(() => props.currentCard >= props.totalCards);
 
 const isFinalCompleted = computed(() => {
@@ -135,10 +153,28 @@ watch(
   (completed) => {
     if (completed) {
       fireExerciseCelebration();
+      showNextExerciseBtn.value = false;
+      if (nextButtonTimer) {
+        clearTimeout(nextButtonTimer);
+      }
+      nextButtonTimer = setTimeout(() => {
+        showNextExerciseBtn.value = true;
+      }, 1000);
+    } else {
+      showNextExerciseBtn.value = false;
+      if (nextButtonTimer) {
+        clearTimeout(nextButtonTimer);
+      }
     }
   },
   { immediate: true }
 );
+
+onUnmounted(() => {
+  if (nextButtonTimer) {
+    clearTimeout(nextButtonTimer);
+  }
+});
 
 const effectiveFeedback = computed<CardFeedback | null>(() => {
   if (props.feedback) {
@@ -287,20 +323,29 @@ const handleFinalNext = () => {
   margin: 0;
 }
 
-.next-exercise-btn {
+.success-resolu-badge {
   font-weight: 700;
-  animation: pulseGlow 1.8s infinite;
+  font-size: 0.82rem;
+  letter-spacing: 0.3px;
 }
 
-@keyframes pulseGlow {
+.next-exercise-btn {
+  font-weight: 700;
+  animation: pulseScale 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseScale {
   0% {
-    box-shadow: 0 0 0 0 rgba(45, 211, 111, 0.7);
+    transform: scale(1);
+    filter: brightness(1);
   }
-  70% {
-    box-shadow: 0 0 0 8px rgba(45, 211, 111, 0);
+  50% {
+    transform: scale(1.08);
+    filter: brightness(1.2);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(45, 211, 111, 0);
+    transform: scale(1);
+    filter: brightness(1);
   }
 }
 

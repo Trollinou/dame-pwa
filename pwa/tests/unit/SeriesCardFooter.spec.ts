@@ -4,6 +4,10 @@ import { mount } from '@vue/test-utils';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 
+vi.mock( '@/composables/useCelebration', () => ( {
+	fireExerciseCelebration: vi.fn(),
+} ) );
+
 describe( 'SeriesCardFooter.vue', () => {
 	test( 'affiche le badge avec badgePrefix personnalisé', () => {
 		const wrapper = mount( SeriesCardFooter, {
@@ -87,6 +91,7 @@ describe( 'SeriesCardFooter.vue', () => {
 	} );
 
 	test( 'affiche les boutons de fin d’exercice et navigue quand exerciseNavigation est injecté', async () => {
+		vi.useFakeTimers();
 		const onNextMock = vi.fn();
 		const onCourseMock = vi.fn();
 
@@ -115,6 +120,16 @@ describe( 'SeriesCardFooter.vue', () => {
 			'🎉 Exercice réussi !'
 		);
 
+		// Pendant la temporisation : le badge immédiat est présent
+		expect( wrapper.find( '.success-resolu-badge' ).text() ).toContain(
+			'🎉 Exercice réussi !'
+		);
+		expect( wrapper.find( '.footer-course-btn' ).exists() ).toBe( false );
+
+		// Avance de la temporisation d'1 seconde
+		vi.advanceTimersByTime( 1000 );
+		await wrapper.vm.$nextTick();
+
 		// Bouton Retour au cours
 		const courseBtn = wrapper.find( '.footer-course-btn' );
 		expect( courseBtn.exists() ).toBe( true );
@@ -129,5 +144,7 @@ describe( 'SeriesCardFooter.vue', () => {
 		await nextBtn.trigger( 'click' );
 		expect( onNextMock ).toHaveBeenCalledTimes( 1 );
 		expect( wrapper.emitted( 'next' ) ).toBeTruthy();
+
+		vi.useRealTimers();
 	} );
 } );
