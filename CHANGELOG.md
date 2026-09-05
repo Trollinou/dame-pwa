@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-05
+
 ### Corrigé
 - **Mélange Aléatoire des Choix QCM du Type 4 (`partieHerosParser.ts`, `TypePartieHeros.vue`, `partieHerosParser.spec.ts`, `TypePartieHeros.spec.ts`, `USING.md`)** :
   - **Mélange de Fisher-Yates (`shuffleChoices`)** : Les options de réponse lors des embranchements QCM de la Partie du Héros sont désormais mélangées aléatoirement à l'issue de l'analyse du PGN. Le coup de la branche principale (bonne réponse) n'apparaît plus systématiquement en premier choix, supprimant le biais de prévisibilité.
