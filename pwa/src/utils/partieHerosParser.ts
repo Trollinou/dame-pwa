@@ -128,6 +128,23 @@ export function extractShapesAndComment( comments?: string[] ): {
 }
 
 /**
+ * Mélange aléatoirement les choix d'un QCM (algorithme de Fisher-Yates).
+ * @param choices
+ * @param rng     Fonction aléatoire optionnelle (par défaut Math.random)
+ */
+export function shuffleChoices(
+	choices: QcmChoice[],
+	rng: () => number = Math.random
+): QcmChoice[] {
+	const shuffled = [ ...choices ];
+	for ( let i = shuffled.length - 1; i > 0; i-- ) {
+		const j = Math.floor( rng() * ( i + 1 ) );
+		[ shuffled[ i ], shuffled[ j ] ] = [ shuffled[ j ], shuffled[ i ] ];
+	}
+	return shuffled;
+}
+
+/**
  * Analyse une étude PGN complète et la découpe en étapes séquentielles
  * (séquences de défilement PGN + embranchements QCM interactifs).
  * @param rawPgn
@@ -312,7 +329,7 @@ export function parsePartieHerosPgn(
 				),
 				shapes: qcmShapes,
 				question: defaultConsigne || 'Quel est le meilleur coup ?',
-				choices,
+				choices: shuffleChoices( choices ),
 			} );
 
 			// Avancer sur la ligne principale avec le bon coup joué dans le QCM

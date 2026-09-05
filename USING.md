@@ -84,7 +84,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
        - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté pas-à-pas (boutons Début, Précédent, Suivant avec désactivation contextuelle au début et à la fin de la séquence, sans saut direct à la fin pour garantir l'assimilation des coups et commentaires) et embranchements QCM interactifs.
        - Moments de choix QCM identifiés par les 3 flèches indicatrices `[%cal ...]` et les 2 variantes associées au coup principal.
-       - Choix QCM présentés en notation française (R, D, T, F, C) sans numéro de coup parasite.
+       - Choix QCM présentés en notation française (R, D, T, F, C) sans numéro de coup parasite, avec mélange aléatoire (Fisher-Yates) des options garantissant que le bon coup n'apparaît pas systématiquement en première position.
        - Sélection interactive d'un coup parmi les 3 choix :
          - Choix d'une variante : feedback rouge avec l'explication spécifique du mauvais coup rédigée par l'auteur.
          - Choix du coup principal : feedback vert avec l'explication du bon coup, coup joué sur l'échiquier et déblocage de l'étape suivante.

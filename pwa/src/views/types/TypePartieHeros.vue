@@ -139,6 +139,7 @@ import { useApprentissageStore } from '@/stores/apprentissage';
 import { useFeedback } from '@/composables/useFeedback';
 import {
   parsePartieHerosPgn,
+  shuffleChoices,
   type PartieHerosStage,
   type PgnStage,
   type QcmStage,
@@ -252,7 +253,7 @@ const etapesListe = computed<PartieHerosStage[]>(() => {
           orientation: 'white',
           shapes: item.shapes || [],
           question: item.question || 'Quel est le meilleur coup ?',
-          choices,
+          choices: shuffleChoices(choices),
         });
       }
     }

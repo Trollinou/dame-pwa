@@ -126,8 +126,12 @@ describe( 'TypePartieHeros.vue', () => {
 
 		// Sélectionner le bon coup (a6)
 		const choiceBtns = wrapper.findAll( '.choice-btn' );
-		expect( choiceBtns.length ).toBeGreaterThanOrEqual( 1 );
-		await choiceBtns[ 0 ].trigger( 'click' );
+		expect( choiceBtns.length ).toBeGreaterThanOrEqual( 2 );
+		const correctBtn = choiceBtns.find(
+			( btn ) => btn.text().trim() === 'a6'
+		);
+		expect( correctBtn ).toBeDefined();
+		await correctBtn!.trigger( 'click' );
 		expect( qcmFooter.props( 'isSolved' ) ).toBe( true );
 		// Pas de célébration lors du succès du QCM
 		expect( fireCelebrationMock ).not.toHaveBeenCalled();
