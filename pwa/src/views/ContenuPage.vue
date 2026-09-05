@@ -250,7 +250,6 @@ const onSuccess = async () => {
     await apprentissageStore.validerElement(contenuActuel.value.id, elapsed);
   }
   estReussi.value = true;
-  fireExerciseCelebration();
 };
 
 const validerLecon = async () => {
@@ -259,6 +258,7 @@ const validerLecon = async () => {
     await apprentissageStore.validerElement(contenuActuel.value.id, elapsed);
   }
   estReussi.value = true;
+  fireExerciseCelebration();
 };
 
 const allerAuSuivant = () => {
