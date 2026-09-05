@@ -3,44 +3,76 @@
     <!-- Zone de feedback toujours présente (réservée dès le départ pour éviter tout décalage) -->
     <div
       class="feedback-row"
-      :class="[feedback ? 'feedback-' + feedback.type : 'feedback-empty']"
+      :class="[effectiveFeedback ? 'feedback-' + effectiveFeedback.type : 'feedback-empty']"
     >
-      <template v-if="feedback">
+      <template v-if="effectiveFeedback">
         <ion-icon
-          :icon="feedback.type === 'success' ? checkmarkCircleOutline : alertCircleOutline"
+          :icon="effectiveFeedback.type === 'success' ? checkmarkCircleOutline : alertCircleOutline"
           class="feedback-icon"
         />
-        <span class="feedback-message">{{ feedback.message }}</span>
+        <span class="feedback-message">{{ effectiveFeedback.message }}</span>
       </template>
     </div>
 
     <!-- Bar de cartes compacte -->
     <div class="series-card-footer">
-      <!-- Badge compact d'étape / carte -->
-      <ion-badge color="medium" class="card-badge">
-        {{ badgePrefix }} {{ currentCard }} / {{ totalCards }}
-      </ion-badge>
-
-      <!-- Zone d'action interactive -->
-      <div class="action-zone">
+      <!-- Mode Terminé : Bouton Retour au cours à gauche + Bouton Suivant à droite -->
+      <template v-if="isFinalCompleted">
         <ion-button
-          v-if="isSolved"
-          :color="isLastCard ? 'success' : 'primary'"
+          fill="outline"
           size="small"
-          fill="solid"
-          :disabled="disabled"
-          class="next-card-btn animate-fade-in"
-          :title="disabled ? disabledHint : buttonLabel"
-          @click="!disabled && emit('next')"
+          color="medium"
+          class="footer-course-btn animate-fade-in"
+          title="Retour au cours"
+          @click="exerciseNav?.onCourse"
         >
-          <span>{{ buttonLabel }}</span>
-          <ion-icon slot="end" :icon="isLastCard ? checkmarkCircleOutline : arrowForwardOutline" />
+          <ion-icon slot="start" :icon="listOutline" />
+          <span>Cours</span>
         </ion-button>
 
-        <span v-else class="pending-hint">
-          {{ pendingHintText }}
-        </span>
-      </div>
+        <div class="action-zone">
+          <ion-button
+            color="success"
+            size="small"
+            fill="solid"
+            :disabled="disabled"
+            class="next-card-btn next-exercise-btn animate-fade-in"
+            @click="handleFinalNext"
+          >
+            <span>{{ exerciseNav?.nextLabel.value }}</span>
+            <ion-icon slot="end" :icon="exerciseNav?.hasNext.value ? arrowForwardOutline : checkmarkCircleOutline" />
+          </ion-button>
+        </div>
+      </template>
+
+      <!-- Mode Standard (en cours d'exercice ou sans contexte injecté) -->
+      <template v-else>
+        <!-- Badge compact d'étape / carte -->
+        <ion-badge color="medium" class="card-badge">
+          {{ badgePrefix }} {{ currentCard }} / {{ totalCards }}
+        </ion-badge>
+
+        <!-- Zone d'action interactive -->
+        <div class="action-zone">
+          <ion-button
+            v-if="isSolved"
+            :color="isLastCard ? 'success' : 'primary'"
+            size="small"
+            fill="solid"
+            :disabled="disabled"
+            class="next-card-btn animate-fade-in"
+            :title="disabled ? disabledHint : buttonLabel"
+            @click="!disabled && emit('next')"
+          >
+            <span>{{ buttonLabel }}</span>
+            <ion-icon slot="end" :icon="isLastCard ? checkmarkCircleOutline : arrowForwardOutline" />
+          </ion-button>
+
+          <span v-else class="pending-hint">
+            {{ pendingHintText }}
+          </span>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -48,7 +80,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { IonBadge, IonButton, IonIcon } from '@ionic/vue';
-import { arrowForwardOutline, checkmarkCircleOutline, alertCircleOutline } from 'ionicons/icons';
+import {
+  arrowForwardOutline,
+  checkmarkCircleOutline,
+  alertCircleOutline,
+  listOutline
+} from 'ionicons/icons';
+import { useExerciseNavigation } from '@/composables/useExerciseNavigation';
 
 export interface CardFeedback {
   message: string;
@@ -83,7 +121,26 @@ const emit = defineEmits<{
   (e: 'next'): void;
 }>();
 
+const exerciseNav = useExerciseNavigation();
+
 const isLastCard = computed(() => props.currentCard >= props.totalCards);
+
+const isFinalCompleted = computed(() => {
+  return isLastCard.value && props.isSolved && exerciseNav !== null;
+});
+
+const effectiveFeedback = computed<CardFeedback | null>(() => {
+  if (props.feedback) {
+    return props.feedback;
+  }
+  if (isFinalCompleted.value) {
+    return {
+      type: 'success',
+      message: '🎉 Exercice réussi !'
+    };
+  }
+  return null;
+});
 
 const buttonLabel = computed(() => {
   if (isLastCard.value) {
@@ -98,6 +155,14 @@ const pendingHintText = computed(() => {
   }
   return 'Trouvez la solution pour continuer';
 });
+
+const handleFinalNext = () => {
+  if (props.disabled) return;
+  emit('next');
+  if (exerciseNav) {
+    exerciseNav.onNext();
+  }
+};
 </script>
 
 <style scoped>
@@ -194,12 +259,25 @@ const pendingHintText = computed(() => {
   min-width: 0;
 }
 
+.footer-course-btn {
+  --border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  height: 30px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
 .next-card-btn {
   --border-radius: 6px;
   font-weight: 600;
   font-size: 0.85rem;
   height: 30px;
   margin: 0;
+}
+
+.next-exercise-btn {
+  font-weight: 700;
 }
 
 .next-card-btn[disabled],

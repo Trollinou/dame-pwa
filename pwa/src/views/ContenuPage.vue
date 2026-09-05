@@ -60,9 +60,9 @@
             </div>
           </div>
 
-          <!-- Success Card -->
+          <!-- Success Card (uniquement pour les leçons, les exercices utilisent leur propre SeriesCardFooter) -->
           <transition name="fade">
-            <ion-card v-if="estReussi" class="success-card ion-margin-top">
+            <ion-card v-if="estReussi && contenuActuel.post_type === 'roi_lecon'" class="success-card ion-margin-top">
               <ion-card-header>
                 <ion-card-title class="success-title">
                   {{ contenuActuel.post_type === 'roi_lecon' ? '🎉 Leçon terminée !' : '🎉 Exercice réussi !' }}
@@ -130,9 +130,10 @@ import {
   IonButton,
   IonIcon
 } from '@ionic/vue';
-import { ref, computed, watch, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted, provide } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApprentissageStore } from '@/stores/apprentissage';
+import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 import TypeABCDaire from './types/TypeABCDaire.vue';
 import Type100Commandements from './types/Type100Commandements.vue';
 import TypePopEchecs from './types/TypePopEchecs.vue';
@@ -261,8 +262,38 @@ const validerLecon = async () => {
 const allerAuSuivant = () => {
   if (prochainElement.value) {
     router.push(`/contenu/${prochainElement.value.id}`);
+  } else {
+    router.push('/tabs/apprentissage');
   }
 };
+
+const retourAuCours = () => {
+  if (coursParentInfo.value) {
+    router.push(`/cours/${coursParentInfo.value.cours.id}`);
+  } else {
+    router.push('/tabs/apprentissage');
+  }
+};
+
+// Contexte de navigation fourni à SeriesCardFooter pour les exercices
+provide(EXERCISE_NAVIGATION_KEY, {
+  hasNext: computed(() => !!prochainElement.value),
+  nextLabel: computed(() => {
+    if (!prochainElement.value) {
+      return 'Terminer le cours';
+    }
+    return prochainElement.value.type === 'roi_lecon' ? 'Leçon suivante' : 'Exercice suivant';
+  }),
+  hasCourse: computed(() => !!coursParentInfo.value),
+  courseUrl: computed(() => {
+    if (coursParentInfo.value) {
+      return `/cours/${coursParentInfo.value.cours.id}`;
+    }
+    return '/tabs/apprentissage';
+  }),
+  onNext: allerAuSuivant,
+  onCourse: retourAuCours,
+});
 
 const loadContenu = async (idVal: string | string[] | number) => {
   isLoading.value = true;

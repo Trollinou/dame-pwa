@@ -90,7 +90,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
          - Choix du coup principal : feedback vert avec l'explication du bon coup, coup joué sur l'échiquier et déblocage de l'étape suivante.
        - Reprise de la séquence PGN post-QCM directement sur la position résultante (un demi-coup plus tard) avec restitution du commentaire et des formes du coup validé.
        - Progression fluide avec `ExerciseHeader` et `SeriesCardFooter` jusqu'au coup final de la partie et validation de la progression.
-     - **Navigation en Série (`SeriesCardFooter`)** : Badge d'étape (`Carte X / Y` ou `Étape X / Y`), zone de feedback visuel fixe (succès/erreur), bouton d'avancement débloqué dès la validation de la position et support du verrouillage temporaire (`disabled`) pour imposer la lecture intégrale des explications.
+     - **Navigation en Série & Fin d'Exercice (`SeriesCardFooter`)** : Badge d'étape (`Carte X / Y` ou `Étape X / Y`), zone de feedback visuel fixe (succès/erreur), bouton d'avancement débloqué dès la validation de la position et support du verrouillage temporaire (`disabled`) pour imposer la lecture intégrale des explications. Dès la dernière étape résolue, le footer se métamorphose sur place pour proposer le bouton *« Cours »* et le bouton *« Exercice suivant »* (ou *« Terminer le cours »*) sans aucun panneau redondant inférieur, assurant une ergonomie optimale sur mobile sans aucun défilement nécessaire.
      - **Chronométrage & Validation finale** : Mesure en temps réel du temps passé sur la leçon ou l'exercice, puis transmission atomique de la durée (`time_spent`) lors de la validation de la réussite dans la progression de l'adhérent.
 
 2. **Partie d'Échecs & Échiquier ♟️** :

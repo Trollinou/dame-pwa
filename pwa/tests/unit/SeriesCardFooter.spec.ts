@@ -1,6 +1,8 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
+import { computed } from 'vue';
 import { mount } from '@vue/test-utils';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
+import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 
 describe( 'SeriesCardFooter.vue', () => {
 	test( 'affiche le badge avec badgePrefix personnalisé', () => {
@@ -65,5 +67,67 @@ describe( 'SeriesCardFooter.vue', () => {
 
 		await btn.trigger( 'click' );
 		expect( wrapper.emitted( 'next' ) ).toBeFalsy();
+	} );
+
+	test( 'affiche le finishText sur la dernière carte quand exerciseNavigation n’est pas injecté', () => {
+		const wrapper = mount( SeriesCardFooter, {
+			props: {
+				currentCard: 3,
+				totalCards: 3,
+				isSolved: true,
+				finishText: 'Terminer le défi',
+			},
+		} );
+
+		expect( wrapper.find( '.card-badge' ).text() ).toBe( 'Carte 3 / 3' );
+		expect( wrapper.find( '.next-card-btn' ).text() ).toBe(
+			'Terminer le défi'
+		);
+		expect( wrapper.find( '.footer-course-btn' ).exists() ).toBe( false );
+	} );
+
+	test( 'affiche les boutons de fin d’exercice et navigue quand exerciseNavigation est injecté', async () => {
+		const onNextMock = vi.fn();
+		const onCourseMock = vi.fn();
+
+		const wrapper = mount( SeriesCardFooter, {
+			props: {
+				currentCard: 3,
+				totalCards: 3,
+				isSolved: true,
+			},
+			global: {
+				provide: {
+					[ EXERCISE_NAVIGATION_KEY as symbol ]: {
+						hasNext: computed( () => true ),
+						nextLabel: computed( () => 'Exercice suivant' ),
+						hasCourse: computed( () => true ),
+						courseUrl: computed( () => '/cours/42' ),
+						onNext: onNextMock,
+						onCourse: onCourseMock,
+					},
+				},
+			},
+		} );
+
+		// Vérification du feedback de succès par défaut
+		expect( wrapper.find( '.feedback-message' ).text() ).toBe(
+			'🎉 Exercice réussi !'
+		);
+
+		// Bouton Retour au cours
+		const courseBtn = wrapper.find( '.footer-course-btn' );
+		expect( courseBtn.exists() ).toBe( true );
+		await courseBtn.trigger( 'click' );
+		expect( onCourseMock ).toHaveBeenCalledTimes( 1 );
+
+		// Bouton Exercice suivant
+		const nextBtn = wrapper.find( '.next-exercise-btn' );
+		expect( nextBtn.exists() ).toBe( true );
+		expect( nextBtn.text() ).toContain( 'Exercice suivant' );
+
+		await nextBtn.trigger( 'click' );
+		expect( onNextMock ).toHaveBeenCalledTimes( 1 );
+		expect( wrapper.emitted( 'next' ) ).toBeTruthy();
 	} );
 } );

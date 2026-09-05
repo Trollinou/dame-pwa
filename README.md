@@ -143,9 +143,9 @@ import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
 
 ### 5. Composant Pied de Série `<SeriesCardFooter>` (`src/components/shared/SeriesCardFooter.vue`)
 Barre de navigation et zone de feedback visuel pour les exercices séquentiels ou séries multi-cartes :
-- **Zone de feedback intégrée** : Affiche les messages dynamiques d'encouragement ou d'erreur (`feedback: { message, type }`) avec icône adaptée.
-- **Badge d'étape** : Indique l'avancement (`Carte X / Y` ou préfixe personnalisé avec `badgePrefix`).
-- **Bouton d'action dynamique** : Passe automatiquement de *"Carte suivante"* (`nextText`) à *"Terminer l'exercice"* (`finishText`) sur la dernière étape lorsque `isSolved` est à `true`.
+- **Zone de feedback intégrée** : Affiche les messages dynamiques d'encouragement ou d'erreur (`feedback: { message, type }`) avec icône adaptée, ou message de victoire automatique (`🎉 Exercice réussi !`) dès la résolution finale.
+- **Badge d'étape & Métamorphose de fin d'exercice** : Indique l'avancement (`Carte X / Y` ou préfixe personnalisé avec `badgePrefix`). Dès la dernière carte résolue, le badge fait place à un bouton compact *« Cours »* et le bouton d'action devient directement *« Exercice suivant »* (ou *« Terminer le cours »*), évitant tout panel redondant sur mobile.
+- **Orchestration inter-exercices sans prop-drilling** : Consomme optionnellement `useExerciseNavigation()` (`EXERCISE_NAVIGATION_KEY` injecté par `ContenuPage`) pour déclencher la navigation vers le prochain contenu ou le cours parent.
 - **Verrouillage pédagogique (`disabled`, `disabledHint`)** : Permet de désactiver le bouton d'avancement tant qu'une action requise (ex: relecture complète du PGN d'explication) n'est pas achevée, avec infobulle explicative.
 - **Indicateur d'attente** : Affiche un indice textuel (`pendingHint`) tant que la carte n'a pas été résolue.
 

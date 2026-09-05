@@ -7,6 +7,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Ajouté & Amélioré
+- **Unification de la Fin d'Exercice dans le Pied de Série (`SeriesCardFooter.vue`, `useExerciseNavigation.ts`, `ContenuPage.vue`, `SeriesCardFooter.spec.ts`, `README.md`, `USING.md`)** :
+  - **Suppression du panneau inférieur redondant (`ContenuPage.vue`)** : Retrait de la `success-card` sous les exercices (`roi_exercice`), évitant tout allongement vertical ou défilement (scroll) forcé sur petit écran mobile.
+  - **Métamorphose du pied de série (`SeriesCardFooter.vue`)** : Dès que la dernière étape/carte d'un exercice est résolue, le badge d'étape fait place à un bouton compact *« Cours »* et le bouton d'avancement devient directement *« Exercice suivant »* (ou *« Terminer le cours »*) en couleur de succès, avec feedback immédiat `🎉 Exercice réussi !`.
+  - **Contexte d'injection sans prop-drilling (`useExerciseNavigation.ts`)** : Mise à disposition de `useExerciseNavigation` et de la clé `EXERCISE_NAVIGATION_KEY` pour orchestrer les transitions de cours de manière transparente pour les 16 types d'exercices en cours d'harmonisation.
+  - **Couverture de tests unitaires (`SeriesCardFooter.spec.ts`)** : Ajout des tests vérifiant le basculement en mode fin d'exercice injecté et la rétrocompatibilité en mode autonome.
 - **Verrouillage Pédagogique de la Navigation PGN (`SeriesCardFooter.vue`, `ABCDaireTactiqueViewer.vue`, `PgnViewer.vue`, `USING.md`, `README.md`)** :
   - **Désactivation conditionnelle du bouton d'avancement (`SeriesCardFooter.vue`)** : Introduction des props `disabled` et `disabledHint` permettant de maintenir le bouton « Carte suivante » ou « Terminer l'exercice » grisé (`opacity: 0.5`, `cursor: not-allowed`) avec infobulle explicative tant que l'action requise n'est pas complétée.
   - **Parcours obligatoire des explications du PGN (`ABCDaireTactiqueViewer.vue`)** : Dans les exercices de type ABCDaire Tactique (Type 3), après avoir joué le coup ou la séquence tactique gagnante, le bouton d'avancement de carte reste inactif tant que l'apprenant n'a pas fait défiler le PGN d'explication jusqu'à son dernier coup, garantissant la lecture pas-à-pas des commentaires et annotations pédagogiques.
