@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { IonBadge, IonButton, IonIcon } from '@ionic/vue';
 import {
   arrowForwardOutline,
@@ -87,6 +87,7 @@ import {
   listOutline
 } from 'ionicons/icons';
 import { useExerciseNavigation } from '@/composables/useExerciseNavigation';
+import { fireExerciseCelebration } from '@/composables/useCelebration';
 
 export interface CardFeedback {
   message: string;
@@ -128,6 +129,16 @@ const isLastCard = computed(() => props.currentCard >= props.totalCards);
 const isFinalCompleted = computed(() => {
   return isLastCard.value && props.isSolved && exerciseNav !== null;
 });
+
+watch(
+  () => isFinalCompleted.value,
+  (completed) => {
+    if (completed) {
+      fireExerciseCelebration();
+    }
+  },
+  { immediate: true }
+);
 
 const effectiveFeedback = computed<CardFeedback | null>(() => {
   if (props.feedback) {
