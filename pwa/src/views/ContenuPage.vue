@@ -134,6 +134,7 @@ import { ref, computed, watch, onUnmounted, provide } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
+import { fireExerciseCelebration } from '@/composables/useCelebration';
 import TypeABCDaire from './types/TypeABCDaire.vue';
 import Type100Commandements from './types/Type100Commandements.vue';
 import TypePopEchecs from './types/TypePopEchecs.vue';
@@ -249,6 +250,7 @@ const onSuccess = async () => {
     await apprentissageStore.validerElement(contenuActuel.value.id, elapsed);
   }
   estReussi.value = true;
+  fireExerciseCelebration();
 };
 
 const validerLecon = async () => {

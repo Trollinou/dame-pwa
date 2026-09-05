@@ -7,6 +7,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Ajouté & Amélioré
+- **Célébration Visuelle & Sensorielle de Fin d'Exercice (`useCelebration.ts`, `canvas-confetti`, `@capacitor/haptics`, `ContenuPage.vue`, `SeriesCardFooter.vue`, `useCelebration.spec.ts`)** :
+  - **Pluie de confettis festifs (`canvas-confetti`)** : Déclenchement automatique d'un feu d'artifice de confettis en double gerbe latérale dès la résolution complète de l'exercice, offrant une confirmation visuelle immédiate et gratifiante.
+  - **Retour tactile haptique (`@capacitor/haptics`)** : Vibration courte de succès sur smartphone confirmant physiquement la victoire dans la main de l'utilisateur.
+  - **Bouton d'avancement pulsant (`SeriesCardFooter.vue`)** : Animation `@keyframes pulseGlow` sur le bouton vert « Exercice suivant » attirant naturellement le regard pour poursuivre le parcours.
+  - **Couverture de tests unitaires (`useCelebration.spec.ts`)** : Validation des déclenchements de confettis et d'haptique.
 - **Unification de la Fin d'Exercice dans le Pied de Série (`SeriesCardFooter.vue`, `useExerciseNavigation.ts`, `ContenuPage.vue`, `SeriesCardFooter.spec.ts`, `README.md`, `USING.md`)** :
   - **Suppression du panneau inférieur redondant (`ContenuPage.vue`)** : Retrait de la `success-card` sous les exercices (`roi_exercice`), évitant tout allongement vertical ou défilement (scroll) forcé sur petit écran mobile.
   - **Métamorphose du pied de série (`SeriesCardFooter.vue`)** : Dès que la dernière étape/carte d'un exercice est résolue, le badge d'étape fait place à un bouton compact *« Cours »* et le bouton d'avancement devient directement *« Exercice suivant »* (ou *« Terminer le cours »*) en couleur de succès, avec feedback immédiat `🎉 Exercice réussi !`.

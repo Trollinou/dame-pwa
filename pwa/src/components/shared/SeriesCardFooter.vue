@@ -278,6 +278,19 @@ const handleFinalNext = () => {
 
 .next-exercise-btn {
   font-weight: 700;
+  animation: pulseGlow 1.8s infinite;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(45, 211, 111, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(45, 211, 111, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 211, 111, 0);
+  }
 }
 
 .next-card-btn[disabled],
