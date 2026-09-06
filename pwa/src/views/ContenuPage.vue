@@ -112,7 +112,7 @@
     </ion-content>
 
     <!-- Footer Fixe Unifié pour les Exercices -->
-    <ion-footer v-if="!isPageLoading && contenuActuel?.post_type === 'roi_exercice'" class="exercise-ion-footer">
+    <ion-footer v-show="!isPageLoading && contenuActuel?.post_type === 'roi_exercice'" class="exercise-ion-footer">
       <div ref="footerPortalRef" class="exercise-footer-portal"></div>
     </ion-footer>
   </ion-page>
@@ -446,6 +446,15 @@ ion-content::part(scroll) {
   background: var(--ion-background-color, #ffffff);
   border-top: 1px solid var(--ion-color-step-150, #e0e0e0);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+  padding-top: 6px;
+  padding-bottom: calc(6px + var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
+  padding-left: calc(12px + var(--ion-safe-area-left, env(safe-area-inset-left, 0px)));
+  padding-right: calc(12px + var(--ion-safe-area-right, env(safe-area-inset-right, 0px)));
+  box-sizing: border-box;
+}
+
+.exercise-ion-footer[style*="display: none"] {
+  display: none !important;
 }
 
 .exercise-footer-portal {

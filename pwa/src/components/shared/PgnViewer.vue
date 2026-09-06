@@ -55,7 +55,7 @@
     </div>
 
     <!-- Comment Display (hauteur fixe et réservée) -->
-    <div class="comment-container" :class="{ 'comment-empty': !currentComment }">
+    <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !currentComment }">
       <p class="comment-text">
         {{ currentComment ? '💬 ' + currentComment : '' }}
       </p>
@@ -102,6 +102,15 @@ const emit = defineEmits<{
 
 const boardApi = ref<BoardCore | null>(null);
 const currentComment = ref('');
+const commentContainerEl = ref<HTMLElement | null>(null);
+
+watch(currentComment, () => {
+  nextTick(() => {
+    if (commentContainerEl.value) {
+      commentContainerEl.value.scrollTop = 0;
+    }
+  });
+});
 const isCompleted = ref(false);
 const currentPly = ref(0);
 const totalPly = ref(0);
@@ -269,7 +278,7 @@ const viewEnd = () => {
   box-sizing: border-box;
   overflow-y: auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 .comment-empty {
   visibility: hidden;
@@ -285,6 +294,7 @@ const viewEnd = () => {
   font-size: 0.88rem;
   line-height: 1.4;
   color: var(--ion-color-step-800, #333);
+  white-space: pre-line;
 }
 .placeholder-text {
   color: var(--ion-color-step-400, #989aa2);

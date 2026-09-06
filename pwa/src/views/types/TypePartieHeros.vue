@@ -60,7 +60,7 @@
         </div>
 
         <!-- Affichage du Commentaire du Coup Courant (hauteur constante réservée pour éviter les sauts d'interface) -->
-        <div class="comment-container" :class="{ 'comment-empty': !activePgnComment }">
+        <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !activePgnComment }">
           <p class="comment-text">
             {{ activePgnComment ? '💬 ' + activePgnComment : '' }}
           </p>
@@ -342,6 +342,16 @@ const activePgnComment = computed<string>(() => {
   }
   const move = stage.moves[currentPgnMoveIndex.value];
   return move?.comment || '';
+});
+
+const commentContainerEl = ref<HTMLElement | null>(null);
+
+watch(activePgnComment, () => {
+  nextTick(() => {
+    if (commentContainerEl.value) {
+      commentContainerEl.value.scrollTop = 0;
+    }
+  });
 });
 
 const syncPgnBoardPosition = () => {
@@ -649,7 +659,7 @@ const passerEtapeSuivante = async () => {
   box-sizing: border-box;
   overflow-y: auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .comment-empty {
@@ -667,6 +677,7 @@ const passerEtapeSuivante = async () => {
   font-size: 0.88rem;
   line-height: 1.4;
   color: var(--ion-color-step-800, #333);
+  white-space: pre-line;
 }
 
 .placeholder-text {

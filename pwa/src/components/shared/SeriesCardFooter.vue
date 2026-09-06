@@ -1,5 +1,5 @@
 <template>
-  <Teleport :to="portalTarget || 'body'" :disabled="!isTeleportEnabled">
+  <Teleport defer :to="portalTarget || 'body'" :disabled="!isTeleportEnabled">
     <div :key="`footer-${props.currentCard}-${props.totalCards}`" class="series-card-footer-container">
     <!-- Zone de feedback toujours présente (réservée dès le départ pour éviter tout décalage) -->
     <div

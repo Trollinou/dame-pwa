@@ -6,6 +6,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Corrigé
+- **Défilement et Formatage des Commentaires PGN (`TypePartieHeros.vue`, `PgnViewer.vue`)** :
+  - **Correction du rognage initial en flexbox (`align-items: flex-start`)** : Remplacement de `align-items: center` par `align-items: flex-start` sur `.comment-container`. L'alignement centré provoquait, sur les commentaires longs excédant la hauteur maximale (120px), un décalage vertical vers le haut en coordonnées négatives non atteignables par le défilement navigateur (`scrollTop = 0`), tronquant systématiquement les premières lignes du texte explicatif.
+  - **Préservation des sauts de ligne (`white-space: pre-line`)** : Application de `white-space: pre-line` sur `.comment-text` afin de respecter les retours à la ligne et les listes numérotées des annotations pédagogiques rédigées dans les études PGN.
+  - **Réinitialisation automatique du défilement au coup suivant** : Ajout d'une surveillance réactive réinitialisant automatiquement `scrollTop = 0` lors de chaque changement de coup ou de commentaire.
+- **Stabilisation du Footer Fixe et Correction du Placement Initial (`ContenuPage.vue`, `SeriesCardFooter.vue`, `SeriesCardFooter.spec.ts`, `README.md`, `USING.md`)** :
+  - **Portail DOM persistant (`v-show` sur `<ion-footer>`)** : Remplacement du `v-if` par un `v-show` sur le conteneur `<ion-footer>` de `ContenuPage.vue`. Le conteneur du portail (`footerPortalRef`) reste désormais présent en permanence dans le DOM au lieu d'être détruit et recréé à chaque chargement d'exercice (`isPageLoading`), éliminant ainsi la condition de course initiale où le `SeriesCardFooter` de la première carte s'affichait en ligne au fond du contenu défilable avant de ne se replacer qu'à la deuxième carte.
+  - **Téléportation différée sécurisée (`<Teleport defer>`)** : Ajout de la directive `defer` sur `<Teleport>` dans `SeriesCardFooter.vue` pour garantir la résolution de la cible après le cycle de rendu initial de la page.
+  - **Gestion des marges de sécurité mobiles (Safe Areas iOS / Android)** : Intégration des marges de sécurité (`var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px))`, safe-area-left, safe-area-right) dans le styling de `.exercise-ion-footer`. Le footer et ses boutons d'action sont ainsi parfaitement surélevés au-dessus de la barre d'accueil iOS (Home Indicator), éliminant tout rognage ou placement trop bas sous le pouce.
+  - **Couverture de tests unitaires** : Enrichissement de la suite `SeriesCardFooter.spec.ts` avec la validation de la téléportation asynchrone et du portail persistant sous `v-show`.
+
 ## [1.3.1] - 2026-09-05
 
 ### Corrigé

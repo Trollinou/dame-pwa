@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { computed } from 'vue';
+import { computed, ref, nextTick, provide } from 'vue';
 import { mount } from '@vue/test-utils';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
@@ -225,5 +225,96 @@ describe( 'SeriesCardFooter.vue', () => {
 		).toContain( 'Carte 1 / 2' );
 
 		document.body.removeChild( targetDiv );
+	} );
+
+	test( 'se téléporte correctement lorsque exerciseFooterPortal est initialement null puis résolu', async () => {
+		const targetDiv = document.createElement( 'div' );
+		targetDiv.id = 'test-portal-async';
+		document.body.appendChild( targetDiv );
+
+		const portalRef = ref< HTMLElement | null >( null );
+
+		const wrapper = mount( SeriesCardFooter, {
+			props: {
+				currentCard: 1,
+				totalCards: 2,
+				isSolved: false,
+			},
+			global: {
+				provide: {
+					exerciseFooterPortal: portalRef,
+				},
+			},
+		} );
+
+		// Initialement non téléporté (rendu inline)
+		expect( wrapper.find( '.series-card-footer-container' ).exists() ).toBe(
+			true
+		);
+		expect(
+			targetDiv.querySelector( '.series-card-footer-container' )
+		).toBeNull();
+
+		// Le portal est maintenant résolu
+		portalRef.value = targetDiv;
+		await nextTick();
+
+		// Est-il maintenant dans le portail ?
+		expect(
+			targetDiv.querySelector( '.series-card-footer-container' )
+		).not.toBeNull();
+
+		document.body.removeChild( targetDiv );
+	} );
+
+	test( 'simulation ContenuPage: téléportation immédiate dans le portail persistant (v-show)', async () => {
+		const ParentComponent = {
+			components: { SeriesCardFooter },
+			template: `
+				<div>
+					<div class="content" v-if="!isLoading">
+						<SeriesCardFooter :currentCard="1" :totalCards="3" :isSolved="false" />
+					</div>
+					<div class="footer" v-show="!isLoading">
+						<div ref="footerPortalRef" class="portal-slot"></div>
+					</div>
+				</div>
+			`,
+			setup() {
+				const footerPortalRef = ref( null );
+				const isLoading = ref( true );
+				provide( 'exerciseFooterPortal', footerPortalRef );
+				return { footerPortalRef, isLoading };
+			},
+		};
+
+		const wrapper = mount( ParentComponent, {
+			attachTo: document.body,
+		} );
+
+		// Au départ isLoading est true, le portail DOM est déjà présent grâce à v-show
+		expect( wrapper.find( '.portal-slot' ).exists() ).toBe( true );
+		expect( wrapper.find( '.series-card-footer-container' ).exists() ).toBe(
+			false
+		);
+
+		// Le contenu a fini de charger
+		wrapper.vm.isLoading = false;
+		await nextTick();
+
+		const portalSlot = wrapper.find( '.portal-slot' ).element;
+		const footerInPortal = portalSlot.querySelector(
+			'.series-card-footer-container'
+		);
+
+		// Le footer est immédiatement dans le portail fixe, jamais inline dans le contenu
+		const footerInContent = wrapper
+			.find( '.content .series-card-footer-container' )
+			.exists();
+
+		wrapper.unmount();
+
+		expect( footerInPortal ).not.toBeNull();
+		expect( footerInContent ).toBe( false );
 	} );
 } );
