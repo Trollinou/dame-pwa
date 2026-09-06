@@ -35,6 +35,11 @@ export interface ExerciseNavigationContext {
 	 * Déclenche le retour au cours parent ou à la liste.
 	 */
 	onCourse: () => void;
+
+	/**
+	 * Déclenche la validation et l'enregistrement immédiat de la progression de l'exercice.
+	 */
+	onSuccess?: () => Promise< void > | void;
 }
 
 export const EXERCISE_NAVIGATION_KEY: InjectionKey< ExerciseNavigationContext > =

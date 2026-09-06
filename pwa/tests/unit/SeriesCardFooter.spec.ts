@@ -94,6 +94,7 @@ describe( 'SeriesCardFooter.vue', () => {
 		vi.useFakeTimers();
 		const onNextMock = vi.fn();
 		const onCourseMock = vi.fn();
+		const onSuccessMock = vi.fn();
 
 		const wrapper = mount( SeriesCardFooter, {
 			props: {
@@ -110,10 +111,14 @@ describe( 'SeriesCardFooter.vue', () => {
 						courseUrl: computed( () => '/cours/42' ),
 						onNext: onNextMock,
 						onCourse: onCourseMock,
+						onSuccess: onSuccessMock,
 					},
 				},
 			},
 		} );
+
+		// Vérification de la validation immédiate dès la complétion finale
+		expect( onSuccessMock ).toHaveBeenCalledTimes( 1 );
 
 		// Vérification du feedback de succès par défaut
 		expect( wrapper.find( '.feedback-message' ).text() ).toBe(

@@ -136,7 +136,6 @@ import type { BoardCore, DrawShape } from 'eg-chessboard';
 import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
-import { useFeedback } from '@/composables/useFeedback';
 import {
   parsePartieHerosPgn,
   shuffleChoices,
@@ -173,7 +172,6 @@ const emit = defineEmits<{
 }>();
 
 const store = useApprentissageStore();
-const { showSuccess } = useFeedback();
 
 const normalizedConfig = computed<Record<string, any>>(() => {
   let cfg: any = props.config;
@@ -581,12 +579,20 @@ const currentStagePendingHint = computed<string>(() => {
   return 'Visionnez tous les coups pour continuer';
 });
 
-const passerEtapeSuivante = async () => {
+watch(
+  () => isCurrentStageSolved.value,
+  (solved) => {
+    if (solved && etapeCouranteIndex.value >= totalEtapes.value - 1) {
+      emit('success');
+    }
+  },
+  { immediate: true }
+);
+
+const passerEtapeSuivante = () => {
   if (etapeCouranteIndex.value < totalEtapes.value - 1) {
     etapeCouranteIndex.value++;
   } else {
-    // Dernière étape terminée
-    await showSuccess('Félicitations ! Vous avez terminé ce scénario !', 3000);
     emit('success');
   }
 };

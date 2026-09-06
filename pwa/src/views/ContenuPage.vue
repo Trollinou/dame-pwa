@@ -60,9 +60,9 @@
             </div>
           </div>
 
-          <!-- Success Card (uniquement pour les leçons, les exercices utilisent leur propre SeriesCardFooter) -->
+          <!-- Success Card (pour les leçons et pour les types d'exercices n'utilisant pas encore SeriesCardFooter) -->
           <transition name="fade">
-            <ion-card v-if="estReussi && contenuActuel.post_type === 'roi_lecon'" class="success-card ion-margin-top">
+            <ion-card v-if="estReussi && !aSeriesFooter" class="success-card ion-margin-top">
               <ion-card-header>
                 <ion-card-title class="success-title">
                   {{ contenuActuel.post_type === 'roi_lecon' ? '🎉 Leçon terminée !' : '🎉 Exercice réussi !' }}
@@ -111,8 +111,8 @@
       </div>
     </ion-content>
 
-    <!-- Footer Fixe Unifié pour les Exercices -->
-    <ion-footer v-show="!isPageLoading && contenuActuel?.post_type === 'roi_exercice'" class="exercise-ion-footer">
+    <!-- Footer Fixe Unifié pour les Exercices utilisant SeriesCardFooter -->
+    <ion-footer v-show="!isPageLoading && aSeriesFooter" class="exercise-ion-footer">
       <div ref="footerPortalRef" class="exercise-footer-portal"></div>
     </ion-footer>
   </ion-page>
@@ -169,6 +169,13 @@ const isLoading = ref(true);
 const isPageLoading = computed(() => isLoading.value || apprentissageStore.isContenuLoading);
 const estReussi = ref(false);
 const contenuActuel = computed(() => apprentissageStore.contenuActuel);
+
+const TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 8];
+
+const aSeriesFooter = computed(() => {
+  return contenuActuel.value?.post_type === 'roi_exercice' &&
+    TYPES_AVEC_SERIES_FOOTER.includes(contenuActuel.value.type ?? 0);
+});
 
 const footerPortalRef = ref<HTMLElement | null>(null);
 const ionContentRef = ref<ComponentPublicInstance | null>(null);
@@ -256,24 +263,38 @@ const getElapsedTimeSeconds = (): number => {
   return Math.max(1, Math.round((Date.now() - startTime.value) / 1000));
 };
 
-const onSuccess = async () => {
-  if (contenuActuel.value) {
-    const elapsed = getElapsedTimeSeconds();
-    await apprentissageStore.validerElement(contenuActuel.value.id, elapsed);
+let currentValidationPromise: Promise<void> | null = null;
+
+const onSuccess = async (): Promise<void> => {
+  if (estReussi.value && currentValidationPromise) {
+    await currentValidationPromise;
+    return;
   }
   estReussi.value = true;
+  // Déclencher la célébration pour les leçons et les exercices n'ayant pas SeriesCardFooter
+  if (!aSeriesFooter.value) {
+    fireExerciseCelebration();
+  }
+  if (contenuActuel.value) {
+    const idToValidate = contenuActuel.value.id;
+    const elapsed = getElapsedTimeSeconds();
+    currentValidationPromise = apprentissageStore.validerElement(idToValidate, elapsed);
+    await currentValidationPromise;
+  }
 };
 
 const validerLecon = async () => {
-  if (contenuActuel.value) {
-    const elapsed = getElapsedTimeSeconds();
-    await apprentissageStore.validerElement(contenuActuel.value.id, elapsed);
-  }
-  estReussi.value = true;
-  fireExerciseCelebration();
+  await onSuccess();
 };
 
-const allerAuSuivant = () => {
+const allerAuSuivant = async () => {
+  if (currentValidationPromise) {
+    try {
+      await currentValidationPromise;
+    } catch {
+      // ignore
+    }
+  }
   if (prochainElement.value) {
     router.push(`/contenu/${prochainElement.value.id}`);
   } else {
@@ -281,7 +302,14 @@ const allerAuSuivant = () => {
   }
 };
 
-const retourAuCours = () => {
+const retourAuCours = async () => {
+  if (currentValidationPromise) {
+    try {
+      await currentValidationPromise;
+    } catch {
+      // ignore
+    }
+  }
   if (coursParentInfo.value) {
     router.push(`/cours/${coursParentInfo.value.cours.id}`);
   } else {
@@ -307,11 +335,13 @@ provide(EXERCISE_NAVIGATION_KEY, {
   }),
   onNext: allerAuSuivant,
   onCourse: retourAuCours,
+  onSuccess: onSuccess,
 });
 
 const loadContenu = async (idVal: string | string[] | number) => {
   isLoading.value = true;
   estReussi.value = false;
+  currentValidationPromise = null;
   startTime.value = Date.now();
   const id = typeof idVal === 'number' ? idVal : parseInt(Array.isArray(idVal) ? idVal[0] : idVal, 10);
   if (!isNaN(id)) {
@@ -446,10 +476,10 @@ ion-content::part(scroll) {
   background: var(--ion-background-color, #ffffff);
   border-top: 1px solid var(--ion-color-step-150, #e0e0e0);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
-  padding-top: 6px;
-  padding-bottom: calc(6px + var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
-  padding-left: calc(12px + var(--ion-safe-area-left, env(safe-area-inset-left, 0px)));
-  padding-right: calc(12px + var(--ion-safe-area-right, env(safe-area-inset-right, 0px)));
+  padding-top: 8px;
+  padding-bottom: max(16px, calc(12px + env(safe-area-inset-bottom, 0px)), calc(12px + var(--ion-safe-area-bottom, 0px)));
+  padding-left: max(12px, calc(12px + env(safe-area-inset-left, 0px)), calc(12px + var(--ion-safe-area-left, 0px)));
+  padding-right: max(12px, calc(12px + env(safe-area-inset-right, 0px)), calc(12px + var(--ion-safe-area-right, 0px)));
   box-sizing: border-box;
 }
 

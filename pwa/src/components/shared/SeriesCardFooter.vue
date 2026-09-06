@@ -167,6 +167,9 @@ watch(
   (completed) => {
     if (completed) {
       fireExerciseCelebration();
+      if (exerciseNav?.onSuccess) {
+        exerciseNav.onSuccess();
+      }
       showNextExerciseBtn.value = false;
       if (nextButtonTimer) {
         clearTimeout(nextButtonTimer);
@@ -219,9 +222,16 @@ const pendingHintText = computed(() => {
   return 'Trouvez la solution pour continuer';
 });
 
-const handleFinalNext = () => {
+const handleFinalNext = async () => {
   if (props.disabled) return;
   emit('next');
+  if (exerciseNav?.onSuccess) {
+    try {
+      await exerciseNav.onSuccess();
+    } catch {
+      // ignore
+    }
+  }
   if (exerciseNav) {
     exerciseNav.onNext();
   }
@@ -232,7 +242,7 @@ const handleFinalNext = () => {
 .series-card-footer-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;

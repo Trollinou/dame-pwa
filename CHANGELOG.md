@@ -7,6 +7,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Corrigé
+- **Validation Immédiate de la Progression et Déblocage de l'Exercice Suivant (`SeriesCardFooter.vue`, `useExerciseNavigation.ts`, `ContenuPage.vue`, `TypePartieHeros.vue`, `SeriesCardFooter.spec.ts`)** :
+  - **Déclenchement synchrone lors de la célébration** : L'enregistrement de la validation en base de données (`validerElement`) est désormais déclenché immédiatement dès que la dernière étape de l'exercice est résolue (`isFinalCompleted`) et que la pluie de confettis s'anime, sans attendre que l'utilisateur clique sur « Exercice suivant » après la temporisation de 2,2 secondes.
+  - **Élimination de la condition de course à la navigation** : Mise en attente de la promesse de validation (`currentValidationPromise`) dans `allerAuSuivant`, `retourAuCours` et `handleFinalNext`, garantissant l'invalidation du cache de progression et la synchronisation avec le serveur avant toute redirection de route.
+  - **Correction du Type 4 (Partie du Héros)** : Suppression du toast bloquant de 3 secondes (`showSuccess`) dans `passerEtapeSuivante` qui retardait l'émission de `@success` et provoquait l'abandon de la requête lors du démontage du composant au profit de l'exercice suivant (Type 8).
+  - **Résolution du verrouillage prématuré dans la liste de cours** : Lorsque l'apprenant termine un exercice de type 4 et retourne à la liste de cours, l'exercice suivant (type 8) apparaît désormais immédiatement débloqué avec l'exercice de type 4 coché en vert.
+  - **Prise en charge universelle des 16 types d'exercice (`ContenuPage.vue`)** : Déclenchement automatique des confettis festifs (`fireExerciseCelebration`) et validation instantanée pour l'ensemble des types d'exercice dès l'émission de `@success`, avec affichage conditionnel de la carte de succès pour les types n'utilisant pas encore `SeriesCardFooter` et masquage de la barre blanche résiduelle de pied de page.
+  - **Couverture de tests unitaires** : Actualisation de `SeriesCardFooter.spec.ts` pour valider l'appel automatique de `exerciseNav.onSuccess` dès l'activation de `isFinalCompleted`.
+
+## [1.3.2] - 2026-09-06
+
+### Corrigé
 - **Défilement et Formatage des Commentaires PGN (`TypePartieHeros.vue`, `PgnViewer.vue`)** :
   - **Correction du rognage initial en flexbox (`align-items: flex-start`)** : Remplacement de `align-items: center` par `align-items: flex-start` sur `.comment-container`. L'alignement centré provoquait, sur les commentaires longs excédant la hauteur maximale (120px), un décalage vertical vers le haut en coordonnées négatives non atteignables par le défilement navigateur (`scrollTop = 0`), tronquant systématiquement les premières lignes du texte explicatif.
   - **Préservation des sauts de ligne (`white-space: pre-line`)** : Application de `white-space: pre-line` sur `.comment-text` afin de respecter les retours à la ligne et les listes numérotées des annotations pédagogiques rédigées dans les études PGN.
@@ -14,7 +25,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Stabilisation du Footer Fixe et Correction du Placement Initial (`ContenuPage.vue`, `SeriesCardFooter.vue`, `SeriesCardFooter.spec.ts`, `README.md`, `USING.md`)** :
   - **Portail DOM persistant (`v-show` sur `<ion-footer>`)** : Remplacement du `v-if` par un `v-show` sur le conteneur `<ion-footer>` de `ContenuPage.vue`. Le conteneur du portail (`footerPortalRef`) reste désormais présent en permanence dans le DOM au lieu d'être détruit et recréé à chaque chargement d'exercice (`isPageLoading`), éliminant ainsi la condition de course initiale où le `SeriesCardFooter` de la première carte s'affichait en ligne au fond du contenu défilable avant de ne se replacer qu'à la deuxième carte.
   - **Téléportation différée sécurisée (`<Teleport defer>`)** : Ajout de la directive `defer` sur `<Teleport>` dans `SeriesCardFooter.vue` pour garantir la résolution de la cible après le cycle de rendu initial de la page.
-  - **Gestion des marges de sécurité mobiles (Safe Areas iOS / Android)** : Intégration des marges de sécurité (`var(--ion-safe-area-bottom, env(safe-area-inset-bottom, 0px))`, safe-area-left, safe-area-right) dans le styling de `.exercise-ion-footer`. Le footer et ses boutons d'action sont ainsi parfaitement surélevés au-dessus de la barre d'accueil iOS (Home Indicator), éliminant tout rognage ou placement trop bas sous le pouce.
+  - **Gestion résiliente des marges de sécurité mobiles (Safe Areas iOS / Android)** : Remplacement de l'ancien padding fixe par une formule `max()` garantissant une surélévation confortable (`max(16px, calc(12px + env(safe-area-inset-bottom, 0px)), calc(12px + var(--ion-safe-area-bottom, 0px)))`). Le footer n'est plus incrusté au bord de l'écran lorsque la safe area est à 0px (navigateur Safari ou Android avec 16px minimum garanti), et s'élève à 44px sur les iPhone équipés d'une encoche ou du Home Indicator (34px de safe area + 10-12px de marge de confort sous les boutons). Sécurisation des variables d'environnement dans `variables.css` avec fallbacks explicites à `0px`.
   - **Couverture de tests unitaires** : Enrichissement de la suite `SeriesCardFooter.spec.ts` avec la validation de la téléportation asynchrone et du portail persistant sous `v-show`.
 
 ## [1.3.1] - 2026-09-05
