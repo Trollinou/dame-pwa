@@ -35,30 +35,83 @@
         </div>
 
         <!-- Liste des cours -->
-        <div v-else class="list-container">
-          <ion-card
-            v-for="(cours, index) in apprentissageStore.parcours"
-            :key="cours.id"
-            :color="cours.chapitre_couleur"
-            :class="{ 'locked': !apprentissageStore.isCoursUnlocked(index) }"
-            :button="apprentissageStore.isCoursUnlocked(index)"
-            :router-link="apprentissageStore.isCoursUnlocked(index) ? `/cours/${cours.id}` : undefined"
-            class="cours-card"
-          >
-            <ion-card-header>
-              <div class="cours-header-wrapper">
-                <div>
-                  <ion-card-subtitle>Niveau {{ cours.niveau }} — {{ decodeHtmlEntities(cours.chapitre_nom) }}</ion-card-subtitle>
-                  <ion-card-title>{{ decodeHtmlEntities(cours.titre) }}</ion-card-title>
-                </div>
-                <ion-icon
-                  v-if="!apprentissageStore.isCoursUnlocked(index)"
-                  :icon="lockClosedOutline"
-                  class="lock-icon"
-                ></ion-icon>
-              </div>
-            </ion-card-header>
-          </ion-card>
+        <div v-else class="courses-wrapper">
+          <!-- SECTION 1 : COURS ASSIGNÉS PAR LES ENTRAÎNEURS -->
+          <div v-if="apprentissageStore.coursAssignes.length > 0" class="assigned-section">
+            <div class="section-title-wrapper">
+              <h2 class="section-title">
+                <ion-icon :icon="bookmarkOutline" class="section-icon"></ion-icon>
+                Cours assignés
+              </h2>
+              <span class="section-badge">{{ apprentissageStore.coursAssignes.length }}</span>
+            </div>
+            <p class="section-subtitle">Sélectionnés et prescrits par vos entraîneurs</p>
+
+            <div class="list-container">
+              <ion-card
+                v-for="cours in apprentissageStore.coursAssignes"
+                :key="'assigned-' + cours.id"
+                :color="cours.chapitre_couleur"
+                :button="true"
+                :router-link="`/cours/${cours.id}`"
+                class="cours-card assigned-card"
+              >
+                <ion-card-header>
+                  <div class="cours-header-wrapper">
+                    <div>
+                      <ion-card-subtitle>
+                        <span class="assigned-tag">📌 Assigné</span>
+                        Niveau {{ cours.niveau }} — {{ decodeHtmlEntities(cours.chapitre_nom) }}
+                      </ion-card-subtitle>
+                      <ion-card-title>{{ decodeHtmlEntities(cours.titre) }}</ion-card-title>
+                    </div>
+                    <div class="progress-pill">
+                      {{ getCourseProgress(cours) }}
+                    </div>
+                  </div>
+                </ion-card-header>
+              </ion-card>
+            </div>
+          </div>
+
+          <!-- SECTION 2 : PARCOURS DU CLUB (TRONC COMMUN) -->
+          <div class="tronc-section">
+            <div v-if="apprentissageStore.coursAssignes.length > 0" class="section-title-wrapper ion-margin-top">
+              <h2 class="section-title">
+                <ion-icon :icon="schoolOutline" class="section-icon"></ion-icon>
+                Parcours du Club
+              </h2>
+            </div>
+
+            <div class="list-container">
+              <ion-card
+                v-for="cours in apprentissageStore.coursTroncCommun"
+                :key="cours.id"
+                :color="cours.chapitre_couleur"
+                :class="{ 'locked': !isCourseUnlocked(cours) }"
+                :button="isCourseUnlocked(cours)"
+                :router-link="isCourseUnlocked(cours) ? `/cours/${cours.id}` : undefined"
+                class="cours-card"
+              >
+                <ion-card-header>
+                  <div class="cours-header-wrapper">
+                    <div>
+                      <ion-card-subtitle>Niveau {{ cours.niveau }} — {{ decodeHtmlEntities(cours.chapitre_nom) }}</ion-card-subtitle>
+                      <ion-card-title>{{ decodeHtmlEntities(cours.titre) }}</ion-card-title>
+                    </div>
+                    <ion-icon
+                      v-if="!isCourseUnlocked(cours)"
+                      :icon="lockClosedOutline"
+                      class="lock-icon"
+                    ></ion-icon>
+                    <div v-else class="progress-pill">
+                      {{ getCourseProgress(cours) }}
+                    </div>
+                  </div>
+                </ion-card-header>
+              </ion-card>
+            </div>
+          </div>
         </div>
       </div>
     </ion-content>
@@ -83,17 +136,33 @@ import {
   IonCardSubtitle
 } from '@ionic/vue';
 import { onMounted, watch } from 'vue';
-import { useApprentissageStore } from '@/stores/apprentissage';
+import { useApprentissageStore, type Cours } from '@/stores/apprentissage';
 import { useAuthStore } from '@/stores/auth';
 import { decodeHtmlEntities } from '@/utils/stringUtils';
 import {
   schoolOutline,
   homeOutline,
-  lockClosedOutline
+  lockClosedOutline,
+  bookmarkOutline
 } from 'ionicons/icons';
 
 const authStore = useAuthStore();
 const apprentissageStore = useApprentissageStore();
+
+const getCourseProgress = (cours: Cours): string => {
+  const playlist = cours.playlist || [];
+  if (playlist.length === 0) return '0/0';
+  const validated = playlist.filter((item) =>
+    apprentissageStore.elementsValides.includes(item.id)
+  ).length;
+  return `${validated}/${playlist.length}`;
+};
+
+const isCourseUnlocked = (cours: Cours): boolean => {
+  const idx = apprentissageStore.parcours.findIndex((c) => c.id === cours.id);
+  if (idx < 0) return true;
+  return apprentissageStore.isCoursUnlocked(idx);
+};
 
 const loadData = async () => {
   if (authStore.isAuthenticated && authStore.canAccessApprentissage) {
@@ -128,11 +197,58 @@ onMounted(async () => {
   min-height: 250px;
 }
 
+.courses-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.assigned-section {
+  margin-bottom: 8px;
+}
+
+.section-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ion-text-color, #1d2327);
+}
+
+.section-icon {
+  font-size: 1.25rem;
+  color: var(--ion-color-primary, #0073aa);
+}
+
+.section-badge {
+  background: var(--ion-color-primary, #0073aa);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.section-subtitle {
+  margin: 0 0 10px 0;
+  font-size: 0.85rem;
+  color: var(--ion-color-step-600, #666);
+}
+
 .list-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .cours-card {
@@ -155,6 +271,28 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.assigned-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-right: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.progress-pill {
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 3px 8px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  margin-left: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .lock-icon {

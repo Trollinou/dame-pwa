@@ -33,7 +33,10 @@
                   <ion-icon :icon="schoolOutline"></ion-icon>
                 </div>
                 <div class="panel-badge-wrapper">
-                  <ion-badge v-if="canAccessCours" color="success">Accès autorisé</ion-badge>
+                  <ion-badge v-if="canAccessCours && apprentissageStore.coursAssignes.length > 0" color="primary">
+                    📌 {{ apprentissageStore.coursAssignes.length }} assigné{{ apprentissageStore.coursAssignes.length > 1 ? 's' : '' }}
+                  </ion-badge>
+                  <ion-badge v-else-if="canAccessCours" color="success">Accès autorisé</ion-badge>
                   <ion-badge v-else color="warning">
                     <ion-icon :icon="constructOutline" class="mini-lock"></ion-icon> En développement
                   </ion-badge>
@@ -142,6 +145,7 @@ import {
   IonButton
 } from '@ionic/vue';
 import { useAuthStore } from '@/stores/auth';
+import { useApprentissageStore } from '@/stores/apprentissage';
 import {
   schoolOutline,
   gameControllerOutline,
@@ -153,6 +157,7 @@ import {
 } from 'ionicons/icons';
 
 const authStore = useAuthStore();
+const apprentissageStore = useApprentissageStore();
 
 const canAccessCours = computed(() => {
   return authStore.isAuthenticated && authStore.canAccessApprentissage;
