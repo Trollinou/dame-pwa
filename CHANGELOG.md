@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-09-06
+
 ### Corrigé
 - **Validation Immédiate de la Progression et Déblocage de l'Exercice Suivant (`SeriesCardFooter.vue`, `useExerciseNavigation.ts`, `ContenuPage.vue`, `TypePartieHeros.vue`, `SeriesCardFooter.spec.ts`)** :
   - **Déclenchement synchrone lors de la célébration** : L'enregistrement de la validation en base de données (`validerElement`) est désormais déclenché immédiatement dès que la dernière étape de l'exercice est résolue (`isFinalCompleted`) et que la pluie de confettis s'anime, sans attendre que l'utilisateur clique sur « Exercice suivant » après la temporisation de 2,2 secondes.
@@ -14,6 +16,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Résolution du verrouillage prématuré dans la liste de cours** : Lorsque l'apprenant termine un exercice de type 4 et retourne à la liste de cours, l'exercice suivant (type 8) apparaît désormais immédiatement débloqué avec l'exercice de type 4 coché en vert.
   - **Prise en charge universelle des 16 types d'exercice (`ContenuPage.vue`)** : Déclenchement automatique des confettis festifs (`fireExerciseCelebration`) et validation instantanée pour l'ensemble des types d'exercice dès l'émission de `@success`, avec affichage conditionnel de la carte de succès pour les types n'utilisant pas encore `SeriesCardFooter` et masquage de la barre blanche résiduelle de pied de page.
   - **Couverture de tests unitaires** : Actualisation de `SeriesCardFooter.spec.ts` pour valider l'appel automatique de `exerciseNav.onSuccess` dès l'activation de `isFinalCompleted`.
+
+## [1.3.2] - 2026-09-06
+
 - **Défilement et Formatage des Commentaires PGN (`TypePartieHeros.vue`, `PgnViewer.vue`)** :
   - **Correction du rognage initial en flexbox (`align-items: flex-start`)** : Remplacement de `align-items: center` par `align-items: flex-start` sur `.comment-container`. L'alignement centré provoquait, sur les commentaires longs excédant la hauteur maximale (120px), un décalage vertical vers le haut en coordonnées négatives non atteignables par le défilement navigateur (`scrollTop = 0`), tronquant systématiquement les premières lignes du texte explicatif.
   - **Préservation des sauts de ligne (`white-space: pre-line`)** : Application de `white-space: pre-line` sur `.comment-text` afin de respecter les retours à la ligne et les listes numérotées des annotations pédagogiques rédigées dans les études PGN.
