@@ -58,6 +58,8 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
 L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
 
 1. **Cours & Parcours 🎓** :
+   - **Section « Cours assignés » (Prescrits par vos entraîneurs)** : Lorsqu'un ou plusieurs cours sont prescrits spécifiquement à l'adhérent (ou à son groupe d'entraînement) par les entraîneurs, ils sont présentés en tête de liste sous la section dédiée `📌 Cours assignés` avec badge `📌 Assigné`. Ces cours bénéficient d'un déverrouillage immédiat sans prérequis séquentiel. Un badge contextuel `📌 X assigné(s)` est également visible sur la carte du Hub d'Apprentissage.
+   - **Section « Méthode EEF » (École d'Échecs à la Française)** : Présente les cours du tronc commun avec déblocage progressif linéaire au fil de la complétion des exercices.
    - Présente un ruban diagonal **"En dev"** signalant que le module est en cours de conception.
    - Accessible temporairement aux seuls profils autorisés (administrateurs, entraîneurs).
    - Pour les adhérents et visiteurs non autorisés : un panneau explicatif indique clairement que le module est en développement.

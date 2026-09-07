@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Ajouté
+- **Section « Cours assignés » et Déblocage Direct (`apprentissage.ts`, `ApprentissageCoursListPage.vue`, `ApprentissageHubPage.vue`)** :
+  - **Section dédiée aux cours prescrits** : Présentation en tête de liste des cours assignés par les entraîneurs sous la section « 📌 Cours assignés » avec la mention explicative « Prescrits par vos entraîneurs » et badge distinctif `📌 Assigné`.
+  - **Déverrouillage immédiat sans prérequis séquentiel** : Tout cours assigné à l'adhérent (directement ou via son groupe d'entraînement) est déverrouillé immédiatement (`unlocked_by_assignment: true`), sans être bloqué par la progression linéaire du parcours du club.
+  - **Indicateur dynamique sur le Hub d'Apprentissage** : Affichage d'un badge contextuel `📌 X assigné(s)` sur la carte des cours théoriques lorsque l'adhérent bénéficie de cours ciblés prescrits par ses coachs.
+  - **Identité de Section « Méthode EEF » (`ApprentissageCoursListPage.vue`)** : Renommage de la section générale en « Méthode EEF » avec sous-titre « École d'Échecs à la Française » (référence fédérale FFE https://eef.ffechecs.fr), assurant une distinction claire et pédagogique entre le parcours d'apprentissage national et les cours assignés par les entraîneurs.
 ## [1.3.3] - 2026-09-06
 
 ### Corrigé

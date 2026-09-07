@@ -21,7 +21,8 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 
 ## Espace de Jeu & Apprentissage
 
-- **Hub Apprentissage** : Accessible à tous depuis la barre d'onglets, il offre un point d'entrée vers les cours théoriques (protégés par adhésion) et vers l'échiquier de jeu (libre d'accès).
+- **Hub Apprentissage** : Accessible à tous depuis la barre d'onglets, il offre un point d'entrée vers les cours théoriques (protégés par adhésion) et vers l'échiquier de jeu (libre d'accès). Badge contextuel « 📌 X assigné(s) » signalant les cours prescrits par les entraîneurs.
+- **Parcours Pédagogique & Cours Assignés** : Distinction claire entre la section « 📌 Cours assignés » (*« Prescrits par vos entraîneurs »*, immédiatement déverrouillés sans prérequis séquentiel) et les cours généraux de la « 📚 Méthode EEF » (*École d'Échecs à la Française*, progression linéaire).
 - **Moteur Stockfish** : Embarqué via `eg-chessboard` avec calcul dynamique du temps de réflexion (`Elo * 1.4 ms`) et mémorisation du niveau choisi.
 - **Envoi PGN** : En mode 1 joueur, les parties des adhérents connectés sont enregistrées et synchronisées avec le plugin `roi` (`POST /roi/v1/games`).
 - **Ergonomie iPad & Tablettes (Paysage)** : Adaptation plein écran avec disposition côte-à-côte centrée pour l'échiquier de jeu et la revue d'analyse.

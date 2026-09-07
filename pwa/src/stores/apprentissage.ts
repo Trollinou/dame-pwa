@@ -35,6 +35,11 @@ export interface Cours {
 	chapitre_nom: string;
 	chapitre_couleur: string;
 	playlist: PlaylistItem[];
+	is_assigned?: boolean;
+	unlocked_by_assignment?: boolean;
+	audience_type?: string;
+	target_groups?: number[];
+	target_members?: number[];
 }
 
 export const useApprentissageStore = defineStore( 'apprentissage', () => {
@@ -150,18 +155,51 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	// Getters
 	const isCoursUnlocked = computed( () => {
 		return ( coursIndex: number ): boolean => {
+			const cours = parcours.value[ coursIndex ];
+			if ( ! cours ) {
+				return false;
+			}
+			// Les cours assignés par les entraîneurs sont immédiatement déverrouillés
+			if ( cours.unlocked_by_assignment || cours.is_assigned ) {
+				return true;
+			}
 			if ( coursIndex <= 0 ) {
 				return true;
 			}
-			const coursPrecedent = parcours.value[ coursIndex - 1 ];
+			// Trouver le cours précédent faisant partie du tronc commun
+			let previousTroncIndex = coursIndex - 1;
+			while (
+				previousTroncIndex >= 0 &&
+				( parcours.value[ previousTroncIndex ]?.is_assigned ||
+					parcours.value[ previousTroncIndex ]
+						?.unlocked_by_assignment )
+			) {
+				previousTroncIndex--;
+			}
+			if ( previousTroncIndex < 0 ) {
+				return true;
+			}
+			const coursPrecedent = parcours.value[ previousTroncIndex ];
 			if ( ! coursPrecedent ) {
-				return false;
+				return true;
 			}
 			return coursPrecedent.playlist.every( ( item ) =>
 				elementsValides.value.includes( item.id )
 			);
 		};
 	} );
+
+	const coursAssignes = computed( () =>
+		parcours.value.filter(
+			( c ) => c.is_assigned || c.unlocked_by_assignment
+		)
+	);
+
+	const coursTroncCommun = computed( () =>
+		parcours.value.filter(
+			( c ) => ! c.is_assigned && ! c.unlocked_by_assignment
+		)
+	);
 
 	const isElementUnlocked = computed( () => {
 		return ( coursIndex: number, playlistIndex: number ): boolean => {
@@ -302,6 +340,8 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 
 	return {
 		parcours,
+		coursAssignes,
+		coursTroncCommun,
 		contenuActuel,
 		elementsValides,
 		isLoading,
