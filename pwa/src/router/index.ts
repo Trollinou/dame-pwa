@@ -187,6 +187,11 @@ const router = createRouter( {
 
 // Navigation Guard (Vue Router 4 style)
 router.beforeEach( ( to ) => {
+	// Défocus de l'élément actif pour éviter les warnings WAI-ARIA lors des transitions de page Ionic
+	if ( typeof document !== 'undefined' && document.activeElement instanceof HTMLElement ) {
+		document.activeElement.blur();
+	}
+
 	const authStore = useAuthStore();
 
 	// 1. Vérification de l'authentification de base

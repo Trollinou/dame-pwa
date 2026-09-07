@@ -202,6 +202,45 @@ describe( 'SeriesCardFooter.vue', () => {
 		);
 	} );
 
+	test( 'ne déclenche pas de confettis ni onSuccess au montage si isAlreadyCompleted est true', async () => {
+		const onNextMock = vi.fn();
+		const onCourseMock = vi.fn();
+		const onSuccessMock = vi.fn();
+
+		const wrapper = mount( SeriesCardFooter, {
+			props: {
+				currentCard: 1,
+				totalCards: 1,
+				isSolved: true,
+				isAlreadyCompleted: true,
+			},
+			global: {
+				provide: {
+					[ EXERCISE_NAVIGATION_KEY as symbol ]: {
+						hasNext: computed( () => false ),
+						nextLabel: computed( () => 'Terminer le cours' ),
+						hasCourse: computed( () => true ),
+						courseUrl: computed( () => '/cours/42' ),
+						onNext: onNextMock,
+						onCourse: onCourseMock,
+						onSuccess: onSuccessMock,
+					},
+				},
+			},
+		} );
+
+		// Aucun appel à onSuccess
+		expect( onSuccessMock ).not.toHaveBeenCalled();
+
+		// Les boutons finaux sont immédiatement affichés sans temporisation
+		const courseBtn = wrapper.find( '.footer-course-btn' );
+		expect( courseBtn.exists() ).toBe( true );
+
+		const nextBtn = wrapper.find( '.next-exercise-btn' );
+		expect( nextBtn.exists() ).toBe( true );
+		expect( nextBtn.text() ).toContain( 'Terminer le cours' );
+	} );
+
 	test( 'se téléporte dans exerciseFooterPortal lorsqu’il est fourni via provide', async () => {
 		const targetDiv = document.createElement( 'div' );
 		targetDiv.id = 'test-portal-target';

@@ -34,9 +34,25 @@
           <!-- Rendu d'une leçon -->
           <div v-if="contenuActuel.post_type === 'roi_lecon'" class="lecon-wrapper">
             <LeconReader :contenuHtml="contenuActuel.contenu_html || ''" class="lecon-content ion-padding" />
-            <ion-button v-if="!estReussi" expand="block" class="ion-margin-top" @click="validerLecon">
+            <ion-button v-if="!estReussi" expand="block" class="ion-margin-top" @click="validerContenu">
               J'ai compris, terminer la leçon
             </ion-button>
+          </div>
+
+          <!-- Rendu d'une vidéo -->
+          <div v-else-if="contenuActuel.post_type === 'roi_video'" class="video-wrapper">
+            <VideoReader 
+              :key="contenuActuel.id"
+              :title="decodeHtmlEntities(contenuActuel.titre)"
+              :typeLabel="getContenuTypeLabel(contenuActuel)"
+              :chapitreNiveauLabel="formatChapitreNiveauLabel(contenuActuel.chapitre_nom, contenuActuel.niveau)"
+              :videoId="contenuActuel.video_id"
+              :videoUrl="contenuActuel.video_url"
+              :duree="contenuActuel.duree"
+              :contenuHtml="contenuActuel.contenu_html"
+              :isAlreadyCompleted="estReussi"
+              @success="onSuccess"
+            />
           </div>
 
           <!-- Rendu d'un exercice -->
@@ -60,17 +76,17 @@
             </div>
           </div>
 
-          <!-- Success Card (pour les leçons et pour les types d'exercices n'utilisant pas encore SeriesCardFooter) -->
+          <!-- Success Card (pour les leçons, vidéos et types d'exercices n'utilisant pas SeriesCardFooter) -->
           <transition name="fade">
             <ion-card v-if="estReussi && !aSeriesFooter" class="success-card ion-margin-top">
               <ion-card-header>
                 <ion-card-title class="success-title">
-                  {{ contenuActuel.post_type === 'roi_lecon' ? '🎉 Leçon terminée !' : '🎉 Exercice réussi !' }}
+                  {{ contenuActuel.post_type === 'roi_lecon' ? '🎉 Leçon terminée !' : (contenuActuel.post_type === 'roi_video' ? '🎉 Vidéo visionnée !' : '🎉 Exercice réussi !') }}
                 </ion-card-title>
               </ion-card-header>
               <ion-card-content>
                 <p class="success-subtitle">
-                  {{ contenuActuel.post_type === 'roi_lecon' ? 'Vous avez validé cette leçon avec succès.' : 'Félicitations, vous avez trouvé la bonne séquence de coups.' }}
+                  {{ contenuActuel.post_type === 'roi_lecon' ? 'Vous avez validé cette leçon avec succès.' : (contenuActuel.post_type === 'roi_video' ? 'Vous avez terminé le visionnage de cette vidéo.' : 'Félicitations, vous avez trouvé la bonne séquence de coups.') }}
                 </p>
                 <div class="action-buttons ion-margin-top">
                   <ion-button 
@@ -80,7 +96,7 @@
                     class="next-btn"
                     @click="allerAuSuivant"
                   >
-                    {{ prochainElement.type === 'roi_lecon' ? 'Leçon suivante' : 'Exercice suivant' }}
+                    {{ prochainElement.type === 'roi_lecon' ? 'Leçon suivante' : (prochainElement.type === 'roi_video' ? 'Vidéo suivante' : 'Exercice suivant') }}
                   </ion-button>
                   <ion-button 
                     v-else
@@ -159,6 +175,7 @@ import TypeCapOuPasCap from './types/TypeCapOuPasCap.vue';
 import TypeJugementFinal from './types/TypeJugementFinal.vue';
 import TypeDestinationFinale from './types/TypeDestinationFinale.vue';
 import LeconReader from '@/components/apprentissage/LeconReader.vue';
+import VideoReader from '@/components/apprentissage/VideoReader.vue';
 import { listOutline, homeOutline } from 'ionicons/icons';
 import { decodeHtmlEntities, getContenuTypeLabel, formatChapitreNiveauLabel } from '@/utils/stringUtils';
 
@@ -173,6 +190,9 @@ const contenuActuel = computed(() => apprentissageStore.contenuActuel);
 const TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 8];
 
 const aSeriesFooter = computed(() => {
+  if (contenuActuel.value?.post_type === 'roi_video') {
+    return true;
+  }
   return contenuActuel.value?.post_type === 'roi_exercice' &&
     TYPES_AVEC_SERIES_FOOTER.includes(contenuActuel.value.type ?? 0);
 });
@@ -283,9 +303,10 @@ const onSuccess = async (): Promise<void> => {
   }
 };
 
-const validerLecon = async () => {
+const validerContenu = async () => {
   await onSuccess();
 };
+const validerLecon = validerContenu;
 
 const allerAuSuivant = async () => {
   if (currentValidationPromise) {
@@ -324,7 +345,13 @@ provide(EXERCISE_NAVIGATION_KEY, {
     if (!prochainElement.value) {
       return 'Terminer le cours';
     }
-    return prochainElement.value.type === 'roi_lecon' ? 'Leçon suivante' : 'Exercice suivant';
+    if (prochainElement.value.type === 'roi_lecon') {
+      return 'Leçon suivante';
+    }
+    if (prochainElement.value.type === 'roi_video') {
+      return 'Vidéo suivante';
+    }
+    return 'Exercice suivant';
   }),
   hasCourse: computed(() => !!coursParentInfo.value),
   courseUrl: computed(() => {
@@ -353,7 +380,7 @@ const loadContenu = async (idVal: string | string[] | number) => {
       await apprentissageStore.fetchProgression();
     }
     if (
-      contenuActuel.value?.post_type === 'roi_lecon' &&
+      (contenuActuel.value?.post_type === 'roi_lecon' || contenuActuel.value?.post_type === 'roi_video') &&
       apprentissageStore.elementsValides.includes(id)
     ) {
       estReussi.value = true;

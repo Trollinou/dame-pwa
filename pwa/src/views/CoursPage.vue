@@ -50,7 +50,7 @@
             >
               <ion-icon
                 slot="start"
-                :icon="item.type === 'roi_lecon' ? bookOutline : extensionPuzzleOutline"
+                :icon="item.type === 'roi_lecon' ? bookOutline : (item.type === 'roi_video' ? videocamOutline : extensionPuzzleOutline)"
                 color="primary"
               ></ion-icon>
               
@@ -111,6 +111,7 @@ import {
   chevronForwardOutline,
   bookOutline,
   extensionPuzzleOutline,
+  videocamOutline,
   homeOutline
 } from 'ionicons/icons';
 

@@ -26,7 +26,7 @@
           </ion-badge>
           <div class="action-zone">
             <ion-badge color="success" class="card-badge success-resolu-badge animate-fade-in">
-              🎉 Exercice réussi !
+              {{ completedText }}
             </ion-badge>
           </div>
         </template>
@@ -84,6 +84,20 @@
             <ion-icon slot="end" :icon="isLastCard ? checkmarkCircleOutline : arrowForwardOutline" />
           </ion-button>
 
+          <!-- Bouton d'action directe quand non-résolu (ex: vidéo ou étape passive) -->
+          <ion-button
+            v-else-if="showActionButtonWhenUnsolved"
+            :color="actionButtonColor || 'primary'"
+            size="small"
+            fill="solid"
+            :disabled="disabled"
+            class="next-card-btn animate-fade-in"
+            @click="!disabled && emit('action')"
+          >
+            <span>{{ actionButtonText }}</span>
+            <ion-icon slot="end" :icon="checkmarkCircleOutline" />
+          </ion-button>
+
           <span v-else class="pending-hint">
             {{ pendingHintText }}
           </span>
@@ -121,23 +135,34 @@ const props = withDefaults(
     feedback?: CardFeedback | null;
     nextText?: string;
     finishText?: string;
+    completedText?: string;
     pendingHint?: string;
     disabledHint?: string;
     badgePrefix?: string;
+    showActionButtonWhenUnsolved?: boolean;
+    actionButtonText?: string;
+    actionButtonColor?: string;
+    isAlreadyCompleted?: boolean;
   }>(),
   {
     disabled: false,
     feedback: null,
     nextText: 'Carte suivante',
     finishText: 'Terminer l\'exercice',
+    completedText: '🎉 Exercice réussi !',
     pendingHint: 'Trouvez la solution pour continuer',
     disabledHint: 'Visionnez tous les coups pour continuer',
-    badgePrefix: 'Carte'
+    badgePrefix: 'Carte',
+    showActionButtonWhenUnsolved: false,
+    actionButtonText: 'Valider',
+    actionButtonColor: 'primary',
+    isAlreadyCompleted: false
   }
 );
 
 const emit = defineEmits<{
   (e: 'next'): void;
+  (e: 'action'): void;
 }>();
 
 const exerciseNav = useExerciseNavigation();
@@ -155,6 +180,7 @@ const isTeleportEnabled = computed(() => !!portalTarget.value);
 
 const showNextExerciseBtn = ref(false);
 let nextButtonTimer: ReturnType<typeof setTimeout> | null = null;
+let isInitialMount = true;
 
 const isLastCard = computed(() => props.currentCard >= props.totalCards);
 
@@ -165,6 +191,14 @@ const isFinalCompleted = computed(() => {
 watch(
   () => isFinalCompleted.value,
   (completed) => {
+    if (isInitialMount) {
+      isInitialMount = false;
+      if (completed && props.isAlreadyCompleted) {
+        showNextExerciseBtn.value = true;
+        return;
+      }
+    }
+
     if (completed) {
       fireExerciseCelebration();
       if (exerciseNav?.onSuccess) {

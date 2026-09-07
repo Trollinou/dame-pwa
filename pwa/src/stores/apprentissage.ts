@@ -20,6 +20,9 @@ export interface Contenu {
 	type?: number;
 	config?: ExerciceConfig;
 	contenu_html?: string;
+	video_url?: string;
+	video_id?: string;
+	duree?: string;
 }
 
 export interface PlaylistItem {

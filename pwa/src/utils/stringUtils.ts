@@ -139,9 +139,12 @@ export function getContenuTypeLabel(
 		return EXERCICE_TYPES_MAP[ item ] || `Type ${ item }`;
 	}
 
-	// 1. Check if it's a lesson
+	// 1. Check if it's a lesson or video
 	if ( item.type === 'roi_lecon' ) {
 		return 'Leçon';
+	}
+	if ( item.type === 'roi_video' ) {
+		return 'Vidéo';
 	}
 
 	// 2. Check if explicit exercise type number is available

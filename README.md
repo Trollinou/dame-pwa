@@ -37,14 +37,15 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 ## Modèle d'Architecture Découplé (CMS ROI / Moteur Runtime PWA)
 
 L'application suit un principe de découplage strict :
-- **ROI (WordPress)** : Rôle de CMS auteur stockant les standards d'échecs (FEN + Shapes, PGN avec annotations `%csl`/`%cal`/variantes) et les consignes rédigées par l'auteur.
-- **DAME-PWA (Client-Side)** : Moteur d'interprétation interactive via `fenUtils.ts`, `partieHerosParser.ts`, `eg-chessboard` et `chessops` :
+- **ROI (WordPress)** : Rôle de CMS auteur stockant les standards d'échecs (FEN + Shapes, PGN avec annotations `%csl`/`%cal`/variantes, vidéos pédagogiques `roi_video` avec URLs YouTube) et les consignes rédigées par l'auteur.
+- **DAME-PWA (Client-Side)** : Moteur d'interprétation interactive via `fenUtils.ts`, `partieHerosParser.ts`, `eg-chessboard`, `chessops` et `VideoReader.vue` :
   - Détection automatique de la pièce cible à partir du cercle bleu (`brush: 'blue'`).
   - Dérivation de la `fen_depart` sans la pièce cible.
   - Calcul dynamique de l'orientation de l'échiquier selon le trait de la position (`getActiveColorFromFen(fen)` : Blancs en bas si trait aux Blancs, Noirs en bas si trait aux Noirs).
   - Découpage automatique des études PGN complètes (Type 4 — La Partie dont tu es le Héros) en séquences PGN et embranchements QCM via l'analyse des variantes et des flèches `[%cal ...]`.
   - Masquage initial des `shapes` pendant la recherche, puis révélation complète dès le placement réussi.
   - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
+  - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec bascule plein écran / paysage et validation de progression.
 
 ## Composants & Composables Partagés (PWA Frontend)
 
