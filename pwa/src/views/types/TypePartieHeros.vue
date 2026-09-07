@@ -1,7 +1,7 @@
 <template>
   <div class="exercice-type-partie-heros">
     <!-- En-tête Unifié de l'exercice -->
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -133,7 +133,7 @@ import {
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import {

@@ -1,6 +1,6 @@
 <template>
   <div class="exercice-type-100commandements">
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import QcmViewer from '@/components/shared/QcmViewer.vue';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import type { DrawShape } from 'eg-chessboard';
 

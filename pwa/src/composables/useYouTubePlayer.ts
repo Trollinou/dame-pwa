@@ -208,8 +208,14 @@ export function useYouTubePlayer(options: UseYouTubePlayerOptions = {}) {
     }
   };
 
+  let isBinding = false;
+
   const bindIframe = async (iframeEl: HTMLIFrameElement) => {
     if (!iframeEl) return;
+    if (activeIframe === iframeEl && (playerInstance || isReady.value || isBinding)) {
+      return;
+    }
+    isBinding = true;
     activeIframe = iframeEl;
 
     // Envoi du message d'écoute à l'iframe
@@ -230,6 +236,14 @@ export function useYouTubePlayer(options: UseYouTubePlayerOptions = {}) {
     try {
       await loadYouTubeIframeApi();
       if (window.YT && window.YT.Player && iframeEl.id) {
+        if (playerInstance && typeof playerInstance.destroy === 'function') {
+          try {
+            playerInstance.destroy();
+          } catch {
+            // ignore
+          }
+          playerInstance = null;
+        }
         playerInstance = new window.YT.Player(iframeEl.id, {
           events: {
             onReady: (event: any) => {
@@ -253,10 +267,13 @@ export function useYouTubePlayer(options: UseYouTubePlayerOptions = {}) {
     } catch (err: any) {
       // Si YT.Player échoue, postMessage assure le suivi sans problème
       apiError.value = err?.message || null;
+    } finally {
+      isBinding = false;
     }
   };
 
   const destroyPlayer = () => {
+    isBinding = false;
     stopPolling();
     if (typeof window !== 'undefined') {
       window.removeEventListener('message', handleWindowMessage);

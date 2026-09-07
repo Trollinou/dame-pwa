@@ -361,4 +361,17 @@ describe( 'SeriesCardFooter.vue', () => {
 		expect( footerInPortal ).not.toBeNull();
 		expect( footerInContent ).toBe( false );
 	} );
+
+	test( 'masque la zone de feedback quand hideFeedback est true', () => {
+		const wrapper = mount( SeriesCardFooter, {
+			props: {
+				currentCard: 1,
+				totalCards: 1,
+				isSolved: false,
+				hideFeedback: true,
+			},
+		} );
+
+		expect( wrapper.find( '.feedback-row' ).exists() ).toBe( false );
+	} );
 } );

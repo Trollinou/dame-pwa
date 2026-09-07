@@ -87,10 +87,22 @@ describe( 'stringUtils', () => {
 	} );
 
 	describe( 'getContenuTypeLabel', () => {
-		test( 'identifies lessons correctly', () => {
+		test( 'identifies lessons correctly with type or post_type', () => {
 			expect(
 				getContenuTypeLabel( { type: 'roi_lecon', titre: 'Leçon 1' } )
 			).toBe( 'Leçon' );
+			expect(
+				getContenuTypeLabel( { post_type: 'roi_lecon', titre: 'Les déplacements' } )
+			).toBe( 'Leçon' );
+		} );
+
+		test( 'identifies videos correctly with type or post_type', () => {
+			expect(
+				getContenuTypeLabel( { type: 'roi_video', titre: 'Vidéo 1' } )
+			).toBe( 'Vidéo' );
+			expect(
+				getContenuTypeLabel( { post_type: 'roi_video', titre: 'La valeur des pièces' } )
+			).toBe( 'Vidéo' );
 		} );
 
 		test( 'extracts exercise type labels from titles', () => {

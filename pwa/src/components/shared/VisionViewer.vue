@@ -1,7 +1,7 @@
 <template>
   <div class="vision-viewer-wrapper">
     <!-- En-tête Unifié 2 Panels -->
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -64,7 +64,7 @@ import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { parseFenPieces, getActiveColorFromFen } from '@/utils/fenUtils';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
 
 const chessPreferences = useChessPreferencesStore();

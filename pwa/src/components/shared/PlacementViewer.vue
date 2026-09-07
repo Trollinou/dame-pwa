@@ -1,7 +1,7 @@
 <template>
   <div class="placement-viewer-wrapper">
     <!-- En-tête Unifié de l'exercice avec la consigne du diagramme courant -->
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -45,7 +45,7 @@ import {
   removePieceFromFen,
   getActiveColorFromFen
 } from '@/utils/fenUtils';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 
 export interface DiagrammePopEchecs {

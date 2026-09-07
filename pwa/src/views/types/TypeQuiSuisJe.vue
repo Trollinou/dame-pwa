@@ -1,6 +1,6 @@
 <template>
   <div class="exercice-type-qui-suis-je">
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import QuiSuisJeViewer, { type QcmConfig } from '@/components/shared/QuiSuisJeViewer.vue';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 
 interface ConfigQuiSuisJe {
   consigne?: string;

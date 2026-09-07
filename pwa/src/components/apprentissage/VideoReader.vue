@@ -1,12 +1,11 @@
 <template>
   <div class="video-reader-wrapper">
-    <!-- En-tête Unifié Type Exercice -->
-    <ExerciseHeader
+    <!-- En-tête Unifié Vidéo -->
+    <ContentHeader
       :title="title"
       :typeLabel="typeLabel || 'Vidéo'"
       :chapitreNiveauLabel="chapitreNiveauLabel"
-      :consigne="consigne || 'Visionnez attentivement la vidéo ci-dessous pour valider cette étape.'"
-      stepBadgeText="1 / 1"
+      :hideSubPanel="true"
     />
 
     <!-- Conteneur Vidéo Principal -->
@@ -21,7 +20,6 @@
           class="video-iframe"
           title="Vidéo pédagogique"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowfullscreen
           @load="onIframeLoaded"
         ></iframe>
         <div v-else class="video-placeholder">
@@ -65,7 +63,7 @@
       :isSolved="estValide"
       :isAlreadyCompleted="props.isAlreadyCompleted"
       :disabled="!estValide && !canValidate"
-      :feedback="feedback"
+      :hideFeedback="true"
       :showActionButtonWhenUnsolved="!estValide"
       :actionButtonText="canValidate ? 'Valider la vidéo' : `Valider (${progressPercent}% / ${threshold}%)`"
       :actionButtonColor="canValidate ? 'success' : 'medium'"
@@ -74,7 +72,7 @@
       completedText="🎉 Vidéo validée !"
       pendingHint="Visionnez au moins 95% de la vidéo pour valider"
       disabledHint="Visionnez au moins 95% de la vidéo pour débloquer la validation"
-      badgePrefix="Étape"
+      badgePrefix="Vidéo"
       @action="validerVisionnage"
       @next="validerVisionnage"
     />
@@ -92,8 +90,8 @@ import {
   checkmarkCircleOutline,
   informationCircleOutline
 } from 'ionicons/icons';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
-import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
+import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
 import { useYouTubePlayer } from '@/composables/useYouTubePlayer';
 
 const props = defineProps<{
@@ -116,14 +114,6 @@ const containerRef = ref<HTMLElement | null>(null);
 const iframeRef = ref<HTMLIFrameElement | null>(null);
 const isFullscreen = ref(false);
 const estValide = ref(props.isAlreadyCompleted ?? false);
-const feedback = ref<CardFeedback | null>(
-  props.isAlreadyCompleted
-    ? {
-        type: 'success',
-        message: 'Vidéo déjà validée !'
-      }
-    : null
-);
 
 const {
   progressPercent,
@@ -145,7 +135,8 @@ const onIframeLoaded = () => {
 
 const embedUrl = computed(() => {
   if (!props.videoId) return '';
-  return `https://www.youtube.com/embed/${props.videoId}?enablejsapi=1&playsinline=1&rel=0&modestbranding=1`;
+  const origin = typeof window !== 'undefined' && window.location?.origin ? `&origin=${encodeURIComponent(window.location.origin)}` : '';
+  return `https://www.youtube.com/embed/${props.videoId}?enablejsapi=1&playsinline=1&rel=0&modestbranding=1${origin}`;
 });
 
 const onFullscreenChange = () => {
@@ -208,10 +199,6 @@ const toggleFullscreen = async () => {
 
 const validerVisionnage = () => {
   estValide.value = true;
-  feedback.value = {
-    type: 'success',
-    message: 'Visionnage terminé avec succès !'
-  };
   emit('success');
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="exercice-type-ouvre-boite">
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -22,7 +22,7 @@
 import { computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import InteractiveQcmViewer from '@/components/shared/InteractiveQcmViewer.vue';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 import type { DrawShape } from 'eg-chessboard';
 
 interface Choix {

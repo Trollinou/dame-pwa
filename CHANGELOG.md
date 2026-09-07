@@ -6,7 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-### Ajouté
+- **En-tête Générique et Harmonisation des Contenus (`ContentHeader.vue`, `ExerciseHeader.vue`, `SeriesCardFooter.vue`, `LeconReader.vue`, `VideoReader.vue`, `ContenuPage.vue`)** :
+  - **Renommage Sémantique `ContentHeader.vue`** : Remplacement du composant spécifique `ExerciseHeader` par `ContentHeader`, reflétant son utilisation transversale pour les trois types de contenus pédagogiques (Exercices, Vidéos et Leçons). Maintien d'un wrapper typé `ExerciseHeader.vue` pour la rétrocompatibilité.
+  - **Masquage Conditionnel du Panel 2 (`hideSubPanel`)** : Pour les Vidéos et les Leçons, le deuxième panneau (consigne et badge d'étape) est masqué automatiquement ou via la prop `hideSubPanel: true`, éliminant tout encombrement visuel inutile.
+  - **Zone de Feedback Masquable (`hideFeedback`) dans `SeriesCardFooter.vue`** : Ajout de la prop `hideFeedback: boolean`. Pour les Vidéos et Leçons, la zone de feedback est retirée du DOM, évitant de réserver un espace vide sur des contenus ne comportant pas de choix bon/mauvais.
+  - **Intégration et Validation des Leçons (Seuil de Défilement à 95%)** : `LeconReader.vue` adopte désormais `ContentHeader` et le footer fixe `SeriesCardFooter` (carte 1/1). Le bouton de validation reste inactif tant que l'utilisateur n'a pas fait défiler 95% du document (ou débloqué immédiatement si le contenu tient sans scroll vertical).
 - **Prise en Charge des Vidéos Pédagogiques & Ergonomie Unifiée (`VideoReader.vue`, `useYouTubePlayer.ts`, `ContenuPage.vue`, `SeriesCardFooter.vue`, `stringUtils.ts`, `apprentissage.ts`)** :
   - **Suivi Dynamique de Progression YouTube (Seuil à 95%)** : Intégration de l'API YouTube IFrame Player (`window.YT.Player`) et du canal `postMessage` (`enablejsapi=1`) via le composable réutilisable `useYouTubePlayer.ts` mesurant la lecture en temps réel. Le bouton de validation dans le footer fixe reste verrouillé avec l'indication dynamique du pourcentage (`Valider (X% / 95%)`) jusqu'à ce que 95% de la vidéo soient visionnés ou que la lecture prenne fin (`ENDED`), sans barre de progression redondante sous le lecteur YouTube.
   - **Présentation Unifiée (`ExerciseHeader` + `SeriesCardFooter`)** : Intégration de l'en-tête standard (`ExerciseHeader`) avec titre, chapitre, niveau et consigne (« Visionnez attentivement... ») et badge d'étape `1 / 1`.
@@ -15,7 +19,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Transition et Validation Automatisée** : Dès le clic sur « Valider la vidéo », le footer affiche la mention `🎉 Vidéo validée !`, déclenche la célébration festive (`fireExerciseCelebration`) et bascule directement sur les boutons d'action unifiés (« Cours » et « Vidéo suivante / Exercice suivant » ou « Terminer le cours »).
   - **Bascule Plein Écran & Mode Paysage Mobile** : Bouton tactile dédié « Plein écran / Paysage » exploitant l'API Fullscreen et le verrouillage d'orientation `screen.orientation.lock('landscape')` sur mobile/PWA pour un confort de visionnage horizontal sans contrainte.
   - **Tolérance aux Pannes & Mode Hors-ligne** : Fallback automatique autorisant la validation directe si le chargement de l'API YouTube est restreint ou indisponible.
-  - **Typage & Libellés** : Reconnaissance du post-type `roi_video` retournant le libellé « Vidéo » dans `getContenuTypeLabel` et extension de l'interface `Contenu` (`video_id`, `video_url`, `duree`).
+- **Détection Universelle du Type de Contenu (`stringUtils.ts`, `ContenuPage.vue`, `VideoReader.vue`, `stringUtils.spec.ts`)** :
+  - **Prise en charge de `item.post_type`** : `getContenuTypeLabel` inspecte désormais `item.post_type` (`'roi_video'`, `'roi_lecon'`) en plus de `item.type` (réservé aux éléments de playlist de cours), résolvant l'affichage persistant du badge « Exercice » lors du chargement individuel d'une vidéo ou d'une leçon.
+  - **Sécurisation des libellés de secours** : Ajout de fallbacks explicites (`|| 'Leçon'`, `|| 'Vidéo'`) dans `ContenuPage.vue`.
+  - **Harmonisation du footer vidéo** : Configuration de `badgePrefix="Vidéo"` sur le `SeriesCardFooter` de `VideoReader.vue` (affichant « Vidéo 1/1 » au lieu de « Étape 1/1 »).
+- **Conformité & Robustesse du Lecteur Vidéo YouTube (`VideoReader.vue`, `useYouTubePlayer.ts`)** :
+  - **Origine dynamique & Sécurité IFrame API** : Ajout dynamique du paramètre `&origin=${encodeURIComponent(window.location.origin)}` dans l'URL d'intégration YouTube, éliminant l'erreur de sécurité cross-origin `postMessage` avec `www-widgetapi.js`.
+  - **Nettoyage des attributs HTML** : Suppression de l'attribut redondant `allowfullscreen` sur l'iframe au profit de la directive standard moderne `allow="... fullscreen"`.
+  - **Idempotence du Player** : Sécurisation de `bindIframe` dans `useYouTubePlayer.ts` via un verrou d'initialisation et destruction propre de l'instance précédente pour éliminer tout risque de double instanciation de `window.YT.Player`.
+- **Conformité Hiérarchique Ionic Framework (`ContenuPage.vue`)** :
+  - **Suppression du header condensé résiduel** : Éradication de la balise `<ion-header collapse="condense">` imbriquée dans `<div class="safe-area-wrapper">`, supprimant l'avertissement console `<ion-header> must be used inside ion-content.` lors de la navigation entre leçons et exercices.
 - **Section « Cours assignés » et Déblocage Direct (`apprentissage.ts`, `ApprentissageCoursListPage.vue`, `ApprentissageHubPage.vue`)** :
   - **Section dédiée aux cours prescrits** : Présentation en tête de liste des cours assignés par les entraîneurs sous la section « 📌 Cours assignés » avec la mention explicative « Prescrits par vos entraîneurs » et badge distinctif `📌 Assigné`.
   - **Déverrouillage immédiat sans prérequis séquentiel** : Tout cours assigné à l'adhérent (directement ou via son groupe d'entraînement) est déverrouillé immédiatement (`unlocked_by_assignment: true`), sans être bloqué par la progression linéaire du parcours du club.

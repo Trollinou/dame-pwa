@@ -123,6 +123,7 @@ export function getContenuTypeLabel(
 	item:
 		| {
 				type?: string | number;
+				post_type?: string;
 				exercice_type?: number;
 				type_exercice?: number;
 				titre?: string;
@@ -139,11 +140,18 @@ export function getContenuTypeLabel(
 		return EXERCICE_TYPES_MAP[ item ] || `Type ${ item }`;
 	}
 
-	// 1. Check if it's a lesson or video
-	if ( item.type === 'roi_lecon' ) {
+	// 1. Check if it's a lesson or video (supports both post_type and type)
+	const rawType =
+		typeof item.post_type === 'string'
+			? item.post_type
+			: typeof item.type === 'string'
+			? item.type
+			: undefined;
+
+	if ( rawType === 'roi_lecon' || rawType === 'lecon' ) {
 		return 'Leçon';
 	}
-	if ( item.type === 'roi_video' ) {
+	if ( rawType === 'roi_video' || rawType === 'video' ) {
 		return 'Vidéo';
 	}
 

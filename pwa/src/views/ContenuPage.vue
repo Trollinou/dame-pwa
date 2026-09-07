@@ -19,12 +19,6 @@
 
     <ion-content ref="ionContentRef" :fullscreen="true" class="ion-padding">
       <div class="safe-area-wrapper">
-        <ion-header v-if="contenuActuel?.post_type === 'roi_lecon'" collapse="condense">
-          <ion-toolbar>
-            <ion-title size="large">{{ decodeHtmlEntities(contenuActuel?.titre) || 'Contenu' }}</ion-title>
-          </ion-toolbar>
-        </ion-header>
-
         <div v-if="isPageLoading" class="ion-text-center ion-padding spinner-container">
           <ion-spinner name="crescent"></ion-spinner>
           <p>Chargement du contenu...</p>
@@ -33,10 +27,15 @@
         <div v-else-if="contenuActuel" class="exercice-container">
           <!-- Rendu d'une leçon -->
           <div v-if="contenuActuel.post_type === 'roi_lecon'" class="lecon-wrapper">
-            <LeconReader :contenuHtml="contenuActuel.contenu_html || ''" class="lecon-content ion-padding" />
-            <ion-button v-if="!estReussi" expand="block" class="ion-margin-top" @click="validerContenu">
-              J'ai compris, terminer la leçon
-            </ion-button>
+            <LeconReader
+              :key="contenuActuel.id"
+              :title="decodeHtmlEntities(contenuActuel.titre)"
+              :typeLabel="getContenuTypeLabel(contenuActuel) || 'Leçon'"
+              :chapitreNiveauLabel="formatChapitreNiveauLabel(contenuActuel.chapitre_nom, contenuActuel.niveau)"
+              :contenuHtml="contenuActuel.contenu_html || ''"
+              :isAlreadyCompleted="estReussi"
+              @success="onSuccess"
+            />
           </div>
 
           <!-- Rendu d'une vidéo -->
@@ -44,7 +43,7 @@
             <VideoReader 
               :key="contenuActuel.id"
               :title="decodeHtmlEntities(contenuActuel.titre)"
-              :typeLabel="getContenuTypeLabel(contenuActuel)"
+              :typeLabel="getContenuTypeLabel(contenuActuel) || 'Vidéo'"
               :chapitreNiveauLabel="formatChapitreNiveauLabel(contenuActuel.chapitre_nom, contenuActuel.niveau)"
               :videoId="contenuActuel.video_id"
               :videoUrl="contenuActuel.video_url"
@@ -190,7 +189,7 @@ const contenuActuel = computed(() => apprentissageStore.contenuActuel);
 const TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 8];
 
 const aSeriesFooter = computed(() => {
-  if (contenuActuel.value?.post_type === 'roi_video') {
+  if (contenuActuel.value?.post_type === 'roi_video' || contenuActuel.value?.post_type === 'roi_lecon') {
     return true;
   }
   return contenuActuel.value?.post_type === 'roi_exercice' &&

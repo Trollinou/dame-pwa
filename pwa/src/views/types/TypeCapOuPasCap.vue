@@ -1,6 +1,6 @@
 <template>
   <div class="exercice-type-cap-ou-pas-cap">
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -21,7 +21,7 @@
 import { computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import CapOuPasCapViewer, { type DiagrammeCapOuPasCap } from '@/components/shared/CapOuPasCapViewer.vue';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 
 interface ConfigCapOuPasCap {
   consigne: string;

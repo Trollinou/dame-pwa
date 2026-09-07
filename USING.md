@@ -66,44 +66,50 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
    - Boutons de navigation d'en-tête (pour les profils autorisés) :
      - **Maison** (`homeOutline`) : retour rapide à la liste des cours (`/apprentissage/cours`).
      - **Liste** (`listOutline`) : retour au sommaire du cours actif (`/cours/:id`).
-   - **Structure des Exercices & Puzzles** :
-     - **En-tête unifié (`ExerciseHeader`)** : Affiche le titre de l'étape, le type d'exercice, la consigne contextualisée à la question active et le badge d'étape interactive (`Carte X / Y`).
-     - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, dimensionnement stable et constant sur chaque appareil (non altéré par l'apparition de commentaires ou de boutons de choix), ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
-     - **Exercices Pop'Echecs (Type 2)** :
-       - Série de 4 diagrammes avec consigne propre à chaque position.
-       - Masquage des annotations/formes initiales pendant la phase de réflexion.
-       - Clic sur la case cible : placement de la pièce, validation instantanée, révélation des flèches/formes du diagramme complet.
-       - Retrait automatique avec feedback rouge en cas d'erreur de case.
-     - **Exercices ABCDaire Tactique (Type 3)** :
-       - Série de 4 Mini-PGN contenant 1 ou plusieurs coups (attaque, défense, mat, gain matériel).
-       - Orientation automatique de l'échiquier selon le trait de la position initiale (Blancs ou Noirs en bas).
-       - Masquage des formes pendant la recherche et le jeu du coup.
-       - Déplacement direct sur l'échiquier du meilleur coup attendu :
-         - En cas de mauvais coup : annulation immédiate et possibilité de réessayer sans limite.
-         - En cas de bon coup : si l'exercice comporte des coups intermédiaires, l'ordinateur joue sa réplique scriptée (délai de 500ms) et l'apprenant rejoue jusqu'au coup final.
-       - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées (Début, Précédent, Suivant) avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur), sans bouton d'avance rapide à la fin afin de garantir la lecture pas-à-pas des explications. Les boutons *Début* et *Précédent* sont automatiquement grisés/désactivés (`disabled`) sur la position initiale, et le bouton *Suivant* est désactivé une fois parvenu au dernier coup. Le bouton *Carte suivante* ou *Terminer l'exercice* du pied de carte (`SeriesCardFooter`) reste inactif (grisé) jusqu'à ce que l'apprenant ait fait défiler tous les coups du PGN jusqu'au dernier. Sur la dernière carte, la victoire (`🎉 Exercice réussi !` et pluie de confettis) est fêtée uniquement à la fin du PGN d'explication et non dès la résolution de la dernière interrogation tactique.
-     - **Exercices La Partie dont tu es le Héros (Type 4)** :
-       - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
-       - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté pas-à-pas (boutons Début, Précédent, Suivant avec désactivation contextuelle au début et à la fin de la séquence, sans saut direct à la fin pour garantir l'assimilation des coups et commentaires) et embranchements QCM interactifs.
-       - Moments de choix QCM identifiés par les 3 flèches indicatrices `[%cal ...]` et les 2 variantes associées au coup principal.
-       - Choix QCM présentés en notation française (R, D, T, F, C) sans numéro de coup parasite, avec mélange aléatoire (Fisher-Yates) des options garantissant que le bon coup n'apparaît pas systématiquement en première position.
-       - Sélection interactive d'un coup parmi les 3 choix :
-         - Choix d'une variante : feedback rouge avec l'explication spécifique du mauvais coup rédigée par l'auteur.
-         - Choix du coup principal : feedback vert avec l'explication du bon coup, coup joué sur l'échiquier et déblocage de l'étape suivante.
-       - Reprise de la séquence PGN post-QCM directement sur la position résultante (un demi-coup plus tard) avec restitution du commentaire et des formes du coup validé.
-       - Bulle de commentaires PGN ergonomique : affichage propre des retours à la ligne (`pre-line`) pour préserver les listes pédagogiques, défilement vertical fluide dès que le commentaire dépasse la hauteur réservée, réinitialisation automatique du défilement au début du texte à chaque coup, sans rognage du haut du commentaire.
-       - Progression fluide avec `ExerciseHeader` et `SeriesCardFooter` jusqu'au coup final de la partie et validation de la progression. Lorsque la partie se poursuit après le dernier QCM, la séquence PGN finale exige de visionner l'intégralité des coups jusqu'au terme de la partie pour afficher `🎉 Exercice réussi !` et déclencher la célébration.
-     - **Vidéos Pédagogiques FFE / Entraîneurs (`roi_video`)** :
-       - Intégration de vidéos officielles issues de la Fédération (École d'Échecs à la Française) ou de vidéos spécifiques recommandées par les entraîneurs (ouvertures, tactiques).
-       - **Lecteur optimisé & Plein écran / Paysage** : Lecteur YouTube responsive 16:9 sans distraction (`youtube-nocookie.com`), accompagné d'un bouton tactile « Plein écran / Paysage » pour basculer confortablement en orientation horizontale sur smartphone.
-       - **Suivi Dynamique & Validation au Seuil de 95%** :
-         - L'avancement est mesuré en temps réel en arrière-plan sans encombrer l'écran (le lecteur YouTube intégrant déjà ses propres contrôles et sa barre de défilement native).
-         - Le bouton d'action dans le footer fixe (`SeriesCardFooter`) affiche le pourcentage en direct (`Valider (X% / 95%)`) et reste verrouillé tant que l'élève n'a pas visionné au moins 95% de la vidéo ou atteint son terme.
-         - Dès le seuil atteint, le bouton s'active en vert vif (« Valider la vidéo »).
-         - Au clic sur « Valider la vidéo », la célébration confettis s'anime et les boutons de navigation (« Cours » et « Terminer le cours » ou « Élément suivant ») apparaissent.
-         - Si une vidéo a déjà été validée par le passé, elle s'ouvre directement avec ses boutons de navigation prêts sans rejouer de confettis intempestifs.
-     - **Navigation en Série & Fin d'Exercice (`SeriesCardFooter`)** : Ancré de manière fixe et permanente au bas de l'écran (Scaffold mobile) sous le pouce de l'utilisateur dès la première carte (portail persistant et téléportation sécurisée), le footer intègre le badge d'étape (`Carte X / Y` ou `Étape X / Y`), une zone de feedback visuel stable (succès/erreur) et le bouton d'avancement débloqué dès la validation de la position (avec support du verrouillage temporaire `disabled` pour imposer la lecture intégrale des explications). Il respecte scrupuleusement la marge de sécurité basse des smartphones (Home Indicator iOS/Android) pour un confort tactile absolu. La zone d'exercice centrale défile en toute fluidité avec un ascenseur automatique si le contenu dépasse la hauteur d'affichage, sans jamais déplacer le footer. Dès la dernière étape résolue, le footer se métamorphose sur place pour proposer le bouton *« Cours »* et le bouton *« Exercice suivant »* (ou *« Terminer le cours »*) animé d'une pulsation lumineuse douce, accompagné d'une double gerbe de confettis festifs (`canvas-confetti`) et d'une vibration haptique sur smartphone, pour une ergonomie sans défilement superflu.
-     - **Chronométrage & Validation finale** : Mesure en temps réel du temps passé sur la leçon ou l'exercice, puis transmission atomique de la durée (`time_spent`) lors de la validation de la réussite dans la progression de l'adhérent. L'enregistrement de la validation s'exécute immédiatement dès le déclenchement des confettis (avec synchronisation et attente de la promesse lors des navigations), garantissant le déblocage instantané de l'exercice suivant dans la playlist de cours, que l'apprenant clique sur « Exercice suivant », revienne au « Cours » ou quitte la page.
+   - **Structure des Exercices, Vidéos & Leçons** :
+      - **En-tête unifié (`ContentHeader`)** : Affiche le titre de l'étape, le type adapté (« Exercice / Type », « Vidéo » ou « Leçon ») et le chapitre/niveau. Pour les Vidéos et Leçons, le deuxième panneau (consigne / question) est masqué automatiquement.
+      - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, dimensionnement stable et constant sur chaque appareil (non altéré par l'apparition de commentaires ou de boutons de choix), ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
+      - **Exercices Pop'Echecs (Type 2)** :
+        - Série de 4 diagrammes avec consigne propre à chaque position.
+        - Masquage des annotations/formes initiales pendant la phase de réflexion.
+        - Clic sur la case cible : placement de la pièce, validation instantanée, révélation des flèches/formes du diagramme complet.
+        - Retrait automatique avec feedback rouge en cas d'erreur de case.
+      - **Exercices ABCDaire Tactique (Type 3)** :
+        - Série de 4 Mini-PGN contenant 1 ou plusieurs coups (attaque, défense, mat, gain matériel).
+        - Orientation automatique de l'échiquier selon le trait de la position initiale (Blancs ou Noirs en bas).
+        - Masquage des formes pendant la recherche et le jeu du coup.
+        - Déplacement direct sur l'échiquier du meilleur coup attendu :
+          - En cas de mauvais coup : annulation immédiate et possibilité de réessayer sans limite.
+          - En cas de bon coup : si l'exercice comporte des coups intermédiaires, l'ordinateur joue sa réplique scriptée (délai de 500ms) et l'apprenant rejoue jusqu'au coup final.
+        - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées (Début, Précédent, Suivant) avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur), sans bouton d'avance rapide à la fin afin de garantir la lecture pas-à-pas des explications. Les boutons *Début* et *Précédent* sont automatiquement grisés/désactivés (`disabled`) sur la position initiale, et le bouton *Suivant* est désactivé une fois parvenu au dernier coup. Le bouton *Carte suivante* ou *Terminer l'exercice* du pied de carte (`SeriesCardFooter`) reste inactif (grisé) jusqu'à ce que l'apprenant ait fait défiler tous les coups du PGN jusqu'au dernier. Sur la dernière carte, la victoire (`🎉 Exercice réussi !` et pluie de confettis) est fêtée uniquement à la fin du PGN d'explication et non dès la résolution de la dernière interrogation tactique.
+      - **Exercices La Partie dont tu es le Héros (Type 4)** :
+        - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
+        - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté pas-à-pas (boutons Début, Précédent, Suivant avec désactivation contextuelle au début et à la fin de la séquence, sans saut direct à la fin pour garantir l'assimilation des coups et commentaires) et embranchements QCM interactifs.
+        - Moments de choix QCM identifiés par les 3 flèches indicatrices `[%cal ...]` et les 2 variantes associées au coup principal.
+        - Choix QCM présentés en notation française (R, D, T, F, C) sans numéro de coup parasite, avec mélange aléatoire (Fisher-Yates) des options garantissant que le bon coup n'apparaît pas systématiquement en première position.
+        - Sélection interactive d'un coup parmi les 3 choix :
+          - Choix d'une variante : feedback rouge avec l'explication spécifique du mauvais coup rédigée par l'auteur.
+          - Choix du coup principal : feedback vert avec l'explication du bon coup, coup joué sur l'échiquier et déblocage de l'étape suivante.
+        - Reprise de la séquence PGN post-QCM directement sur la position résultante (un demi-coup plus tard) avec restitution du commentaire et des formes du coup validé.
+        - Bulle de commentaires PGN ergonomique : affichage propre des retours à la ligne (`pre-line`) pour préserver les listes pédagogiques, défilement vertical fluide dès que le commentaire dépasse la hauteur réservée, réinitialisation automatique du défilement au début du texte à chaque coup, sans rognage du haut du commentaire.
+        - Progression fluide avec `ContentHeader` et `SeriesCardFooter` jusqu'au coup final de la partie et validation de la progression. Lorsque la partie se poursuit après le dernier QCM, la séquence PGN finale exige de visionner l'intégralité des coups jusqu'au terme de la partie pour afficher `🎉 Exercice réussi !` et déclencher la célébration.
+      - **Vidéos Pédagogiques FFE / Entraîneurs (`roi_video`)** :
+        - Intégration de vidéos officielles issues de la Fédération (École d'Échecs à la Française) ou de vidéos spécifiques recommandées par les entraîneurs (ouvertures, tactiques).
+        - **En-tête et Pied Unifiés** : En-tête `ContentHeader` compact (Type « Vidéo ») et pied de page fixe `SeriesCardFooter` (sans zone de feedback inutile).
+        - **Lecteur optimisé & Plein écran / Paysage** : Lecteur YouTube responsive 16:9 sans distraction (`youtube-nocookie.com`), accompagné d'un bouton tactile « Plein écran / Paysage » pour basculer confortablement en orientation horizontale sur smartphone.
+        - **Suivi Dynamique & Validation au Seuil de 95%** :
+          - L'avancement est mesuré en temps réel en arrière-plan sans encombrer l'écran.
+          - Le bouton d'action dans le footer fixe (`SeriesCardFooter`) affiche le pourcentage en direct (`Valider (X% / 95%)`) et reste verrouillé tant que l'élève n'a pas visionné au moins 95% de la vidéo ou atteint son terme.
+          - Dès le seuil atteint, le bouton s'active en vert vif (« Valider la vidéo »).
+          - Au clic sur « Valider la vidéo », la célébration confettis s'anime et les boutons de navigation (« Cours » et « Terminer le cours » ou « Élément suivant ») apparaissent.
+          - Si une vidéo a déjà été validée par le passé, elle s'ouvre directement avec ses boutons de navigation prêts sans rejouer de confettis intempestifs.
+      - **Leçons Pédagogiques de Cours (`roi_lecon`)** :
+        - Présentation unifiée sous forme d'une carte unique (`1 / 1`) avec `ContentHeader` compact (Type « Leçon », sans sous-panneau redondant).
+        - Lecture et hydratation interactive des diagrammes FEN et visualisateurs PGN au fil du texte.
+        - **Validation au seuil de défilement (95%)** : Le bouton de validation du footer fixe `SeriesCardFooter` (sans zone de feedback) reste inactif tant que l'élève n'a pas fait défiler au moins 95% du contenu de la leçon (ou débloqué d'emblée si le document est court et ne nécessite pas d'ascenseur).
+        - Dès la validation, la célébration confettis se déclenche et permet d'enchaîner directement vers la suite du cours.
+      - **Navigation en Série & Fin de Contenu (`SeriesCardFooter`)** : Ancré de manière fixe et permanente au bas de l'écran (Scaffold mobile) sous le pouce de l'utilisateur dès la première carte (portail persistant et téléportation sécurisée), le footer intègre le badge d'étape (`Carte X / Y`, `Étape 1 / 1` ou `Leçon 1 / 1`), la zone de feedback masquable (inactive pour les vidéos et leçons) et le bouton d'avancement débloqué dès la validation de la position (avec support du verrouillage temporaire `disabled` pour imposer la lecture intégrale des explications ou le seuil de 95%). Il respecte scrupuleusement la marge de sécurité basse des smartphones (Home Indicator iOS/Android) pour un confort tactile absolu. La zone de contenu centrale défile en toute fluidité avec un ascenseur automatique si le contenu dépasse la hauteur d'affichage, sans jamais déplacer le footer. Dès la dernière étape résolue, le footer se métamorphose sur place pour proposer le bouton *« Cours »* et le bouton *« Élément suivant »* (ou *« Terminer le cours »*) animé d'une pulsation lumineuse douce, accompagné d'une double gerbe de confettis festifs (`canvas-confetti`) et d'une vibration haptique sur smartphone, pour une ergonomie sans défilement superflu.
+      - **Chronométrage & Validation finale** : Mesure en temps réel du temps passé sur la leçon, vidéo ou exercice, puis transmission atomique de la durée (`time_spent`) lors de la validation de la réussite dans la progression de l'adhérent. L'enregistrement de la validation s'exécute immédiatement dès le déclenchement des confettis (avec synchronisation et attente de la promesse lors des navigations), garantissant le déblocage instantané de l'élément suivant dans la playlist de cours.
 
 2. **Partie d'Échecs & Échiquier ♟️** :
    - Accessible librement à tous les visiteurs et adhérents.

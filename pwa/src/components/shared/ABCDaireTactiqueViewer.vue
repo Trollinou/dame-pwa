@@ -1,7 +1,7 @@
 <template>
   <div class="abcdaire-viewer-wrapper">
     <!-- En-tête Unifié de l'exercice -->
-    <ExerciseHeader
+    <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
@@ -57,7 +57,7 @@ import { Chessboard } from '@/components/shared/Chessboard';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
 import type { BoardCore, DrawShape, Move } from 'eg-chessboard';
 import { getActiveColorFromFen } from '@/utils/fenUtils';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 import { parsePgn } from 'chessops/pgn';
 import { parseFen } from 'chessops/fen';

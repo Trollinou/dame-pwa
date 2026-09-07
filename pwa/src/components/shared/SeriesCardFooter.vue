@@ -1,8 +1,9 @@
 <template>
   <Teleport defer :to="portalTarget || 'body'" :disabled="!isTeleportEnabled">
     <div :key="`footer-${props.currentCard}-${props.totalCards}`" class="series-card-footer-container">
-    <!-- Zone de feedback toujours présente (réservée dès le départ pour éviter tout décalage) -->
+    <!-- Zone de feedback (conditionnelle selon le type de contenu) -->
     <div
+      v-if="!hideFeedback"
       class="feedback-row"
       :class="[effectiveFeedback ? 'feedback-' + effectiveFeedback.type : 'feedback-empty']"
     >
@@ -143,6 +144,7 @@ const props = withDefaults(
     actionButtonText?: string;
     actionButtonColor?: string;
     isAlreadyCompleted?: boolean;
+    hideFeedback?: boolean;
   }>(),
   {
     disabled: false,
@@ -156,7 +158,8 @@ const props = withDefaults(
     showActionButtonWhenUnsolved: false,
     actionButtonText: 'Valider',
     actionButtonColor: 'primary',
-    isAlreadyCompleted: false
+    isAlreadyCompleted: false,
+    hideFeedback: false
   }
 );
 

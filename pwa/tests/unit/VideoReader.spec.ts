@@ -1,7 +1,10 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import VideoReader from '@/components/apprentissage/VideoReader.vue';
-import { useYouTubePlayer, YOUTUBE_DEFAULT_THRESHOLD_PERCENT } from '@/composables/useYouTubePlayer';
+import {
+	useYouTubePlayer,
+	YOUTUBE_DEFAULT_THRESHOLD_PERCENT,
+} from '@/composables/useYouTubePlayer';
 
 describe( 'useYouTubePlayer', () => {
 	test( 'le seuil par défaut est bien de 95%', () => {
@@ -11,7 +14,8 @@ describe( 'useYouTubePlayer', () => {
 	} );
 
 	test( 'canValidate est false à l’initialisation', () => {
-		const { canValidate, hasReachedThreshold, isEnded } = useYouTubePlayer();
+		const { canValidate, hasReachedThreshold, isEnded } =
+			useYouTubePlayer();
 		expect( canValidate.value ).toBe( false );
 		expect( hasReachedThreshold.value ).toBe( false );
 		expect( isEnded.value ).toBe( false );
@@ -55,7 +59,10 @@ describe( 'VideoReader.vue', () => {
 			},
 		} );
 
-		expect( wrapper.text() ).toContain( 'Vidéo déjà validée' );
+		expect( wrapper.text() ).toContain( 'Valider la vidéo' );
+		expect(
+			( wrapper.vm as unknown as { estValide: boolean } ).estValide
+		).toBe( true );
 	} );
 
 	test( 'émet success lors de la validation', async () => {
@@ -68,7 +75,9 @@ describe( 'VideoReader.vue', () => {
 		} );
 
 		// Appel direct de la méthode ou clic
-		( wrapper.vm as any ).validerVisionnage();
+		(
+			wrapper.vm as unknown as { validerVisionnage: () => void }
+		 ).validerVisionnage();
 		expect( wrapper.emitted( 'success' ) ).toBeTruthy();
 	} );
 } );

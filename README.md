@@ -122,36 +122,49 @@ const { currentCard, isSolved, next, markSolved } = useCardNavigation(
 );
 ```
 
-### 4. Composant En-tête d'Exercice `<ExerciseHeader>` (`src/components/shared/ExerciseHeader.vue`)
-Composant d'en-tête standardisé pour les vues d'exercices d'apprentissage :
-- **Panneau 1 (Métadonnées)** : Affiche le titre de l'exercice (`title`), son type (`typeLabel`, ex: "QCM", "Puzzle") et le chapitre/niveau associé (`chapitreNiveauLabel`).
-- **Panneau 2 (Consigne & Badge d'étape)** : Affiche optionnellement le texte de la consigne (`consigne`) et le badge d'étape interactive (`stepBadgeText`).
+### 4. Composant En-tête de Contenu `<ContentHeader>` (`src/components/shared/ContentHeader.vue`)
+Composant d'en-tête standardisé et générique pour l'ensemble des contenus pédagogiques (Exercices, Vidéos, Leçons) :
+- **Panneau 1 (Métadonnées Compactes)** : Affiche le titre (`title`), son type adapté (`typeLabel`, ex: "Exercice", "Vidéo", "Leçon", "Vision'checs", etc.) et le chapitre/niveau associé (`chapitreNiveauLabel`).
+- **Panneau 2 (Consigne & Badge d'étape - Optionnel / Masquable)** : Affiche optionnellement le texte de la consigne (`consigne`) et le badge d'étape interactive (`stepBadgeText`). Grâce à la prop `hideSubPanel: true` (ou en l'absence de consigne/badge), ce deuxième panneau est totalement masqué pour les Vidéos et les Leçons, allégeant la vue.
+- **Rétrocompatibilité** : `<ExerciseHeader>` est conservé comme wrapper typé vers `<ContentHeader>`.
 
 ```vue
 <template>
-  <ExerciseHeader
+  <!-- Pour un exercice standard -->
+  <ContentHeader
     :title="exercice.titre"
-    type-label="QCM"
+    type-label="Pop'Échecs"
     :chapitre-niveau-label="exercice.chapitre"
     :consigne="exercice.consigne"
     :step-badge-text="`Étape ${currentCard}/${totalCards}`"
   />
+
+  <!-- Pour une vidéo ou une leçon (Panel 2 masqué) -->
+  <ContentHeader
+    :title="lecon.titre"
+    type-label="Leçon"
+    :chapitre-niveau-label="lecon.chapitre"
+    :hide-sub-panel="true"
+  />
 </template>
 
 <script setup lang="ts">
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
 </script>
 ```
 
 ### 5. Composant Pied de Série `<SeriesCardFooter>` (`src/components/shared/SeriesCardFooter.vue`)
-Barre de navigation et zone de feedback visuel pour les exercices séquentiels ou séries multi-cartes :
-- **Zone de feedback intégrée** : Affiche les messages dynamiques d'encouragement ou d'erreur (`feedback: { message, type }`) avec icône adaptée, ou message de victoire automatique (`🎉 Exercice réussi !`) dès la résolution finale.
-- **Badge d'étape & Métamorphose de fin d'exercice** : Indique l'avancement (`Carte X / Y` ou préfixe personnalisé avec `badgePrefix`). Dès la dernière carte résolue, le badge fait place à un bouton compact *« Cours »* et le bouton d'action devient directement *« Exercice suivant »* (ou *« Terminer le cours »*) avec pulsation lumineuse (`pulseGlow`), évitant tout panel redondant sur mobile.
-- **Célébration visuelle & sensorielle (`useCelebration.ts`)** : Déclenchement automatique d'un feu d'artifice de confettis (`canvas-confetti`) et d'un retour haptique sur smartphone (`@capacitor/haptics`) lors de la validation finale de l'exercice.
-- **Orchestration inter-exercices sans prop-drilling** : Consomme optionnellement `useExerciseNavigation()` (`EXERCISE_NAVIGATION_KEY` injecté par `ContenuPage`) pour déclencher la navigation vers le prochain contenu ou le cours parent.
-- **Ancrage fixe en bas d'écran (Scaffold Mobile & Teleport)** : Téléporté automatiquement via Vue 3 `<Teleport defer>` ciblant la référence DOM scopée du `<ion-footer>` persistant de `ContenuPage.vue` (via `provide('exerciseFooterPortal', footerPortalRef)` avec affichage permanent `v-show`, intégrant les safe areas mobiles et fallback inline pour les tests/vues isolées). Le footer reste 100% immobile sous le pouce au bas de l'écran dès la première carte (y compris sur les exercices à carte unique), surélevé au-dessus de la barre d'accueil iOS/Android, laissant `<ion-content>` défiler au centre uniquement si le contenu dépasse la hauteur d'affichage.
-- **Verrouillage pédagogique & Célébration au bout de l'exercice (`disabled`, `disabledHint`)** : Permet de désactiver le bouton d'avancement tant qu'une action requise (ex: relecture complète du PGN d'explication) n'est pas achevée. La célébration finale (`isFinalCompleted`) est strictement conditionnée à la levée de tout verrouillage (`!disabled`), garantissant que la victoire (`🎉 Exercice réussi !`) n'est fêtée qu'à la fin complète de l'exercice (défilement du PGN) et non pas dès la dernière interrogation ou QCM.
-- **Indicateur d'attente** : Affiche un indice textuel (`pendingHint`) tant que la carte n'a pas été résolue.
+Barre de navigation et zone d'action fixe pour les exercices, vidéos et leçons :
+- **Zone de feedback masquable (`hideFeedback`)** : Affiche les messages dynamiques d'encouragement ou d'erreur (`feedback: { message, type }`) lors des exercices interactifs. Pour les Vidéos et les Leçons où il n'y a pas d'évaluation de choix bon/mauvais, la prop `:hide-feedback="true"` masque intégralement cette zone sans réserver d'espace vide.
+- **Badge d'étape & Métamorphose de fin de contenu** : Indique l'avancement (`Carte X / Y`, `Étape 1 / 1` ou `Leçon 1 / 1` via `badgePrefix`). Dès la dernière carte résolue ou validée, le badge fait place à un bouton compact *« Cours »* et le bouton d'action devient directement *« Élément suivant »* (ou *« Terminer le cours »*) avec pulsation lumineuse (`pulseGlow`), évitant tout panel redondant sur mobile.
+- **Validation au seuil de 95% (Vidéos & Leçons)** :
+  - Sur les Vidéos : le bouton reste verrouillé jusqu'à ce que 95% de la vidéo soient visionnés (`useYouTubePlayer`).
+  - Sur les Leçons : le bouton se débloque dès que 95% du document ont été défilés / lus (ou immédiatement si le contenu tient sans ascenseur).
+- **Célébration visuelle & sensorielle (`useCelebration.ts`)** : Déclenchement automatique d'un feu d'artifice de confettis (`canvas-confetti`) et d'un retour haptique sur smartphone (`@capacitor/haptics`) lors de la validation.
+- **Orchestration inter-contenus sans prop-drilling** : Consomme optionnellement `useExerciseNavigation()` (`EXERCISE_NAVIGATION_KEY` injecté par `ContenuPage`) pour déclencher la navigation vers le prochain contenu ou le cours parent.
+- **Ancrage fixe en bas d'écran (Scaffold Mobile & Teleport)** : Téléporté automatiquement via Vue 3 `<Teleport defer>` ciblant la référence DOM scopée du `<ion-footer>` persistant de `ContenuPage.vue` (via `provide('exerciseFooterPortal', footerPortalRef)` avec affichage permanent `v-show`, intégrant les safe areas mobiles et fallback inline pour les tests/vues isolées). Le footer reste 100% immobile sous le pouce au bas de l'écran dès la première carte (y compris sur les leçons et vidéos à carte unique), surélevé au-dessus de la barre d'accueil iOS/Android, laissant `<ion-content>` défiler au centre uniquement si le contenu dépasse la hauteur d'affichage.
+- **Verrouillage pédagogique & Célébration (`disabled`, `disabledHint`)** : Permet de désactiver le bouton d'avancement tant qu'une action requise (ex: seuil de 95% ou relecture du PGN) n'est pas achevée. La célébration finale (`isFinalCompleted`) est strictement conditionnée à la levée de tout verrouillage (`!disabled`).
+- **Indicateur d'attente** : Affiche un indice textuel (`pendingHint`) tant que le contenu n'a pas été résolu ou débloqué.
 
 ```vue
 <template>
