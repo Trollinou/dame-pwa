@@ -74,14 +74,15 @@
             </div>
           </div>
 
-          <!-- SECTION 2 : PARCOURS DU CLUB (TRONC COMMUN) -->
+          <!-- SECTION 2 : MÉTHODE EEF (TRONC COMMUN) -->
           <div class="tronc-section">
-            <div v-if="apprentissageStore.coursAssignes.length > 0" class="section-title-wrapper ion-margin-top">
+            <div class="section-title-wrapper" :class="{ 'ion-margin-top': apprentissageStore.coursAssignes.length > 0 }">
               <h2 class="section-title">
                 <ion-icon :icon="schoolOutline" class="section-icon"></ion-icon>
-                Parcours du Club
+                Méthode EEF
               </h2>
             </div>
+            <p class="section-subtitle">École d'Échecs à la Française</p>
 
             <div class="list-container">
               <ion-card
