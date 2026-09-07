@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-07
+
 - **En-tête Générique et Harmonisation des Contenus (`ContentHeader.vue`, `ExerciseHeader.vue`, `SeriesCardFooter.vue`, `LeconReader.vue`, `VideoReader.vue`, `ContenuPage.vue`)** :
   - **Renommage Sémantique `ContentHeader.vue`** : Remplacement du composant spécifique `ExerciseHeader` par `ContentHeader`, reflétant son utilisation transversale pour les trois types de contenus pédagogiques (Exercices, Vidéos et Leçons). Maintien d'un wrapper typé `ExerciseHeader.vue` pour la rétrocompatibilité.
   - **Masquage Conditionnel du Panel 2 (`hideSubPanel`)** : Pour les Vidéos et les Leçons, le deuxième panneau (consigne et badge d'étape) est masqué automatiquement ou via la prop `hideSubPanel: true`, éliminant tout encombrement visuel inutile.
