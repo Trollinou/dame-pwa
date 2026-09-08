@@ -59,6 +59,7 @@ export default [
 			'@typescript-eslint/no-shadow': 'off',
 			'@typescript-eslint/no-explicit-any': 'error',
 			'@wordpress/no-unused-vars-before-return': 'off',
+			'@wordpress/no-global-active-element': 'off',
 		},
 	},
 ];

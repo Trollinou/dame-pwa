@@ -92,7 +92,10 @@ describe( 'stringUtils', () => {
 				getContenuTypeLabel( { type: 'roi_lecon', titre: 'Leçon 1' } )
 			).toBe( 'Leçon' );
 			expect(
-				getContenuTypeLabel( { post_type: 'roi_lecon', titre: 'Les déplacements' } )
+				getContenuTypeLabel( {
+					post_type: 'roi_lecon',
+					titre: 'Les déplacements',
+				} )
 			).toBe( 'Leçon' );
 		} );
 
@@ -101,7 +104,10 @@ describe( 'stringUtils', () => {
 				getContenuTypeLabel( { type: 'roi_video', titre: 'Vidéo 1' } )
 			).toBe( 'Vidéo' );
 			expect(
-				getContenuTypeLabel( { post_type: 'roi_video', titre: 'La valeur des pièces' } )
+				getContenuTypeLabel( {
+					post_type: 'roi_video',
+					titre: 'La valeur des pièces',
+				} )
 			).toBe( 'Vidéo' );
 		} );
 

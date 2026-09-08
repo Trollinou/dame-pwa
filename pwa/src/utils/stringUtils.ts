@@ -141,12 +141,12 @@ export function getContenuTypeLabel(
 	}
 
 	// 1. Check if it's a lesson or video (supports both post_type and type)
-	const rawType =
-		typeof item.post_type === 'string'
-			? item.post_type
-			: typeof item.type === 'string'
-			? item.type
-			: undefined;
+	let rawType: string | undefined;
+	if ( typeof item.post_type === 'string' ) {
+		rawType = item.post_type;
+	} else if ( typeof item.type === 'string' ) {
+		rawType = item.type;
+	}
 
 	if ( rawType === 'roi_lecon' || rawType === 'lecon' ) {
 		return 'Leçon';
