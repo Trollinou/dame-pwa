@@ -6,6 +6,22 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte et Alignement Architectural de l'Exercice Type 6 (Associ'Plan) (`TypeAssociPlan.vue`, `MatchingViewer.vue`, `associPlanParser.ts`, `associPlanParser.spec.ts`, `ContenuPage.vue`)** :
+  - **Parseur PGN Dédié (`associPlanParser.ts`)** : Extraction automatique depuis les 4 PGNs purs de la FEN initiale (`[FEN "..."]`), de l'orientation dynamique selon le trait (`getActiveColorFromFen`), des formes graphiques initiales (`[%csl]`, `[%cal]`) et du commentaire d'introduction `{ ... }` nettoyé comme description pédagogique.
+  - **Déroulement en 5 Cartes Séquentielles (`TypeAssociPlan.vue`)** :
+    - Carte 1 : Phase d'association (`MatchingViewer`) présentant les 4 diagrammes mélangés et les 4 descriptions, avec feedback intégré dans `SeriesCardFooter` et déblocage au succès des 4 correspondances.
+    - Cartes 2 à 5 : Visualisation pas-à-pas ordonnancée des PGNs 1 à 4 via `PgnViewer`, imposant le visionnage de tous les coups avant d'autoriser le passage à la carte suivante.
+    - En-tête `ContentHeader` épuré affichant sobrement `Plan 1`, `Plan 2`, `Plan 3`, `Plan 4` pour laisser la lecture complète du commentaire au visualiseur PGN.
+  - **Ergonomie et Robustesse Graphique de `MatchingViewer.vue`** :
+    - Échiquiers compacts sans étirement vertical (`align-items: flex-start`, hauteur naturelle `auto`) éliminant le grand espace blanc lorsque la carte descriptive voisine est volumineuse.
+    - Remplacement du toast flottant superposé (`useFeedback`) par l'émission d'un événement `@feedback` transmis directement dans la zone de feedback intégrée de `SeriesCardFooter`.
+    - Marge basse augmentée (`padding-bottom: 120px`) permettant au défilement naturel de la page d'amener l'ensemble des descriptions et le bouton de validation au-dessus du footer fixe sans ascenseur interne.
+    - **Sélection Haute Visibilité & Stabilité Géométrique** :
+      - Stabilisation absolue de l'échiquier miniature (`pointer-events: none`, bordure constante à 3px, `width: 100% !important; height: 100% !important;` sur `:deep(.main-wrap)` et `:deep(.main-board)`, suppression des transitions dimensionnelles), éliminant tout rétrécissement ou perturbation du runtime Chessground.
+      - Double bordure ultra contrastée (bordure noire 3px et anneau extérieur blanc lumineux `box-shadow`) avec titre « Échiquier X » noir foncé (`#111827`, graisse 900) et point sombre de sélection, assurant une parfaite lisibilité en mode clair comme en mode sombre.
+  - **Enregistrement dans `ContenuPage.vue`** : Ajout du type `6` dans `TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 8]`.
+  - **Tests Unitaires & QA** : Ajout de la suite de tests `associPlanParser.spec.ts` validant le découpage des tags FEN, déduction du trait, extraction des annotations graphiques et nettoyage des commentaires textuels.
+
 ## [1.4.0] - 2026-09-07
 
 - **En-tête Générique et Harmonisation des Contenus (`ContentHeader.vue`, `ExerciseHeader.vue`, `SeriesCardFooter.vue`, `LeconReader.vue`, `VideoReader.vue`, `ContenuPage.vue`)** :
@@ -36,6 +52,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Déverrouillage immédiat sans prérequis séquentiel** : Tout cours assigné à l'adhérent (directement ou via son groupe d'entraînement) est déverrouillé immédiatement (`unlocked_by_assignment: true`), sans être bloqué par la progression linéaire du parcours du club.
   - **Indicateur dynamique sur le Hub d'Apprentissage** : Affichage d'un badge contextuel `📌 X assigné(s)` sur la carte des cours théoriques lorsque l'adhérent bénéficie de cours ciblés prescrits par ses coachs.
   - **Identité de Section « Méthode EEF » (`ApprentissageCoursListPage.vue`)** : Renommage de la section générale en « Méthode EEF » avec sous-titre « École d'Échecs à la Française » (référence fédérale FFE https://eef.ffechecs.fr), assurant une distinction claire et pédagogique entre le parcours d'apprentissage national et les cours assignés par les entraîneurs.
+  
 ## [1.3.3] - 2026-09-06
 
 ### Corrigé

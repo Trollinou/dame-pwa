@@ -43,6 +43,7 @@ L'application suit un principe de découplage strict :
   - Dérivation de la `fen_depart` sans la pièce cible.
   - Calcul dynamique de l'orientation de l'échiquier selon le trait de la position (`getActiveColorFromFen(fen)` : Blancs en bas si trait aux Blancs, Noirs en bas si trait aux Noirs).
   - Découpage automatique des études PGN complètes (Type 4 — La Partie dont tu es le Héros) en séquences PGN et embranchements QCM via l'analyse des variantes et des flèches `[%cal ...]`.
+  - Extraction automatique pour Associ'Plan (Type 6) depuis 4 PGNs purs : FEN initiale, orientation, formes graphiques `[%csl]/[%cal]` et description (commentaire initial), déroulement séquentiel en 5 cartes (`MatchingViewer` puis visualisations pas-à-pas obligatoires `PgnViewer`).
   - Masquage initial des `shapes` pendant la recherche, puis révélation complète dès le placement réussi.
   - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
   - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec bascule plein écran / paysage et validation de progression.

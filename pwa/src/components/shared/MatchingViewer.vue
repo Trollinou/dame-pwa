@@ -20,7 +20,9 @@
             @click="selectBoard(index)"
           >
             <div class="board-header-bar">
-              <span class="board-num">Échiquier {{ index + 1 }}</span>
+              <span class="board-num">
+                Échiquier {{ index + 1 }}
+              </span>
               <span
                 v-if="liaisons[index] !== undefined"
                 class="link-indicator"
@@ -32,12 +34,18 @@
               >
                 <span v-if="boardsCorrects.includes(index)">✓ </span>Option {{ getLetter(liaisons[index]) }}
               </span>
+              <span
+                v-else-if="selectionEchiquier === index"
+                class="selection-dot"
+                title="Échiquier sélectionné"
+              ></span>
             </div>
             <div class="chessboard-container--mini">
               <Chessboard
                 :fen="echiquiersMelanges[index].fen"
                 :player-color="echiquiersMelanges[index].couleur_joueur"
                 :orientation="echiquiersMelanges[index].couleur_joueur"
+                :shapes="echiquiersMelanges[index].shapes || []"
                 :view-only="true"
                 :coordinates="false"
               />
@@ -108,20 +116,25 @@ import {
   IonButton
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import { useFeedback } from '@/composables/useFeedback';
+import type { DrawShape } from 'eg-chessboard';
 
-const { showSuccess, showError } = useFeedback();
+export interface MatchingFeedback {
+  type: 'success' | 'danger' | 'warning' | 'info';
+  message: string;
+}
 
 interface Paire {
   fen: string;
   couleur_joueur: 'white' | 'black';
   description: string;
+  shapes?: DrawShape[];
 }
 
 interface EchiquierMelange {
   fen: string;
   couleur_joueur: 'white' | 'black';
   originalIndex: number;
+  shapes?: DrawShape[];
 }
 
 const props = defineProps<{
@@ -130,6 +143,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'success'): void;
+  (e: 'feedback', feedback: MatchingFeedback | null): void;
 }>();
 
 // Palette de couleurs premium pour différencier les descriptions
@@ -154,13 +168,6 @@ const getBoardStyle = (boardIdx: number) => {
       'background-color': color.bg
     };
   }
-  if (selectionEchiquier.value === boardIdx) {
-    return {
-      'border-color': 'var(--ion-color-dark, #222428)',
-      'box-shadow': '0 0 0 3px rgba(34, 36, 40, 0.25), 0 8px 20px rgba(34, 36, 40, 0.12)',
-      'transform': 'scale(1.02)'
-    };
-  }
   return {};
 };
 
@@ -171,6 +178,7 @@ const initEchiquiers = () => {
   const items = props.paires.map((p, idx) => ({
     fen: p.fen,
     couleur_joueur: p.couleur_joueur,
+    shapes: p.shapes || [],
     originalIndex: idx
   }));
 
@@ -201,6 +209,7 @@ const getLetter = (index: number): string => {
 
 const selectBoard = (index: number) => {
   if (boardsCorrects.value.includes(index)) return;
+  emit('feedback', null);
   selectionEchiquier.value = selectionEchiquier.value === index ? null : index;
 };
 
@@ -209,6 +218,7 @@ const linkDescription = (descIdx: number) => {
     return;
   }
 
+  emit('feedback', null);
   const boardIdx = selectionEchiquier.value;
 
   // Supprime l'ancienne liaison si cette description était déjà liée à un autre échiquier
@@ -248,7 +258,7 @@ const toutesLiaisonsFaites = computed(() => {
   return Object.keys(liaisons.value).length === props.paires.length && props.paires.length > 0;
 });
 
-const validerAssociations = async () => {
+const validerAssociations = () => {
   let errorsCount = 0;
   const newlyCorrect: number[] = [];
 
@@ -271,7 +281,10 @@ const validerAssociations = async () => {
   boardsCorrects.value.push(...newlyCorrect);
 
   if (errorsCount > 0) {
-    await showError('Certaines associations sont incorrectes, réessayez !', 2500);
+    emit('feedback', {
+      type: 'danger',
+      message: 'Certaines associations sont incorrectes, réessayez !',
+    });
     // Reprendre la sélection sur le premier échiquier vide et non correct
     const firstEmpty = [0, 1, 2, 3].find(
       (idx) => liaisons.value[idx] === undefined && !boardsCorrects.value.includes(idx)
@@ -280,7 +293,10 @@ const validerAssociations = async () => {
       selectionEchiquier.value = firstEmpty;
     }
   } else {
-    await showSuccess('Parfait !', 2000);
+    emit('feedback', {
+      type: 'success',
+      message: 'Bravo ! Toutes les correspondances sont trouvées.',
+    });
     emit('success');
   }
 };
@@ -289,7 +305,7 @@ const validerAssociations = async () => {
 <style scoped>
 .matching-container {
   width: 100%;
-  padding: 8px;
+  padding: 8px 8px 120px 8px;
 }
 
 .matching-rows-list {
@@ -301,44 +317,106 @@ const validerAssociations = async () => {
 
 .matching-row {
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 16px;
   width: 100%;
 }
 
-.board-column,
+.board-column {
+  flex: 0 0 44%;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
 .desc-column {
   flex: 1;
-  width: 50%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
 .board-wrapper-card {
+  box-sizing: border-box;
   background: var(--ion-color-step-50, #fcfcfc);
-  border: 2px solid var(--ion-color-step-200, #e0e0e0);
+  border: 3px solid var(--ion-color-step-200, #e0e0e0);
   border-radius: 12px;
   padding: 10px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
-  height: 100%;
+  height: auto;
+  width: 100%;
+}
+
+.chessboard-container--mini {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.chessboard-container--mini :deep(.main-wrap) {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.chessboard-container--mini :deep(.main-board) {
+  width: 100% !important;
+  height: 100% !important;
+  padding-bottom: 0 !important;
+}
+
+.chessboard-container--mini :deep(cg-board) {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .board-wrapper-card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .board-wrapper-card.selected {
-  border-color: var(--ion-color-dark, #222428);
-  box-shadow: 0 0 0 3px rgba(34, 36, 40, 0.25), 0 8px 20px rgba(34, 36, 40, 0.12);
-  transform: scale(1.02);
+  border-color: #111827 !important;
+  box-shadow: 0 0 0 3px #ffffff, 0 0 16px rgba(255, 255, 255, 0.85) !important;
+  transform: none;
+}
+
+.board-wrapper-card.selected .board-num {
+  font-weight: 900;
+  color: #111827 !important;
+}
+
+.selection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #111827;
+  box-shadow: 0 0 0 2px #ffffff;
+  flex-shrink: 0;
+  animation: pulseDot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
 }
 
 .board-wrapper-card.linked {
@@ -362,17 +440,24 @@ const validerAssociations = async () => {
 
 .board-header-bar {
   width: 100%;
+  height: 24px;
+  min-height: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
-  padding: 0 4px;
+  padding: 0 2px;
+  box-sizing: border-box;
 }
 
 .board-num {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--ion-color-step-600, #666);
+  color: var(--ion-color-step-600, #555);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
 }
 
 .link-indicator {
@@ -393,7 +478,8 @@ const validerAssociations = async () => {
   transition: all 0.25s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   background: var(--ion-color-step-50, #fcfcfc);
-  height: 100%;
+  height: auto;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -415,7 +501,7 @@ const validerAssociations = async () => {
   flex-grow: 1;
   gap: 8px;
   position: relative;
-  padding: 16px;
+  padding: 14px;
 }
 
 .desc-letter-badge {
@@ -436,14 +522,14 @@ const validerAssociations = async () => {
 }
 
 .desc-text-content {
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: 0.88rem;
+  line-height: 1.45;
   color: var(--ion-color-step-800, #333);
   font-weight: 500;
   flex-grow: 1;
-  display: flex;
-  align-items: center;
-  margin: 4px 0;
+  display: block;
+  margin: 6px 0;
+  word-break: break-word;
 }
 
 .desc-link-badge {

@@ -93,6 +93,12 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - Reprise de la séquence PGN post-QCM directement sur la position résultante (un demi-coup plus tard) avec restitution du commentaire et des formes du coup validé.
         - Bulle de commentaires PGN ergonomique : affichage propre des retours à la ligne (`pre-line`) pour préserver les listes pédagogiques, défilement vertical fluide dès que le commentaire dépasse la hauteur réservée, réinitialisation automatique du défilement au début du texte à chaque coup, sans rognage du haut du commentaire.
         - Progression fluide avec `ContentHeader` et `SeriesCardFooter` jusqu'au coup final de la partie et validation de la progression. Lorsque la partie se poursuit après le dernier QCM, la séquence PGN finale exige de visionner l'intégralité des coups jusqu'au terme de la partie pour afficher `🎉 Exercice réussi !` et déclencher la célébration.
+      - **Exercices Associ'Plan (Type 6)** :
+        - Saisie simplifiée dans le CMS de 4 PGNs purs : chaque PGN porte sa FEN de départ `[FEN "..."]`, ses annotations graphiques `[%csl]/[%cal]` et sa description pédagogique dans son commentaire initial `{ ... }`.
+        - Déroulement structuré en **5 cartes séquentielles** avec `ContentHeader` et `SeriesCardFooter` :
+          - **Carte 1 (Matching / Association)** : Affichage des 4 échiquiers mélangés à gauche et des 4 descriptions textuelles à droite. L'apprenant sélectionne et relie chaque échiquier à sa description. Une fois toutes les associations validées sans erreur, l'état résolu est atteint et débloque le passage à la carte suivante.
+          - **Cartes 2 à 5 (Visualisation des PGNs 1 à 4)** : Présentation individuelle et ordonnancée de chacun des 4 plans via `PgnViewer`. Pour chaque carte, l'apprenant doit dérouler l'intégralité des coups du PGN pour débloquer le bouton *« Position suivante »* (ou *« Terminer l'exercice »* sur la carte 5).
+          - La validation complète de l'exercice, le calcul du temps passé et la célébration confettis ont lieu à l'issue de la consultation du 4e PGN (carte 5/5).
       - **Vidéos Pédagogiques FFE / Entraîneurs (`roi_video`)** :
         - Intégration de vidéos officielles issues de la Fédération (École d'Échecs à la Française) ou de vidéos spécifiques recommandées par les entraîneurs (ouvertures, tactiques).
         - **En-tête et Pied Unifiés** : En-tête `ContentHeader` compact (Type « Vidéo ») et pied de page fixe `SeriesCardFooter` (sans zone de feedback inutile).
