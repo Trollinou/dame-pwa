@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-09-09
+
 - **Refonte et Alignement Architectural de l'Exercice Type 6 (Associ'Plan) (`TypeAssociPlan.vue`, `MatchingViewer.vue`, `associPlanParser.ts`, `associPlanParser.spec.ts`, `ContenuPage.vue`)** :
   - **Parseur PGN Dédié (`associPlanParser.ts`)** : Extraction automatique depuis les 4 PGNs purs de la FEN initiale (`[FEN "..."]`), de l'orientation dynamique selon le trait (`getActiveColorFromFen`), des formes graphiques initiales (`[%csl]`, `[%cal]`) et du commentaire d'introduction `{ ... }` nettoyé comme description pédagogique.
   - **Déroulement en 5 Cartes Séquentielles (`TypeAssociPlan.vue`)** :
