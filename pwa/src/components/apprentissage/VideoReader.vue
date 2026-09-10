@@ -1,7 +1,8 @@
 <template>
   <div class="video-reader-wrapper">
-    <!-- En-tête Unifié Vidéo -->
+    <!-- En-tête Unifié Vidéo (masqué si plein écran immersif) -->
     <ContentHeader
+      v-show="!isImmersiveFullscreen"
       :title="title"
       :typeLabel="typeLabel || 'Vidéo'"
       :chapitreNiveauLabel="chapitreNiveauLabel"
@@ -9,7 +10,23 @@
     />
 
     <!-- Conteneur Vidéo Principal -->
-    <div class="video-reader-container" ref="containerRef">
+    <div
+      class="video-reader-container"
+      :class="{ 'is-pseudo-fullscreen': isPseudoFullscreen, 'is-immersive': isImmersiveFullscreen }"
+      ref="containerRef"
+    >
+      <!-- Bouton flottant de fermeture plein écran immersif (utile sur iPhone et en mode paysage) -->
+      <button
+        v-if="isImmersiveFullscreen"
+        type="button"
+        class="floating-exit-fullscreen-btn"
+        aria-label="Quitter le plein écran"
+        @click="exitAllFullscreen"
+      >
+        <ion-icon :icon="closeOutline" class="exit-icon"></ion-icon>
+        <span class="exit-text">Quitter</span>
+      </button>
+
       <!-- Lecteur YouTube plein format 16:9 -->
       <div class="video-responsive-wrapper">
         <iframe
@@ -28,8 +45,8 @@
         </div>
       </div>
 
-      <!-- Barre d'outils vidéo : Durée et Passage Plein Écran / Paysage -->
-      <div class="video-actions-bar">
+      <!-- Barre d'outils vidéo : Durée et Passage Plein Écran / Paysage (masquée en plein écran immersif) -->
+      <div v-show="!isImmersiveFullscreen" class="video-actions-bar">
         <div v-if="duree" class="video-badge-duree">
           <ion-icon :icon="timeOutline" class="duree-icon"></ion-icon>
           <span>{{ duree }}</span>
@@ -41,23 +58,24 @@
           class="fullscreen-toggle-btn"
           @click="toggleFullscreen"
         >
-          <ion-icon slot="start" :icon="isFullscreen ? contractOutline : expandOutline"></ion-icon>
-          {{ isFullscreen ? 'Quitter plein écran' : 'Plein écran / Paysage' }}
+          <ion-icon slot="start" :icon="isImmersiveFullscreen ? contractOutline : expandOutline"></ion-icon>
+          {{ isImmersiveFullscreen ? 'Quitter plein écran' : 'Plein écran / Paysage' }}
         </ion-button>
       </div>
 
       <!-- Notice de fallback si l'API YouTube n'a pas pu se charger -->
-      <div v-if="apiError && !estValide" class="video-fallback-notice ion-padding-horizontal">
+      <div v-if="apiError && !estValide && !isImmersiveFullscreen" class="video-fallback-notice ion-padding-horizontal">
         <ion-icon :icon="informationCircleOutline" />
         <span>Suivi automatique restreint. Vous pouvez valider directement la vidéo.</span>
       </div>
 
       <!-- Notes ou texte d'accompagnement de la vidéo si présent -->
-      <div v-if="contenuHtml" class="video-accompanying-text ion-padding" v-html="contenuHtml"></div>
+      <div v-if="contenuHtml && !isImmersiveFullscreen" class="video-accompanying-text ion-padding" v-html="contenuHtml"></div>
     </div>
 
-    <!-- Footer Fixe Unifié SeriesCardFooter (Carte 1/1) -->
+    <!-- Footer Fixe Unifié SeriesCardFooter (Carte 1/1 - masqué si plein écran immersif) -->
     <SeriesCardFooter
+      v-show="!isImmersiveFullscreen"
       :currentCard="1"
       :totalCards="1"
       :isSolved="estValide"
@@ -88,7 +106,8 @@ import {
   expandOutline,
   contractOutline,
   checkmarkCircleOutline,
-  informationCircleOutline
+  informationCircleOutline,
+  closeOutline
 } from 'ionicons/icons';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
@@ -112,8 +131,12 @@ const emit = defineEmits<{
 
 const containerRef = ref<HTMLElement | null>(null);
 const iframeRef = ref<HTMLIFrameElement | null>(null);
-const isFullscreen = ref(false);
+const isNativeFullscreen = ref(false);
+const isPseudoFullscreen = ref(false);
 const estValide = ref(props.isAlreadyCompleted ?? false);
+
+// État combiné : vrai si fullscreen natif ou pseudo-fullscreen actif
+const isImmersiveFullscreen = computed(() => isNativeFullscreen.value || isPseudoFullscreen.value);
 
 const {
   progressPercent,
@@ -140,7 +163,23 @@ const embedUrl = computed(() => {
 });
 
 const onFullscreenChange = () => {
-  isFullscreen.value = !!document.fullscreenElement;
+  isNativeFullscreen.value = !!document.fullscreenElement;
+};
+
+// Gestion de l'orientation paysage mobile (Option 2 : auto-fullscreen en paysage)
+let landscapeMediaQuery: MediaQueryList | null = null;
+
+const handleOrientationChange = (e: MediaQueryListEvent | MediaQueryList) => {
+  const isLandscape = e.matches;
+  const isSmallDevice = typeof window !== 'undefined' && (window.innerHeight <= 600 || window.innerWidth <= 900);
+
+  if (isLandscape && isSmallDevice) {
+    // Si on passe en paysage sur mobile, basculer en mode immersif automatique
+    isPseudoFullscreen.value = true;
+  } else if (!isLandscape && !isNativeFullscreen.value) {
+    // Si on repasse en portrait et que le fullscreen natif n'est pas actif, quitter le pseudo-fullscreen
+    isPseudoFullscreen.value = false;
+  }
 };
 
 onMounted(() => {
@@ -150,50 +189,106 @@ onMounted(() => {
   if (iframeRef.value) {
     bindIframe(iframeRef.value);
   }
+
+  // Écoute des changements d'orientation
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    landscapeMediaQuery = window.matchMedia('(orientation: landscape)');
+    try {
+      landscapeMediaQuery.addEventListener('change', handleOrientationChange);
+    } catch {
+      // Fallback pour anciens navigateurs WebKit
+      landscapeMediaQuery.addListener(handleOrientationChange);
+    }
+
+    // Vérification initiale si déjà chargé en paysage
+    if (landscapeMediaQuery.matches && window.innerHeight <= 600) {
+      isPseudoFullscreen.value = true;
+    }
+  }
 });
 
 onUnmounted(() => {
   document.removeEventListener('fullscreenchange', onFullscreenChange);
   document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
+
+  if (landscapeMediaQuery) {
+    try {
+      landscapeMediaQuery.removeEventListener('change', handleOrientationChange);
+    } catch {
+      landscapeMediaQuery.removeListener(handleOrientationChange);
+    }
+  }
+
   destroyPlayer();
 });
 
-const toggleFullscreen = async () => {
+const supportsNativeFullscreen = (): boolean => {
+  if (!containerRef.value) return false;
+  return typeof containerRef.value.requestFullscreen === 'function' ||
+    typeof (containerRef.value as any).webkitRequestFullscreen === 'function';
+};
+
+const enterNativeFullscreen = async () => {
   if (!containerRef.value) return;
+  if (containerRef.value.requestFullscreen) {
+    await containerRef.value.requestFullscreen();
+  } else if ((containerRef.value as any).webkitRequestFullscreen) {
+    await (containerRef.value as any).webkitRequestFullscreen();
+  }
 
-  try {
-    if (!document.fullscreenElement) {
-      if (containerRef.value.requestFullscreen) {
-        await containerRef.value.requestFullscreen();
-      } else if ((containerRef.value as any).webkitRequestFullscreen) {
-        await (containerRef.value as any).webkitRequestFullscreen();
-      }
+  // Tentative optionnelle d'orientation lock sur PWA Android
+  if ('orientation' in screen && 'lock' in (screen.orientation as any)) {
+    try {
+      await (screen.orientation as any).lock('landscape');
+    } catch {
+      // Silencieux si non supporté
+    }
+  }
+};
 
-      // Tentative de verrouillage en paysage si disponible sur PWA mobile
-      if ('orientation' in screen && 'lock' in (screen.orientation as any)) {
-        try {
-          await (screen.orientation as any).lock('landscape');
-        } catch {
-          // Si le navigateur ne supporte pas le lock d'orientation, ignorer sans bloquer
-        }
+const exitNativeFullscreen = async () => {
+  if (document.fullscreenElement) {
+    if (document.exitFullscreen) {
+      await document.exitFullscreen();
+    } else if ((document as any).webkitExitFullscreen) {
+      await (document as any).webkitExitFullscreen();
+    }
+  }
+
+  if ('orientation' in screen && 'unlock' in (screen.orientation as any)) {
+    try {
+      (screen.orientation as any).unlock();
+    } catch {
+      // ignore
+    }
+  }
+};
+
+const toggleFullscreen = async () => {
+  if (isImmersiveFullscreen.value) {
+    await exitAllFullscreen();
+  } else {
+    // Si l'API native est supportée (Android, Desktop), l'utiliser
+    if (supportsNativeFullscreen()) {
+      try {
+        await enterNativeFullscreen();
+      } catch (err) {
+        console.warn('Fallback pseudo-fullscreen après échec requestFullscreen:', err);
+        isPseudoFullscreen.value = true;
       }
     } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        await (document as any).webkitExitFullscreen();
-      }
-
-      if ('orientation' in screen && 'unlock' in (screen.orientation as any)) {
-        try {
-          (screen.orientation as any).unlock();
-        } catch {
-          // ignore
-        }
-      }
+      // Sur iOS Safari / iPhone : activation du pseudo-fullscreen CSS
+      isPseudoFullscreen.value = true;
     }
+  }
+};
+
+const exitAllFullscreen = async () => {
+  isPseudoFullscreen.value = false;
+  try {
+    await exitNativeFullscreen();
   } catch (err) {
-    console.warn('Erreur passage plein écran:', err);
+    console.warn('Erreur sortie plein écran:', err);
   }
 };
 
@@ -210,6 +305,7 @@ const validerVisionnage = () => {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  padding-bottom: 24px;
 }
 
 .video-reader-container {
@@ -221,6 +317,39 @@ const validerVisionnage = () => {
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   margin-top: 4px;
+  position: relative;
+  transition: all 0.25s ease-in-out;
+}
+
+/* Bouton flottant semi-transparent pour quitter le plein écran immersif */
+.floating-exit-fullscreen-btn {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top, 12px));
+  right: max(12px, env(safe-area-inset-right, 12px));
+  z-index: 100000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.floating-exit-fullscreen-btn:active {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(0.96);
+}
+
+.exit-icon {
+  font-size: 18px;
 }
 
 .video-responsive-wrapper {
@@ -229,19 +358,6 @@ const validerVisionnage = () => {
   padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
   height: 0;
   background: #000;
-}
-
-.video-mount-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.video-iframe-mount {
-  width: 100%;
-  height: 100%;
 }
 
 .video-iframe {
@@ -318,19 +434,51 @@ const validerVisionnage = () => {
   color: var(--ion-text-color, #212529);
 }
 
-/* Mode Plein écran Natif du conteneur */
+/* Mode Pseudo-Fullscreen CSS (Universal iPhone / WebKit & Mobile Landscape) */
+.video-reader-container.is-pseudo-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  z-index: 999999 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background: #000000 !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.video-reader-container.is-pseudo-fullscreen .video-responsive-wrapper {
+  width: 100vw;
+  height: 100vh;
+  padding-bottom: 0;
+}
+
+.video-reader-container.is-pseudo-fullscreen .video-iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* Mode Plein écran Natif du conteneur (Android / Desktop) */
 :fullscreen .video-reader-container,
 .video-reader-container:fullscreen {
   max-width: 100vw;
   height: 100vh;
   border-radius: 0;
   justify-content: center;
+  align-items: center;
   background: #000;
 }
 
 :fullscreen .video-responsive-wrapper,
 .video-reader-container:fullscreen .video-responsive-wrapper {
   padding-bottom: 0;
+  width: 100vw;
   height: 100vh;
 }
 </style>

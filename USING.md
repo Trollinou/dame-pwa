@@ -102,7 +102,10 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
       - **Vidéos Pédagogiques FFE / Entraîneurs (`roi_video`)** :
         - Intégration de vidéos officielles issues de la Fédération (École d'Échecs à la Française) ou de vidéos spécifiques recommandées par les entraîneurs (ouvertures, tactiques).
         - **En-tête et Pied Unifiés** : En-tête `ContentHeader` compact (Type « Vidéo ») et pied de page fixe `SeriesCardFooter` (sans zone de feedback inutile).
-        - **Lecteur optimisé & Plein écran / Paysage** : Lecteur YouTube responsive 16:9 sans distraction (`youtube-nocookie.com`), accompagné d'un bouton tactile « Plein écran / Paysage » pour basculer confortablement en orientation horizontale sur smartphone.
+        - **Lecteur optimisé & Plein écran / Paysage Universel (iOS & Android)** : 
+          - Lecteur YouTube responsive 16:9 sans distraction (`enablejsapi=1&playsinline=1`).
+          - **Option 1 (Plein écran Hybride & Pseudo-Fullscreen iOS)** : Le bouton « Plein écran / Paysage » utilise l'API Fullscreen native sur Android/Desktop et active un mode *Pseudo-Fullscreen* immersif en CSS (`fixed`, 100vw / 100vh, fond noir et `z-index` supérieur) sur iPhone/Safari où l'API Fullscreen sur élément DOM est absente. Un bouton flottant semi-transparent « Quitter » dans la safe area permet de quitter l'immersion à tout moment.
+          - **Option 2 (Bascule Automatique en Paysage)** : Dès que l'apprenant tourne son smartphone à l'horizontale (mode paysage), le lecteur passe automatiquement en immersion plein écran à 100% sans être masqué par l'en-tête ni par `SeriesCardFooter`. Le retour en mode portrait rétablit la disposition normale et les boutons de validation.
         - **Suivi Dynamique & Validation au Seuil de 95%** :
           - L'avancement est mesuré en temps réel en arrière-plan sans encombrer l'écran.
           - Le bouton d'action dans le footer fixe (`SeriesCardFooter`) affiche le pourcentage en direct (`Valider (X% / 95%)`) et reste verrouillé tant que l'élève n'a pas visionné au moins 95% de la vidéo ou atteint son terme.

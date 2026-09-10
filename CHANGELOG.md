@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Mode Plein Écran Universel & Bascule Automatique en Paysage (`VideoReader.vue`, `README.md`, `USING.md`)** :
+  - **Support Universel iOS (iPhone / Safari) & Android** : Résolution de l'absence de l'API Fullscreen DOM sur les conteneurs `<div>` sous iOS Safari / WebKit grâce à un mode immersif *Pseudo-Fullscreen* en CSS pur (`fixed`, $100\text{vw} \times 100\text{vh}$, fond noir et `z-index: 999999`). Sur Android et Desktop, le lecteur exploite l'API standard `requestFullscreen` avec verrouillage d'orientation si disponible.
+  - **Bascule Automatique en Mode Paysage** : Détection en temps réel des changements d'orientation via `window.matchMedia('(orientation: landscape)')`. Dès que le smartphone est tourné à l'horizontale, le lecteur active immédiatement l'immersion complète sans nécessiter d'action sur le bouton.
+  - **Masquage Contextuel de l'Interface & Dégagement du Footer** : Masquage automatique de `ContentHeader` et du footer fixe `SeriesCardFooter` pendant l'immersion plein écran, éliminant tout masquage ou obstruction des boutons en mode paysage.
+  - **Bouton Flottant de Sortie Sécurisé** : Ajout d'un bouton flottant semi-transparent « Quitter » positionné dans la zone de sécurité (`env(safe-area-inset-top)`) en haut à droite pour quitter l'immersion en un clic sans perte d'état.
+  - **Conservation du Suivi & Progression** : Préservation intégrale du suivi de lecture et de complétion YouTube (seuil à 95%) pendant et après les transitions plein écran et rotations d'écran.
+
 ## [1.4.1] - 2026-09-09
 
 - **Refonte et Alignement Architectural de l'Exercice Type 6 (Associ'Plan) (`TypeAssociPlan.vue`, `MatchingViewer.vue`, `associPlanParser.ts`, `associPlanParser.spec.ts`, `ContenuPage.vue`)** :

@@ -46,7 +46,7 @@ L'application suit un principe de découplage strict :
   - Extraction automatique pour Associ'Plan (Type 6) depuis 4 PGNs purs : FEN initiale, orientation, formes graphiques `[%csl]/[%cal]` et description (commentaire initial), déroulement séquentiel en 5 cartes (`MatchingViewer` puis visualisations pas-à-pas obligatoires `PgnViewer`).
   - Masquage initial des `shapes` pendant la recherche, puis révélation complète dès le placement réussi.
   - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
-  - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec bascule plein écran / paysage et validation de progression.
+  - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec mode plein écran universel (hybride Fullscreen natif Android/Desktop + Pseudo-Fullscreen CSS iOS sans blocage), bascule automatique en immersion lors de la rotation paysage sur mobile et validation de progression au seuil de 95%.
 
 ## Composants & Composables Partagés (PWA Frontend)
 
