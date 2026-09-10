@@ -24,7 +24,7 @@
     "@tanstack/query-persist-client-core": "^5.102.8",
     "@tanstack/query-sync-storage-persister": "^5.102.8",
     "@tanstack/vue-query": "^5.102.8",
-    "@tanstack/vue-table": "^9.2.4",
+    "@tanstack/vue-table": "^8.21.3",
     "canvas-confetti": "^1.9.4",
     "chessops": "^0.15.1",
     "dompurify": "^3.4.15",
@@ -70,7 +70,7 @@
     "core-js@3.50.0": true,
     "core-js-pure@3.50.0": true,
     "@parcel/watcher@2.6.0": true,
-    "cypress@15.20.0": true
+    "cypress@16.0.0": true
   },
   "overrides": {
     "react": "^18.3.1"
