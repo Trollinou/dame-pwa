@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Mise à jour des dépendances & Verrouillage TanStack Table (`package.json`, `package-lock.json`)** :
+  - **Montée de version des dépendances frontend et tooling** : Mise à niveau d'Ionic (`@ionic/vue` et `@ionic/vue-router` en `^9.0.3`), TanStack Query (`^5.102.8`), Pinia (`^4.0.3`), DOMPurify (`^3.4.15`), Vue (`^3.5.42`), Vue Router (`^5.3.1`), Vite (`^8.3.0`), WordPress Scripts (`^35.0.0`), Cypress (`^16.0.0`), Playwright (`^1.63.0`) et Sass (`^1.104.0`).
+  - **Maintien et verrouillage de `@tanstack/vue-table` en v8 (`^8.21.3`)** : Conservation de la version majeure v8 dans `dependencies` afin de garantir la stabilité de l'API standard (`useVueTable`, `getCoreRowModel`, etc.) exploitée par le composant `DataTable.vue`.
+
 - **Mode Plein Écran Universel & Bascule Automatique en Paysage (`VideoReader.vue`, `README.md`, `USING.md`)** :
   - **Support Universel iOS (iPhone / Safari) & Android** : Résolution de l'absence de l'API Fullscreen DOM sur les conteneurs `<div>` sous iOS Safari / WebKit grâce à un mode immersif *Pseudo-Fullscreen* en CSS pur (`fixed`, $100\text{vw} \times 100\text{vh}$, fond noir et `z-index: 999999`). Sur Android et Desktop, le lecteur exploite l'API standard `requestFullscreen` avec verrouillage d'orientation si disponible.
   - **Bascule Automatique en Mode Paysage** : Détection en temps réel des changements d'orientation via `window.matchMedia('(orientation: landscape)')`. Dès que le smartphone est tourné à l'horizontale, le lecteur active immédiatement l'immersion complète sans nécessiter d'action sur le bouton.
