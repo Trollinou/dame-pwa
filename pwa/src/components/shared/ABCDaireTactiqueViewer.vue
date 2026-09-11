@@ -16,6 +16,7 @@
           :key="`play-${indexCourant}-${fenDepart}`"
           mode="game"
           :fen="fenDepart"
+          :shapes="formesJaunes"
           :orientation="couleurJoueur"
           :player-color="couleurJoueur"
           :view-only="isComputerPlaying"
@@ -55,8 +56,8 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
-import type { BoardCore, DrawShape, Move } from 'eg-chessboard';
-import { getActiveColorFromFen } from '@/utils/fenUtils';
+import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
+import { getActiveColorFromFen, filterYellowShapes } from '@/utils/fenUtils';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 import { parsePgn } from 'chessops/pgn';
@@ -164,7 +165,11 @@ const parsedPgnData = computed(() => {
 
   const orientation = getActiveColorFromFen(fen);
 
-  // 2. Extraction des coups via chessops/pgn
+  // 2. Extraction des formes jaunes de la racine (pièce d'étude)
+  let rootComments: string[] = [];
+  let rootYellowShapes: DrawShape[] = [];
+
+  // 3. Extraction des coups via chessops/pgn
   const moves: ParsedMove[] = [];
   try {
     const games = parsePgn(rawPgn);
@@ -174,6 +179,10 @@ const parsedPgnData = computed(() => {
       const setupRes = setupFen && setupFen !== 'start' ? parseFen(setupFen) : null;
       const chessSetup = setupRes && setupRes.isOk ? Chess.fromSetup(setupRes.value) : null;
       const pos = chessSetup && chessSetup.isOk ? chessSetup.value : null;
+
+      if (Array.isArray(game.comments) && game.comments.length > 0) {
+        rootComments = game.comments;
+      }
 
       let currentNode = game.moves;
       while (currentNode.children.length > 0) {
@@ -194,6 +203,36 @@ const parsedPgnData = computed(() => {
     }
   } catch (e) {
     console.warn('parsePgn parsing fallback:', e);
+  }
+
+  // Fallback extraction des commentaires racine si chessops n'a pas trouvé de comments
+  if (rootComments.length === 0) {
+    const firstMoveIndex = rawPgn.search(/\b\d+\s*\./);
+    const initialSection = firstMoveIndex !== -1 ? rawPgn.slice(0, firstMoveIndex) : rawPgn;
+    const fallbackMatches = initialSection.match(/\{([^}]*)\}/g);
+    if (fallbackMatches) {
+      rootComments = fallbackMatches.map((c) => c.slice(1, -1));
+    }
+  }
+
+  if (rootComments.length > 0) {
+    const commentsText = rootComments.join(' ');
+    const cslRegex = /\[%(?:csl|cpl)\s+([^\]]+)\]/gi;
+    let cslMatch: RegExpExecArray | null;
+    const rawShapes: DrawShape[] = [];
+    while ((cslMatch = cslRegex.exec(commentsText)) !== null) {
+      const items = cslMatch[1].split(',');
+      for (const item of items) {
+        const cleanItem = item.trim();
+        if (cleanItem.length >= 3) {
+          const brushChar = cleanItem[0].toLowerCase();
+          const orig = cleanItem.substring(1, 3).toLowerCase() as Key;
+          const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
+          rawShapes.push({ orig, brush });
+        }
+      }
+    }
+    rootYellowShapes = filterYellowShapes(rawShapes);
   }
 
   // Fallback token extraction si chessops n'a pas trouvé de coups
@@ -229,12 +268,14 @@ const parsedPgnData = computed(() => {
     fen,
     orientation,
     moves,
+    yellowShapes: rootYellowShapes,
   };
 });
 
 const fenDepart = computed<string>(() => parsedPgnData.value.fen);
 const couleurJoueur = computed<'white' | 'black'>(() => parsedPgnData.value.orientation);
 const movesSequence = computed<ParsedMove[]>(() => parsedPgnData.value.moves);
+const formesJaunes = computed<DrawShape[]>(() => parsedPgnData.value.yellowShapes);
 
 const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
@@ -251,7 +292,7 @@ const initialiserPositionJeu = () => {
 
   if (boardApi.value) {
     boardApi.value.setPosition(fenDepart.value);
-    boardApi.value.setShapes([]);
+    boardApi.value.setShapes(formesJaunes.value);
   }
 };
 
@@ -332,6 +373,9 @@ const verifierCoup = async (move: Move) => {
   } else {
     // Mauvais coup
     boardApi.value?.undoLastMove();
+    if (formesJaunes.value.length > 0) {
+      boardApi.value?.setShapes(formesJaunes.value);
+    }
     feedback.value = {
       type: 'danger',
       message: "Ce n'est pas le bon coup ! Cherchez encore."

@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Mise en Évidence des Pièces d'Étude par Cercle Jaune (Types 2 Pop'Echecs & 3 ABCDaire Tactique) (`fenUtils.ts`, `PlacementViewer.vue`, `ABCDaireTactiqueViewer.vue`, `TypePopEchecs.spec.ts`)** :
+  - **Maintien Visible du Cercle Jaune en Phase de Recherche** : Ajout de la fonction `filterYellowShapes` dans `fenUtils.ts`. Les cercles jaunes (`brush: 'yellow'` ou `'y'`) restent affichés dès le chargement sur l'échiquier interactif pour guider l'élève sur la pièce d'étude (menacée, clouée...), tout en conservant le masquage des flèches et formes de solution jusqu'à la réussite de l'exercice.
+  - **Application Harmonique aux Types 2 et 3** : Prise en charge dans `PlacementViewer.vue` (Pop'Echecs) et `ABCDaireTactiqueViewer.vue` (ABCDaire Tactique) avec persistance après coups faux ou lors des réinitialisations de cartes.
+
 - **Mise à jour des dépendances & Verrouillage TanStack Table (`package.json`, `package-lock.json`)** :
   - **Montée de version des dépendances frontend et tooling** : Mise à niveau d'Ionic (`@ionic/vue` et `@ionic/vue-router` en `^9.0.3`), TanStack Query (`^5.102.8`), Pinia (`^4.0.3`), DOMPurify (`^3.4.15`), Vue (`^3.5.42`), Vue Router (`^5.3.1`), Vite (`^8.3.0`), WordPress Scripts (`^35.0.0`), Cypress (`^16.0.0`), Playwright (`^1.63.0`) et Sass (`^1.104.0`).
   - **Maintien et verrouillage de `@tanstack/vue-table` en v8 (`^8.21.3`)** : Conservation de la version majeure v8 dans `dependencies` afin de garantir la stabilité de l'API standard (`useVueTable`, `getCoreRowModel`, etc.) exploitée par le composant `DataTable.vue`.

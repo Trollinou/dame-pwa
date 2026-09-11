@@ -196,6 +196,29 @@ export function findBlueCircledSquare(
 }
 
 /**
+ * Filtre les formes circulaires jaunes d'un ensemble de formes.
+ * Utilisé pour mettre en évidence les pièces d'étude dès la phase de recherche.
+ * @param shapes
+ */
+export function filterYellowShapes< T extends { orig?: string; dest?: string; brush?: string; color?: string } >(
+	shapes?: T[]
+): T[] {
+	if ( ! Array.isArray( shapes ) ) {
+		return [];
+	}
+	return shapes.filter(
+		( shape ) =>
+			shape &&
+			shape.orig &&
+			( ! shape.dest || shape.dest === shape.orig ) &&
+			( shape.brush === 'yellow' ||
+				shape.brush === 'y' ||
+				shape.brush === 'o' ||
+				shape.color === 'yellow' )
+	);
+}
+
+/**
  * Finds the piece on a specific square in a FEN position.
  * @param fen
  * @param square

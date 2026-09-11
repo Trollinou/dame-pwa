@@ -43,7 +43,8 @@ import {
   findBlueCircledSquare,
   findPieceOnSquare,
   removePieceFromFen,
-  getActiveColorFromFen
+  getActiveColorFromFen,
+  filterYellowShapes
 } from '@/utils/fenUtils';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
@@ -134,7 +135,7 @@ const shapesAffichees = computed<DrawShape[]>(() => {
   if (isSolved.value) {
     return diagrammeCourant.value.shapes || [];
   }
-  return [];
+  return filterYellowShapes(diagrammeCourant.value.shapes) as DrawShape[];
 });
 
 const onBoardCreated = (api: BoardCore) => {
@@ -150,7 +151,7 @@ watch(indexCourant, () => {
   feedback.value = null;
   if (boardApi.value) {
     boardApi.value.setPosition(fenDepart.value);
-    boardApi.value.setShapes([]);
+    boardApi.value.setShapes(filterYellowShapes(diagrammeCourant.value.shapes) as DrawShape[]);
   }
 });
 

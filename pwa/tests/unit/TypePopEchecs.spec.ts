@@ -9,6 +9,7 @@ import {
 	findPieceOnSquare,
 	removePieceFromFen,
 	getActiveColorFromFen,
+	filterYellowShapes,
 } from '@/utils/fenUtils';
 
 // Mock eg-chessboard
@@ -45,6 +46,22 @@ describe( 'fenUtils - PopEchecs helpers', () => {
 			{ orig: 'd2', dest: 'd4', brush: 'green' },
 		];
 		expect( findBlueCircledSquare( shapes ) ).toBe( 'e4' );
+	} );
+
+	test( 'filterYellowShapes retains only yellow circular shapes', () => {
+		const shapes = [
+			{ orig: 'e4', dest: 'e4', brush: 'blue' },
+			{ orig: 'f7', brush: 'yellow' },
+			{ orig: 'd5', brush: 'y' },
+			{ orig: 'c3', dest: 'e4', brush: 'yellow' }, // Flèche : doit être exclue
+			{ orig: 'g1', brush: 'green' },
+		];
+		const filtered = filterYellowShapes( shapes );
+		expect( filtered ).toHaveLength( 2 );
+		expect( filtered ).toEqual( [
+			{ orig: 'f7', brush: 'yellow' },
+			{ orig: 'd5', brush: 'y' },
+		] );
 	} );
 
 	test( 'findPieceOnSquare extracts piece type and color correctly', () => {

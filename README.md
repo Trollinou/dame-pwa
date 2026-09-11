@@ -44,7 +44,7 @@ L'application suit un principe de découplage strict :
   - Calcul dynamique de l'orientation de l'échiquier selon le trait de la position (`getActiveColorFromFen(fen)` : Blancs en bas si trait aux Blancs, Noirs en bas si trait aux Noirs).
   - Découpage automatique des études PGN complètes (Type 4 — La Partie dont tu es le Héros) en séquences PGN et embranchements QCM via l'analyse des variantes et des flèches `[%cal ...]`.
   - Extraction automatique pour Associ'Plan (Type 6) depuis 4 PGNs purs : FEN initiale, orientation, formes graphiques `[%csl]/[%cal]` et description (commentaire initial), déroulement séquentiel en 5 cartes (`MatchingViewer` puis visualisations pas-à-pas obligatoires `PgnViewer`).
-  - Masquage initial des `shapes` pendant la recherche, puis révélation complète dès le placement réussi.
+  - Masquage initial des `shapes` de solution pendant la recherche, avec **maintien visible du cercle jaune (`brush: 'yellow'`)** pour mettre en évidence la pièce d'étude (Types 2 Pop'Echecs et 3 ABCDaire Tactique), puis révélation complète des annotations dès la réussite.
   - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
   - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec mode plein écran universel (hybride Fullscreen natif Android/Desktop + Pseudo-Fullscreen CSS iOS sans blocage), bascule automatique en immersion lors de la rotation paysage sur mobile et validation de progression au seuil de 95%.
 

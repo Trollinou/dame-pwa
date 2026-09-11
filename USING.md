@@ -71,16 +71,16 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
       - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, dimensionnement stable et constant sur chaque appareil (non altéré par l'apparition de commentaires ou de boutons de choix), ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
       - **Exercices Pop'Echecs (Type 2)** :
         - Série de 4 diagrammes avec consigne propre à chaque position.
-        - Masquage des annotations/formes initiales pendant la phase de réflexion.
+        - Masquage des annotations/formes de solution initiales pendant la phase de réflexion, **à l'exception du cercle jaune optionnel** entourant la pièce d'étude (qui reste visible pour guider l'analyse de situation).
         - Clic sur la case cible : placement de la pièce, validation instantanée, révélation des flèches/formes du diagramme complet.
         - Retrait automatique avec feedback rouge en cas d'erreur de case.
       - **Exercices ABCDaire Tactique (Type 3)** :
         - Série de 4 Mini-PGN contenant 1 ou plusieurs coups (attaque, défense, mat, gain matériel).
         - Orientation automatique de l'échiquier selon le trait de la position initiale (Blancs ou Noirs en bas).
-        - Masquage des formes pendant la recherche et le jeu du coup.
+        - Masquage des flèches et formes tactiques pendant la recherche et le jeu du coup, **avec maintien visible du cercle jaune** sur la pièce d'étude si défini par l'entraîneur à la racine du PGN.
         - Déplacement direct sur l'échiquier du meilleur coup attendu :
-          - En cas de mauvais coup : annulation immédiate et possibilité de réessayer sans limite.
-          - En cas de bon coup : si l'exercice comporte des coups intermédiaires, l'ordinateur joue sa réplique scriptée (délai de 500ms) et l'apprenant rejoue jusqu'au coup final.
+        - En cas de mauvais coup : annulation immédiate, maintien du repère jaune et possibilité de réessayer sans limite.
+        - En cas de bon coup : si l'exercice comporte des coups intermédiaires, l'ordinateur joue sa réplique scriptée (délai de 500ms) et l'apprenant rejoue jusqu'au coup final.
         - Révélation & Relecture PGN : à l'issue de la variante réussie, les commandes de navigation PGN pas-à-pas sont débloquées (Début, Précédent, Suivant) avec affichage des commentaires et des shapes (cases et flèches de l'entraîneur), sans bouton d'avance rapide à la fin afin de garantir la lecture pas-à-pas des explications. Les boutons *Début* et *Précédent* sont automatiquement grisés/désactivés (`disabled`) sur la position initiale, et le bouton *Suivant* est désactivé une fois parvenu au dernier coup. Le bouton *Carte suivante* ou *Terminer l'exercice* du pied de carte (`SeriesCardFooter`) reste inactif (grisé) jusqu'à ce que l'apprenant ait fait défiler tous les coups du PGN jusqu'au dernier. Sur la dernière carte, la victoire (`🎉 Exercice réussi !` et pluie de confettis) est fêtée uniquement à la fin du PGN d'explication et non dès la résolution de la dernière interrogation tactique.
       - **Exercices La Partie dont tu es le Héros (Type 4)** :
         - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
