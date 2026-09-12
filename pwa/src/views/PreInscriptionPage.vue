@@ -79,6 +79,7 @@
             <!-- SECTION 3 : Santé & Consentement -->
             <PreInscriptionHealthSection
               v-model:consent-checkbox="consentCheckbox"
+              :is-minor="isMinor"
             />
 
             <!-- Message d'erreur -->
@@ -94,7 +95,7 @@
                 type="submit"
                 color="primary"
                 expand="block"
-                :disabled="isSubmitting || !consentCheckbox || !form.dame_health_questionnaire"
+                :disabled="isSubmitDisabled"
               >
                 <ion-spinner v-if="isSubmitting" name="crescent"></ion-spinner>
                 <span v-else>{{ isExistingPreInscription ? 'Mettre à jour la préinscription' : 'Valider ma préinscription' }}</span>
@@ -112,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide } from 'vue';
+import { provide, computed } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -196,6 +197,21 @@ const onResetForm = () => {
   errorMessage.value = '';
   successData.value = null;
 };
+
+const isSubmitDisabled = computed(() => {
+  if (isSubmitting.value) return true;
+  if (!consentCheckbox.value) return true;
+  if (!form.dame_health_questionnaire) return true;
+
+  // Si réponses "non partout" : signature et consentements requis
+  if (form.dame_health_questionnaire === 'non') {
+    if (!form.health_honor_consent) return true;
+    if (isMinor.value && !form.parental_consent) return true;
+    if (!form.signature_image) return true;
+  }
+
+  return false;
+});
 
 const onSubmit = () => {
   submitForm(form, consentCheckbox.value);

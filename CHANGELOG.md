@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Dématérialisation & Signature Électronique Manuscrite (`SignaturePad.vue`, `PreInscriptionHealthSection.vue`, `usePreInscriptionForm.ts`, `PreInscriptionPage.vue`, `README.md`, `USING.md`)** :
+  - **Composant Réutilisable `SignaturePad.vue`** : Saisie tactile et souris sur canvas HTML5 haute résolution avec support tactile fluide (`pointerdown`, `pointermove`, `pointerup`, `pointercancel`, `touch-action: none`), bouton d'effacement et export PNG base64 transparent.
+  - **Intégration au Formulaire de Préinscription PWA** :
+    - Déploiement conditionnel automatique dès que l'utilisateur coche « NON » à l'ensemble du questionnaire de santé.
+    - Consentements obligatoires : attestation sur l'honneur pour majeur, accord conjoint du responsable légal (santé + autorisation parentale) pour mineur.
+    - Transmission de la signature au format base64 via `POST /wp-json/dame-pwa/v1/pre-inscriptions` (`signature_image`).
+    - Verrouillage réactif du bouton de soumission jusqu'à apposition d'une signature valide et validation des consentements requis.
+
 - **Mise en Évidence des Pièces d'Étude par Cercle Jaune (Types 2 Pop'Echecs & 3 ABCDaire Tactique) (`fenUtils.ts`, `PlacementViewer.vue`, `ABCDaireTactiqueViewer.vue`, `TypePopEchecs.spec.ts`)** :
   - **Maintien Visible du Cercle Jaune en Phase de Recherche** : Ajout de la fonction `filterYellowShapes` dans `fenUtils.ts`. Les cercles jaunes (`brush: 'yellow'` ou `'y'`) restent affichés dès le chargement sur l'échiquier interactif pour guider l'élève sur la pièce d'étude (menacée, clouée...), tout en conservant le masquage des flèches et formes de solution jusqu'à la réussite de l'exercice.
   - **Application Harmonique aux Types 2 et 3** : Prise en charge dans `PlacementViewer.vue` (Pop'Echecs) et `ABCDaireTactiqueViewer.vue` (ABCDaire Tactique) avec persistance après coups faux ou lors des réinitialisations de cartes.

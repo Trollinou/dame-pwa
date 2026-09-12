@@ -26,7 +26,13 @@ Le module de préinscription (`/pre-inscription`) permet aux nouveaux visiteurs 
    - **Statut visuel dans le sélecteur** : Les enfants ayant déjà une préinscription enregistrée affichent l'indicateur `📝 Nom (Enfant/Associé - Préinscription déjà saisie)`.
    - **Reprise et modification unitaire** : Sélectionner un enfant déjà préinscrit recharge immédiatement sa préinscription en cours et permet de la corriger de façon totalement indépendante de ses frères et sœurs.
 
-3. **Suivi sur la Page d'Accueil** :
+3. **Signature Électronique Intégrée & Dématérialisation** :
+   - Lorsque l'adhérent répond « NON partout » au questionnaire de santé, une zone de signature tactile manuscrite s'affiche directement dans le formulaire.
+   - **Majeurs** : Signature de l'adhérent sous l'attestation sur l'honneur.
+   - **Mineurs (Option groupée)** : Deux consentements explicites (Attestation de santé sur l'honneur pour l'enfant + Autorisation parentale) validés par une **signature unique** du représentant légal 1.
+   - Les documents PDF officiels (attestation de santé FFE et autorisation parentale) sont automatiquement générés, signés et rattachés au dossier sans nécessiter d'impression papier.
+
+4. **Suivi sur la Page d'Accueil** :
    - Lorsque tous les membres du foyer non inscrits ont soumis leur préinscription, la carte d'accueil affiche un message de confirmation rassurant (*« Votre dossier de préinscription a bien été transmis et est en cours de traitement par le club »*) accompagné du bouton d'accès *« Consulter / Modifier ma préinscription »*.
 
 ## Module Le Club (Actualités, Agenda, Tournois, Bénévolat)

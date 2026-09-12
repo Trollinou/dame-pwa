@@ -42,6 +42,9 @@ export interface PreInscriptionFormData {
 	dame_refuses_comms: boolean;
 	dame_legal_rep_1_refuses_comms: boolean;
 	dame_legal_rep_2_refuses_comms: boolean;
+	signature_image: string;
+	health_honor_consent: boolean;
+	parental_consent: boolean;
 }
 
 export function usePreInscriptionForm() {
@@ -101,6 +104,9 @@ export function usePreInscriptionForm() {
 		dame_refuses_comms: false,
 		dame_legal_rep_1_refuses_comms: false,
 		dame_legal_rep_2_refuses_comms: false,
+		signature_image: '',
+		health_honor_consent: false,
+		parental_consent: false,
 	} );
 
 	const consentCheckbox = ref( false );
@@ -186,6 +192,9 @@ export function usePreInscriptionForm() {
 		form.dame_refuses_comms = false;
 		form.dame_legal_rep_1_refuses_comms = false;
 		form.dame_legal_rep_2_refuses_comms = false;
+		form.signature_image = '';
+		form.health_honor_consent = false;
+		form.parental_consent = false;
 		consentCheckbox.value = false;
 		isMinor.value = false;
 	};
