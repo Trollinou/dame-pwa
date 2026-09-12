@@ -40,9 +40,10 @@ export function loadYouTubeIframeApi(): Promise< void > {
 		return Promise.resolve();
 	}
 
-	if ( window.YT && typeof window.YT.ready === 'function' ) {
+	const ytApi = window.YT;
+	if ( ytApi && typeof ytApi.ready === 'function' ) {
 		return new Promise( ( resolve ) => {
-			window.YT.ready( () => resolve() );
+			ytApi.ready( () => resolve() );
 		} );
 	}
 

@@ -153,6 +153,7 @@ const parsedPgnData = computed(() => {
       fen: defaultFen,
       orientation: 'white' as const,
       moves: [] as ParsedMove[],
+      yellowShapes: [] as DrawShape[],
     };
   }
 
