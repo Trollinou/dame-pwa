@@ -6,6 +6,7 @@
         :shapes="props.shapes"
         :orientation="props.orientation"
         :view-only="true"
+        :zoomable="props.zoomable"
       />
     </div>
   </div>
@@ -20,10 +21,12 @@ const props = withDefaults(
     fen: string;
     orientation?: 'white' | 'black';
     shapes?: DrawShape[];
+    zoomable?: boolean;
   }>(),
   {
     orientation: 'white',
-    shapes: () => []
+    shapes: () => [],
+    zoomable: true
   }
 );
 </script>

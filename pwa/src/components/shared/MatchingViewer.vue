@@ -48,6 +48,7 @@
                 :shapes="echiquiersMelanges[index].shapes || []"
                 :view-only="true"
                 :coordinates="false"
+                :zoomable="true"
               />
             </div>
           </div>
@@ -358,7 +359,6 @@ const validerAssociations = () => {
   width: 100%;
   aspect-ratio: 1 / 1;
   position: relative;
-  pointer-events: none;
   box-sizing: border-box;
 }
 

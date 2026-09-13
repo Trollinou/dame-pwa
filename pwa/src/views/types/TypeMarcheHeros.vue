@@ -19,11 +19,6 @@
           class="diagram-card-item grid-card-item"
           :class="{ 'is-selected': isItemSelected(item.id) }"
           @click="toggleSelection(item)"
-          @contextmenu="handleLongPress($event, item)"
-          @touchstart="startTouchTimer($event, item)"
-          @touchmove="moveTouch"
-          @touchend="endTouchTimer"
-          @touchcancel="endTouchTimer"
         >
           <div class="card-selection-indicator">
             <span v-if="isItemSelected(item.id)" class="check-mark">✓</span>
@@ -51,11 +46,6 @@
           class="diagram-card-item order-card-item"
           :class="{ 'is-swap-selected': selectedSwapIndex === index }"
           @click="handleCardClickSwap(index)"
-          @contextmenu="handleLongPress($event, item)"
-          @touchstart="startTouchTimer($event, item)"
-          @touchmove="moveTouch"
-          @touchend="endTouchTimer"
-          @touchcancel="endTouchTimer"
         >
           <div class="order-rank-badge">
             {{ index + 1 }}
@@ -91,19 +81,6 @@
           @success="handlePuzzleSuccess"
           @error="handlePuzzleError"
         />
-      </div>
-    </div>
-
-    <!-- Modal de Zoom (Appui long / Clic droit) -->
-    <div v-if="zoomedDiagram" class="zoom-overlay" @click="closeZoom">
-      <div class="zoom-modal" @click.stop>
-        <div class="zoom-header">
-          <span>Aperçu de la position</span>
-          <button class="close-btn" @click="closeZoom">&times;</button>
-        </div>
-        <div class="zoom-board-container">
-          <DiagramViewer :fen="zoomedDiagram.fen" :orientation="zoomedDiagram.orientation" />
-        </div>
       </div>
     </div>
 
@@ -475,58 +452,6 @@ const passerEtapeSuivante = () => {
 };
 
 // ==========================================
-// Zoom (Appui long ou Clic droit)
-// ==========================================
-const zoomedDiagram = ref<Diagramme | null>(null);
-let pressTimer: ReturnType<typeof setTimeout> | null = null;
-let touchStartX = 0;
-let touchStartY = 0;
-let isScrolling = false;
-
-const startTouchTimer = (event: TouchEvent, diagram: Diagramme | null) => {
-  if (!diagram) return;
-  isScrolling = false;
-  if (event.touches.length > 0) {
-    touchStartX = event.touches[0].clientX;
-    touchStartY = event.touches[0].clientY;
-  }
-  if (pressTimer) clearTimeout(pressTimer);
-  pressTimer = setTimeout(() => {
-    if (!isScrolling) zoomedDiagram.value = diagram;
-  }, 500);
-};
-
-const moveTouch = (event: TouchEvent) => {
-  if (event.touches.length > 0) {
-    if (Math.abs(event.touches[0].clientX - touchStartX) > 10 || Math.abs(event.touches[0].clientY - touchStartY) > 10) {
-      isScrolling = true;
-      if (pressTimer) {
-        clearTimeout(pressTimer);
-        pressTimer = null;
-      }
-    }
-  }
-};
-
-const endTouchTimer = () => {
-  if (pressTimer) {
-    clearTimeout(pressTimer);
-    pressTimer = null;
-  }
-};
-
-const handleLongPress = (event: Event, diagram: Diagramme | null) => {
-  if (diagram) {
-    event.preventDefault();
-    zoomedDiagram.value = diagram;
-  }
-};
-
-const closeZoom = () => {
-  zoomedDiagram.value = null;
-};
-
-// ==========================================
 // INITIALISATION GLOBALE
 // ==========================================
 const initExercice = () => {
@@ -851,58 +776,6 @@ watch(
   width: 100%;
   display: flex;
   justify-content: center;
-}
-
-/* Modal de Zoom */
-.zoom-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.zoom-modal {
-  background: var(--ion-card-background, #fff);
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  width: 90%;
-  max-width: 440px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.zoom-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 18px;
-  background: var(--ion-color-step-100, #f4f5f8);
-  font-weight: 600;
-  color: var(--ion-color-dark, #222);
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  font-size: 1.8rem;
-  color: var(--ion-color-step-600, #666);
-  cursor: pointer;
-  line-height: 1;
-}
-
-.zoom-board-container {
-  width: 100%;
-  aspect-ratio: 1;
-  padding: 16px;
-  box-sizing: border-box;
 }
 
 .animate-fade-in {

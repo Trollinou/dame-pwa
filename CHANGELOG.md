@@ -6,6 +6,20 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Zoom Universel Plein Écran par Appui Prolongé / Clic Droit (`Chessboard.vue`, `DiagramViewer.vue`, `MatchingViewer.vue`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `JugementFinalViewer.vue`, `ChessboardZoom.spec.ts`, `README.md`, `USING.md`)** :
+  - **Intégration Native dans `Chessboard.vue` & `DiagramViewer.vue`** : Ajout de la prop `zoomable?: boolean` directement sur le composant socle `Chessboard.vue` (et activée par défaut à `true` sur `DiagramViewer.vue`).
+  - **Interaction Tactile & Desktop Ergonomique** : Prise en charge de l'appui prolongé (touch 500ms avec tolérance de glissement anti-scroll de 10px), du clic prolongé souris et du clic droit (`contextmenu`). Neutralisation automatique du clic parent lors du relâchement post-zoom pour éviter les fausses sélections de cartes.
+  - **Modale Agrandie Téléportée (`<Teleport to="body">`)** : Affichage d'un aperçu grand format net et immersif avec coordonnées algébriques, préservation des thèmes et des flèches/formes d'analyse (`shapes`), avec fermeture par clic overlay, bouton croix ou touche `Échap`.
+  - **Généralisation à tous les Échiquiers Multi-Colonnes / Compacts de l'Apprentissage** :
+    - **Type 6 (Associ'Plan / `MatchingViewer.vue`)** : Possibilité d'agrandir en plein écran chacun des 4 mini-échiquiers d'association sans perturber la sélection des cartes.
+    - **Type 7 (Marche du Héros / `TypeMarcheHeros.vue`)** : Factorisation et suppression du code doublon au profit du composant partagé.
+    - **Type 1 & Class'Échecs (`OrderViewer.vue`)** : Factorisation et suppression du code doublon au profit du composant partagé.
+    - **Type 15 (Jugement Final / `JugementFinalViewer.vue`)** : Activation du zoom sur les 3 scénarios miniatures d'observation.
+    - **Lecteur de Leçons (`LeconReader.vue`)** : Support automatique du zoom sur les diagrammes intégrés.
+
+- **Correction de la Navigation Contenu vers Cours (`ContenuPage.vue`)** :
+  - **Filtrage du Watcher de Route** : Ajout de la condition `route.path.startsWith('/contenu/')` dans le watcher de `route.params.id`. Empêche le composant `ContenuPage` (maintenu en cache par Ionic/Vue Router) de tenter de charger l'identifiant du cours (`roi_cours`) via l'endpoint `/wp-json/roi/v1/contenu/<id>` lors du retour vers `/cours/:id`, ce qui provoquait une erreur 404 et un message d'échec dans la console.
+
 - **Refonte et Alignement Architectural de l'Exercice Type 7 (Marche du Héros) (`TypeMarcheHeros.vue`, `ContenuPage.vue`, `ContentHeader.vue`, `PuzzleViewer.vue`, `README.md`, `USING.md`)** :
   - **Parcours Itératif Décomposé par Série** : Remplacement du regroupement global préalable par un traitement étape par étape, série après série (modes 3x5 ou 5x3).
   - **Étape 1 (Sélection en Grille 2 Colonnes)** : Présentation des positions dans une grille fluide à 2 colonnes réduisant par deux la longueur de défilement, avec cartes diagrammes compactes et toggle de sélection tactile (`✓`). Suivi dynamique du décompte des positions sélectionnées et restantes directement intégré au `SeriesCardFooter` fixe et immobile.

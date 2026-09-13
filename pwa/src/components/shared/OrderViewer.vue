@@ -17,11 +17,6 @@
             class="item-wrapper"
             :class="{ 'is-selected': selectionBank === index }"
             @click="selectBank(index)"
-            @contextmenu="handleLongPress($event, item)"
-            @touchstart="startTouchTimer($event, item)"
-            @touchmove="moveTouch"
-            @touchend="endTouchTimer"
-            @touchcancel="endTouchTimer"
           >
             <div class="miniature-wrapper">
               <DiagramViewer :fen="item.fen" :orientation="item.orientation" class="board-miniature" />
@@ -49,11 +44,6 @@
             class="item-wrapper slot-wrapper"
             :class="{ 'is-empty': !slot, 'is-selected': selectionSlot === index }"
             @click="selectSlot(index)"
-            @contextmenu="handleLongPress($event, slot)"
-            @touchstart="startTouchTimer($event, slot)"
-            @touchmove="moveTouch"
-            @touchend="endTouchTimer"
-            @touchcancel="endTouchTimer"
           >
             <!-- Badge de numérotation universel (Ordre ou Force) -->
             <div class="slot-badge" :class="{ 'filled': slot }">{{ index + 1 }}</div>
@@ -76,19 +66,6 @@
       <ion-button expand="block" @click="validerOrdre" :disabled="bank.length > 0">
         Valider l'ordre
       </ion-button>
-    </div>
-
-    <!-- Modal de Zoom (Appui long) -->
-    <div v-if="zoomedItem" class="zoom-overlay" @click="closeZoom">
-      <div class="zoom-modal" @click.stop>
-        <div class="zoom-header">
-          <span>Aperçu de la position</span>
-          <button class="close-btn" @click="closeZoom">&times;</button>
-        </div>
-        <div class="zoom-board-container">
-          <DiagramViewer :fen="zoomedItem.fen" :orientation="zoomedItem.orientation" />
-        </div>
-      </div>
     </div>
 
   </div>
@@ -187,41 +164,6 @@ const validerOrdre = async () => {
     emit('success');
   }
 };
-
-// Logique de Zoom (Appui long)
-const zoomedItem = ref<OrderItem | null>(null);
-let pressTimer: ReturnType<typeof setTimeout> | null = null;
-let touchStartX = 0;
-let touchStartY = 0;
-let isScrolling = false;
-
-const startTouchTimer = (event: TouchEvent, item: OrderItem | null) => {
-  if (!item) return;
-  isScrolling = false;
-  if (event.touches.length > 0) {
-    touchStartX = event.touches[0].clientX;
-    touchStartY = event.touches[0].clientY;
-  }
-  if (pressTimer) clearTimeout(pressTimer);
-  pressTimer = setTimeout(() => { if (!isScrolling) zoomedItem.value = item; }, 500);
-};
-
-const moveTouch = (event: TouchEvent) => {
-  if (event.touches.length > 0) {
-    const diffX = Math.abs(event.touches[0].clientX - touchStartX);
-    const diffY = Math.abs(event.touches[0].clientY - touchStartY);
-    if (diffX > 10 || diffY > 10) {
-      isScrolling = true;
-      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
-    }
-  }
-};
-
-const endTouchTimer = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
-const handleLongPress = (event: Event, item: OrderItem | null) => {
-  if (item) { event.preventDefault(); zoomedItem.value = item; }
-};
-const closeZoom = () => { zoomedItem.value = null; };
 </script>
 
 <style scoped>
@@ -285,7 +227,6 @@ const closeZoom = () => { zoomedItem.value = null; };
   height: 100%;
   border-radius: 6px;
   overflow: hidden;
-  pointer-events: none;
 }
 
 .board-miniature {
@@ -378,20 +319,4 @@ const closeZoom = () => { zoomedItem.value = null; };
 .action-bar {
   margin-top: 16px;
 }
-
-/* Modal Zoom */
-.zoom-overlay {
-  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-  display: flex; justify-content: center; align-items: center; z-index: 9999;
-}
-.zoom-modal {
-  background: var(--ion-background-color, #fff); border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.35); width: 90%; max-width: 400px; overflow: hidden; display: flex; flex-direction: column;
-}
-.zoom-header {
-  display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--ion-color-step-100); font-weight: 600;
-}
-.close-btn { background: transparent; border: none; font-size: 1.8rem; color: var(--ion-color-step-600); cursor: pointer; }
-.zoom-board-container { width: 100%; aspect-ratio: 1; padding: 12px; box-sizing: border-box; }
 </style>

@@ -41,8 +41,8 @@
               :orientation="playerColorTyped"
               :player-color="playerColorTyped"
               :view-only="true"
+              :zoomable="true"
               @board-created="(api: BoardCore) => onScenarioBoardCreated(index, api)"
-              style="pointer-events: none;"
             />
           </div>
         </div>

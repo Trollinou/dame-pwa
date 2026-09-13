@@ -394,7 +394,7 @@ const loadContenu = async (idVal: string | string[] | number) => {
 watch(
   () => route.params.id,
   async (newId) => {
-    if (newId) {
+    if (newId && route.path.startsWith('/contenu/')) {
       await loadContenu(newId);
     }
   },

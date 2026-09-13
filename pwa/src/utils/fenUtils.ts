@@ -200,9 +200,9 @@ export function findBlueCircledSquare(
  * Utilisé pour mettre en évidence les pièces d'étude dès la phase de recherche.
  * @param shapes
  */
-export function filterYellowShapes< T extends { orig?: string; dest?: string; brush?: string; color?: string } >(
-	shapes?: T[]
-): T[] {
+export function filterYellowShapes<
+	T extends { orig?: string; dest?: string; brush?: string; color?: string },
+>( shapes?: T[] ): T[] {
 	if ( ! Array.isArray( shapes ) ) {
 		return [];
 	}

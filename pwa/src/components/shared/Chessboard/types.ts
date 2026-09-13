@@ -18,6 +18,10 @@ export interface ChessboardConfig {
 		lastMove?: boolean;
 		check?: boolean;
 	};
+	animation?: {
+		enabled?: boolean;
+		duration?: number;
+	};
 	lastMove?: Key[];
 	playerColor?: 'white' | 'black' | 'both';
 	[ key: string ]: unknown;
@@ -100,6 +104,11 @@ export interface ChessboardProps {
 	 * Surcharge optionnelle du thème de l'échiquier (si omis, prend la valeur du store Pinia).
 	 */
 	boardTheme?: BoardTheme;
+
+	/**
+	 * Active la possibilité d'ouvrir un aperçu zoomé grand format via un appui prolongé ou clic droit.
+	 */
+	zoomable?: boolean;
 }
 
 export type ChessboardEmits = {
