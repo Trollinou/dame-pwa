@@ -1,32 +1,30 @@
 <template>
   <div class="exercice-type-cap-ou-pas-cap">
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="config.consigne || 'Relevez le défi Cap ou pas Cap ?'"
-      :stepBadgeText="`Diagramme 1 / ${config.diagrammes?.length || 1}`"
-    />
-
     <CapOuPasCapViewer
-      :consigne="''"
-      :typeReponse="config.type_reponse"
-      :diagrammes="config.diagrammes"
+      :consigne="config.consigne"
+      :variante="config.variante || config.type_reponse"
+      :propositions="config.propositions"
+      :question="config.question"
+      :exercices="config.exercices || config.diagrammes"
+      :metaTitre="config.metaTitre"
+      :metaTypeLabel="config.metaTypeLabel"
+      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
       @success="onSuccess"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useApprentissageStore } from '@/stores/apprentissage';
-import CapOuPasCapViewer, { type DiagrammeCapOuPasCap } from '@/components/shared/CapOuPasCapViewer.vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
+import CapOuPasCapViewer, { type ExerciceCapOuPasCap } from '@/components/shared/CapOuPasCapViewer.vue';
 
-interface ConfigCapOuPasCap {
-  consigne: string;
-  type_reponse: 'qcm' | 'move' | string;
-  diagrammes: DiagrammeCapOuPasCap[];
+export interface ConfigCapOuPasCap {
+  consigne?: string;
+  variante?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | string;
+  type_reponse?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | string;
+  propositions?: string[];
+  question?: string;
+  exercices?: ExerciceCapOuPasCap[];
+  diagrammes?: ExerciceCapOuPasCap[];
   metaTitre?: string;
   metaTypeLabel?: string;
   metaChapitreNiveauLabel?: string;
@@ -34,20 +32,12 @@ interface ConfigCapOuPasCap {
 
 const props = defineProps<{
   config: ConfigCapOuPasCap;
-  id: number;
+  id?: number;
 }>();
 
 const emit = defineEmits<{
   (e: 'success'): void;
 }>();
-
-const headerMeta = computed(() => {
-  return {
-    title: props.config?.metaTitre || 'T14 - Cap ou pas Cap ?',
-    typeLabel: props.config?.metaTypeLabel || 'Cap ou pas Cap ?',
-    chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
-  };
-});
 
 const onSuccess = () => {
   emit('success');
@@ -57,8 +47,7 @@ const onSuccess = () => {
 <style scoped>
 .exercice-type-cap-ou-pas-cap {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
 }
 </style>

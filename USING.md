@@ -120,6 +120,19 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - **Variante Traces / Déduction de Pièce (`traces`)** : Présentation d'un échiquier sans pièce avec uniquement les cercles de traces (`shapes`). L'apprenant doit déduire quelle pièce blanche (parmi Roi, Dame, Tour, Fou, Cavalier, Pion) a effectué ce déplacement. Dès la bonne pièce sélectionnée dans la palette dédiée, la position complète avec la pièce est révélée sur sa case finale et l'étape est validée.
         - **Architecture de Variantes Extensible** : Moteur de règles modulaire (`parcoursVariants.ts`) permettant l'ajout aisé de nouvelles variantes de jeu.
         - **Ergonomie Mobile & Scaffold** : Retours d'erreurs et de succès intégrés en temps réel dans le `SeriesCardFooter` fixe, indications d'attente dynamiques selon la variante, verrouillage/déblocage fluide du bouton *« Parcours suivant »* et célébration festive confettis sur le 3ᵉ parcours.
+      - **Exercices Cap ou pas Cap ? (Type 14)** :
+        - Déroulement en **série de 5 mini-situations** sous une consigne commune avec `ContentHeader` (titre, consigne générale, badge `Carte X / 5`) et pied fixe `SeriesCardFooter`.
+        - Saisie auteur en 5 Mini-PGN (position de départ FEN ou coup tactique à analyser, avec flèches/cercles pédagogiques).
+        - **Variante QCM Multiple (`qcm_multiple`)** :
+          - Présentation de la liste d'affirmations définies pour la série sous l'échiquier.
+          - Chaque affirmation dispose d'un **toggle tactile neutre** (position initiale neutre, sélectionnable entre OUI vert et NON rouge).
+          - L'échiquier masque initialement toutes les shapes. Dès que toutes les affirmations sont complétées avec la combinaison exacte, les shapes de l'entraîneur sont révélées sur l'échiquier, le feedback vert s'affiche et le bouton *« Carte suivante »* s'active.
+        - **Variante QCM Oui/Non (`qcm_oui_non`)** :
+          - Une question commune affichée au-dessus d'un grand toggle tactile neutre OUI / NON.
+          - Si le mini-PGN comporte un coup initial, celui-ci s'affiche/s'anime pour situer la position. Les shapes sont masquées pendant la réflexion.
+          - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
+        - **Variante Move (`move`)** :
+          - Résolution du coup attendu directement sur l'échiquier interactif avec révélation des annotations et validation de l'étape.
       - **Vidéos Pédagogiques FFE / Entraîneurs (`roi_video`)** :
         - Intégration de vidéos officielles issues de la Fédération (École d'Échecs à la Française) ou de vidéos spécifiques recommandées par les entraîneurs (ouvertures, tactiques).
         - **En-tête et Pied Unifiés** : En-tête `ContentHeader` compact (Type « Vidéo ») et pied de page fixe `SeriesCardFooter` (sans zone de feedback inutile).

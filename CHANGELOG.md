@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte des Exercices Type 14 (Cap ou pas Cap ?) en Série de 5 Mini-PGN, Variantes QCM Multiple / Oui-Non / Move & Toggles Neutres (`TypeCapOuPasCap.vue`, `CapOuPasCapViewer.vue`, `ContenuPage.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
+  - **Série de 5 Mini-PGN avec Scaffold `ContentHeader` & `SeriesCardFooter`** : Déroulement séquentiel des 5 situations sous consigne générale commune avec navigation sécurisée, retours d'erreur/succès intégrés et téléportation fixe dans `ion-footer` (`TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 14]`).
+  - **Toggle Tactile Neutre (3 états : Neutre -> OUI / NON)** : Composant de sélection démarrant sans parti pris (`null`), permettant de basculer tactilement entre OUI (vert émeraude) et NON (rouge rubis).
+  - **Variante QCM Multiple (`qcm_multiple`)** : Liste d'affirmations définies pour la série avec toggle neutre individuel pour chaque proposition sur chacun des 5 diagrammes. Révélation complète des shapes au succès de toutes les propositions.
+  - **Variante QCM Oui/Non (`qcm_oui_non`)** : Question commune sur les 5 mini-PGN avec grand toggle tactile neutre OUI / NON et révélation des shapes à la bonne réponse.
+  - **Variante Move (`move`)** : Déplacement interactif attendu joué directement sur l'échiquier.
+  - **Couverture de tests unitaires Vitest** : Création de `TypeCapOuPasCap.spec.ts` validant les 3 variantes, le comportement du toggle neutre et l'avancement de série.
+
 - **Refonte des Exercices Type 9 (Parcours) en Série de 3, Variante Traces & Moteur Extensible (`TypeParcours.vue`, `ParcoursViewer.vue`, `parcoursVariants.ts`, `ContenuPage.vue`, `TypeParcours.spec.ts`, `README.md`, `USING.md`)** :
   - **Déroulement en Série de 3 Parcours** : Transition d'un format mono-parcours vers une séquence de 3 parcours progressifs par exercice avec `ContentHeader` (consigne dynamique, badge `Parcours X / 3`) et `SeriesCardFooter` (feedbacks direct succès/erreur, indications contextuelles selon la variante, avancement sécurisé).
   - **Moteur et Registre Extensible de Variantes (`parcoursVariants.ts`)** :

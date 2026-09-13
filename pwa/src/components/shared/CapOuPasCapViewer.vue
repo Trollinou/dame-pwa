@@ -1,72 +1,140 @@
 <template>
-  <div class="exercise-viewer-layout">
-    <!-- Card de consigne -->
-    <ion-card v-if="consigne" class="exercise-card ion-margin-bottom">
-      <ion-card-header>
-        <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
-      </ion-card-header>
-    </ion-card>
+  <div class="cap-ou-pas-cap-viewer-wrapper">
+    <!-- En-tête Unifié de l'exercice avec la consigne de la série -->
+    <ContentHeader
+      :title="headerMeta.title"
+      :typeLabel="headerMeta.typeLabel"
+      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
+      :consigne="consigneTexte"
+      :stepBadgeText="`Carte ${indexCourant + 1} / ${exercicesListe.length}`"
+    />
 
     <!-- Échiquier -->
-    <div class="chessboard-container">
-      <Chessboard
-        :fen="diagrammeActuel?.fen || ''"
-        :shapes="diagrammeActuel?.shapes || []"
-        :orientation="diagrammeActuel?.couleur_joueur || 'white'"
-        :player-color="diagrammeActuel?.couleur_joueur || 'white'"
-        :view-only="typeReponse === 'qcm'"
-        :highlight-last-move="true"
-        @board-created="onBoardCreated"
-        @move="verifierCoup"
-      />
+    <div class="chessboard-panel">
+      <div class="chessboard-container">
+        <Chessboard
+          :key="`cap-${indexCourant}-${currentPgnData.fen}`"
+          :fen="fenAffichee"
+          :shapes="shapesAffichees"
+          :orientation="couleurJoueur"
+          :player-color="couleurJoueur"
+          :view-only="resolvedVariante !== 'move' || isCardSolved"
+          :highlight-last-move="true"
+          @board-created="onBoardCreated"
+          @move="verifierCoup"
+        />
+      </div>
     </div>
 
-    <!-- Choix QCM (uniquement si typeReponse === 'qcm') -->
-    <ion-card v-if="typeReponse === 'qcm' && diagrammeActuel?.qcm_choix" class="exercise-card">
-      <ion-card-content>
-        <div class="qcm-choices">
-          <ion-button
-            v-for="(choix, index) in diagrammeActuel.qcm_choix"
-            :key="index"
-            expand="block"
-            fill="solid"
-            color="primary"
-            class="choice-btn choice-btn--centered"
-            @click="validerQcm(index)"
-          >
-            {{ choix.texte }}
-          </ion-button>
+    <!-- Zone d'interaction sous l'échiquier -->
+    <div class="interaction-card animate-fade-in">
+      <!-- Variante 1 : QCM Multiple (liste de propositions avec toggle Oui/Non) -->
+      <div v-if="resolvedVariante === 'qcm_multiple'" class="qcm-multiple-panel">
+        <div
+          v-for="(prop, pIdx) in propositionsListe"
+          :key="pIdx"
+          class="proposition-row"
+        >
+          <div class="proposition-text">{{ prop }}</div>
+          <div class="neutral-toggle">
+            <button
+              type="button"
+              class="toggle-btn toggle-btn--oui"
+              :class="{ 'is-selected': multipleAnswers[pIdx] === true }"
+              :disabled="isCardSolved"
+              @click="setMultipleAnswer(pIdx, true)"
+            >
+              <span class="toggle-icon">✓</span>
+              <span class="toggle-label">OUI</span>
+            </button>
+            <button
+              type="button"
+              class="toggle-btn toggle-btn--non"
+              :class="{ 'is-selected': multipleAnswers[pIdx] === false }"
+              :disabled="isCardSolved"
+              @click="setMultipleAnswer(pIdx, false)"
+            >
+              <span class="toggle-icon">✗</span>
+              <span class="toggle-label">NON</span>
+            </button>
+          </div>
         </div>
-      </ion-card-content>
-    </ion-card>
+      </div>
+
+      <!-- Variante 2 : QCM Oui/Non (question commune avec toggle Oui/Non) -->
+      <div v-else-if="resolvedVariante === 'qcm_oui_non'" class="qcm-oui-non-panel">
+        <div class="question-header">
+          <span class="question-badge">Question</span>
+          <span class="question-text">{{ questionTexte }}</span>
+        </div>
+        <div class="neutral-toggle neutral-toggle--large">
+          <button
+            type="button"
+            class="toggle-btn toggle-btn--oui"
+            :class="{ 'is-selected': singleAnswer === true }"
+            :disabled="isCardSolved"
+            @click="setSingleAnswer(true)"
+          >
+            <span class="toggle-icon">✓</span>
+            <span class="toggle-label">OUI</span>
+          </button>
+          <button
+            type="button"
+            class="toggle-btn toggle-btn--non"
+            :class="{ 'is-selected': singleAnswer === false }"
+            :disabled="isCardSolved"
+            @click="setSingleAnswer(false)"
+          >
+            <span class="toggle-icon">✗</span>
+            <span class="toggle-label">NON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Variante 3 : Move (Déplacement attendu) -->
+      <div v-else-if="resolvedVariante === 'move'" class="move-panel">
+        <div v-if="!isCardSolved" class="move-hint">
+          <span class="move-hint-icon">♟</span>
+          <span>Jouez le coup attendu directement sur l'échiquier.</span>
+        </div>
+        <div v-else class="move-success-hint">
+          <span class="move-success-icon">✓</span>
+          <span>{{ exerciceCourant.move_explication || 'Coup réussi !' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer de Navigation par Carte avec Feedback Fixe -->
+    <SeriesCardFooter
+      :currentCard="indexCourant + 1"
+      :totalCards="exercicesListe.length"
+      :isSolved="isCardSolved"
+      :feedback="feedback"
+      :pendingHint="pendingHintTexte"
+      @next="passerCarteSuivante"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import {
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonButton
-} from '@ionic/vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import { useFeedback } from '@/composables/useFeedback';
-import type { BoardCore, DrawShape, Move } from 'eg-chessboard';
+import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
+import { getActiveColorFromFen } from '@/utils/fenUtils';
+import ContentHeader from '@/components/shared/ContentHeader.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import { parsePgn } from 'chessops/pgn';
+import { parseFen } from 'chessops/fen';
+import { parseSan, makeSanAndPlay } from 'chessops/san';
+import { Chess } from 'chessops';
 
-const { showSuccess, showError } = useFeedback();
-
-export interface QcmChoix {
-  texte: string;
-  explication: string;
-}
-
-export interface DiagrammeCapOuPasCap {
-  fen: string;
-  couleur_joueur: 'white' | 'black';
+export interface ExerciceCapOuPasCap {
+  pgn?: string;
+  fen?: string;
+  couleur_joueur?: 'white' | 'black';
   shapes?: DrawShape[];
-  qcm_choix?: QcmChoix[];
+  reponses_multiple?: boolean[];
+  reponse_oui_non?: boolean;
   qcm_bonne_reponse?: number;
   move_san?: string;
   move_explication?: string;
@@ -75,13 +143,20 @@ export interface DiagrammeCapOuPasCap {
 const props = withDefaults(
   defineProps<{
     consigne?: string;
-    typeReponse?: 'qcm' | 'move' | string;
-    diagrammes?: DiagrammeCapOuPasCap[];
+    variante?: string;
+    propositions?: string[];
+    question?: string;
+    exercices?: ExerciceCapOuPasCap[];
+    metaTitre?: string;
+    metaTypeLabel?: string;
+    metaChapitreNiveauLabel?: string;
   }>(),
   {
     consigne: '',
-    typeReponse: 'qcm',
-    diagrammes: () => []
+    variante: 'qcm_oui_non',
+    propositions: () => [],
+    question: '',
+    exercices: () => [],
   }
 );
 
@@ -89,91 +164,547 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-const etapeCourante = ref(0);
-const boardApi = ref<BoardCore | null>(null);
+const headerMeta = computed(() => ({
+  title: props.metaTitre || 'T14 - Cap ou pas Cap ?',
+  typeLabel: props.metaTypeLabel || 'Cap ou pas Cap ?',
+  chapitreNiveauLabel: props.metaChapitreNiveauLabel || '',
+}));
 
-const diagrammeActuel = computed<DiagrammeCapOuPasCap | null>(() => {
-  if (props.diagrammes && props.diagrammes.length > etapeCourante.value) {
-    return props.diagrammes[etapeCourante.value];
-  }
-  return null;
+const indexCourant = ref(0);
+const isCardSolved = ref(false);
+const boardApi = ref<BoardCore | null>(null);
+const feedback = ref<CardFeedback | null>(null);
+
+const multipleAnswers = ref<(boolean | null)[]>([]);
+const singleAnswer = ref<boolean | null>(null);
+
+const resolvedVariante = computed<'qcm_multiple' | 'qcm_oui_non' | 'move'>(() => {
+  const v = props.variante || 'qcm_oui_non';
+  if (v === 'qcm') return 'qcm_oui_non';
+  if (v === 'qcm_multiple' || v === 'qcm_oui_non' || v === 'move') return v;
+  return 'qcm_oui_non';
 });
 
-const boardConfig = computed(() => {
-  const diag = diagrammeActuel.value;
+const consigneTexte = computed<string>(() => {
+  return props.consigne || 'Relevez le défi Cap ou pas Cap ?';
+});
+
+const propositionsListe = computed<string[]>(() => {
+  if (props.propositions && Array.isArray(props.propositions) && props.propositions.length > 0) {
+    return props.propositions;
+  }
+  return [];
+});
+
+const questionTexte = computed<string>(() => {
+  return props.question || 'Cette action est-elle possible dans cette position ?';
+});
+
+const exercicesListe = computed<ExerciceCapOuPasCap[]>(() => {
+  if (props.exercices && Array.isArray(props.exercices) && props.exercices.length > 0) {
+    return props.exercices;
+  }
+  return [
+    { pgn: '' },
+    { pgn: '' },
+    { pgn: '' },
+    { pgn: '' },
+    { pgn: '' },
+  ];
+});
+
+const exerciceCourant = computed<ExerciceCapOuPasCap>(() => {
+  return exercicesListe.value[indexCourant.value] || exercicesListe.value[0];
+});
+
+const pendingHintTexte = computed<string>(() => {
+  if (resolvedVariante.value === 'move') {
+    return "Jouez le coup attendu pour continuer";
+  }
+  return "Sélectionnez vos réponses pour continuer";
+});
+
+// Extraction et parsing PGN du mini-PGN courant
+interface ParsedPgnData {
+  fen: string;
+  fenAfterMoves: string;
+  orientation: 'white' | 'black';
+  shapes: DrawShape[];
+  moves: string[];
+}
+
+const currentPgnData = computed<ParsedPgnData>(() => {
+  const rawPgn = (exerciceCourant.value?.pgn || '').trim();
+  const defaultFen = exerciceCourant.value?.fen || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const initialShapes: DrawShape[] = Array.isArray(exerciceCourant.value?.shapes) ? [...exerciceCourant.value.shapes] : [];
+
+  if (!rawPgn) {
+    return {
+      fen: defaultFen,
+      fenAfterMoves: defaultFen,
+      orientation: exerciceCourant.value?.couleur_joueur || getActiveColorFromFen(defaultFen),
+      shapes: initialShapes,
+      moves: [],
+    };
+  }
+
+  let fen = defaultFen;
+  const fenMatch = rawPgn.match(/\[FEN\s+"([^"]+)"\]/i);
+  if (fenMatch && fenMatch[1]) {
+    fen = fenMatch[1].trim();
+  }
+
+  const orientation = (exerciceCourant.value?.couleur_joueur || getActiveColorFromFen(fen)) as 'white' | 'black';
+  const moves: string[] = [];
+  const extractedShapes: DrawShape[] = [...initialShapes];
+
+  try {
+    const games = parsePgn(rawPgn);
+    if (games.length > 0) {
+      const game = games[0];
+      const setupFen = game.headers.get('FEN') || fen;
+      const setupRes = setupFen && setupFen !== 'start' ? parseFen(setupFen) : null;
+      const chessSetup = setupRes && setupRes.isOk ? Chess.fromSetup(setupRes.value) : null;
+      const pos = chessSetup && chessSetup.isOk ? chessSetup.value : null;
+
+      // Extraction des commentaires et annotations shapes [%cal ...] [%csl ...]
+      const allComments: string[] = [];
+      if (Array.isArray(game.comments)) {
+        allComments.push(...game.comments);
+      }
+
+      let currentNode = game.moves;
+      while (currentNode.children.length > 0) {
+        const child = currentNode.children[0];
+        if (Array.isArray(child.data.comments)) {
+          allComments.push(...child.data.comments);
+        }
+        if (pos) {
+          const parsedMove = parseSan(pos, child.data.san);
+          if (parsedMove) {
+            const san = makeSanAndPlay(pos, parsedMove);
+            moves.push(san || child.data.san);
+          } else {
+            moves.push(child.data.san);
+          }
+        } else {
+          moves.push(child.data.san);
+        }
+        currentNode = child;
+      }
+
+      // Parser les flèches et cercles dans les commentaires
+      if (allComments.length > 0) {
+        const fullText = allComments.join(' ');
+        const calRegex = /\[%(?:cal|cpl)\s+([^\]]+)\]/gi;
+        let calMatch: RegExpExecArray | null;
+        while ((calMatch = calRegex.exec(fullText)) !== null) {
+          const items = calMatch[1].split(',');
+          for (const item of items) {
+            const clean = item.trim();
+            if (clean.length >= 5) {
+              const brushChar = clean[0].toLowerCase();
+              const orig = clean.substring(1, 3).toLowerCase() as Key;
+              const dest = clean.substring(3, 5).toLowerCase() as Key;
+              const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
+              extractedShapes.push({ orig, dest, brush });
+            }
+          }
+        }
+
+        const cslRegex = /\[%(?:csl)\s+([^\]]+)\]/gi;
+        let cslMatch: RegExpExecArray | null;
+        while ((cslMatch = cslRegex.exec(fullText)) !== null) {
+          const items = cslMatch[1].split(',');
+          for (const item of items) {
+            const clean = item.trim();
+            if (clean.length >= 3) {
+              const brushChar = clean[0].toLowerCase();
+              const orig = clean.substring(1, 3).toLowerCase() as Key;
+              const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
+              extractedShapes.push({ orig, brush });
+            }
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Erreur parsePgn dans CapOuPasCapViewer:', e);
+  }
+
+  // Calcul de la FEN après les coups du mini-PGN si applicable
+  let fenAfterMoves = fen;
+  if (moves.length > 0) {
+    try {
+      const setupRes = fen && fen !== 'start' ? parseFen(fen) : null;
+      const chessSetup = setupRes && setupRes.isOk ? Chess.fromSetup(setupRes.value) : null;
+      const pos = chessSetup && chessSetup.isOk ? chessSetup.value : null;
+      if (pos) {
+        for (const moveSan of moves) {
+          const parsed = parseSan(pos, moveSan);
+          if (parsed) {
+            makeSanAndPlay(pos, parsed);
+          }
+        }
+        // FEN après coup
+      }
+    } catch (e) {
+      console.warn('Erreur calcul FEN après coup:', e);
+    }
+  }
+
   return {
-    fen: diag?.fen || '',
-    orientation: diag?.couleur_joueur || 'white',
-    viewOnly: props.typeReponse === 'qcm',
-    drawable: { shapes: diag?.shapes || [] },
-    highlight: { lastMove: true }
+    fen,
+    fenAfterMoves,
+    orientation,
+    shapes: extractedShapes,
+    moves,
   };
 });
 
-const onBoardCreated = (api: BoardCore) => {
-  boardApi.value = api;
-  if (diagrammeActuel.value?.fen) {
-    boardApi.value.setPosition(diagrammeActuel.value.fen);
-  }
-};
+const fenAffichee = computed<string>(() => {
+  return currentPgnData.value.fen;
+});
 
-watch(
-  diagrammeActuel,
-  (newDiag) => {
-    if (boardApi.value && newDiag?.fen) {
-      boardApi.value.setPosition(newDiag.fen);
-      if (newDiag.shapes) {
-        boardApi.value.setShapes(newDiag.shapes);
+const couleurJoueur = computed<'white' | 'black'>(() => {
+  return currentPgnData.value.orientation;
+});
+
+const shapesAffichees = computed<DrawShape[]>(() => {
+  if (isCardSolved.value) {
+    return currentPgnData.value.shapes;
+  }
+  return [];
+});
+
+const initCardState = () => {
+  isCardSolved.value = false;
+  feedback.value = null;
+  singleAnswer.value = null;
+  multipleAnswers.value = propositionsListe.value.map(() => null);
+
+  nextTick(() => {
+    if (boardApi.value) {
+      boardApi.value.setPosition(currentPgnData.value.fen);
+      boardApi.value.setShapes([]);
+
+      // Si le mini-pgn contient 1 coup d'animation initial
+      if (currentPgnData.value.moves.length > 0 && resolvedVariante.value !== 'move') {
+        const moveSan = currentPgnData.value.moves[0];
+        setTimeout(() => {
+          if (boardApi.value) {
+            boardApi.value.move(moveSan);
+          }
+        }, 300);
       }
     }
-  },
-  { immediate: true }
-);
+  });
+};
 
-const avancerOuReussir = async (message: string) => {
-  await showSuccess(message, 2000);
+watch(indexCourant, () => {
+  initCardState();
+}, { immediate: true });
 
-  if (etapeCourante.value + 1 < props.diagrammes.length) {
-    etapeCourante.value++;
+const onBoardCreated = (api: BoardCore) => {
+  boardApi.value = api;
+  initCardState();
+};
+
+const setMultipleAnswer = (propIdx: number, val: boolean) => {
+  if (isCardSolved.value) return;
+
+  multipleAnswers.value[propIdx] = val;
+
+  // Vérifier si toutes les propositions ont reçu une réponse
+  const allAnswered = multipleAnswers.value.length > 0 &&
+    multipleAnswers.value.every((ans) => ans !== null);
+
+  if (allAnswered) {
+    const expected = exerciceCourant.value.reponses_multiple || [];
+    let isAllCorrect = true;
+
+    for (let i = 0; i < propositionsListe.value.length; i++) {
+      const expVal = typeof expected[i] === 'boolean' ? expected[i] : true;
+      if (multipleAnswers.value[i] !== expVal) {
+        isAllCorrect = false;
+        break;
+      }
+    }
+
+    if (isAllCorrect) {
+      isCardSolved.value = true;
+      feedback.value = {
+        type: 'success',
+        message: 'Excellent ! Toutes vos réponses sont exactes.',
+      };
+      if (boardApi.value) {
+        boardApi.value.setShapes(currentPgnData.value.shapes);
+      }
+    } else {
+      feedback.value = {
+        type: 'danger',
+        message: 'Certaines réponses sont inexactes. Modifiez vos choix.',
+      };
+    }
   } else {
-    setTimeout(() => {
-      emit('success');
-    }, 800);
+    feedback.value = null;
   }
 };
 
-const validerQcm = async (index: number) => {
-  const diag = diagrammeActuel.value;
-  if (!diag) return;
+const setSingleAnswer = (val: boolean) => {
+  if (isCardSolved.value) return;
 
-  const choix = diag.qcm_choix?.[index];
-  const estBonneReponse = index === diag.qcm_bonne_reponse;
+  singleAnswer.value = val;
 
-  if (estBonneReponse) {
-    const explication = choix?.explication || 'Bien joué !';
-    await avancerOuReussir(explication);
+  let expected = true;
+  if (typeof exerciceCourant.value.reponse_oui_non === 'boolean') {
+    expected = exerciceCourant.value.reponse_oui_non;
+  } else if (typeof exerciceCourant.value.qcm_bonne_reponse === 'number') {
+    expected = exerciceCourant.value.qcm_bonne_reponse === 0;
+  }
+
+  if (val === expected) {
+    isCardSolved.value = true;
+    feedback.value = {
+      type: 'success',
+      message: "Bravo ! C'est la bonne réponse.",
+    };
+    if (boardApi.value) {
+      boardApi.value.setShapes(currentPgnData.value.shapes);
+    }
   } else {
-    const explication = choix?.explication || 'Mauvaise réponse !';
-    await showError(explication, 2500);
+    feedback.value = {
+      type: 'danger',
+      message: 'Mauvaise réponse. Réessayez !',
+    };
   }
 };
 
-const verifierCoup = async (move: Move) => {
-  const diag = diagrammeActuel.value;
-  if (!diag || props.typeReponse !== 'move') return;
+const verifierCoup = (move: Move) => {
+  if (isCardSolved.value || resolvedVariante.value !== 'move') return;
 
-  const playerColorShort = (diag.couleur_joueur || 'white') === 'white' ? 'w' : 'b';
+  const expectedSan = (exerciceCourant.value.move_san || '').trim();
+  const playerColorShort = (couleurJoueur.value === 'black') ? 'b' : 'w';
+
   if (move.color !== playerColorShort) {
     return;
   }
 
-  if (move.san === diag.move_san) {
-    await avancerOuReussir('Bien joué !');
+  if (move.san === expectedSan) {
+    isCardSolved.value = true;
+    feedback.value = {
+      type: 'success',
+      message: exerciceCourant.value.move_explication || 'Bien joué ! Coup gagnant.',
+    };
+    if (boardApi.value) {
+      boardApi.value.setShapes(currentPgnData.value.shapes);
+    }
   } else {
     boardApi.value?.undoLastMove();
-    const messageErreur = diag.move_explication || 'Ce n\'est pas le bon coup. Cherchez le mat !';
-    await showError(messageErreur, 2500);
+    feedback.value = {
+      type: 'danger',
+      message: exerciceCourant.value.move_explication || "Ce n'est pas le bon coup. Réessayez !",
+    };
+  }
+};
+
+const passerCarteSuivante = () => {
+  if (indexCourant.value < exercicesListe.value.length - 1) {
+    indexCourant.value++;
+  } else {
+    emit('success');
   }
 };
 </script>
+
+<style scoped>
+.cap-ou-pas-cap-viewer-wrapper {
+  width: 100%;
+}
+
+.chessboard-panel {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.interaction-card {
+  width: 100%;
+  margin: 10px 0 16px 0;
+  background: var(--ion-card-background, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--ion-color-step-150, #e2e4e7);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 12px 14px;
+}
+
+/* QCM Multiple Panel */
+.qcm-multiple-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.proposition-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  background: var(--ion-color-step-50, #f9fafb);
+  border: 1px solid var(--ion-color-step-150, #eef0f2);
+  border-radius: 8px;
+}
+
+.proposition-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ion-color-step-850, #1f2937);
+  flex: 1;
+  line-height: 1.35;
+}
+
+/* QCM Oui/Non Panel */
+.qcm-oui-non-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 4px;
+}
+
+.question-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.question-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--ion-color-primary-tint, #e0f2fe);
+  color: var(--ion-color-primary-shade, #0284c7);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.question-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ion-color-step-900, #111827);
+  line-height: 1.4;
+}
+
+/* Move Panel */
+.move-panel {
+  padding: 8px;
+  text-align: center;
+}
+
+.move-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ion-color-step-650, #4b5563);
+}
+
+.move-hint-icon {
+  font-size: 1.25rem;
+}
+
+.move-success-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #198754;
+}
+
+.move-success-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Neutral Toggle (3-state: neutral -> Oui/Non) */
+.neutral-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--ion-color-step-100, #f1f3f5);
+  border: 1px solid var(--ion-color-step-250, #d1d5db);
+  border-radius: 30px;
+  padding: 3px;
+  gap: 4px;
+  user-select: none;
+}
+
+.neutral-toggle--large {
+  padding: 4px;
+  gap: 8px;
+  border-radius: 36px;
+}
+
+.toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--ion-color-step-600, #6b7280);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.neutral-toggle--large .toggle-btn {
+  font-size: 0.95rem;
+  padding: 8px 24px;
+  border-radius: 28px;
+}
+
+.toggle-icon {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.toggle-btn--oui:hover:not(:disabled) {
+  color: #198754;
+  background: rgba(25, 135, 84, 0.08);
+}
+
+.toggle-btn--non:hover:not(:disabled) {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.08);
+}
+
+.toggle-btn--oui.is-selected {
+  background: #198754 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(25, 135, 84, 0.35);
+}
+
+.toggle-btn--non.is-selected {
+  background: #dc3545 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.35);
+}
+
+.toggle-btn:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+</style>
+
 
