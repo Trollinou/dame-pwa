@@ -1,4 +1,5 @@
 import type { DrawShape, Key } from 'eg-chessboard';
+import { LoopTracker } from './LoopTracker';
 
 export interface ParcoursBoardApi {
 	getPieces: () => Array< {
@@ -21,6 +22,8 @@ export interface ParcoursMoveContext {
 	caseArrivee: string;
 	shapes: DrawShape[];
 	boardApi: ParcoursBoardApi;
+	isLoop?: boolean;
+	loopTracker?: LoopTracker | null;
 }
 
 export interface ParcoursMoveResult {
@@ -35,9 +38,10 @@ export interface ParcoursVariant {
 	name: string;
 	getDefaultConsigne: (
 		_caseArrivee: string,
-		_couleurJoueur?: string
+		_couleurJoueur?: string,
+		_isLoop?: boolean
 	) => string;
-	getPendingHint: ( _caseArrivee: string ) => string;
+	getPendingHint: ( _caseArrivee: string, _isLoop?: boolean ) => string;
 	validateMove: ( _ctx: ParcoursMoveContext ) => ParcoursMoveResult;
 }
 
@@ -148,14 +152,14 @@ const pacmanVariant: ParcoursVariant = {
 const stealthVariant: ParcoursVariant = {
 	id: 'stealth',
 	name: 'Pas vu, pas pris (Stealth)',
-	getDefaultConsigne: ( caseArrivee ) =>
-		caseArrivee
-			? `Infiltrez la zone cible (${ caseArrivee.toUpperCase() }) sans passer par les cases surveillées par l'adversaire.`
-			: "Atteignez la case d'arrivée sans vous faire repérer.",
-	getPendingHint: ( caseArrivee ) =>
-		caseArrivee
-			? `Évitez les cases surveillées par les pièces adverses pour atteindre ${ caseArrivee.toUpperCase() }.`
-			: 'Évitez les cases contrôlées par les pièces adverses.',
+	getDefaultConsigne: ( caseArrivee, _couleurJoueur, isLoop ) =>
+		isLoop || ! caseArrivee
+			? 'Faites le tour complet de la pièce adverse sans vous faire repérer et revenez à votre case de départ.'
+			: `Infiltrez la zone cible (${ caseArrivee.toUpperCase() }) sans passer par les cases surveillées par l'adversaire.`,
+	getPendingHint: ( caseArrivee, isLoop ) =>
+		isLoop || ! caseArrivee
+			? 'Contournez la pièce adverse en restant hors de sa portée pour revenir à votre case de départ.'
+			: `Évitez les cases surveillées par les pièces adverses pour atteindre ${ caseArrivee.toUpperCase() }.`,
 	validateMove: ( ctx ) => {
 		if ( isRedSquare( ctx.to, ctx.shapes ) ) {
 			return {
@@ -171,6 +175,22 @@ const stealthVariant: ParcoursVariant = {
 				valid: false,
 				isFinished: false,
 				errorMessage: 'Vous avez été repéré !',
+			};
+		}
+
+		if ( ctx.isLoop && ctx.loopTracker ) {
+			const loopResult = ctx.loopTracker.onMove( ctx.to );
+			if ( loopResult.isFinished ) {
+				return {
+					valid: true,
+					isFinished: true,
+					successMessage:
+						'Tour complet réussi sans vous faire repérer ! Bravo.',
+				};
+			}
+			return {
+				valid: true,
+				isFinished: false,
 			};
 		}
 

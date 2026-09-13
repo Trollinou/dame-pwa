@@ -98,6 +98,15 @@ const currentParcours = computed<ParcoursItemConfig>(() => {
   return seriesList.value[indexCourant.value] || seriesList.value[0];
 });
 
+const isCurrentLoop = computed(() => {
+  return (
+    !!currentParcours.value.case_depart &&
+    (!currentParcours.value.case_arrivee ||
+      currentParcours.value.case_depart.toLowerCase() ===
+        currentParcours.value.case_arrivee.toLowerCase())
+  );
+});
+
 const currentVariant = computed(() => {
   return getParcoursVariant(currentParcours.value.variante);
 });
@@ -108,12 +117,16 @@ const consigneCourante = computed(() => {
   }
   return currentVariant.value.getDefaultConsigne(
     currentParcours.value.case_arrivee || '',
-    currentParcours.value.couleur_joueur
+    currentParcours.value.couleur_joueur,
+    isCurrentLoop.value
   );
 });
 
 const pendingHint = computed(() => {
-  return currentVariant.value.getPendingHint(currentParcours.value.case_arrivee || '');
+  return currentVariant.value.getPendingHint(
+    currentParcours.value.case_arrivee || '',
+    isCurrentLoop.value
+  );
 });
 
 const headerMeta = computed(() => {
@@ -140,7 +153,7 @@ const computedShapes = computed<DrawShape[]>(() => {
     }
   }
 
-  if (currentParcours.value.case_arrivee) {
+  if (currentParcours.value.case_arrivee && !isCurrentLoop.value) {
     const arr = currentParcours.value.case_arrivee.toLowerCase() as DrawShape['orig'];
     const alreadyArr = baseShapes.some((s) => s.orig === arr && !s.dest);
     if (!alreadyArr) {

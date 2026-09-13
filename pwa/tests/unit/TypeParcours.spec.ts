@@ -12,6 +12,11 @@ import {
 	removePieceFromSquareInFen,
 	type ParcoursBoardApi,
 } from '@/utils/parcoursVariants';
+import {
+	LoopTracker,
+	extractOpponentPieceSquare,
+	squareToCoords,
+} from '@/utils/LoopTracker';
 
 // Mock eg-chessboard
 vi.mock( 'eg-chessboard/vue', () => ( {
@@ -247,6 +252,116 @@ describe( 'parcoursVariants - Logic & Extensibility', () => {
 		const custom = getParcoursVariant( 'custom_test' );
 		expect( custom.id ).toBe( 'custom_test' );
 		expect( custom.name ).toBe( 'Custom Test Variant' );
+	} );
+
+	test( 'LoopTracker - calculates 360 deg winding and quadrants for complete tour', () => {
+		const target = 'd5';
+		const start = 'c3';
+		const tracker = new LoopTracker( target, start );
+
+		// Move 1: c3 -> a4
+		let res = tracker.onMove( 'a4' );
+		expect( res.isFinished ).toBe( false );
+
+		// Move 2: a4 -> b6
+		res = tracker.onMove( 'b6' );
+		expect( res.isFinished ).toBe( false );
+
+		// Move 3: b6 -> c8
+		res = tracker.onMove( 'c8' );
+		expect( res.isFinished ).toBe( false );
+
+		// Move 4: c8 -> e7
+		res = tracker.onMove( 'e7' );
+		expect( res.isFinished ).toBe( false );
+
+		// Move 5: e7 -> g6
+		res = tracker.onMove( 'g6' );
+		expect( res.isFinished ).toBe( false );
+
+		// Move 6: g6 -> f4
+		res = tracker.onMove( 'f4' );
+		expect( res.isFinished ).toBe( false );
+
+		// Move 7: f4 -> e2
+		res = tracker.onMove( 'e2' );
+		expect( res.isFinished ).toBe( false );
+
+		// Move 8: e2 -> c3 (Returned to start, 360 degrees completed!)
+		res = tracker.onMove( 'c3' );
+		expect( res.isFinished ).toBe( true );
+		expect( Math.abs( res.totalAngleDeg ) ).toBeCloseTo( 360, -1 );
+		expect( res.progressPercent ).toBe( 100 );
+	} );
+
+	test( 'LoopTracker - rejects fraudulent back-and-forth moves', () => {
+		const target = 'd5';
+		const start = 'c3';
+		const tracker = new LoopTracker( target, start );
+
+		// Back and forth: c3 -> a4 -> c3 -> a4 -> c3
+		tracker.onMove( 'a4' );
+		const res1 = tracker.onMove( 'c3' );
+		expect( res1.isFinished ).toBe( false );
+		expect( res1.totalAngleDeg ).toBeCloseTo( 0, 1 );
+
+		tracker.onMove( 'a4' );
+		const res2 = tracker.onMove( 'c3' );
+		expect( res2.isFinished ).toBe( false );
+	} );
+
+	test( 'extractOpponentPieceSquare locates black queen on d5 from white perspective', () => {
+		const fen = '8/8/8/3q4/8/2N5/8/8 w - - 0 1';
+		expect( extractOpponentPieceSquare( fen, 'white' ) ).toBe( 'd5' );
+		expect( squareToCoords( 'd5' ) ).toEqual( { x: 4, y: 5 } );
+		expect( squareToCoords( 'c3' ) ).toEqual( { x: 3, y: 3 } );
+	} );
+
+	test( 'stealth variant in loop mode validates full 8-move loop tour around queen', () => {
+		const stealth = getParcoursVariant( 'stealth' );
+		const fen = '8/8/8/3q4/8/2N5/8/8 w - - 0 1';
+		const tracker = new LoopTracker( 'd5', 'c3' );
+		const mockBoardSafe: ParcoursBoardApi = {
+			getPieces: () => [],
+			isSquareAttacked: () => false,
+		};
+
+		const moves = [
+			'a4',
+			'b6',
+			'c8',
+			'e7',
+			'g6',
+			'f4',
+			'e2',
+			'c3',
+		];
+		let currentPos = 'c3';
+
+		for ( let i = 0; i < moves.length; i++ ) {
+			const nextPos = moves[ i ];
+			const result = stealth.validateMove( {
+				from: currentPos as any,
+				to: nextPos as any,
+				fenDepart: fen,
+				couleurJoueur: 'white',
+				caseDepart: 'c3',
+				caseArrivee: 'c3',
+				shapes: [],
+				boardApi: mockBoardSafe,
+				isLoop: true,
+				loopTracker: tracker,
+			} );
+
+			expect( result.valid ).toBe( true );
+			if ( i === moves.length - 1 ) {
+				expect( result.isFinished ).toBe( true );
+				expect( result.successMessage ).toContain( 'Tour complet réussi' );
+			} else {
+				expect( result.isFinished ).toBe( false );
+			}
+			currentPos = nextPos;
+		}
 	} );
 } );
 

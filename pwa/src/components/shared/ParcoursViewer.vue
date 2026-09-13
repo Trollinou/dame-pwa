@@ -48,6 +48,7 @@ import {
   removePieceFromSquareInFen,
   type ParcoursBoardApi
 } from '@/utils/parcoursVariants';
+import { LoopTracker, extractOpponentPieceSquare } from '@/utils/LoopTracker';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import type { CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 
@@ -73,6 +74,7 @@ const emit = defineEmits<{
 const boardApi = ref<ParcoursBoardApi | null>(null);
 const boardKey = ref(0);
 const selectedPieceRole = ref<string | null>(null);
+const loopTracker = ref<LoopTracker | null>(null);
 
 const tracesPieces = [
   { role: 'k', cgClass: 'king', label: 'Roi' },
@@ -84,6 +86,27 @@ const tracesPieces = [
 ];
 
 const isTracesVariant = computed(() => props.variante === 'traces');
+
+const isLoop = computed(() => {
+  if (
+    props.caseDepart &&
+    (!props.caseArrivee ||
+      props.caseDepart.toLowerCase() === props.caseArrivee.toLowerCase())
+  ) {
+    return true;
+  }
+  return false;
+});
+
+const initLoopTracker = () => {
+  if (isLoop.value && props.caseDepart) {
+    const oppSquare =
+      extractOpponentPieceSquare(props.fenDepart, props.couleurJoueur) || 'd5';
+    loopTracker.value = new LoopTracker(oppSquare, props.caseDepart);
+  } else {
+    loopTracker.value = null;
+  }
+};
 
 const targetGreenSquare = computed(() => {
   if (props.caseArrivee) {
@@ -117,7 +140,7 @@ const effectiveFen = computed(() => {
   if (isTracesVariant.value) {
     return '8/8/8/8/8/8/8/8 w - - 0 1';
   }
-  if (props.variante === 'standard' || props.variante === 'stealth') {
+  if ((props.variante === 'standard' || props.variante === 'stealth') && !isLoop.value) {
     if (targetGreenSquare.value) {
       return removePieceFromSquareInFen(props.fenDepart, targetGreenSquare.value);
     }
@@ -134,6 +157,9 @@ const expectedPieceRole = computed(() => {
 
 const resetPosition = () => {
   selectedPieceRole.value = null;
+  if (loopTracker.value) {
+    loopTracker.value.reset();
+  }
   if (!boardApi.value) return;
   if (typeof boardApi.value.setPosition === 'function') {
     boardApi.value.setPosition(effectiveFen.value);
@@ -167,10 +193,19 @@ watch(
 );
 
 watch(
-  () => [props.fenDepart, props.couleurJoueur, props.variante, props.isSolved],
+  () => [
+    props.fenDepart,
+    props.couleurJoueur,
+    props.variante,
+    props.caseDepart,
+    props.caseArrivee,
+    props.isSolved,
+  ],
   () => {
+    initLoopTracker();
     boardKey.value++;
-  }
+  },
+  { immediate: true }
 );
 
 const handleSelectTracesPiece = (role: string) => {
@@ -207,6 +242,8 @@ const handleMove = (move: Move) => {
     caseArrivee: props.caseArrivee || '',
     shapes: props.shapes || [],
     boardApi: boardApi.value,
+    isLoop: isLoop.value,
+    loopTracker: loopTracker.value,
   });
 
   if (!result.valid) {

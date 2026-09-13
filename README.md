@@ -227,6 +227,13 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 | **Actions & Feedback**| `.feedback-banner`<br>`.feedback-text` | Bannières et textes de feedback dynamique. |
 | | `.exercise-action-btn` | Bouton d'action ou de validation en bas d'étape (max 320px, centré). |
 
+### 8. Utilitaire `LoopTracker` (`src/utils/LoopTracker.ts`)
+Gère le calcul en temps réel de l'enroulement angulaire (*Winding Number*) et la validation du passage par les 4 quadrants pour les exercices de parcours en boucle fermée (Type 9) :
+- `squareToCoords(sq)` : Convertit une case algébrique (ex: `'c3'`) en coordonnées cartésiennes $(\{x, y\} \in [1..8] \times [1..8])$.
+- `extractOpponentPieceSquare(fen, playerColor)` : Localise la case de la pièce adverse cible à partir du FEN.
+- `LoopTracker(targetSquare, startSquare)` : Instancie le tracker sur la pièce cible et la case de départ.
+- `onMove(toSquare)` : Calcule le $\Delta \theta$ normalisé dans $[-\pi, \pi]$, accumule l'angle total et renvoie `{ isFinished, totalAngleDeg, rotations, progressPercent }`. La complétion requiert $|\theta_{\text{total}}| \ge 360^\circ$, la visite des 4 quadrants et le retour à la case de départ après au moins 4 coups.
+
 ## API REST & Hooks Partagés
 
 *   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).

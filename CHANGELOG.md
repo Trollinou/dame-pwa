@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Parcours en Boucle Fermée & Détection de Tour Complet Type 9 (Variante Stealth) (`LoopTracker.ts`, `parcoursVariants.ts`, `ParcoursViewer.vue`, `TypeParcours.vue`, `TypeParcours.spec.ts`)** :
+  - **Algorithme d'Enroulement Angulaire (*Winding Number*) & 4 Quadrants** : Suivi vectoriel polaire en temps réel par rapport à la pièce adverse centrale avec normalisation $[-\pi, \pi]$ du $\Delta \theta$ et contrôle d'entrée dans les 4 quadrants pour valider les tours complets ($\ge 360^\circ$) et rejeter les allers-retours frauduleux.
+  - **Prise en charge de la boucle fermée (Départ = Arrivée)** : Détection automatique des parcours en boucle (`isLoop`), préservation de la pièce du joueur sur la case de départ sans conflit d'écrasement de cercle vert/bleu, et consignes contextuelles adaptées.
+  - **Tests Unitaires Vitest** : Validation complète du cycle de 8 coups de Cavalier autour de la Dame en Stealth, de l'élimination des allers-retours frauduleux et du calcul angulaire.
+
+
 ## [1.6.0] - 2026-09-13
 
 - **Refonte des Exercices Type 14 (Cap ou pas Cap ?) en Série de 5 Mini-PGN, Variantes QCM Multiple / Oui-Non / Move & Toggles Neutres (`TypeCapOuPasCap.vue`, `CapOuPasCapViewer.vue`, `ContenuPage.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
