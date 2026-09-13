@@ -4,47 +4,117 @@
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="config.description || `Atteignez la case ${config.case_arrivee} (${config.variante})`"
-      stepBadgeText="1 / 1"
+      :consigne="consigneCourante"
+      :stepBadgeText="`Parcours ${indexCourant + 1} / ${totalParcours}`"
     />
 
     <ParcoursViewer
-      :fenDepart="config.fen_depart"
-      :couleurJoueur="config.couleur_joueur"
-      :variante="config.variante"
-      :caseDepart="config.case_depart"
-      :caseArrivee="config.case_arrivee"
+      ref="viewerRef"
+      :key="indexCourant"
+      :fenDepart="currentParcours.fen_depart"
+      :couleurJoueur="currentParcours.couleur_joueur"
+      :variante="currentParcours.variante"
+      :caseDepart="currentParcours.case_depart"
+      :caseArrivee="currentParcours.case_arrivee"
+      :pieceAttendue="currentParcours.piece_attendue"
       :shapes="computedShapes"
-      @success="$emit('success')"
+      :isSolved="isSolved"
+      @solved="handleSolved"
+      @feedback="handleFeedback"
+    />
+
+    <SeriesCardFooter
+      :currentCard="indexCourant + 1"
+      :totalCards="totalParcours"
+      :isSolved="isSolved"
+      :feedback="feedback"
+      :pendingHint="pendingHint"
+      :nextText="indexCourant < totalParcours - 1 ? 'Parcours suivant' : 'Terminer l\'exercice'"
+      @next="passerParcoursSuivant"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import ParcoursViewer from '@/components/shared/ParcoursViewer.vue';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import { getParcoursVariant } from '@/utils/parcoursVariants';
 import type { DrawShape } from 'eg-chessboard';
 
+export interface ParcoursItemConfig {
+  variante: string;
+  description?: string;
+  fen_depart: string;
+  couleur_joueur: 'white' | 'black';
+  case_depart?: string;
+  case_arrivee?: string;
+  piece_attendue?: string;
+  shapes?: DrawShape[];
+}
+
+export interface ConfigTypeParcours {
+  consigne?: string;
+  series?: ParcoursItemConfig[];
+  metaTitre?: string;
+  metaTypeLabel?: string;
+  metaChapitreNiveauLabel?: string;
+}
+
 const props = defineProps<{
-  config: {
-    fen_depart: string;
-    couleur_joueur: 'white' | 'black';
-    description?: string;
-    case_depart: string;
-    case_arrivee: string;
-    variante: string;
-    shapes?: DrawShape[];
-    metaTitre?: string;
-    metaTypeLabel?: string;
-    metaChapitreNiveauLabel?: string;
-  };
+  config: ConfigTypeParcours;
   id: number;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'success'): void;
 }>();
+
+const indexCourant = ref(0);
+const isSolved = ref(false);
+const feedback = ref<CardFeedback | null>(null);
+const viewerRef = ref<InstanceType<typeof ParcoursViewer> | null>(null);
+
+const seriesList = computed<ParcoursItemConfig[]>(() => {
+  if (props.config?.series && Array.isArray(props.config.series) && props.config.series.length > 0) {
+    return props.config.series;
+  }
+  return [
+    {
+      variante: 'standard',
+      fen_depart: '8/8/8/8/8/8/8/8 w - - 0 1',
+      couleur_joueur: 'white',
+      case_depart: 'a1',
+      case_arrivee: 'h8',
+      shapes: [],
+    },
+  ];
+});
+
+const totalParcours = computed(() => seriesList.value.length);
+
+const currentParcours = computed<ParcoursItemConfig>(() => {
+  return seriesList.value[indexCourant.value] || seriesList.value[0];
+});
+
+const currentVariant = computed(() => {
+  return getParcoursVariant(currentParcours.value.variante);
+});
+
+const consigneCourante = computed(() => {
+  if (currentParcours.value.description && currentParcours.value.description.trim() !== '') {
+    return currentParcours.value.description;
+  }
+  return currentVariant.value.getDefaultConsigne(
+    currentParcours.value.case_arrivee || '',
+    currentParcours.value.couleur_joueur
+  );
+});
+
+const pendingHint = computed(() => {
+  return currentVariant.value.getPendingHint(currentParcours.value.case_arrivee || '');
+});
 
 const headerMeta = computed(() => {
   return {
@@ -55,18 +125,23 @@ const headerMeta = computed(() => {
 });
 
 const computedShapes = computed<DrawShape[]>(() => {
-  const baseShapes: DrawShape[] = props.config?.shapes ? [...props.config.shapes] : [];
+  const baseShapes: DrawShape[] = currentParcours.value.shapes ? [...currentParcours.value.shapes] : [];
 
-  if (props.config?.case_depart) {
-    const dep = props.config.case_depart.toLowerCase() as DrawShape['orig'];
+  // Pour la variante traces, on conserve uniquement les traces sans ajouter automatiquement de repères
+  if (currentParcours.value.variante === 'traces') {
+    return baseShapes;
+  }
+
+  if (currentParcours.value.case_depart) {
+    const dep = currentParcours.value.case_depart.toLowerCase() as DrawShape['orig'];
     const alreadyDep = baseShapes.some((s) => s.orig === dep && !s.dest);
     if (!alreadyDep) {
       baseShapes.push({ orig: dep, brush: 'blue' });
     }
   }
 
-  if (props.config?.case_arrivee) {
-    const arr = props.config.case_arrivee.toLowerCase() as DrawShape['orig'];
+  if (currentParcours.value.case_arrivee) {
+    const arr = currentParcours.value.case_arrivee.toLowerCase() as DrawShape['orig'];
     const alreadyArr = baseShapes.some((s) => s.orig === arr && !s.dest);
     if (!alreadyArr) {
       baseShapes.push({ orig: arr, brush: 'green' });
@@ -75,6 +150,24 @@ const computedShapes = computed<DrawShape[]>(() => {
 
   return baseShapes;
 });
+
+const handleFeedback = (fb: CardFeedback | null) => {
+  feedback.value = fb;
+};
+
+const handleSolved = () => {
+  isSolved.value = true;
+};
+
+const passerParcoursSuivant = () => {
+  if (indexCourant.value < seriesList.value.length - 1) {
+    indexCourant.value++;
+    isSolved.value = false;
+    feedback.value = null;
+  } else {
+    emit('success');
+  }
+};
 </script>
 
 <style scoped>

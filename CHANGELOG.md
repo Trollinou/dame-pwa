@@ -6,6 +6,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte des Exercices Type 9 (Parcours) en Série de 3, Variante Traces & Moteur Extensible (`TypeParcours.vue`, `ParcoursViewer.vue`, `parcoursVariants.ts`, `ContenuPage.vue`, `TypeParcours.spec.ts`, `README.md`, `USING.md`)** :
+  - **Déroulement en Série de 3 Parcours** : Transition d'un format mono-parcours vers une séquence de 3 parcours progressifs par exercice avec `ContentHeader` (consigne dynamique, badge `Parcours X / 3`) et `SeriesCardFooter` (feedbacks direct succès/erreur, indications contextuelles selon la variante, avancement sécurisé).
+  - **Moteur et Registre Extensible de Variantes (`parcoursVariants.ts`)** :
+    - Variantes intégrées : `standard` (respect des obstacles rouges et arrivée), `pacman` (obligation de capturer toutes les pièces adverses avant l'arrivée), `stealth` (interdiction des cases surveillées par les pièces adverses et des cases rouges) et `traces` (*« Mais qui a bien pu laisser ces traces ? »*).
+    - Architecture modulaire permettant l'ajout immédiat de nouvelles variantes de règles sans modification du visualiseur d'échiquier.
+    - Ajout de la fonction utilitaire `removePieceFromSquareInFen` pour manipuler et vider proprement des cases cibles dans les FEN standard.
+  - **Variante Traces & Palette de Sélection des Pièces** : Présentation d'un échiquier sans pièce avec uniquement les cercles de traces (`shapes`) et intégration d'une palette des 6 pièces blanches (Roi, Dame, Tour, Fou, Cavalier, Pion). Révélation de la position complète avec la pièce dès validation du bon choix.
+  - **Masquage Initial des Flèches et Pièce d'Arrivée (Variantes `standard` et `stealth`)** : Masquage des flèches (`shapes` avec destination) et de la pièce présente sur le cercle vert (`caseArrivee`) lors de l'affichage initial (`!isSolved`), avec affichage complet du diagramme d'origine dès la réussite du parcours.
+  - **Intégration Footer Fixe (`TYPES_AVEC_SERIES_FOOTER`)** : Ajout du type `9` dans `TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9]` dans `ContenuPage.vue`, suppression des anciens toasts `useFeedback` au profit du panneau persistant.
+  - **Couverture de Tests Unitaires** : Création de la suite complète `TypeParcours.spec.ts` (95 tests) validant l'ensemble des règles de déplacement, le masquage/restauration du diagramme initial, le fonctionnement de la palette de traces et l'enchaînement des 3 parcours.
+
 - **Zoom Universel Plein Écran par Appui Prolongé / Clic Droit (`Chessboard.vue`, `DiagramViewer.vue`, `MatchingViewer.vue`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `JugementFinalViewer.vue`, `ChessboardZoom.spec.ts`, `README.md`, `USING.md`)** :
   - **Intégration Native dans `Chessboard.vue` & `DiagramViewer.vue`** : Ajout de la prop `zoomable?: boolean` directement sur le composant socle `Chessboard.vue` (et activée par défaut à `true` sur `DiagramViewer.vue`).
   - **Interaction Tactile & Desktop Ergonomique** : Prise en charge de l'appui prolongé (touch 500ms avec tolérance de glissement anti-scroll de 10px), du clic prolongé souris et du clic droit (`contextmenu`). Neutralisation automatique du clic parent lors du relâchement post-zoom pour éviter les fausses sélections de cartes.
