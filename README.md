@@ -45,6 +45,7 @@ L'application suit un principe de découplage strict :
   - Calcul dynamique de l'orientation de l'échiquier selon le trait de la position (`getActiveColorFromFen(fen)` : Blancs en bas si trait aux Blancs, Noirs en bas si trait aux Noirs).
   - Découpage automatique des études PGN complètes (Type 4 — La Partie dont tu es le Héros) en séquences PGN et embranchements QCM via l'analyse des variantes et des flèches `[%cal ...]`.
   - Extraction automatique pour Associ'Plan (Type 6) depuis 4 PGNs purs : FEN initiale, orientation, formes graphiques `[%csl]/[%cal]` et description (commentaire initial), déroulement séquentiel en 5 cartes (`MatchingViewer` puis visualisations pas-à-pas obligatoires `PgnViewer`).
+  - Découpage itératif par série pour La Marche du Héros (Type 7) : tri en colonne unique, ordonnancement chronologique direct (▲ / ▼) sur grands échiquiers et coup final avec `ContentHeader` et `SeriesCardFooter`.
   - Masquage initial des `shapes` de solution pendant la recherche, avec **maintien visible du cercle jaune (`brush: 'yellow'`)** pour mettre en évidence la pièce d'étude (Types 2 Pop'Echecs et 3 ABCDaire Tactique), puis révélation complète des annotations dès la réussite.
   - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
   - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec mode plein écran universel (hybride Fullscreen natif Android/Desktop + Pseudo-Fullscreen CSS iOS sans blocage), bascule automatique en immersion lors de la rotation paysage sur mobile et validation de progression au seuil de 95%.
@@ -127,7 +128,7 @@ const { currentCard, isSolved, next, markSolved } = useCardNavigation(
 ### 4. Composant En-tête de Contenu `<ContentHeader>` (`src/components/shared/ContentHeader.vue`)
 Composant d'en-tête standardisé et générique pour l'ensemble des contenus pédagogiques (Exercices, Vidéos, Leçons) :
 - **Panneau 1 (Métadonnées Compactes)** : Affiche le titre (`title`), son type adapté (`typeLabel`, ex: "Exercice", "Vidéo", "Leçon", "Vision'checs", etc.) et le chapitre/niveau associé (`chapitreNiveauLabel`).
-- **Panneau 2 (Consigne & Badge d'étape - Optionnel / Masquable)** : Affiche optionnellement le texte de la consigne (`consigne`) et le badge d'étape interactive (`stepBadgeText`). Grâce à la prop `hideSubPanel: true` (ou en l'absence de consigne/badge), ce deuxième panneau est totalement masqué pour les Vidéos et les Leçons, allégeant la vue.
+- **Panneau 2 (Consigne & Badge d'étape - Optionnel / Masquable)** : Affiche optionnellement le texte de la consigne (`consigne`) et le badge d'étape interactive (`stepBadgeText`, supportant les retours à la ligne `\n` pour découper série et sous-étape sur deux lignes compactes et préserver la largeur de la consigne). Grâce à la prop `hideSubPanel: true` (ou en l'absence de consigne/badge), ce deuxième panneau est totalement masqué pour les Vidéos et les Leçons, allégeant la vue.
 - **Rétrocompatibilité** : `<ExerciseHeader>` est conservé comme wrapper typé vers `<ContentHeader>`.
 
 ```vue

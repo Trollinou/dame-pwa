@@ -115,9 +115,11 @@ withDefaults(
 
 .step-badge {
   font-size: 0.78rem;
+  line-height: 1.25;
   padding: 3px 8px;
   border-radius: 10px;
   flex-shrink: 0;
-  white-space: nowrap;
+  white-space: pre-line;
+  text-align: center;
 }
 </style>

@@ -31,14 +31,17 @@ const props = withDefaults(
     solution: string[];
     shapes?: DrawShape[];
     lastMoveHighlight?: Key[];
+    disableFeedbackToast?: boolean;
   }>(),
   {
-    shapes: () => []
+    shapes: () => [],
+    disableFeedbackToast: false,
   }
 );
 
 const emit = defineEmits<{
   (e: 'success'): void;
+  (e: 'error', move: Move): void;
 }>();
 
 const boardApi = ref<BoardCore | null>(null);
@@ -75,13 +78,10 @@ const verifierCoup = async (move: Move) => {
 
     // Vérifie si l'exercice est terminé
     if (etapeActuelle.value === props.solution.length) {
-      showSuccess('Félicitations ! Exercice réussi.', 3000);
-      
-      // Petit délai pour laisser l'utilisateur apprécier son dernier coup
-      setTimeout(() => {
-        emit('success');
-      }, 1000);
-      
+      if (!props.disableFeedbackToast) {
+        showSuccess('Félicitations ! Exercice réussi.', 3000);
+      }
+      emit('success');
     } else {
       // L'exercice continue : l'ordinateur joue sa réponse scriptée
       setTimeout(() => {
@@ -108,7 +108,10 @@ const verifierCoup = async (move: Move) => {
     if (boardApi.value && props.shapes && props.shapes.length > 0) {
       boardApi.value.setShapes(props.shapes);
     }
-    showError('Mauvais coup, cherche encore !', 2000);
+    emit('error', move);
+    if (!props.disableFeedbackToast) {
+      showError('Mauvais coup, cherche encore !', 2000);
+    }
   }
 };
 </script>

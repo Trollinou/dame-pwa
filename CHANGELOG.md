@@ -6,6 +6,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte et Alignement Architectural de l'Exercice Type 7 (Marche du Héros) (`TypeMarcheHeros.vue`, `ContenuPage.vue`, `ContentHeader.vue`, `PuzzleViewer.vue`, `README.md`, `USING.md`)** :
+  - **Parcours Itératif Décomposé par Série** : Remplacement du regroupement global préalable par un traitement étape par étape, série après série (modes 3x5 ou 5x3).
+  - **Étape 1 (Sélection en Grille 2 Colonnes)** : Présentation des positions dans une grille fluide à 2 colonnes réduisant par deux la longueur de défilement, avec cartes diagrammes compactes et toggle de sélection tactile (`✓`). Suivi dynamique du décompte des positions sélectionnées et restantes directement intégré au `SeriesCardFooter` fixe et immobile.
+  - **Étape 2 (Ordonnancement Chronologique Combiné Glisser-Déposer & Permutation)** : Classement des cartes de la série en colonne unique avec grands échiquiers confortables, poignée de glisser-déposer native Ionic (`<ion-reorder-group>`, `<ion-reorder>`) et interaction tactile alternative *Tap & Swap* (clic sur une carte source puis sur une cible pour les permuter instantanément). Pour la dernière série, passage automatique direct à cette étape avec les cartes restantes.
+  - **Étape 3 (Coup Décisif)** : Échiquier de puzzle interactif (`PuzzleViewer`) pour trouver le coup suivant et valider la série. Validation instantanée du coup gagnant (suppression de la latence artificielle d'une seconde).
+  - **Intégration Unifiée `ContentHeader` & `SeriesCardFooter`** : Ajout du Type 7 à `TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8]` dans `ContenuPage.vue` pour le portail téléporté. Centralisation de tous les retours (succès, erreurs, compteurs de sélection et indications d'attente) dans le footer fixe. Suppression totale de `toastController`.
+  - **Badge Multi-Lignes dans `ContentHeader`** : Prise en charge des retours à la ligne (`\n` avec `white-space: pre-line` et centrage) dans `.step-badge` pour découper proprement `Série X / Y` et `Étape Z : Libellé`, libérant l'espace horizontal pour la consigne textuelle.
+  - **Fiabilisation de la Célébration Finale** : Ajustement du seuil de dernière carte dans le footer (`totalCards`) pour garantir que la sous-étape 3 (coup décisif) de la dernière série est impérativement jouée avant le déclenchement de la célébration confettis et la fin de l'exercice.
+
 ## [1.5.0] - 2026-09-12
 
 - **Dématérialisation & Signature Électronique Manuscrite (`SignaturePad.vue`, `PreInscriptionHealthSection.vue`, `usePreInscriptionForm.ts`, `PreInscriptionPage.vue`, `README.md`, `USING.md`)** :
