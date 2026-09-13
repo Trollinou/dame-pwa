@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-09-13
+
 - **Refonte des Exercices Type 14 (Cap ou pas Cap ?) en Série de 5 Mini-PGN, Variantes QCM Multiple / Oui-Non / Move & Toggles Neutres (`TypeCapOuPasCap.vue`, `CapOuPasCapViewer.vue`, `ContenuPage.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
   - **Série de 5 Mini-PGN avec Scaffold `ContentHeader` & `SeriesCardFooter`** : Déroulement séquentiel des 5 situations sous consigne générale commune avec navigation sécurisée, retours d'erreur/succès intégrés et téléportation fixe dans `ion-footer` (`TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 14]`).
   - **Toggle Tactile Neutre (3 états : Neutre -> OUI / NON)** : Composant de sélection démarrant sans parti pris (`null`), permettant de basculer tactilement entre OUI (vert émeraude) et NON (rouge rubis).
