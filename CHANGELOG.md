@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-12
+
 - **Dématérialisation & Signature Électronique Manuscrite (`SignaturePad.vue`, `PreInscriptionHealthSection.vue`, `usePreInscriptionForm.ts`, `PreInscriptionPage.vue`, `README.md`, `USING.md`)** :
   - **Composant Réutilisable `SignaturePad.vue`** : Saisie tactile et souris sur canvas HTML5 haute résolution avec support tactile fluide (`pointerdown`, `pointermove`, `pointerup`, `pointercancel`, `touch-action: none`), bouton d'effacement et export PNG base64 transparent.
   - **Intégration au Formulaire de Préinscription PWA** :
