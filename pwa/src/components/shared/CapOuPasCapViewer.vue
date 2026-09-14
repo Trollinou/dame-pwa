@@ -64,7 +64,6 @@
       <!-- Variante 2 : QCM Oui/Non (question commune avec toggle Oui/Non) -->
       <div v-else-if="resolvedVariante === 'qcm_oui_non'" class="qcm-oui-non-panel">
         <div class="question-header">
-          <span class="question-badge">Question</span>
           <span class="question-text">{{ questionTexte }}</span>
         </div>
         <div class="neutral-toggle neutral-toggle--large">
@@ -580,17 +579,6 @@ const passerCarteSuivante = () => {
   align-items: center;
   text-align: center;
   gap: 6px;
-}
-
-.question-badge {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: var(--ion-color-primary-tint, #e0f2fe);
-  color: var(--ion-color-primary-shade, #0284c7);
-  padding: 2px 10px;
-  border-radius: 12px;
 }
 
 .question-text {
