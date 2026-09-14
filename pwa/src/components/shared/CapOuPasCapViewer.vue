@@ -524,43 +524,45 @@ const passerCarteSuivante = () => {
 
 .chessboard-panel {
   width: 100%;
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 .interaction-card {
   width: 100%;
-  margin: 10px 0 16px 0;
+  margin: 6px 0 12px 0;
   background: var(--ion-card-background, #ffffff);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--ion-color-step-150, #e2e4e7);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  padding: 12px 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  padding: 8px 10px;
+  box-sizing: border-box;
 }
 
 /* QCM Multiple Panel */
 .qcm-multiple-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .proposition-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 6px 10px;
   background: var(--ion-color-step-50, #f9fafb);
   border: 1px solid var(--ion-color-step-150, #eef0f2);
-  border-radius: 8px;
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 
 .proposition-text {
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--ion-color-step-850, #1f2937);
   flex: 1;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 /* QCM Oui/Non Panel */
@@ -640,9 +642,10 @@ const passerCarteSuivante = () => {
   background: var(--ion-color-step-100, #f1f3f5);
   border: 1px solid var(--ion-color-step-250, #d1d5db);
   border-radius: 30px;
-  padding: 3px;
-  gap: 4px;
+  padding: 2px 3px;
+  gap: 3px;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .neutral-toggle--large {
@@ -659,11 +662,12 @@ const passerCarteSuivante = () => {
   border: none;
   background: transparent;
   color: var(--ion-color-step-600, #6b7280);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 24px;
+  padding: 5px 12px;
+  border-radius: 20px;
   cursor: pointer;
+  touch-action: manipulation;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
 }

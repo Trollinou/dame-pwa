@@ -24,7 +24,7 @@
           <p>Chargement du contenu...</p>
         </div>
 
-        <div v-else-if="contenuActuel" class="exercice-container">
+        <div v-else-if="contenuActuel" class="exercice-container" :class="{ 'has-series-footer': aSeriesFooter }">
           <!-- Rendu d'une leçon -->
           <div v-if="contenuActuel.post_type === 'roi_lecon'" class="lecon-wrapper">
             <LeconReader
@@ -451,6 +451,10 @@ ion-content::part(scroll) {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+}
+
+.exercice-container.has-series-footer {
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px) + var(--ion-safe-area-bottom, 0px));
 }
 
 .success-card {
