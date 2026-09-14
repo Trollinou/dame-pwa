@@ -17,14 +17,19 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content ref="ionContentRef" :fullscreen="true" class="ion-padding">
+    <ion-content 
+      ref="ionContentRef" 
+      :fullscreen="true" 
+      class="ion-padding contenu-ion-content"
+      :class="{ 'has-series-footer': aSeriesFooter }"
+    >
       <div class="safe-area-wrapper">
         <div v-if="isPageLoading" class="ion-text-center ion-padding spinner-container">
           <ion-spinner name="crescent"></ion-spinner>
           <p>Chargement du contenu...</p>
         </div>
 
-        <div v-else-if="contenuActuel" class="exercice-container" :class="{ 'has-series-footer': aSeriesFooter }">
+        <div v-else-if="contenuActuel" class="exercice-container">
           <!-- Rendu d'une leçon -->
           <div v-if="contenuActuel.post_type === 'roi_lecon'" class="lecon-wrapper">
             <LeconReader
@@ -419,19 +424,19 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-ion-content::part(scroll) {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+.contenu-ion-content {
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  --padding-start: max(16px, var(--ion-safe-area-left, 0px));
+  --padding-end: max(16px, var(--ion-safe-area-right, 0px));
+}
+
+.contenu-ion-content.has-series-footer {
+  --padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px) + var(--ion-safe-area-bottom, 0px));
 }
 
 .safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+  width: 100%;
 }
 
 .spinner-container, .error-container {
@@ -439,22 +444,14 @@ ion-content::part(scroll) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
-  flex: 1;
+  min-height: 250px;
+  padding: 32px 16px;
 }
 
 .exercice-container {
   max-width: 600px;
   margin: 0 auto;
   width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
-.exercice-container.has-series-footer {
-  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px) + var(--ion-safe-area-bottom, 0px));
 }
 
 .success-card {
