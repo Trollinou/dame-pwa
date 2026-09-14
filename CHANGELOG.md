@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte des Exercices Type 12 (Qui-suis-je ?) en Série de 6 Cartes avec Variantes (`QuiSuisJeViewer.vue`, `TypeQuiSuisJe.vue`, `ContenuPage.vue`, `TypeQuiSuisJe.spec.ts`, `USING.md`)** :
+  - **Structure en Série de 6 Cartes** : Gestion séquentielle des 6 cartes d'indices avec en-tête unifié `ContentHeader` (badge `Carte X / 6`), affichage soigné du texte multiligne d'affirmations (`pre-line`) et pied de page fixe `SeriesCardFooter` (activé dans `ContenuPage.vue`).
+  - **Variante Pièces (`pieces`)** : Intégration d'une palette tactile des 6 pièces blanches en notation française (`R`, `D`, `T`, `F`, `C`, `P`), prise en charge des notations complètes avec case (`Da1`, `TF4`), détection du bon choix, feedback instantané et déblocage de la carte suivante.
+  - **Variante Cases (`cases`)** : Échiquier interactif vide permettant de toucher la case mystère, révélation d'un cercle vert sur la case cible en cas de réussite et progression fluide.
+  - **Couverture de Tests Unitaires** : Ajout de la suite de tests complète `TypeQuiSuisJe.spec.ts` validant le bon fonctionnement des deux variantes, les notations françaises, les feedbacks et l'enchaînement des 6 cartes jusqu'au succès.
+
 ## [1.6.4] - 2026-09-14
 
 - **Ajustement Responsive & Uniformisation de la Palette de Pièces Type 9 Variante Traces (`ParcoursViewer.vue`, `shared-components.scss`)** :

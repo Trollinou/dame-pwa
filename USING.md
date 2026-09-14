@@ -123,6 +123,17 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - **Variante Traces / Déduction de Pièce (`traces`)** : Présentation d'un échiquier sans pièce avec uniquement les cercles de traces (`shapes`). L'apprenant doit déduire quelle pièce blanche (parmi Roi, Dame, Tour, Fou, Cavalier, Pion) a effectué ce déplacement. Dès la bonne pièce sélectionnée dans la palette dédiée, la position complète avec la pièce est révélée sur sa case finale et l'étape est validée.
         - **Architecture de Variantes Extensible** : Moteur de règles modulaire (`parcoursVariants.ts`) permettant l'ajout aisé de nouvelles variantes de jeu.
         - **Ergonomie Mobile & Scaffold** : Retours d'erreurs et de succès intégrés en temps réel dans le `SeriesCardFooter` fixe, indications d'attente dynamiques selon la variante, verrouillage/déblocage fluide du bouton *« Parcours suivant »* et célébration festive confettis sur le 3ᵉ parcours.
+      - **Exercices Qui-suis-je ? (Type 12)** :
+        - Déroulement structuré en **série de 6 cartes** sous une consigne commune avec `ContentHeader` (titre, consigne générale, badge `Carte X / 6`) et pied fixe `SeriesCardFooter`.
+        - Chaque carte affiche des indices et affirmations pédagogiques (avec gestion propre des retours à la ligne).
+        - **Variante Pièces (`pieces`)** :
+          - Présentation d'une palette tactile des 6 pièces blanches (Roi, Dame, Tour, Fou, Cavalier, Pion).
+          - L'apprenant déduit et sélectionne la pièce blanche correspondante.
+          - Dès la bonne pièce touchée, un feedback de validation s'affiche et le passage à la carte suivante est débloqué.
+        - **Variante Cases (`cases`)** :
+          - Présentation d'un échiquier vide interactif.
+          - L'apprenant touche la case de l'échiquier déduite des indices.
+          - Dès la bonne case touchée, un cercle vert s'affiche sur la case cible avec feedback de succès et déblocage du passage à la carte suivante.
       - **Exercices Cap ou pas Cap ? (Type 14)** :
         - Déroulement en **série de 5 mini-situations** sous une consigne commune avec `ContentHeader` (titre, consigne générale, badge `Carte X / 5`) et pied fixe `SeriesCardFooter`.
         - Saisie auteur en 5 Mini-PGN (position de départ FEN ou coup tactique à analyser, avec flèches/cercles pédagogiques).
