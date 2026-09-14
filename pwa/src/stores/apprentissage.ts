@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useAuthStore } from './auth';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
@@ -23,12 +23,14 @@ export interface Contenu {
 	video_url?: string;
 	video_id?: string;
 	duree?: string;
+	modified?: string;
 }
 
 export interface PlaylistItem {
 	type: string;
 	id: number;
 	titre?: string;
+	modified?: string;
 }
 
 export interface Cours {
@@ -224,6 +226,54 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		};
 	} );
 
+	/**
+	 * Synchronisation sélective et fine du cache des contenus :
+	 * Compare les dates 'modified' des éléments de la playlist avec le cache local TanStack Query.
+	 * Invalide uniquement les éléments modifiés côté serveur pour éviter les requêtes inutiles.
+	 */
+	const syncContenuCache = ( coursList: Cours[] ): void => {
+		if ( ! Array.isArray( coursList ) ) {
+			return;
+		}
+		const identityId = authStore.selectedIdentity?.id || 'default';
+		for ( const cours of coursList ) {
+			if ( ! Array.isArray( cours.playlist ) ) {
+				continue;
+			}
+			for ( const item of cours.playlist ) {
+				if ( ! item.id || ! item.modified ) {
+					continue;
+				}
+				const cached = queryClient.getQueryData< Contenu >( [
+					'contenu',
+					item.id,
+					identityId,
+				] );
+				// Si le contenu est déjà en cache et que sa date modified ne correspond plus à celle du serveur
+				if (
+					cached &&
+					cached.modified &&
+					cached.modified !== item.modified
+				) {
+					queryClient.invalidateQueries( {
+						queryKey: [ 'contenu', item.id, identityId ],
+					} );
+				}
+			}
+		}
+	};
+
+	// Surveille les mises à jour des parcours pour invalider automatiquement les exercices modifiés
+	watch(
+		queryParcours,
+		( newParcours ) => {
+			if ( newParcours ) {
+				syncContenuCache( newParcours );
+			}
+		},
+		{ immediate: true }
+	);
+
 	// Actions
 	const fetchParcours = async (): Promise< void > => {
 		await refetchParcours();
@@ -236,6 +286,35 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	const fetchContenu = async ( id: number ): Promise< Contenu | null > => {
 		contenuActuelId.value = id;
 		const identityId = authStore.selectedIdentity?.id || 'default';
+
+		// Recherche du 'modified' attendu selon le listing des parcours
+		let expectedModified: string | undefined;
+		for ( const cours of parcours.value ) {
+			const found = cours.playlist?.find( ( p ) => p.id === id );
+			if ( found?.modified ) {
+				expectedModified = found.modified;
+				break;
+			}
+		}
+
+		const cached = queryClient.getQueryData< Contenu >( [
+			'contenu',
+			id,
+			identityId,
+		] );
+
+		// Si les données en cache sont obsolètes par rapport au parcours, invalider pour forcer la mise à jour
+		if (
+			cached &&
+			expectedModified &&
+			cached.modified &&
+			cached.modified !== expectedModified
+		) {
+			await queryClient.invalidateQueries( {
+				queryKey: [ 'contenu', id, identityId ],
+			} );
+		}
+
 		return await queryClient.ensureQueryData< Contenu | null >( {
 			queryKey: [ 'contenu', id, identityId ],
 			queryFn: async () => {
@@ -316,6 +395,22 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 		coursTarget.playlist.forEach( ( item ) => {
+			const cached = queryClient.getQueryData< Contenu >( [
+				'contenu',
+				item.id,
+				identityId,
+			] );
+
+			// Économie réseau mobile : si l'élément est déjà en cache avec la même date modified, aucune requête n'est émise
+			if (
+				cached &&
+				item.modified &&
+				cached.modified &&
+				cached.modified === item.modified
+			) {
+				return;
+			}
+
 			queryClient.prefetchQuery( {
 				queryKey: [ 'contenu', item.id, identityId ],
 				queryFn: async () => {

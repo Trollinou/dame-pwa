@@ -15,6 +15,11 @@
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
+      <!-- Refresher pour le tirage vers le bas (pull-to-refresh) -->
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
       <div class="safe-area-wrapper">
         <ion-header collapse="condense">
           <ion-toolbar>
@@ -99,7 +104,10 @@ import {
   IonItem,
   IonLabel,
   IonIcon,
-  IonButton
+  IonButton,
+  IonRefresher,
+  IonRefresherContent,
+  type RefresherCustomEvent
 } from '@ionic/vue';
 import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -151,6 +159,17 @@ const isUnlocked = (playlistIndex: number): boolean => {
 
 const isValidated = (itemId: number): boolean => {
   return apprentissageStore.elementsValides.includes(itemId);
+};
+
+const handleRefresh = async (event: RefresherCustomEvent) => {
+  await Promise.all([
+    apprentissageStore.fetchParcours(),
+    apprentissageStore.fetchProgression()
+  ]);
+  if (coursId.value) {
+    apprentissageStore.prefetchCoursContenus(coursId.value);
+  }
+  event.target.complete();
 };
 
 onMounted(async () => {

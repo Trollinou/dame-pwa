@@ -15,6 +15,11 @@
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
+      <!-- Refresher pour le tirage vers le bas (pull-to-refresh) -->
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
       <div class="safe-area-wrapper">
         <ion-header collapse="condense">
           <ion-toolbar>
@@ -134,7 +139,10 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardSubtitle
+  IonCardSubtitle,
+  IonRefresher,
+  IonRefresherContent,
+  type RefresherCustomEvent
 } from '@ionic/vue';
 import { onMounted, watch } from 'vue';
 import { useApprentissageStore, type Cours } from '@/stores/apprentissage';
@@ -172,6 +180,11 @@ const loadData = async () => {
       apprentissageStore.fetchProgression()
     ]);
   }
+};
+
+const handleRefresh = async (event: RefresherCustomEvent) => {
+  await loadData();
+  event.target.complete();
 };
 
 watch(() => [authStore.isAuthenticated, authStore.canAccessApprentissage], () => {
