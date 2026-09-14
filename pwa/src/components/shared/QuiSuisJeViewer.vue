@@ -46,7 +46,7 @@
       <!-- Variante 2 : Cases (Échiquier vide interactif avec révélation cercle vert) -->
       <div v-else-if="resolvedVariante === 'cases'" class="cases-panel">
         <p class="section-instruction">Cliquez sur la case mystère sur l'échiquier :</p>
-        <div class="chessboard-container">
+        <div class="chessboard-container" @contextmenu.prevent>
           <Chessboard
             :key="`t12-board-${indexCourant}`"
             fen="8/8/8/8/8/8/8/8 w - - 0 1"
@@ -54,6 +54,9 @@
             player-color="white"
             :shapes="currentShapes"
             :view-only="isCardSolved"
+            :board-config="{
+              drawable: { enabled: false }
+            }"
             @square-click="verifierCase"
           />
         </div>
