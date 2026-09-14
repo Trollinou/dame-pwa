@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-09-14
+
 - **Synchronisation Sélective par Horodatage (`modified`) & Invalidation Intelligente du Cache d'Apprentissage (`apprentissage.ts`, `apprentissageStore.spec.ts`)** :
   - **Comparaison Différentielle Légère & Économie Réseau Mobile** : Utilisation du champ `modified` présent dans la playlist `/roi/v1/parcours` pour inspecter les entrées du cache local TanStack Query. Seuls les exercices dont l'horodatage a changé côté serveur sont invalidés et re-téléchargés, évitant ainsi toute consommation inutile de données en 4G/5G.
   - **Préchargement et Consultation Ciblés** : `prefetchCoursContenus()` et `fetchContenu()` ignorent les téléchargements pour les contenus déjà en cache avec la même date `modified` et forcent le rechargement immédiat si la version locale est obsolète.
