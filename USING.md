@@ -66,6 +66,8 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
 1. **Cours & Parcours 🎓** :
    - **Section « Cours assignés » (Prescrits par vos entraîneurs)** : Lorsqu'un ou plusieurs cours sont prescrits spécifiquement à l'adhérent (ou à son groupe d'entraînement) par les entraîneurs, ils sont présentés en tête de liste sous la section dédiée `📌 Cours assignés` avec badge `📌 Assigné`. Ces cours bénéficient d'un déverrouillage immédiat sans prérequis séquentiel. Un badge contextuel `📌 X assigné(s)` est également visible sur la carte du Hub d'Apprentissage.
    - **Section « Méthode EEF » (École d'Échecs à la Française)** : Présente les cours du tronc commun avec déblocage progressif linéaire au fil de la complétion des exercices.
+   - **Actualisation Manuelle (Pull-to-refresh) 🔄** : Glisser vers le bas sur la liste des cours ou sur le détail d'un cours permet de forcer l'actualisation immédiate des parcours et de la progression.
+   - **Synchronisation Différentielle & Économie Réseau** : Toute modification d'un exercice dans l'administration WordPress est automatiquement détectée grâce à son horodatage `modified`. L'application ne retélécharge que les exercices modifiés ou manquants, garantissant un affichage à jour sans nécessiter de vider le cache et sans surconsommer de données mobiles.
    - Présente un ruban diagonal **"En dev"** signalant que le module est en cours de conception.
    - Accessible temporairement aux seuls profils autorisés (administrateurs, entraîneurs).
    - Pour les adhérents et visiteurs non autorisés : un panneau explicatif indique clairement que le module est en développement.
@@ -183,3 +185,17 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
    - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
    - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).
+
+## Informations Système, Mises à Jour & Gestion du Cache
+
+En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou non), une section dédiée permet de suivre l'état de l'application et de forcer la mise à niveau :
+
+1. **Version Applicative** :
+   - Affiche la version courante de la PWA (ex: `Version 1.6.1`), synchronisée avec le plugin WordPress.
+2. **Rechercher les mises à jour** :
+   - Interroge immédiatement le Service Worker pour vérifier si un nouveau paquet applicatif est disponible sur le serveur.
+   - Affiche une notification toast confirmant si l'application est déjà à jour ou si une mise à jour est en cours d'installation.
+3. **Vider le cache & actualiser** :
+   - Permet de résoudre tout problème de cache persistant (notamment sous iOS en mode écran d'accueil).
+   - Purge le `CacheStorage` d'assets et le cache des requêtes tout en **préservant scrupuleusement la session active** (aucun mot de passe à resaisir).
+   - Recharge immédiatement l'application pour afficher la dernière version disponible.

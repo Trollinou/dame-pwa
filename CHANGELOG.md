@@ -6,6 +6,22 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Synchronisation Sélective par Horodatage (`modified`) & Invalidation Intelligente du Cache d'Apprentissage (`apprentissage.ts`, `apprentissageStore.spec.ts`)** :
+  - **Comparaison Différentielle Légère & Économie Réseau Mobile** : Utilisation du champ `modified` présent dans la playlist `/roi/v1/parcours` pour inspecter les entrées du cache local TanStack Query. Seuls les exercices dont l'horodatage a changé côté serveur sont invalidés et re-téléchargés, évitant ainsi toute consommation inutile de données en 4G/5G.
+  - **Préchargement et Consultation Ciblés** : `prefetchCoursContenus()` et `fetchContenu()` ignorent les téléchargements pour les contenus déjà en cache avec la même date `modified` et forcent le rechargement immédiat si la version locale est obsolète.
+  - **Pull-to-Refresh sur les Écrans d'Apprentissage (`ApprentissageCoursListPage.vue`, `CoursPage.vue`)** :
+    - Intégration du composant `<ion-refresher>` sur la liste des cours et sur le détail d'un cours pour permettre à l'utilisateur de forcer l'actualisation à la demande par simple geste de glissement vers le bas.
+
+- **Résolution de la Persistance de Cache & Gestion des Mises à Jour PWA sous iOS Standalone (`main.ts`, `usePwaUpdate.ts`, `ProfilePage.vue`, `Plugin.php`)** :
+  - **Surveillance Active du Cycle de Vie du Service Worker (`main.ts`)** : Déclenchement systématique de `registration.update()` à chaque retour au premier plan de l'application (`visibilitychange`, `pageshow`, et reprise Capacitor `appStateChange`) ainsi qu'un intervalle régulier toutes les 30 minutes.
+  - **Rechargement Instantané sur `controllerchange` (`main.ts`)** : Écoute de l'événement `controllerchange` sur `navigator.serviceWorker` pour actualiser immédiatement et de façon transparente l'application dès l'activation d'une nouvelle version du Service Worker.
+  - **Cache-Busting d'URL Dynamique (`Plugin.php`)** : Injection du paramètre `?v=` synchronisé avec la version du plugin dans `get_pwa_url()` lors de la redirection `/pwa` pour forcer WebKit à contourner le cache local sur les WebClips iOS.
+  - **Routage Prioritaire WordPress (`Plugin.php`)** : Interception de `/pwa` sur le hook `init` (priorité 1) avec `wp_redirect( $pwa_url, 302 )` pour garantir l'interception avant les 404 du thème.
+  - **Carte Système & Mises à Jour dans le Profil (`ProfilePage.vue`, `usePwaUpdate.ts`)** :
+    - Affichage de la version synchronisée de l'application (basée sur `__APP_VERSION__`).
+    - Bouton d'actualisation manuelle (*« Rechercher les mises à jour »*) avec notifications de retour (Toasts Ionic).
+    - Bouton de purge d'urgence (*« Vider le cache & actualiser »*) nettoyant le `CacheStorage` et le cache de requêtes TanStack tout en préservant scrupuleusement la session et les jetons d'authentification utilisateur.
+
 ## [1.6.1] - 2026-09-13
 
 - **Parcours en Boucle Fermée & Détection de Tour Complet Type 9 (Variante Stealth) (`LoopTracker.ts`, `parcoursVariants.ts`, `ParcoursViewer.vue`, `TypeParcours.vue`, `TypeParcours.spec.ts`)** :

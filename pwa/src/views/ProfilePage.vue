@@ -137,6 +137,39 @@
           </div>
         </div>
 
+        <!-- Section Système & Mises à jour PWA -->
+        <div class="system-card">
+          <div class="system-info">
+            <ion-icon :icon="informationCircleOutline" class="system-icon"></ion-icon>
+            <div>
+              <p class="system-title">Échiquier Lédonien PWA</p>
+              <p class="system-version">Version {{ appVersion }}</p>
+            </div>
+          </div>
+          <div class="system-actions">
+            <ion-button 
+              expand="block"
+              fill="outline" 
+              size="small"
+              :disabled="isChecking"
+              @click="handleCheckUpdate"
+            >
+              <ion-icon slot="start" :icon="cloudDownloadOutline"></ion-icon>
+              {{ isChecking ? 'Vérification en cours...' : 'Rechercher les mises à jour' }}
+            </ion-button>
+            <ion-button 
+              expand="block"
+              fill="clear" 
+              size="small"
+              color="medium"
+              @click="handleClearCache"
+            >
+              <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
+              Vider le cache & actualiser
+            </ion-button>
+          </div>
+        </div>
+
       </div>
     </ion-content>
   </ion-page>
@@ -169,17 +202,40 @@ import {
   settingsOutline,
   lockOpenOutline,
   logInOutline,
-  personAddOutline
+  personAddOutline,
+  informationCircleOutline,
+  cloudDownloadOutline,
+  refreshOutline
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { usePwaUpdate } from '@/composables/usePwaUpdate';
+import { useFeedback } from '@/composables/useFeedback';
 import ChessThemeCustomizer from '@/components/profile/ChessThemeCustomizer.vue';
 
 const router = useRouter();
 const ionRouter = useIonRouter();
 const authStore = useAuthStore();
+const { appVersion, isChecking, checkForUpdates, clearCacheAndReload } = usePwaUpdate();
+const { showInfo, showSuccess } = useFeedback();
 const identitiesCount = ref(0);
+
+const handleCheckUpdate = async () => {
+  const result = await checkForUpdates();
+  if (result.updated) {
+    showSuccess(result.message);
+  } else {
+    showInfo(result.message);
+  }
+};
+
+const handleClearCache = async () => {
+  showInfo('Nettoyage du cache et réinitialisation en cours...', 1500);
+  setTimeout(async () => {
+    await clearCacheAndReload();
+  }, 400);
+};
 
 const checkMultipleIdentities = async () => {
   if (!authStore.isAuthenticated) return;
@@ -479,5 +535,49 @@ onIonViewWillLeave(() => {
   line-height: 1.5;
   max-width: 320px;
   margin: 0;
+}
+
+.system-card {
+  margin-top: 24px;
+  margin-bottom: 32px;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: 14px;
+  border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.system-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.system-icon {
+  font-size: 26px;
+  color: var(--ion-color-medium, #8a8a8f);
+  flex-shrink: 0;
+}
+
+.system-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 2px 0;
+  color: var(--ion-color-dark, #222);
+}
+
+.system-version {
+  font-size: 12px;
+  color: var(--ion-color-step-600, #666);
+  margin: 0;
+}
+
+.system-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>

@@ -52,8 +52,8 @@ class Plugin {
 		// Expose l'URL du Web Worker Stockfish pour les modules tiers (comme ROI)
 		add_filter( 'dame_pwa_stockfish_worker_url', array( $this, 'get_stockfish_worker_url' ) );
 
-		// Intercepte les requêtes pour servir la PWA ou le manifest
-		add_action( 'template_redirect', array( $this, 'handle_pwa_routing' ) );
+		// Intercepte les requêtes pour servir la PWA ou le manifest dès l'initialisation de WordPress
+		add_action( 'init', array( $this, 'handle_pwa_routing' ), 1 );
 
 		// Assure que les fichiers .wasm sont servis avec le bon Content-Type si interceptés
 		add_action( 'init', array( $this, 'handle_wasm_mime_type' ) );
@@ -71,7 +71,7 @@ class Plugin {
 	 * @return string
 	 */
 	public function get_pwa_url(): string {
-		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/index.html';
+		return \DAME_PWA_PLUGIN_URL . 'pwa/dist/index.html?v=' . \DAME_PWA_VERSION;
 	}
 
 	/**
@@ -101,15 +101,17 @@ class Plugin {
 			$request_uri = trim( substr( $request_uri, strlen( $home_path ) ), '/' );
 		}
 
+		$clean_uri = strtolower( $request_uri );
+
 		// 1. Redirection vers l'index.html de la PWA
-		if ( 'pwa' === $request_uri ) {
+		if ( 'pwa' === $clean_uri ) {
 			$pwa_url = $this->get_pwa_url();
-			wp_safe_redirect( $pwa_url, 301 );
+			wp_redirect( $pwa_url, 302 );
 			exit;
 		}
 
 		// 2. Génération dynamique du Manifest
-		if ( 'dame-manifest.json' === $request_uri || 'dame-manifest' === $request_uri ) {
+		if ( 'dame-manifest.json' === $clean_uri || 'dame-manifest' === $clean_uri ) {
 			$this->serve_dynamic_manifest();
 		}
 	}

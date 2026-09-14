@@ -66,9 +66,59 @@ app.directive( 'safe-html', vSafeHtml );
 
 router.isReady().then( () => {
 	app.mount( '#app' );
-	// Enregistrement du Service Worker pour le support hors-ligne avec mise à jour immédiate
+
+	// Rechargement automatique et immédiat dès qu'un nouveau Service Worker s'active
+	if ( typeof navigator !== 'undefined' && 'serviceWorker' in navigator ) {
+		navigator.serviceWorker.addEventListener( 'controllerchange', () => {
+			window.location.reload();
+		} );
+	}
+
+	// Enregistrement du Service Worker avec vérifications périodiques et au réveil
 	registerSW( {
 		immediate: true,
+		onRegisteredSW( _swUrl, registration ) {
+			if ( ! registration ) {
+				return;
+			}
+
+			// 1. Vérification périodique toutes les 30 minutes
+			setInterval(
+				() => {
+					registration.update().catch( () => {} );
+				},
+				30 * 60 * 1000
+			);
+
+			// 2. Vérification au retour au premier plan (crucial sur iOS WebClip)
+			if ( typeof document !== 'undefined' ) {
+				document.addEventListener( 'visibilitychange', () => {
+					if ( document.visibilityState === 'visible' ) {
+						registration.update().catch( () => {} );
+					}
+				} );
+			}
+
+			if ( typeof window !== 'undefined' ) {
+				window.addEventListener( 'pageshow', () => {
+					registration.update().catch( () => {} );
+				} );
+			}
+
+			// 3. Vérification lors de la reprise de l'app native/Capacitor
+			try {
+				CapacitorApp.addListener(
+					'appStateChange',
+					( { isActive } ) => {
+						if ( isActive ) {
+							registration.update().catch( () => {} );
+						}
+					}
+				);
+			} catch {
+				// Silencieux si Capacitor n'est pas actif
+			}
+		},
 		onNeedRefresh() {
 			window.location.reload();
 		},

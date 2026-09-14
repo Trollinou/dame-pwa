@@ -234,6 +234,13 @@ Gère le calcul en temps réel de l'enroulement angulaire (*Winding Number*) et 
 - `LoopTracker(targetSquare, startSquare)` : Instancie le tracker sur la pièce cible et la case de départ.
 - `onMove(toSquare)` : Calcule le $\Delta \theta$ normalisé dans $[-\pi, \pi]$, accumule l'angle total et renvoie `{ isFinished, totalAngleDeg, rotations, progressPercent }`. La complétion requiert $|\theta_{\text{total}}| \ge 360^\circ$, la visite des 4 quadrants et le retour à la case de départ après au moins 4 coups.
 
+### 9. Composable `usePwaUpdate` & Résilience iOS (`src/composables/usePwaUpdate.ts`)
+Centralise la gestion du cycle de vie des mises à jour applicatives et la purge ciblée des caches :
+- **Surveillance au réveil** : Déclenche systématiquement `registration.update()` à chaque retour au premier plan (`visibilitychange`, `pageshow`, reprise Capacitor).
+- **Rechargement sur `controllerchange`** : Dès qu'un nouveau Service Worker s'active (`skipWaiting`), l'application est rechargée instantanément.
+- **Cache-Busting d'URL Dynamique** : Paramètre de version `?v=` injecté lors de la redirection `/pwa` (`Plugin.php`) pour forcer WebKit à bypasser le cache local sur les WebClips iOS.
+- **Purge d'urgence & Préservation de session** : Fonction `clearCacheAndReload()` nettoyant le `CacheStorage` et `DAME_QUERY_CACHE` tout en maintenant intacts les jetons JWT et l'identité sélectionnée.
+
 ## API REST & Hooks Partagés
 
 *   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
