@@ -280,15 +280,15 @@ defineExpose({
 <style scoped>
 .traces-palette-section {
   width: 100%;
-  max-width: 480px;
-  margin: 16px auto 0 auto;
+  margin: 12px auto 0 auto;
+  box-sizing: border-box;
 }
 
 .section-instruction {
   font-size: 0.95rem;
   font-weight: 600;
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--ion-color-step-800, #333);
 }
 </style>

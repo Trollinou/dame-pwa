@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Ajustement Responsive & Uniformisation de la Palette de Pièces Type 9 Variante Traces (`ParcoursViewer.vue`, `shared-components.scss`)** :
+  - **Harmonisation Mobile avec `ContentHeader`** : Ajustement de la classe canonique `.piece-palette` en `width: 100%`, `box-sizing: border-box`, `border-radius: 8px` et `box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05)` pour aligner parfaitement la largeur du panneau sur celle des cartes d'en-tête `ContentHeader` sur smartphone.
+  - **Taille Uniforme des 6 Pièces sans Débordement** : Configuration de la grille en `repeat(6, minmax(0, 1fr))` avec `min-width: 0`, `width: 100%`, `box-sizing: border-box` sur `.piece-btn`, assurant la visibilité intégrale et la taille strictement identique des 6 boutons (Roi, Dame, Tour, Fou, Cavalier, Pion) sur tous les modèles d'iPhone.
+
 - **Dégagement Inférieur de Défilement sous le Footer Fixe & Ajustement QCM Multiple Type 14 (`ContenuPage.vue`, `CapOuPasCapViewer.vue`, `README.md`, `USING.md`)** :
   - **Dégagement Universel de Défilement (`ContenuPage.vue`)** : Application dynamique de la classe `.has-series-footer` avec `padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px) + var(--ion-safe-area-bottom, 0px))` sur `.exercice-container` pour l'ensemble des exercices, leçons et vidéos téléportés dans `ion-footer`. Permet au défilement vertical d'amener facilement toutes les questions et cibles tactiles bien au-dessus du footer fixe sous iOS et Android sans risque de masquage résiduel.
   - **Compacité & Ergonomie des Lignes QCM (`CapOuPasCapViewer.vue`)** : Préservation intégrale des dimensions réglementaires de l'échiquier (`.chessboard-container`, `max-width: min(100%, 38dvh, 440px)`) conformément à `AGENTS.md`, associée à un resserrement propre des marges et des gaps (`gap: 6px`, `padding: 6px 10px`) et `touch-action: manipulation` sur les boutons OUI/NON pour une navigation fluide et compacte sur mobile.

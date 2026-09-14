@@ -142,22 +142,30 @@
    5. Grilles et Palettes de Pièces d'Échecs
    ========================================================================== */
 
-/* Palette de sélection de pièces (ex: QuiSuisJe) */
+/* Palette de sélection de pièces (ex: QuiSuisJe, Parcours Traces) */
 .piece-palette {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-  max-width: 480px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
   width: 100%;
   margin: 0 auto;
-  padding: 12px;
+  padding: 8px;
+  box-sizing: border-box;
   background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  @media (min-width: 400px) {
+    gap: 8px;
+    padding: 8px 10px;
+  }
 }
 
 .piece-btn {
+  width: 100%;
+  min-width: 0;
   aspect-ratio: 1 / 1;
+  box-sizing: border-box;
   border-radius: 8px;
   border: 1px solid var(--ion-color-light-shade, #ddd);
   background: var(--ion-color-light, #fafafa);
@@ -170,16 +178,36 @@
   transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 
   &:hover {
-    transform: scale(1.08);
+    transform: scale(1.05);
     border-color: var(--ion-color-primary);
     background: var(--ion-color-primary-tint, #e8f0fe);
+  }
+
+  &.is-selected {
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-primary-tint, #e8f0fe);
+    box-shadow: 0 0 0 2px var(--ion-color-primary);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.85;
+    pointer-events: none;
   }
 }
 
 /* Neutralisation du damier et normalisation des icônes de pièces vectorielles isolées */
-.piece-icon-box,
-.piece-palette {
+.piece-icon-box {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  display: block;
+  flex-shrink: 0;
   background: transparent !important;
+  background-image: none !important;
+}
+
+.piece-palette {
   background-image: none !important;
 
   :is(piece, .piece) {
@@ -191,15 +219,8 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    pointer-events: none;
   }
-}
-
-.piece-icon-box {
-  width: 24px;
-  height: 24px;
-  position: relative;
-  display: block;
-  flex-shrink: 0;
 }
 
 /* ==========================================================================
