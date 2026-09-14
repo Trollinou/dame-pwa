@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.6.4] - 2026-09-14
+
 - **Ajustement Responsive & Uniformisation de la Palette de Pièces Type 9 Variante Traces (`ParcoursViewer.vue`, `shared-components.scss`)** :
   - **Harmonisation Mobile avec `ContentHeader`** : Ajustement de la classe canonique `.piece-palette` en `width: 100%`, `box-sizing: border-box`, `border-radius: 8px` et `box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05)` pour aligner parfaitement la largeur du panneau sur celle des cartes d'en-tête `ContentHeader` sur smartphone.
   - **Taille Uniforme des 6 Pièces sans Débordement** : Configuration de la grille en `repeat(6, minmax(0, 1fr))` avec `min-width: 0`, `width: 100%`, `box-sizing: border-box` sur `.piece-btn`, assurant la visibilité intégrale et la taille strictement identique des 6 boutons (Roi, Dame, Tour, Fou, Cavalier, Pion) sur tous les modèles d'iPhone.
