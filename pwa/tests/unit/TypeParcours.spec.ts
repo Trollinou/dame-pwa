@@ -17,6 +17,7 @@ import {
 	extractOpponentPieceSquare,
 	squareToCoords,
 } from '@/utils/LoopTracker';
+import type { Key } from 'eg-chessboard';
 
 // Mock eg-chessboard
 vi.mock( 'eg-chessboard/vue', () => ( {
@@ -326,23 +327,14 @@ describe( 'parcoursVariants - Logic & Extensibility', () => {
 			isSquareAttacked: () => false,
 		};
 
-		const moves = [
-			'a4',
-			'b6',
-			'c8',
-			'e7',
-			'g6',
-			'f4',
-			'e2',
-			'c3',
-		];
+		const moves = [ 'a4', 'b6', 'c8', 'e7', 'g6', 'f4', 'e2', 'c3' ];
 		let currentPos = 'c3';
 
 		for ( let i = 0; i < moves.length; i++ ) {
 			const nextPos = moves[ i ];
 			const result = stealth.validateMove( {
-				from: currentPos as any,
-				to: nextPos as any,
+				from: currentPos as Key,
+				to: nextPos as Key,
 				fenDepart: fen,
 				couleurJoueur: 'white',
 				caseDepart: 'c3',
@@ -356,7 +348,9 @@ describe( 'parcoursVariants - Logic & Extensibility', () => {
 			expect( result.valid ).toBe( true );
 			if ( i === moves.length - 1 ) {
 				expect( result.isFinished ).toBe( true );
-				expect( result.successMessage ).toContain( 'Tour complet réussi' );
+				expect( result.successMessage ).toContain(
+					'Tour complet réussi'
+				);
 			} else {
 				expect( result.isFinished ).toBe( false );
 			}

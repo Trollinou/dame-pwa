@@ -101,6 +101,49 @@
           <span>{{ exerciceCourant.move_explication || 'Coup réussi !' }}</span>
         </div>
       </div>
+
+      <!-- Variante 4 : Notation (Saisie de la position de chaque pièce) -->
+      <div v-else-if="resolvedVariante === 'notation'" class="notation-panel">
+        <div class="notation-instruction">
+          <span>Indiquez la position de chaque pièce en notation française (ex: <strong>Tc2</strong>, <strong>Dd4</strong>, <strong>c3</strong>) :</span>
+        </div>
+        <div class="notation-pieces-list">
+          <div
+            v-for="(pieceItem, pIdx) in currentBoardPieces"
+            :key="pieceItem.id"
+            class="notation-piece-row"
+            :class="{
+              'is-valid': isNotationRowValid(pIdx) === true,
+              'is-invalid': isNotationRowValid(pIdx) === false
+            }"
+          >
+            <div class="piece-info">
+              <div :class="['piece-icon-box', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
+                <piece :class="['piece', pieceItem.role, pieceItem.color]"></piece>
+              </div>
+              <span class="piece-label">{{ pieceItem.label }}</span>
+            </div>
+
+            <div class="notation-input-wrapper">
+              <input
+                type="text"
+                class="notation-input"
+                :value="notationInputs[pIdx] || ''"
+                :placeholder="pieceItem.role === 'pawn' ? 'ex: c3' : `ex: ${pieceItem.letterFr}c2`"
+                :disabled="isCardSolved"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                maxlength="5"
+                @input="onNotationInput(pIdx, ($event.target as HTMLInputElement).value)"
+              />
+              <span v-if="isNotationRowValid(pIdx) === true" class="notation-status-icon success-icon">✓</span>
+              <span v-else-if="isNotationRowValid(pIdx) === false" class="notation-status-icon error-icon">✗</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Footer de Navigation par Carte avec Feedback Fixe -->
@@ -126,6 +169,9 @@ import { parsePgn } from 'chessops/pgn';
 import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { Chess } from 'chessops';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface ExerciceCapOuPasCap {
   pgn?: string;
@@ -177,10 +223,10 @@ const feedback = ref<CardFeedback | null>(null);
 const multipleAnswers = ref<(boolean | null)[]>([]);
 const singleAnswer = ref<boolean | null>(null);
 
-const resolvedVariante = computed<'qcm_multiple' | 'qcm_oui_non' | 'move'>(() => {
+const resolvedVariante = computed<'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation'>(() => {
   const v = props.variante || 'qcm_oui_non';
   if (v === 'qcm') return 'qcm_oui_non';
-  if (v === 'qcm_multiple' || v === 'qcm_oui_non' || v === 'move') return v;
+  if (v === 'qcm_multiple' || v === 'qcm_oui_non' || v === 'move' || v === 'notation') return v;
   return 'qcm_oui_non';
 });
 
@@ -219,6 +265,9 @@ const exerciceCourant = computed<ExerciceCapOuPasCap>(() => {
 const pendingHintTexte = computed<string>(() => {
   if (resolvedVariante.value === 'move') {
     return "Jouez le coup attendu pour continuer";
+  }
+  if (resolvedVariante.value === 'notation') {
+    return "Saisissez la notation de chaque pièce pour continuer";
   }
   return "Sélectionnez vos réponses pour continuer";
 });
@@ -376,11 +425,215 @@ const shapesAffichees = computed<DrawShape[]>(() => {
   return [];
 });
 
+export interface BoardPieceItem {
+  id: string;
+  role: 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn';
+  color: 'white' | 'black';
+  square: string;
+  letterFr: string;
+  expectedNotation: string;
+  label: string;
+}
+
+function extractPiecesFromFen(fen: string): BoardPieceItem[] {
+  if (!fen || typeof fen !== 'string') return [];
+  const cleanFen = fen.trim();
+  const placement = cleanFen.split(' ')[0] || '';
+  const rows = placement.split('/');
+  if (rows.length !== 8) return [];
+
+  const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+  const pieces: BoardPieceItem[] = [];
+
+  const roleOrder: Record<string, number> = {
+    king: 1,
+    queen: 2,
+    rook: 3,
+    bishop: 4,
+    knight: 5,
+    pawn: 6,
+  };
+
+  rows.forEach((rowStr, rowIndex) => {
+    const rank = 8 - rowIndex;
+    let fileIdx = 0;
+
+    for (let i = 0; i < rowStr.length; i++) {
+      const char = rowStr[i];
+      if (char >= '1' && char <= '8') {
+        fileIdx += parseInt(char, 10);
+      } else {
+        const file = files[fileIdx] || 'a';
+        const square = `${file}${rank}`;
+        const isWhite = char === char.toUpperCase();
+        const color: 'white' | 'black' = isWhite ? 'white' : 'black';
+        const lower = char.toLowerCase();
+
+        let role: 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn' = 'pawn';
+        let letterFr = '';
+        let nameFr = 'Pion';
+        let isFeminine = false;
+
+        switch (lower) {
+          case 'k':
+            role = 'king';
+            letterFr = 'R';
+            nameFr = 'Roi';
+            break;
+          case 'q':
+            role = 'queen';
+            letterFr = 'D';
+            nameFr = 'Dame';
+            isFeminine = true;
+            break;
+          case 'r':
+            role = 'rook';
+            letterFr = 'T';
+            nameFr = 'Tour';
+            isFeminine = true;
+            break;
+          case 'b':
+            role = 'bishop';
+            letterFr = 'F';
+            nameFr = 'Fou';
+            break;
+          case 'n':
+            role = 'knight';
+            letterFr = 'C';
+            nameFr = 'Cavalier';
+            break;
+          case 'p':
+          default:
+            role = 'pawn';
+            letterFr = '';
+            nameFr = 'Pion';
+            break;
+        }
+
+        const colorAdjective = isWhite
+          ? (isFeminine ? 'blanche' : 'blanc')
+          : (isFeminine ? 'noire' : 'noir');
+        const label = `${nameFr} ${colorAdjective}`;
+        const expectedNotation = `${letterFr}${square}`;
+
+        pieces.push({
+          id: `${color}-${letterFr || 'P'}-${square}-${pieces.length}`,
+          role,
+          color,
+          square,
+          letterFr,
+          expectedNotation,
+          label,
+        });
+
+        fileIdx++;
+      }
+    }
+  });
+
+  pieces.sort((a, b) => {
+    if (a.color !== b.color) {
+      return a.color === 'white' ? -1 : 1;
+    }
+    const orderA = roleOrder[a.role] || 99;
+    const orderB = roleOrder[b.role] || 99;
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    return a.square.localeCompare(b.square);
+  });
+
+  return pieces;
+}
+
+const currentBoardPieces = computed<BoardPieceItem[]>(() => {
+  return extractPiecesFromFen(currentPgnData.value.fen);
+});
+
+const notationInputs = ref<string[]>([]);
+
+const normalizeNotation = (raw: string): string => {
+  const clean = (raw || '').trim().replace(/\s+/g, '');
+  if (!clean) return '';
+  if (clean.length === 2) {
+    return clean.toLowerCase();
+  }
+  if (clean.length >= 3) {
+    const pieceChar = clean[0].toUpperCase();
+    const squarePart = clean.slice(1).toLowerCase();
+    return `${pieceChar}${squarePart}`;
+  }
+  return clean;
+};
+
+const isNotationRowValid = (idx: number): boolean | null => {
+  const val = (notationInputs.value[idx] || '').trim();
+  if (!val) return null;
+
+  const item = currentBoardPieces.value[idx];
+  if (!item) return null;
+
+  const normalized = normalizeNotation(val);
+
+  if (normalized === item.expectedNotation) {
+    return true;
+  }
+
+  // Check among identical piece types on the board
+  const samePieces = currentBoardPieces.value.filter(
+    (p) => p.role === item.role && p.color === item.color
+  );
+  const matchingPiece = samePieces.find((p) => p.expectedNotation === normalized);
+  if (matchingPiece) {
+    const firstOccurIdx = currentBoardPieces.value.findIndex(
+      (p, i) => p.role === item.role && p.color === item.color && normalizeNotation(notationInputs.value[i] || '') === normalized
+    );
+    if (firstOccurIdx === idx) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const onNotationInput = (idx: number, val: string) => {
+  if (isCardSolved.value) return;
+
+  notationInputs.value[idx] = val;
+
+  const pieces = currentBoardPieces.value;
+  if (pieces.length === 0) return;
+
+  const allFilled = notationInputs.value.length === pieces.length &&
+    notationInputs.value.every((v) => (v || '').trim().length > 0);
+
+  const allCorrect = pieces.every((_, i) => isNotationRowValid(i) === true);
+
+  if (allCorrect) {
+    isCardSolved.value = true;
+    feedback.value = {
+      type: 'success',
+      message: 'Bravo ! Toutes les notations de pièces sont exactes.',
+    };
+    if (boardApi.value) {
+      boardApi.value.setShapes(currentPgnData.value.shapes);
+    }
+  } else if (allFilled) {
+    feedback.value = {
+      type: 'danger',
+      message: "Certaines notations sont inexactes. Vérifiez l'initiale de la pièce et les coordonnées.",
+    };
+  } else {
+    feedback.value = null;
+  }
+};
+
 const initCardState = () => {
   isCardSolved.value = false;
   feedback.value = null;
   singleAnswer.value = null;
   multipleAnswers.value = propositionsListe.value.map(() => null);
+  notationInputs.value = currentBoardPieces.value.map(() => '');
 
   nextTick(() => {
     if (boardApi.value) {
@@ -696,6 +949,147 @@ const passerCarteSuivante = () => {
 .toggle-btn:disabled {
   opacity: 0.8;
   cursor: default;
+}
+
+/* Notation Panel */
+.notation-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 2px;
+}
+
+.notation-instruction {
+  font-size: 0.86rem;
+  color: var(--ion-color-step-700, #374151);
+  text-align: center;
+  line-height: 1.35;
+  margin-bottom: 4px;
+}
+
+.notation-instruction strong {
+  color: var(--ion-color-primary, #3880ff);
+  font-weight: 700;
+}
+
+.notation-pieces-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.notation-piece-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--ion-color-step-50, #f9fafb);
+  border: 1.5px solid var(--ion-color-step-150, #eef0f2);
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notation-piece-row.is-valid {
+  border-color: #198754;
+  background: rgba(25, 135, 84, 0.05);
+}
+
+.notation-piece-row.is-invalid {
+  border-color: #dc3545;
+  background: rgba(220, 53, 69, 0.05);
+}
+
+.piece-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.piece-icon-box {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-step-100, #f3f4f6);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.piece-icon-box piece {
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: block;
+}
+
+.piece-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ion-color-step-850, #1f2937);
+  line-height: 1.2;
+}
+
+.notation-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.notation-input {
+  width: 100%;
+  height: 34px;
+  border: 1.5px solid var(--ion-color-step-250, #d1d5db);
+  border-radius: 6px;
+  padding: 4px 26px 4px 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--ion-color-step-900, #111827);
+  background: #ffffff;
+  text-align: center;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.notation-input:focus {
+  border-color: var(--ion-color-primary, #3880ff);
+  box-shadow: 0 0 0 2px rgba(56, 128, 255, 0.15);
+}
+
+.notation-input:disabled {
+  background: var(--ion-color-step-100, #f3f4f6);
+  color: var(--ion-color-step-700, #374151);
+  cursor: default;
+}
+
+.notation-status-icon {
+  position: absolute;
+  right: 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.success-icon {
+  color: #198754;
+}
+
+.error-icon {
+  color: #dc3545;
 }
 </style>
 

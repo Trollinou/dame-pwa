@@ -119,10 +119,18 @@ export class LoopTracker {
 		const dx = coords.x - this.targetCoords.x;
 		const dy = coords.y - this.targetCoords.y;
 
-		if ( dx >= 0 && dy > 0 ) return 1;
-		if ( dx < 0 && dy >= 0 ) return 2;
-		if ( dx <= 0 && dy < 0 ) return 3;
-		if ( dx > 0 && dy <= 0 ) return 4;
+		if ( dx >= 0 && dy > 0 ) {
+			return 1;
+		}
+		if ( dx < 0 && dy >= 0 ) {
+			return 2;
+		}
+		if ( dx <= 0 && dy < 0 ) {
+			return 3;
+		}
+		if ( dx > 0 && dy <= 0 ) {
+			return 4;
+		}
 		return 0;
 	}
 
@@ -131,8 +139,12 @@ export class LoopTracker {
 		const newAngle = this.getAngleFromTarget( sq );
 		let delta = newAngle - this.lastAngle;
 
-		while ( delta > Math.PI ) delta -= 2 * Math.PI;
-		while ( delta < -Math.PI ) delta += 2 * Math.PI;
+		while ( delta > Math.PI ) {
+			delta -= 2 * Math.PI;
+		}
+		while ( delta < -Math.PI ) {
+			delta += 2 * Math.PI;
+		}
 
 		this.totalAngle += delta;
 		this.lastAngle = newAngle;
@@ -149,10 +161,7 @@ export class LoopTracker {
 		const hasAllQuadrants = this.quadrantsVisited.size >= 4;
 		const isAtStart = sq === this.startSquare;
 		const isFinished =
-			hasFullTurn &&
-			hasAllQuadrants &&
-			isAtStart &&
-			this.movesCount >= 4;
+			hasFullTurn && hasAllQuadrants && isAtStart && this.movesCount >= 4;
 
 		const progressPercent = Math.min(
 			100,

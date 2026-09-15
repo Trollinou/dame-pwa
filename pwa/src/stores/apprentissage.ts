@@ -230,6 +230,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	 * Synchronisation sélective et fine du cache des contenus :
 	 * Compare les dates 'modified' des éléments de la playlist avec le cache local TanStack Query.
 	 * Invalide uniquement les éléments modifiés côté serveur pour éviter les requêtes inutiles.
+	 * @param coursList
 	 */
 	const syncContenuCache = ( coursList: Cours[] ): void => {
 		if ( ! Array.isArray( coursList ) ) {

@@ -211,4 +211,92 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		await moveBtn.trigger( 'click' );
 		expect( wrapper.text() ).toContain( 'Le roque est le meilleur coup.' );
 	} );
+
+	test( 'gère la variante Notation avec extraction FEN et saisie des coordonnées', async () => {
+		// FEN avec Tour blanche en c2, Dame noire en d4, Pion blanc en c3
+		const fenNotation = '8/8/8/8/3q4/2P5/2R5/8 w - - 0 1';
+		const config = {
+			consigne: 'Indiquez la position de chaque pièce.',
+			variante: 'notation',
+			exercices: [
+				{
+					pgn: `[SetUp "1"]\n[FEN "${ fenNotation }"]\n\n*`,
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 1405,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		expect( wrapper.text() ).toContain(
+			'Indiquez la position de chaque pièce'
+		);
+
+		const pieceRows = wrapper.findAll( '.notation-piece-row' );
+		// 3 pièces : Tour blanche (c2), Pion blanc (c3), Dame noire (d4)
+		expect( pieceRows.length ).toBe( 3 );
+
+		const inputs = wrapper.findAll( '.notation-input' );
+		expect( inputs.length ).toBe( 3 );
+
+		// Saisir une notation inexacte
+		await inputs[ 0 ].setValue( 'Ta1' );
+		await inputs[ 1 ].setValue( 'c4' );
+		await inputs[ 2 ].setValue( 'De5' );
+
+		expect( wrapper.text() ).toContain(
+			'Certaines notations sont inexactes'
+		);
+
+		// Saisir les bonnes notations (avec tolérance de casse pour pion et pièces)
+		await inputs[ 0 ].setValue( 'tc2' );
+		await inputs[ 1 ].setValue( 'C3' );
+		await inputs[ 2 ].setValue( 'Dd4' );
+
+		expect( wrapper.text() ).toContain(
+			'Bravo ! Toutes les notations de pièces sont exactes.'
+		);
+	} );
+
+	test( 'gère la variante Notation avec plusieurs pièces du même type', async () => {
+		// FEN avec 2 Cavaliers blancs en c3 et f3
+		const fenKnights = '8/8/8/8/8/2N2N2/8/8 w - - 0 1';
+		const config = {
+			consigne: 'Donnez les coordonnées des cavaliers.',
+			variante: 'notation',
+			exercices: [
+				{
+					pgn: `[SetUp "1"]\n[FEN "${ fenKnights }"]\n\n*`,
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 1406,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		const inputs = wrapper.findAll( '.notation-input' );
+		expect( inputs.length ).toBe( 2 );
+
+		// Saisie croisée des deux cavaliers (Cf3 puis Cc3)
+		await inputs[ 0 ].setValue( 'Cf3' );
+		await inputs[ 1 ].setValue( 'Cc3' );
+
+		expect( wrapper.text() ).toContain(
+			'Bravo ! Toutes les notations de pièces sont exactes.'
+		);
+	} );
 } );

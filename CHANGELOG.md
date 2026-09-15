@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Nouvelle Variante « Notation » pour les Exercices Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
+  - **Apprentissage du Repérage & Notation Française** : Présentation de l'échiquier en lecture seule avec détection automatique de chaque pièce présente à partir de la position FEN (`King/R`, `Queen/D`, `Rook/T`, `Bishop/F`, `Knight/C`, `Pawn/case`).
+  - **Zone de Saisie Compacte & Ergonomique** : Affichage d'une ligne par pièce avec son icône graphique thématisée selon la couleur blanche/noire, son nom (`Tour blanche`, `Dame noire`, etc.) et un champ de saisie avec auto-majuscule et validation dynamique en temps réel.
+  - **Validation Intelligente & Permutations** : Tolérance de casse (conversion automatique de `tc2` ou `c3`), validation instantanée (coche verte / croix rouge) et prise en charge des pièces multiples identiques (ex: deux cavaliers dont les coordonnées peuvent être saisies dans n'importe quel ordre).
+  - **Couverture de Tests Unitaires Vitest** : Ajout de tests unitaires dédiés dans `TypeCapOuPasCap.spec.ts` validant l'extraction de pièces, la tolérance de casse, les pièces multiples et le succès de l'exercice.
+
 - **Refonte des Exercices Type 12 (Qui-suis-je ?) en Série de 6 Cartes avec Variantes (`QuiSuisJeViewer.vue`, `TypeQuiSuisJe.vue`, `ContenuPage.vue`, `TypeQuiSuisJe.spec.ts`, `USING.md`)** :
   - **Structure en Série de 6 Cartes** : Gestion séquentielle des 6 cartes d'indices avec en-tête unifié `ContentHeader` (badge `Carte X / 6`), affichage soigné du texte multiligne d'affirmations (`pre-line`) et pied de page fixe `SeriesCardFooter` (activé dans `ContenuPage.vue`).
   - **Variante Pièces (`pieces`)** : Intégration d'une palette tactile des 6 pièces blanches en notation française (`R`, `D`, `T`, `F`, `C`, `P`), prise en charge des notations complètes avec case (`Da1`, `TF4`), détection du bon choix, feedback instantané et déblocage de la carte suivante.

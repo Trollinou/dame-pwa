@@ -19,8 +19,8 @@ import CapOuPasCapViewer, { type ExerciceCapOuPasCap } from '@/components/shared
 
 export interface ConfigCapOuPasCap {
   consigne?: string;
-  variante?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | string;
-  type_reponse?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | string;
+  variante?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | string;
+  type_reponse?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | string;
   propositions?: string[];
   question?: string;
   exercices?: ExerciceCapOuPasCap[];
