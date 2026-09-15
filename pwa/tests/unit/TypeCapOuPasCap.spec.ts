@@ -246,18 +246,18 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		const inputs = wrapper.findAll( '.notation-input' );
 		expect( inputs.length ).toBe( 3 );
 
-		// Saisir une notation inexacte
-		await inputs[ 0 ].setValue( 'Ta1' );
-		await inputs[ 1 ].setValue( 'c4' );
-		await inputs[ 2 ].setValue( 'De5' );
+		// Saisir des notations avec mauvaise casse (ex: tc2 au lieu de Tc2, C3 au lieu de c3, dd4 au lieu de Dd4)
+		await inputs[ 0 ].setValue( 'tc2' );
+		await inputs[ 1 ].setValue( 'C3' );
+		await inputs[ 2 ].setValue( 'dd4' );
 
 		expect( wrapper.text() ).toContain(
 			'Certaines notations sont inexactes'
 		);
 
-		// Saisir les bonnes notations (avec tolérance de casse pour pion et pièces)
-		await inputs[ 0 ].setValue( 'tc2' );
-		await inputs[ 1 ].setValue( 'C3' );
+		// Saisir les notations avec la casse exacte (Tc2, c3, Dd4)
+		await inputs[ 0 ].setValue( 'Tc2' );
+		await inputs[ 1 ].setValue( 'c3' );
 		await inputs[ 2 ].setValue( 'Dd4' );
 
 		expect( wrapper.text() ).toContain(

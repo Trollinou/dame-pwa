@@ -150,8 +150,8 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - **Variante Notation (`notation`)** :
           - Présentation de la position FEN sur l'échiquier en lecture seule (non interactif).
           - Sous l'échiquier, affichage d'une ligne pour chaque pièce présente avec son icône graphique thématisée selon sa couleur (blanche/noire) et son libellé (ex: *Tour blanche*, *Dame noire*, *Pion blanc*).
-          - L'apprenant saisit la notation française de chaque pièce (ex: `Tc2`, `Dd4`, `c3`, `Re1`).
-          - La saisie supporte la conversion et tolérance de casse (`tc2` ou `c3`), valide en temps réel chaque case avec indicateur visuel (✓ vert / ✗ rouge) et accepte l'ordre interchangeable pour les pièces multiples de même nature (ex: 2 cavaliers).
+          - L'apprenant saisit la notation française exacte de chaque pièce (ex: `Tc2`, `Dd4`, `c3`, `Re1`).
+          - La saisie exige une casse exacte (initiale majuscule pour les pièces, minuscules pour les cases et les pions sans lettre), valide en temps réel chaque case avec indicateur visuel (✓ vert / ✗ rouge) et accepte l'ordre interchangeable pour les pièces multiples de même nature (ex: 2 cavaliers).
           - Dès que toutes les pièces ont leurs coordonnées exactes, la carte est validée et le bouton *« Carte suivante »* s'active.
       - **Vidéos Pédagogiques FFE / Entraîneurs (`roi_video`)** :
         - Intégration de vidéos officielles issues de la Fédération (École d'Échecs à la Française) ou de vidéos spécifiques recommandées par les entraîneurs (ouvertures, tactiques).

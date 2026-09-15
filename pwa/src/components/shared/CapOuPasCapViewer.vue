@@ -548,41 +548,29 @@ const currentBoardPieces = computed<BoardPieceItem[]>(() => {
 
 const notationInputs = ref<string[]>([]);
 
-const normalizeNotation = (raw: string): string => {
-  const clean = (raw || '').trim().replace(/\s+/g, '');
-  if (!clean) return '';
-  if (clean.length === 2) {
-    return clean.toLowerCase();
-  }
-  if (clean.length >= 3) {
-    const pieceChar = clean[0].toUpperCase();
-    const squarePart = clean.slice(1).toLowerCase();
-    return `${pieceChar}${squarePart}`;
-  }
-  return clean;
+const cleanNotation = (raw: string): string => {
+  return (raw || '').trim();
 };
 
 const isNotationRowValid = (idx: number): boolean | null => {
-  const val = (notationInputs.value[idx] || '').trim();
+  const val = cleanNotation(notationInputs.value[idx] || '');
   if (!val) return null;
 
   const item = currentBoardPieces.value[idx];
   if (!item) return null;
 
-  const normalized = normalizeNotation(val);
-
-  if (normalized === item.expectedNotation) {
+  if (val === item.expectedNotation) {
     return true;
   }
 
-  // Check among identical piece types on the board
+  // Check among identical piece types on the board with exact case match
   const samePieces = currentBoardPieces.value.filter(
     (p) => p.role === item.role && p.color === item.color
   );
-  const matchingPiece = samePieces.find((p) => p.expectedNotation === normalized);
+  const matchingPiece = samePieces.find((p) => p.expectedNotation === val);
   if (matchingPiece) {
     const firstOccurIdx = currentBoardPieces.value.findIndex(
-      (p, i) => p.role === item.role && p.color === item.color && normalizeNotation(notationInputs.value[i] || '') === normalized
+      (p, i) => p.role === item.role && p.color === item.color && cleanNotation(notationInputs.value[i] || '') === val
     );
     if (firstOccurIdx === idx) {
       return true;
