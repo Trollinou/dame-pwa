@@ -104,9 +104,6 @@
 
       <!-- Variante 4 : Notation (Saisie de la position de chaque pièce) -->
       <div v-else-if="resolvedVariante === 'notation'" class="notation-panel">
-        <div class="notation-instruction">
-          <span>Indiquez la position de chaque pièce en notation française (ex: <strong>Tc2</strong>, <strong>Dd4</strong>, <strong>c3</strong>) :</span>
-        </div>
         <div class="notation-pieces-list">
           <div
             v-for="(pieceItem, pIdx) in currentBoardPieces"
@@ -129,7 +126,6 @@
                 type="text"
                 class="notation-input"
                 :value="notationInputs[pIdx] || ''"
-                :placeholder="pieceItem.role === 'pawn' ? 'ex: c3' : `ex: ${pieceItem.letterFr}c2`"
                 :disabled="isCardSolved"
                 autocomplete="off"
                 autocorrect="off"
@@ -957,19 +953,6 @@ const passerCarteSuivante = () => {
   flex-direction: column;
   gap: 8px;
   padding: 4px 2px;
-}
-
-.notation-instruction {
-  font-size: 0.86rem;
-  color: var(--ion-color-step-700, #374151);
-  text-align: center;
-  line-height: 1.35;
-  margin-bottom: 4px;
-}
-
-.notation-instruction strong {
-  color: var(--ion-color-primary, #3880ff);
-  font-weight: 700;
 }
 
 .notation-pieces-list {
