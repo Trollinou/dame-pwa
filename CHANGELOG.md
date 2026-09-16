@@ -8,7 +8,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - **Extension des Variantes du Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `README.md`, `USING.md`)** :
   - **Variante Clic / Sélection (`clic`)** : Sélection interactive au toucher sur l'échiquier avec ajout/suppression de cercles rouges.
-    - *Sous-mode Cibles (`cibles`)* : Validation instantanée des cases et pièces cibles définies par les annotations `[%csl ...]` (pièces non protégées, attaques du dernier coup).
+    - *Sous-mode Cibles (`cibles`)* : Validation instantanée des cases et pièces cibles définies par les annotations `[%csl ...]` (pièces non protégées, attaques ou défenses du coup joué).
+    - *Repères Visuels d'Observation (`clic`)* : Maintien visible du cercle jaune/orange (`[%csl Y...]`) sur la pièce jouée à observer pendant toute la recherche de l'élève sans le compter parmi les cibles, et révélation automatique de toutes les flèches d'attaque (rouges) et de défense (vertes) dès la validation.
     - *Sous-mode Prises possibles & Meilleur coup (`prises_meilleur_coup`)* : Enchaînement en 2 étapes (identification au clic de toutes les prises possibles des deux camps avec cercles de sélection, puis bascule en échiquier actif pour jouer la meilleure prise cible indiquée en vert).
     - *Sous-mode Différentiel de matériel (`materiel`)* : Identification libre de n'importe quelle pièce excédentaire par rapport à l'inventaire matériel FEN adverse, et bouton « ⚖️ Pas de différence de matériel » en cas d'égalité.
   - **Variante Reconstitution / Setup (`setup`)** : Reconstitution de la position sur échiquier vierge depuis une palette complète de 12 pièces (blanches et noires) et outil gomme :

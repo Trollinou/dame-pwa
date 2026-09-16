@@ -743,14 +743,24 @@ const userClicShapes = computed<DrawShape[]>(() => {
   }));
 });
 
+const initialGuideShapes = computed<DrawShape[]>(() => {
+  const allCircles = currentPgnData.value.shapes.filter((s) => s.orig && !s.dest);
+  const targetColorCircles = allCircles.filter((s) => s.brush === 'red' || s.brush === 'green');
+
+  // Si des cercles cibles (rouge ou vert) existent, les cercles jaune/orange ou bleu sont des repères d'observation
+  if (targetColorCircles.length > 0) {
+    return allCircles.filter((s) => s.brush === 'yellow' || s.brush === 'blue');
+  }
+  return [];
+});
+
 const targetCircles = computed<string[]>(() => {
-  return Array.from(
-    new Set(
-      currentPgnData.value.shapes
-        .filter((s) => s.orig && !s.dest)
-        .map((s) => s.orig.toLowerCase())
-    )
-  );
+  const allCircles = currentPgnData.value.shapes.filter((s) => s.orig && !s.dest);
+  const targetColorCircles = allCircles.filter((s) => s.brush === 'red' || s.brush === 'green');
+
+  // Si des cercles rouges/verts cibles existent, on ne retient que ceux-ci (le jaune étant le sujet observé)
+  const circlesToMatch = targetColorCircles.length > 0 ? targetColorCircles : allCircles;
+  return Array.from(new Set(circlesToMatch.map((s) => s.orig.toLowerCase())));
 });
 
 const targetCirclesCount = computed<number>(() => {
@@ -762,7 +772,7 @@ const shapesAffichees = computed<DrawShape[]>(() => {
     return currentPgnData.value.shapes;
   }
   if (resolvedVariante.value === 'clic') {
-    return userClicShapes.value;
+    return [...initialGuideShapes.value, ...userClicShapes.value];
   }
   return [];
 });
@@ -1243,14 +1253,15 @@ const initCardState = () => {
         : currentPgnData.value.fen;
 
       boardApi.value.setPosition(initialFen);
-      boardApi.value.setShapes([]);
+      boardApi.value.setShapes(shapesAffichees.value);
 
-      // Si le mini-pgn contient 1 coup d'animation initial (sauf si mode move)
-      if (currentPgnData.value.moves.length > 0 && resolvedVariante.value !== 'move' && resolvedVariante.value !== 'setup') {
+      // Si le mini-pgn contient 1 coup d'animation initial (sauf si mode move, setup ou clic)
+      if (currentPgnData.value.moves.length > 0 && resolvedVariante.value !== 'move' && resolvedVariante.value !== 'setup' && resolvedVariante.value !== 'clic') {
         const moveSan = currentPgnData.value.moves[0];
         setTimeout(() => {
           if (boardApi.value) {
             boardApi.value.move(moveSan);
+            boardApi.value.setShapes(shapesAffichees.value);
           }
         }, 300);
       }
