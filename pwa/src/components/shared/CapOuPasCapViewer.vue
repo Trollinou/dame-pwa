@@ -215,39 +215,45 @@
             <p class="conseil-text">{{ exerciceCourant.conseil }}</p>
           </div>
 
-          <!-- Palette des 12 pièces + Outil gomme -->
+          <!-- Palette des 12 pièces + Outil gomme (Grille 7 colonnes unifiée) -->
           <div :class="['setup-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
-            <div class="palette-row palette-row--white">
+            <div class="setup-palette-grid">
+              <!-- Ligne 1 : 6 pièces blanches (colonnes 1 à 6) -->
               <button
                 v-for="p in palettePiecesWhite"
-                :key="p.role"
+                :key="`white-${p.role}`"
                 type="button"
                 class="palette-btn"
                 :class="{ 'is-selected': selectedPalettePiece?.role === p.role && selectedPalettePiece?.color === 'white' && !isEraseActive }"
                 :disabled="isCardSolved"
+                :aria-label="`Poser ${p.role} blanc`"
                 @click="selectPalettePiece(p.role, 'white')"
               >
                 <piece :class="['piece', p.role, 'white']"></piece>
               </button>
-            </div>
-            <div class="palette-row palette-row--black">
+
+              <!-- Ligne 2 : 6 pièces noires (colonnes 1 à 6) -->
               <button
                 v-for="p in palettePiecesBlack"
-                :key="p.role"
+                :key="`black-${p.role}`"
                 type="button"
                 class="palette-btn"
                 :class="{ 'is-selected': selectedPalettePiece?.role === p.role && selectedPalettePiece?.color === 'black' && !isEraseActive }"
                 :disabled="isCardSolved"
+                :aria-label="`Poser ${p.role} noir`"
                 @click="selectPalettePiece(p.role, 'black')"
               >
                 <piece :class="['piece', p.role, 'black']"></piece>
               </button>
+
+              <!-- Colonne 7 : Outil gomme (s'étend sur les 2 lignes) -->
               <button
                 type="button"
                 class="palette-btn palette-btn--erase"
                 :class="{ 'is-selected': isEraseActive }"
                 :disabled="isCardSolved"
                 title="Effacer une pièce"
+                aria-label="Effacer une pièce"
                 @click="toggleEraseTool"
               >
                 <span class="erase-icon">❌</span>
@@ -1743,10 +1749,6 @@ const passerCarteSuivante = () => {
 }
 
 .setup-palette {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: center;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
@@ -1771,19 +1773,17 @@ const passerCarteSuivante = () => {
   }
 }
 
-.palette-row {
+.setup-palette-grid {
   display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 1fr);
   gap: 6px;
   width: 100%;
   box-sizing: border-box;
-}
 
-.palette-row--white {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-.palette-row--black {
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  @media (min-width: 400px) {
+    gap: 8px;
+  }
 }
 
 .palette-btn {
@@ -1823,12 +1823,16 @@ const passerCarteSuivante = () => {
 }
 
 .palette-btn--erase {
+  grid-column: 7;
+  grid-row: 1 / span 2;
+  aspect-ratio: auto;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 
   .erase-icon {
-    font-size: 1.15rem;
+    font-size: 1.35rem;
     line-height: 1;
   }
 
