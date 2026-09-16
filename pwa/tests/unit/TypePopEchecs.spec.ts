@@ -12,6 +12,13 @@ import {
 	filterYellowShapes,
 } from '@/utils/fenUtils';
 
+export const mockBoardApi = {
+	setPosition: vi.fn(),
+	setShapes: vi.fn(),
+	putPiece: vi.fn(),
+	removePiece: vi.fn(),
+};
+
 // Mock eg-chessboard
 vi.mock( 'eg-chessboard/vue', () => ( {
 	default: {
@@ -23,6 +30,9 @@ vi.mock( 'eg-chessboard/vue', () => ( {
 			'stockfishConfig',
 		],
 		emits: [ 'square-click', 'board-created' ],
+		mounted() {
+			this.$emit( 'board-created', mockBoardApi );
+		},
 		template: `
       <div class="mock-eg-chessboard">
         <span class="mock-fen">{{ diagram ? diagram.fen : '' }}</span>
@@ -193,5 +203,64 @@ describe( 'TypePopEchecs.vue', () => {
 		await wrapper.vm.$nextTick();
 
 		expect( wrapper.emitted( 'success' ) ).toBeTruthy();
+	} );
+
+	test( 'restores initial fen and yellow shapes when user clicks on a wrong square', async () => {
+		vi.clearAllMocks();
+		const wrapper = mount( TypePopEchecs, {
+			global: {
+				plugins: [ [ VueQueryPlugin, { queryClient } ] ],
+			},
+			props: {
+				id: 202,
+				config: {
+					consigne: 'Placez le Cavalier blanc sur f3.',
+					diagrammes: [
+						{
+							consigne: 'Placez le Cavalier blanc sur f3.',
+							fen: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2',
+							shapes: [
+								{ orig: 'f3', dest: 'f3', brush: 'blue' },
+								{ orig: 'e4', brush: 'yellow' },
+							],
+						},
+					],
+				},
+			},
+		} );
+
+		// Initial position set on mount
+		const expectedFenDepart = removePieceFromFen(
+			'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2',
+			'f3'
+		);
+		expect( mockBoardApi.setPosition ).toHaveBeenCalledWith(
+			expectedFenDepart
+		);
+
+		const buttons = wrapper.findAll( '.mock-square-btn' );
+		const btnE4 = buttons.find( ( b ) => b.text().includes( 'e4' ) );
+
+		// User clicks wrong square e4 (which already contains a pawn)
+		await btnE4?.trigger( 'click' );
+
+		// Piece was placed visually first
+		expect( mockBoardApi.putPiece ).toHaveBeenCalledWith(
+			{ type: 'n', color: 'w' },
+			'e4'
+		);
+		expect( wrapper.text() ).toContain( "Ce n'est pas la bonne case" );
+
+		// Advance timer past 800ms
+		vi.advanceTimersByTime( 850 );
+		await wrapper.vm.$nextTick();
+
+		// Check that the entire starting position is restored and yellow shapes are preserved
+		expect( mockBoardApi.setPosition ).toHaveBeenLastCalledWith(
+			expectedFenDepart
+		);
+		expect( mockBoardApi.setShapes ).toHaveBeenLastCalledWith( [
+			{ orig: 'e4', brush: 'yellow' },
+		] );
 	} );
 } );

@@ -81,7 +81,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - Série de 4 diagrammes avec consigne propre à chaque position.
         - Masquage des annotations/formes de solution initiales pendant la phase de réflexion, **à l'exception du cercle jaune optionnel** entourant la pièce d'étude (qui reste visible pour guider l'analyse de situation).
         - Clic sur la case cible : placement de la pièce, validation instantanée, révélation des flèches/formes du diagramme complet.
-        - Retrait automatique avec feedback rouge en cas d'erreur de case.
+        - Retrait automatique avec feedback rouge en cas d'erreur de case et rétablissement rigoureux de l'échiquier de départ (préservant intactes toutes les pièces existantes).
       - **Exercices ABCDaire Tactique (Type 3)** :
         - Série de 4 Mini-PGN contenant 1 ou plusieurs coups (attaque, défense, mat, gain matériel).
         - Orientation automatique de l'échiquier selon le trait de la position initiale (Blancs ou Noirs en bas).

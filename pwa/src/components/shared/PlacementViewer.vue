@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onUnmounted } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
 import {
@@ -80,6 +80,7 @@ const indexCourant = ref(0);
 const isSolved = ref(false);
 const boardApi = ref<BoardCore | null>(null);
 const feedback = ref<CardFeedback | null>(null);
+let errorTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const diagrammesListe = computed<DiagrammePopEchecs[]>(() => {
   if (props.diagrammes && Array.isArray(props.diagrammes) && props.diagrammes.length > 0) {
@@ -147,6 +148,10 @@ const onBoardCreated = (api: BoardCore) => {
 
 // Réinitialisation lors du changement de carte
 watch(indexCourant, () => {
+  if (errorTimeout) {
+    clearTimeout(errorTimeout);
+    errorTimeout = null;
+  }
   isSolved.value = false;
   feedback.value = null;
   if (boardApi.value) {
@@ -155,9 +160,25 @@ watch(indexCourant, () => {
   }
 });
 
+onUnmounted(() => {
+  if (errorTimeout) {
+    clearTimeout(errorTimeout);
+    errorTimeout = null;
+  }
+});
+
 const verifierPlacement = async (square: string) => {
   if (isSolved.value || !caseCible.value || !pieceInfo.value) {
     return;
+  }
+
+  if (errorTimeout) {
+    clearTimeout(errorTimeout);
+    errorTimeout = null;
+    if (boardApi.value) {
+      boardApi.value.setPosition(fenDepart.value);
+      boardApi.value.setShapes(filterYellowShapes(diagrammeCourant.value.shapes) as DrawShape[]);
+    }
   }
 
   const squareLower = square.toLowerCase();
@@ -193,11 +214,15 @@ const verifierPlacement = async (square: string) => {
       message: "Ce n'est pas la bonne case ! Réessayez."
     };
 
-    setTimeout(() => {
-      boardApi.value?.removePiece(square);
+    errorTimeout = setTimeout(() => {
+      if (boardApi.value) {
+        boardApi.value.setPosition(fenDepart.value);
+        boardApi.value.setShapes(filterYellowShapes(diagrammeCourant.value.shapes) as DrawShape[]);
+      }
       if (feedback.value?.type === 'danger') {
         feedback.value = null;
       }
+      errorTimeout = null;
     }, 800);
   }
 };

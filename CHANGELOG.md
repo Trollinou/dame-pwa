@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Rétablissement de l'Échiquier de Départ après Erreur de Placement (Type 2 Pop'Echecs) (`PlacementViewer.vue`, `TypePopEchecs.spec.ts`)** :
+  - **Réinitialisation Complète de la Position** : Correction d'un problème où un clic erroné sur une case déjà occupée supprimait la pièce existante lors du retrait. L'échiquier rétablit désormais rigoureusement la FEN de départ (`setPosition(fenDepart)`) et les formes associées (cercle jaune d'étude) à la fin du délai d'erreur ou dès une nouvelle tentative.
+
+
 ## [1.6.5] - 2026-09-15
 
 - **Nouvelle Variante « Notation » pour les Exercices Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
