@@ -217,7 +217,7 @@
 
           <!-- Palette des 12 pièces + Outil gomme -->
           <div :class="['setup-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
-            <div class="palette-row">
+            <div class="palette-row palette-row--white">
               <button
                 v-for="p in palettePiecesWhite"
                 :key="p.role"
@@ -230,7 +230,7 @@
                 <piece :class="['piece', p.role, 'white']"></piece>
               </button>
             </div>
-            <div class="palette-row">
+            <div class="palette-row palette-row--black">
               <button
                 v-for="p in palettePiecesBlack"
                 :key="p.role"
@@ -250,7 +250,7 @@
                 title="Effacer une pièce"
                 @click="toggleEraseTool"
               >
-                <span>❌</span>
+                <span class="erase-icon">❌</span>
               </button>
             </div>
           </div>
@@ -1747,60 +1747,96 @@ const passerCarteSuivante = () => {
   flex-direction: column;
   gap: 6px;
   align-items: center;
-  background: var(--ion-color-step-50, #f9fafb);
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
   border: 1px solid var(--ion-color-step-150, #e5e7eb);
   border-radius: 8px;
-  padding: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 8px;
+  background-image: none !important;
+
+  :deep(:is(piece, .piece)) {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    display: block !important;
+    pointer-events: none;
+  }
 }
 
 .palette-row {
-  display: flex;
+  display: grid;
   gap: 6px;
-  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.palette-row--white {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.palette-row--black {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .palette-btn {
-  width: 38px;
-  height: 38px;
-  border: 2px solid transparent;
-  background: #ffffff;
-  border-radius: 6px;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid var(--ion-color-light-shade, #ddd);
+  background: var(--ion-color-light, #fafafa);
+  cursor: pointer;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0;
-}
+  padding: 4px;
+  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  touch-action: manipulation;
 
-.palette-btn piece {
-  width: 32px;
-  height: 32px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  display: block;
-}
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-primary-tint, #e8f0fe);
+  }
 
-.palette-btn:hover:not(:disabled) {
-  transform: scale(1.05);
-}
+  &.is-selected {
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-primary-tint, #e8f0fe);
+    box-shadow: 0 0 0 2px var(--ion-color-primary);
+  }
 
-.palette-btn.is-selected {
-  border-color: var(--ion-color-primary, #3880ff);
-  background: rgba(56, 128, 255, 0.1);
-  box-shadow: 0 0 0 2px rgba(56, 128, 255, 0.3);
+  &:disabled {
+    cursor: default;
+    opacity: 0.85;
+    pointer-events: none;
+  }
 }
 
 .palette-btn--erase {
-  font-size: 1.1rem;
-}
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-.palette-btn--erase.is-selected {
-  border-color: #dc3545;
-  background: rgba(220, 53, 69, 0.1);
-  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.3);
+  .erase-icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  &.is-selected {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.3);
+  }
 }
 
 .setup-instruction {

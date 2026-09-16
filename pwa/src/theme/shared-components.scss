@@ -207,7 +207,8 @@
   background-image: none !important;
 }
 
-.piece-palette {
+.piece-palette,
+.setup-palette {
   background-image: none !important;
 
   :is(piece, .piece) {
@@ -216,9 +217,10 @@
     height: 100% !important;
     top: 0 !important;
     left: 0 !important;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    display: block !important;
     pointer-events: none;
   }
 }

@@ -15,6 +15,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Variante Reconstitution / Setup (`setup`)** : Reconstitution de la position sur échiquier vierge depuis une palette complète de 12 pièces (blanches et noires) et outil gomme :
     - *Sous-mode Mémorisation (`memoire`)* : Affichage initial pour observation, bascule par « J'ai mémorisé ! », possibilité de revoir la position sans pénalité et affichage du conseil/indice de l'entraîneur.
     - *Sous-mode Description textuelle (`texte`)* : Présentation de la position sous forme de texte descriptif à reproduire sur l'échiquier.
+    - *Affichage & Rendu Tactile de la Palette (`setup`)* : Normalisation du rendu des icônes de pièces (`position: relative !important`, `aspect-ratio: 1/1`) avec disposition responsive en grille 6 et 7 colonnes, garantissant la visibilité permanente et tactile des 12 pièces blanches/noires et de la gomme sans dépendre du survol souris.
   - **Multi-coups pour la Variante Move (`move`)** : Détection automatique des variantes PGN multi-solutions (`1. Nd5+ (1. Bh4+)`) avec compteur de progression (`Trouvés : X/Total`), remise en position automatique après chaque coup trouvé et validation dès que l'ensemble des coups a été joué.
   - **Animation Préalable du Dernier Coup** : Exécution automatique de l'animation du coup joué avant la phase d'interaction élève pour les positions axées sur le dernier coup.
 
