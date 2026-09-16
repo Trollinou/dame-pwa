@@ -3,6 +3,8 @@
     <CapOuPasCapViewer
       :consigne="config.consigne"
       :variante="config.variante || config.type_reponse"
+      :mode_clic="config.mode_clic"
+      :mode_setup="config.mode_setup"
       :propositions="config.propositions"
       :question="config.question"
       :exercices="config.exercices || config.diagrammes"
@@ -19,8 +21,10 @@ import CapOuPasCapViewer, { type ExerciceCapOuPasCap } from '@/components/shared
 
 export interface ConfigCapOuPasCap {
   consigne?: string;
-  variante?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | string;
-  type_reponse?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | string;
+  variante?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | 'clic' | 'setup' | string;
+  type_reponse?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | 'clic' | 'setup' | string;
+  mode_clic?: 'cibles' | 'materiel' | 'prises_meilleur_coup';
+  mode_setup?: 'texte' | 'memoire';
   propositions?: string[];
   question?: string;
   exercices?: ExerciceCapOuPasCap[];

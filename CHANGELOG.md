@@ -6,6 +6,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Extension des Variantes du Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `README.md`, `USING.md`)** :
+  - **Variante Clic / Sélection (`clic`)** : Sélection interactive au toucher sur l'échiquier avec ajout/suppression de cercles rouges.
+    - *Sous-mode Cibles (`cibles`)* : Validation instantanée des cases et pièces cibles définies par les annotations `[%csl ...]` (pièces non protégées, attaques du dernier coup).
+    - *Sous-mode Prises possibles & Meilleur coup (`prises_meilleur_coup`)* : Enchaînement en 2 étapes (identification au clic de toutes les prises possibles des deux camps avec cercles de sélection, puis bascule en échiquier actif pour jouer la meilleure prise cible indiquée en vert).
+    - *Sous-mode Différentiel de matériel (`materiel`)* : Identification libre de n'importe quelle pièce excédentaire par rapport à l'inventaire matériel FEN adverse, et bouton « ⚖️ Pas de différence de matériel » en cas d'égalité.
+  - **Variante Reconstitution / Setup (`setup`)** : Reconstitution de la position sur échiquier vierge depuis une palette complète de 12 pièces (blanches et noires) et outil gomme :
+    - *Sous-mode Mémorisation (`memoire`)* : Affichage initial pour observation, bascule par « J'ai mémorisé ! », possibilité de revoir la position sans pénalité et affichage du conseil/indice de l'entraîneur.
+    - *Sous-mode Description textuelle (`texte`)* : Présentation de la position sous forme de texte descriptif à reproduire sur l'échiquier.
+  - **Multi-coups pour la Variante Move (`move`)** : Détection automatique des variantes PGN multi-solutions (`1. Nd5+ (1. Bh4+)`) avec compteur de progression (`Trouvés : X/Total`), remise en position automatique après chaque coup trouvé et validation dès que l'ensemble des coups a été joué.
+  - **Animation Préalable du Dernier Coup** : Exécution automatique de l'animation du coup joué avant la phase d'interaction élève pour les positions axées sur le dernier coup.
+
 - **Rétablissement de l'Échiquier de Départ après Erreur de Placement (Type 2 Pop'Echecs) (`PlacementViewer.vue`, `TypePopEchecs.spec.ts`)** :
   - **Réinitialisation Complète de la Position** : Correction d'un problème où un clic erroné sur une case déjà occupée supprimait la pièce existante lors du retrait. L'échiquier rétablit désormais rigoureusement la FEN de départ (`setPosition(fenDepart)`) et les formes associées (cercle jaune d'étude) à la fin du délai d'erreur ou dès une nouvelle tentative.
 

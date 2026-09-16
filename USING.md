@@ -147,12 +147,25 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
         - **Variante Move (`move`)** :
           - Résolution du coup attendu directement sur l'échiquier interactif avec révélation des annotations et validation de l'étape.
+          - **Mode Multi-coups** : Si le PGN contient des variantes de coups multiples (ex: *Quels sont les échecs possibles ?*), l'apprenant doit trouver l'ensemble des coups légaux valides. Un badge affiche la progression (`Trouvés : X / Total`), l'échiquier se réinitialise après chaque coup trouvé, et la carte se valide dès que tous les coups ont été découverts.
         - **Variante Notation (`notation`)** :
           - Présentation de la position FEN sur l'échiquier en lecture seule (non interactif).
           - Sous l'échiquier, affichage d'une ligne pour chaque pièce présente avec son icône graphique thématisée selon sa couleur (blanche/noire) et son libellé (ex: *Tour blanche*, *Dame noire*, *Pion blanc*).
           - L'apprenant saisit la notation française exacte de chaque pièce (ex: `Tc2`, `Dd4`, `c3`, `Re1`).
           - La saisie exige une casse exacte (initiale majuscule pour les pièces, minuscules pour les cases et les pions sans lettre), valide en temps réel chaque case avec indicateur visuel (✓ vert / ✗ rouge) et accepte l'ordre interchangeable pour les pièces multiples de même nature (ex: 2 cavaliers).
           - Dès que toutes les pièces ont leurs coordonnées exactes, la carte est validée et le bouton *« Carte suivante »* s'active.
+        - **Variante Clic / Sélection (`clic`)** :
+          - L'apprenant sélectionne ou désélectionne les pièces et cases directement en les touchant sur l'échiquier (ajout/retrait d'un cercle rouge).
+          - **Sous-mode Cibles (`cibles`)** : L'apprenant doit entourer les pièces ou cases précises ciblées par l'exercice (pièces non protégées, attaques ou défenses du coup joué).
+          - **Sous-mode Prises possibles puis Meilleur coup (`prises_meilleur_coup`)** :
+            - *Convention PGN :* Cercle vert = prise possible et meilleur coup / Cercles rouges = autres prises possibles.
+            - *Étape 1 (Clic) :* L'apprenant identifie et entoure toutes les prises possibles des deux camps (cercles rouges et vert).
+            - *Étape 2 (Move) :* L'échiquier s'active et l'apprenant joue la meilleure prise sur l'échiquier (la cible verte). La carte est validée dès le bon coup joué et révèle l'ensemble des flèches et cercles explicatifs.
+          - **Sous-mode Différentiel de matériel (`materiel`)** : L'apprenant entoure n'importe quelle pièce excédentaire du camp concerné pour désigner l'avantage matériel. Si le matériel est égal entre les deux camps, un bouton *« ⚖️ Pas de différence de matériel »* permet de valider la position d'un simple toucher.
+        - **Variante Reconstitution / Setup (`setup`)** :
+          - **Sous-mode Mémorisation (`memoire`)** : L'apprenant étudie la position initiale sur l'échiquier puis clique sur *« J'ai mémorisé ! »*. La carte se retourne sur un échiquier vierge accompagné d'une palette de 12 pièces (blanches et noires) et d'un outil gomme pour replacer les pièces de mémoire. Un bouton *« 👁️ Revoir la position »* permet de consulter à nouveau la position sans pénalité, et un bloc *Conseil de l'entraîneur* s'affiche pour guider la réflexion.
+          - **Sous-mode Description textuelle (`texte`)** : L'apprenant dispose d'un échiquier vierge et de la palette de pièces pour replacer fidèlement la position décrite textuellement en notation française.
+          - Dès que la position posée correspond à la FEN cible, la carte est validée.
       - **Vidéos Pédagogiques FFE / Entraîneurs (`roi_video`)** :
         - Intégration de vidéos officielles issues de la Fédération (École d'Échecs à la Française) ou de vidéos spécifiques recommandées par les entraîneurs (ouvertures, tactiques).
         - **En-tête et Pied Unifiés** : En-tête `ContentHeader` compact (Type « Vidéo ») et pied de page fixe `SeriesCardFooter` (sans zone de feedback inutile).
