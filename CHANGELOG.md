@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.6.6] - 2026-09-16
+
 - **Extension des Variantes du Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `README.md`, `USING.md`)** :
   - **Variante Clic / Sélection (`clic`)** : Sélection interactive au toucher sur l'échiquier avec ajout/suppression de cercles rouges.
     - *Sous-mode Cibles (`cibles`)* : Validation instantanée des cases et pièces cibles définies par les annotations `[%csl ...]` (pièces non protégées, attaques ou défenses du coup joué).
