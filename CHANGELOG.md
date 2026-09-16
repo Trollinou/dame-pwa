@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.6.5] - 2026-09-15
+
 - **Nouvelle Variante « Notation » pour les Exercices Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
   - **Apprentissage du Repérage & Notation Française** : Présentation de l'échiquier en lecture seule avec détection automatique de chaque pièce présente à partir de la position FEN (`King/R`, `Queen/D`, `Rook/T`, `Bishop/F`, `Knight/C`, `Pawn/case`).
   - **Zone de Saisie Compacte & Ergonomique** : Affichage d'une ligne par pièce avec son icône graphique thématisée selon la couleur blanche/noire, son nom (`Tour blanche`, `Dame noire`, etc.) et un champ de saisie vierge (sans indice textuel superflu ni placeholder).
