@@ -129,6 +129,32 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		expect( wrapper.text() ).toContain( 'Bravo !' );
 	} );
 
+	test( 'affiche uniquement la FEN initiale pour la variante QCM Oui/Non même si le PGN contient un coup joué', () => {
+		const initialFen = '8/8/8/P6p/6pP/3qk1P1/8/4K3 w - - 0 1';
+		const pgnWithMove = `[SetUp "1"]\n[FEN "${ initialFen }"]\n\n{ [%csl Ga6][%cal Ga5a6] }\n1. a6 *`;
+
+		const config = {
+			consigne: 'Cap ou pas cap ?',
+			variante: 'qcm_oui_non',
+			question: 'Le pion va-t-il à dame ?',
+			exercices: [ { pgn: pgnWithMove, reponse_oui_non: true } ],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 14021,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		const mockFen = wrapper.find( '.mock-fen' );
+		expect( mockFen.exists() ).toBe( true );
+		expect( mockFen.text() ).toBe( initialFen );
+	} );
+
 	test( 'gère la validation d’une variante QCM Multiple avec plusieurs propositions', async () => {
 		const config = {
 			consigne: 'Évaluez les possibilités de roque.',
@@ -438,6 +464,52 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		// Étape 5 : L'échiquier reconstitué correspond à la position cible -> Succès
 		expect( wrapper.text() ).toContain(
 			'Parfait ! Vous avez reproduit exactement la position.'
+		);
+	} );
+
+	test( 'gère la variante Clic avec cercles cibles multiples (rouge, bleu) et cercle jaune comme seul repère visuel', async () => {
+		const fenClic = '4k3/6p1/4npp1/4p3/2B1P3/P7/1P3P2/4K3 w - - 0 1';
+		// PGN avec 1 cercle jaune (guide d'observation Ye6), 1 rouge (cible Re4) et 2 bleus (cibles Bc4, Bb2)
+		const pgnClic = `[SetUp "1"]
+[FEN "${ fenClic }"]
+
+{ [%csl Ye6,Re4,Bc4,Bb2] }
+*`;
+
+		const config = {
+			consigne: 'Entourez les pièces attaquantes et défenseurs.',
+			variante: 'clic',
+			mode_clic: 'cibles' as const,
+			exercices: [
+				{
+					pgn: pgnClic,
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 1408,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		// 3 cibles attendues (e4, c4, b2), e6 étant jaune (repère d'observation non compté dans les cibles)
+		expect( wrapper.text() ).toContain( '0 / 3' );
+
+		const chessboard = wrapper.findComponent( { name: 'EgChessboard' } );
+		expect( chessboard.exists() ).toBe( true );
+
+		// Cliquer sur les 3 cases cibles
+		await chessboard.vm.$emit( 'square-click', 'e4' );
+		await chessboard.vm.$emit( 'square-click', 'c4' );
+		await chessboard.vm.$emit( 'square-click', 'b2' );
+
+		expect( wrapper.text() ).toContain(
+			'Bravo ! Toutes les cibles ont été trouvées.'
 		);
 	} );
 } );

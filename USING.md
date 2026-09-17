@@ -153,7 +153,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - L'échiquier masque initialement toutes les shapes. Dès que toutes les affirmations sont complétées avec la combinaison exacte, les shapes de l'entraîneur sont révélées sur l'échiquier, le feedback vert s'affiche et le bouton *« Carte suivante »* s'active.
         - **Variante QCM Oui/Non (`qcm_oui_non`)** :
           - Une question commune affichée au-dessus d'un grand toggle tactile neutre OUI / NON.
-          - Si le mini-PGN comporte un coup initial, celui-ci s'affiche/s'anime pour situer la position. Les shapes sont masquées pendant la réflexion.
+          - L'échiquier affiche fidèlement la position FEN de départ (les éventuels coups PGN ne sont pas auto-joués afin de préserver l'énigme) et masque les annotations visuelles (shapes) pendant la réflexion.
           - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
         - **Variante Move (`move`)** :
           - Résolution du coup attendu directement sur l'échiquier interactif avec révélation des annotations et validation de l'étape.
@@ -166,12 +166,13 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - Dès que toutes les pièces ont leurs coordonnées exactes, la carte est validée et le bouton *« Carte suivante »* s'active.
         - **Variante Clic / Sélection (`clic`)** :
           - L'apprenant sélectionne ou désélectionne les pièces et cases directement en les touchant sur l'échiquier (ajout/retrait d'un cercle rouge).
+          - **Repère d'observation exclusif (cercle jaune)** : Seuls les cercles jaunes/oranges (`[%csl Y...]`) sont maintenus visibles sur l'échiquier pendant la réflexion en tant que repère visuel d'observation. Toutes les autres couleurs de cercles (`R` rouge, `G` vert, `B` bleu, etc.) sont masquées pendant la réflexion et constituent les cibles que l'élève doit découvrir et cliquer (permettant à l'entraîneur d'utiliser différentes couleurs dans son PGN pour différencier les camps ou les types d'attaques/défenses).
           - **Sous-mode Cibles (`cibles`)** : L'apprenant doit entourer les pièces ou cases précises ciblées par l'exercice (pièces non protégées, attaques ou défenses du coup joué).
-          - **Sous-mode Prises possibles puis Meilleur coup (`prises_meilleur_coup`)** :
-            - *Convention PGN :* Cercle vert = prise possible et meilleur coup / Cercles rouges = autres prises possibles.
-            - *Étape 1 (Clic) :* L'apprenant identifie et entoure toutes les prises possibles des deux camps (cercles rouges et vert).
-            - *Étape 2 (Move) :* L'échiquier s'active et l'apprenant joue la meilleure prise sur l'échiquier (la cible verte). La carte est validée dès le bon coup joué et révèle l'ensemble des flèches et cercles explicatifs.
-          - **Sous-mode Différentiel de matériel (`materiel`)** : L'apprenant entoure n'importe quelle pièce excédentaire du camp concerné pour désigner l'avantage matériel. Si le matériel est égal entre les deux camps, un bouton *« ⚖️ Pas de différence de matériel »* permet de valider la position d'un simple toucher.
+        - **Sous-mode Prises possibles puis Meilleur coup (`prises_meilleur_coup`)** :
+          - *Convention PGN :* Cercle vert = prise possible et meilleur coup / Cercles rouges = autres prises possibles.
+          - *Étape 1 (Clic) :* L'apprenant identifie et entoure toutes les prises possibles des deux camps (cercles rouges et vert).
+          - *Étape 2 (Move) :* L'échiquier s'active et l'apprenant joue la meilleure prise sur l'échiquier (la cible verte). La carte est validée dès le bon coup joué et révèle l'ensemble des flèches et cercles explicatifs.
+        - **Sous-mode Différentiel de matériel (`materiel`)** : L'apprenant entoure n'importe quelle pièce excédentaire du camp concerné pour désigner l'avantage matériel. Si le matériel est égal entre les deux camps, un bouton *« ⚖️ Pas de différence de matériel »* permet de valider la position d'un simple toucher.
         - **Variante Reconstitution / Setup (`setup`)** :
           - **Sous-mode Mémorisation (`memoire`)** : L'apprenant étudie la position initiale sur l'échiquier puis clique sur *« J'ai mémorisé ! »*. La carte se retourne sur un échiquier vierge accompagné d'une palette de 12 pièces (blanches et noires) et d'un outil gomme pour replacer les pièces de mémoire. Un bouton *« 👁️ Revoir la position »* permet de consulter à nouveau la position sans pénalité (les pièces déjà reconstituées sont intégralement conservées lors du retour à la reconstitution via *« Reprendre la reconstitution »*), et un bloc *Conseil de l'entraîneur* s'affiche pour guider la réflexion.
           - **Sous-mode Description textuelle (`texte`)** : L'apprenant dispose d'un échiquier vierge et de la palette de pièces pour replacer fidèlement la position décrite textuellement en notation française.

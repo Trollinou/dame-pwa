@@ -290,7 +290,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
-import { getActiveColorFromFen, parseFenPieces, type PieceInfo } from '@/utils/fenUtils';
+import { getActiveColorFromFen, parseFenPieces, filterYellowShapes, type PieceInfo } from '@/utils/fenUtils';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 import { parsePgn } from 'chessops/pgn';
@@ -758,23 +758,17 @@ const userClicShapes = computed<DrawShape[]>(() => {
 });
 
 const initialGuideShapes = computed<DrawShape[]>(() => {
-  const allCircles = currentPgnData.value.shapes.filter((s) => s.orig && !s.dest);
-  const targetColorCircles = allCircles.filter((s) => s.brush === 'red' || s.brush === 'green');
-
-  // Si des cercles cibles (rouge ou vert) existent, les cercles jaune/orange ou bleu sont des repères d'observation
-  if (targetColorCircles.length > 0) {
-    return allCircles.filter((s) => s.brush === 'yellow' || s.brush === 'blue');
-  }
-  return [];
+  return filterYellowShapes(currentPgnData.value.shapes) as DrawShape[];
 });
 
 const targetCircles = computed<string[]>(() => {
   const allCircles = currentPgnData.value.shapes.filter((s) => s.orig && !s.dest);
-  const targetColorCircles = allCircles.filter((s) => s.brush === 'red' || s.brush === 'green');
-
-  // Si des cercles rouges/verts cibles existent, on ne retient que ceux-ci (le jaune étant le sujet observé)
-  const circlesToMatch = targetColorCircles.length > 0 ? targetColorCircles : allCircles;
-  return Array.from(new Set(circlesToMatch.map((s) => s.orig.toLowerCase())));
+  // Seuls les cercles jaunes/oranges sont des repères visuels d'observation (non comptés dans les cibles à trouver).
+  // Toutes les autres couleurs (rouge, vert, bleu, etc.) sont des cibles à trouver par l'élève.
+  const targetCirclesList = allCircles.filter(
+    (s) => s.brush !== 'yellow' && s.brush !== 'y' && s.brush !== 'o'
+  );
+  return Array.from(new Set(targetCirclesList.map((s) => s.orig.toLowerCase())));
 });
 
 const targetCirclesCount = computed<number>(() => {
@@ -1280,17 +1274,6 @@ const initCardState = () => {
 
       boardApi.value.setPosition(initialFen);
       boardApi.value.setShapes(shapesAffichees.value);
-
-      // Si le mini-pgn contient 1 coup d'animation initial (sauf si mode move, setup ou clic)
-      if (currentPgnData.value.moves.length > 0 && resolvedVariante.value !== 'move' && resolvedVariante.value !== 'setup' && resolvedVariante.value !== 'clic') {
-        const moveSan = currentPgnData.value.moves[0];
-        setTimeout(() => {
-          if (boardApi.value) {
-            boardApi.value.move(moveSan);
-            boardApi.value.setShapes(shapesAffichees.value);
-          }
-        }, 300);
-      }
     }
   });
 };

@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Repère d'Observation Restreint aux Cercles Jaunes (Type 14 Cap ou pas cap ? Variante Clic) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `USING.md`)** :
+  - Limitation des repères visuels d'observation affichés dès le départ aux seuls cercles jaunes/oranges (`[%csl Y...]` via `filterYellowShapes`).
+  - Traitement de toutes les autres couleurs de cercles (`R` rouge, `G` vert, `B` bleu...) comme des cibles masquées à découvrir par l'élève, permettant aux entraîneurs de différencier visuellement les camps ou les types d'attaques/défenses dans leurs études sans révéler la solution à l'écran.
+
+- **Affichage Strict de la FEN Initiale en QCM Oui/Non (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `USING.md`)** :
+  - Suppression de l'animation automatique du coup PGN à l'affichage de l'échiquier, garantissant la présentation exclusive de la position FEN de départ pour l'exercice sans dévoiler la solution.
+
 - **Préservation des Pièces Posées après « Revoir la position » (Type 14 Setup Mémoire) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `USING.md`)** :
   - Différenciation de la première consultation de la position (où la bascule initialise un échiquier vierge) des consultations suivantes via le bouton *« 👁️ Revoir la position »*.
   - Maintien et restauration intégrale des pièces déjà reconstituées sur l'échiquier lors du retour à la reconstitution (bouton *« Reprendre la reconstitution »*), évitant la perte du travail déjà accompli par l'apprenant.
