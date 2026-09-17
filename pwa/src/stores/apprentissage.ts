@@ -341,6 +341,19 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		timeSpentSeconds?: number,
 		attemptsCount?: number
 	): Promise< void > => {
+		const identityId = authStore.selectedIdentity?.id || 'default';
+		const progressionKey = [ 'progression', identityId ];
+
+		// 1. Mise à jour optimiste immédiate dans le cache TanStack Query
+		const currentProgress =
+			queryClient.getQueryData< number[] >( progressionKey ) || [];
+		if ( ! currentProgress.includes( id ) ) {
+			queryClient.setQueryData< number[] >( progressionKey, [
+				...currentProgress,
+				id,
+			] );
+		}
+
 		try {
 			const apiUrl = import.meta.env.VITE_API_BASE_URL;
 			const body: {
@@ -374,7 +387,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 				throw new Error( `Impossible de valider l'élément ${ id }.` );
 			}
 
-			// Invalidation du cache de progression pour forcer la mise à jour réactive
+			// Invalidation du cache de progression pour forcer la synchronisation avec le serveur
 			await queryClient.invalidateQueries( {
 				queryKey: [ 'progression' ],
 			} );

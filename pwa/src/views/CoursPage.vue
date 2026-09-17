@@ -176,9 +176,7 @@ onMounted(async () => {
   if (apprentissageStore.parcours.length === 0) {
     await apprentissageStore.fetchParcours();
   }
-  if (apprentissageStore.elementsValides.length === 0) {
-    await apprentissageStore.fetchProgression();
-  }
+  await apprentissageStore.fetchProgression();
   if (coursId.value) {
     apprentissageStore.prefetchCoursContenus(coursId.value);
   }

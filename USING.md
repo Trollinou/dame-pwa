@@ -68,6 +68,8 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
    - **Section « Méthode EEF » (École d'Échecs à la Française)** : Présente les cours du tronc commun avec déblocage progressif linéaire au fil de la complétion des exercices.
    - **Actualisation Manuelle (Pull-to-refresh) 🔄** : Glisser vers le bas sur la liste des cours ou sur le détail d'un cours permet de forcer l'actualisation immédiate des parcours et de la progression.
    - **Synchronisation Différentielle & Économie Réseau** : Toute modification d'un exercice dans l'administration WordPress est automatiquement détectée grâce à son horodatage `modified`. L'application ne retélécharge que les exercices modifiés ou manquants, garantissant un affichage à jour sans nécessiter de vider le cache et sans surconsommer de données mobiles.
+   - **Persistance & Synchronisation Instantanée de la Progression** : La validation d'un exercice ou d'une leçon met à jour immédiatement le cache local en 0ms (déblocage instantané du contenu suivant) et sauvegarde la réussite sur le serveur WordPress. L'utilisation des boutons d'en-tête (flèche retour, liste ou maison) ou du bouton retour du navigateur garantit l'enregistrement complet de la progression.
+   - **Fin de Cours Pédagogique** : À la fin du dernier exercice d'un cours, l'action *Terminer le cours* ramène automatiquement l'apprenant vers la liste des cours (`/apprentissage/cours`) pour poursuivre son parcours.
    - Présente un ruban diagonal **"En dev"** signalant que le module est en cours de conception.
    - Accessible temporairement aux seuls profils autorisés (administrateurs, entraîneurs).
    - Pour les adhérents et visiteurs non autorisés : un panneau explicatif indique clairement que le module est en développement.

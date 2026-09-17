@@ -106,7 +106,7 @@
                     v-else
                     expand="block" 
                     color="success" 
-                    router-link="/tabs/apprentissage"
+                    router-link="/apprentissage/cours"
                   >
                     Terminer le cours
                   </ion-button>
@@ -158,7 +158,7 @@ import {
 } from '@ionic/vue';
 import { ref, computed, watch, onUnmounted, provide, nextTick } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 import { fireExerciseCelebration } from '@/composables/useCelebration';
@@ -323,7 +323,7 @@ const allerAuSuivant = async () => {
   if (prochainElement.value) {
     router.push(`/contenu/${prochainElement.value.id}`);
   } else {
-    router.push('/tabs/apprentissage');
+    router.push('/apprentissage/cours');
   }
 };
 
@@ -338,9 +338,20 @@ const retourAuCours = async () => {
   if (coursParentInfo.value) {
     router.push(`/cours/${coursParentInfo.value.cours.id}`);
   } else {
-    router.push('/tabs/apprentissage');
+    router.push('/apprentissage/cours');
   }
 };
+
+// Garantit que toute navigation (header, back-button, navigateur) attend la validation de progression en cours
+onBeforeRouteLeave(async () => {
+  if (currentValidationPromise) {
+    try {
+      await currentValidationPromise;
+    } catch {
+      // ignore
+    }
+  }
+});
 
 // Contexte de navigation fourni à SeriesCardFooter pour les exercices
 provide(EXERCISE_NAVIGATION_KEY, {
@@ -362,7 +373,7 @@ provide(EXERCISE_NAVIGATION_KEY, {
     if (coursParentInfo.value) {
       return `/cours/${coursParentInfo.value.cours.id}`;
     }
-    return '/tabs/apprentissage';
+    return '/apprentissage/cours';
   }),
   onNext: allerAuSuivant,
   onCourse: retourAuCours,

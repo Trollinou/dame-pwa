@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Navigation, Fin de Cours & Persistance de Progression (`ContenuPage.vue`, `apprentissage.ts`, `CoursPage.vue`)** :
+  - **Redirection vers la Liste des Cours** : Correction de la navigation lors de la complétion du dernier élément d'un cours (bouton *« Terminer le cours »* et transition automatique), renvoyant désormais directement vers la liste des cours (`/apprentissage/cours`) au lieu du hub d'apprentissage (`/tabs/apprentissage`).
+  - **Mise à Jour Optimiste Instantanée de la Progression** : Ajout de la mise à jour synchrone du cache TanStack Query (`queryProgression`) dès la réussite d'un exercice/leçon, rendant l'état validé immédiatement disponible en mémoire sans latence réseau.
+  - **Attente des Requêtes en Vol lors du Départ de Page (`onBeforeRouteLeave`)** : Sécurisation de la navigation via le hook de routeur garantissant que tout départ (boutons header, retour arrière, navigation fluide) attend la validation de progression réseau avant de changer de page.
+  - **Re-synchronisation Automatique au Montage du Cours (`CoursPage.vue`)** : Chargement systématique de la progression lors de l'accès à un cours pour garantir un statut d'éléments toujours conforme au serveur.
+
 - **Affichage du Conseil pendant la Phase de Mémorisation (Type 14 Setup Mémoire) (`CapOuPasCapViewer.vue`)** :
   - Déplacement de l'encart *Conseil de l'entraîneur* directement dans le panneau de mémorisation sous l'échiquier complet (phase 1) pour guider l'élève pendant l'observation avant la phase de reconstitution de mémoire (phase 2).
 
