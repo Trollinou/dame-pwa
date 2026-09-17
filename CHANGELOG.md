@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.6.9] - 2026-09-17
+
+- **Maintien des Cercles Jaunes d'Observation sur Toutes les Variantes (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
+  - Généralisation de l'affichage des repères visuels d'observation (cercles jaunes `[%csl Y...]`) dès la phase de recherche pour l'ensemble des variantes du Type 14 (`qcm_multiple`, `qcm_oui_non`, `move`, `notation`, `setup` en phase mémoire et `clic`).
+  - Permet de mettre immédiatement en évidence la pièce d'étude dont il est question dans l'énoncé ou les propositions QCM (ex: Cavalier en e5 entouré en jaune), tout en maintenant masquées les flèches tactiques (`[%cal]`) qui ne sont révélées qu'à la validation de la carte.
+
+## [1.6.8] - 2026-09-17
+
 - **Repère d'Observation Restreint aux Cercles Jaunes (Type 14 Cap ou pas cap ? Variante Clic) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `USING.md`)** :
   - Limitation des repères visuels d'observation affichés dès le départ aux seuls cercles jaunes/oranges (`[%csl Y...]` via `filterYellowShapes`).
   - Traitement de toutes les autres couleurs de cercles (`R` rouge, `G` vert, `B` bleu...) comme des cibles masquées à découvrir par l'élève, permettant aux entraîneurs de différencier visuellement les camps ou les types d'attaques/défenses dans leurs études sans révéler la solution à l'écran.

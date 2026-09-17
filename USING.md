@@ -150,10 +150,10 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - **Variante QCM Multiple (`qcm_multiple`)** :
           - Présentation de la liste d'affirmations définies pour la série sous l'échiquier.
           - Chaque affirmation dispose d'un **toggle tactile neutre** (position initiale neutre, sélectionnable entre OUI vert et NON rouge).
-          - L'échiquier masque initialement toutes les shapes. Dès que toutes les affirmations sont complétées avec la combinaison exacte, les shapes de l'entraîneur sont révélées sur l'échiquier, le feedback vert s'affiche et le bouton *« Carte suivante »* s'active.
+          - L'échiquier maintient visible le repère visuel d'observation (cercle jaune `[%csl Y...]` sur la pièce d'étude ciblée par l'énoncé) tout en masquant les flèches et annotations de solution. Dès que toutes les affirmations sont complétées avec la combinaison exacte, les shapes de l'entraîneur (flèches, attaques, défenses) sont révélées sur l'échiquier, le feedback vert s'affiche et le bouton *« Carte suivante »* s'active.
         - **Variante QCM Oui/Non (`qcm_oui_non`)** :
           - Une question commune affichée au-dessus d'un grand toggle tactile neutre OUI / NON.
-          - L'échiquier affiche fidèlement la position FEN de départ (les éventuels coups PGN ne sont pas auto-joués afin de préserver l'énigme) et masque les annotations visuelles (shapes) pendant la réflexion.
+          - L'échiquier affiche fidèlement la position FEN de départ (les éventuels coups PGN ne sont pas auto-joués afin de préserver l'énigme), maintient visible le cercle jaune d'observation s'il est présent (`[%csl Y...]`), et masque les annotations visuelles de solution (flèches `[%cal]`) pendant la réflexion.
           - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
         - **Variante Move (`move`)** :
           - Résolution du coup attendu directement sur l'échiquier interactif avec révélation des annotations et validation de l'étape.

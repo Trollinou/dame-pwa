@@ -782,7 +782,10 @@ const shapesAffichees = computed<DrawShape[]>(() => {
   if (resolvedVariante.value === 'clic') {
     return [...initialGuideShapes.value, ...userClicShapes.value];
   }
-  return [];
+  if (resolvedVariante.value === 'setup' && setupPhase.value === 'reconstruct') {
+    return [];
+  }
+  return initialGuideShapes.value;
 });
 
 export interface BoardPieceItem {

@@ -512,4 +512,67 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			'Bravo ! Toutes les cibles ont été trouvées.'
 		);
 	} );
+
+	test( 'affiche le cercle jaune de mise en évidence en variante QCM Multiple pendant la recherche', async () => {
+		const pgnWithGuide = `[Event "EA_Matérialité_SeDefendre: EA_Niv1_M_CO-1_Cap ou pas cap ? (QCM choix multiples)"]
+[FEN "4r1k1/2pn1pp1/1p3n1p/4N3/2P5/6NP/1P3PP1/4R1K1 w - - 0 1"]
+[SetUp "1"]
+
+{ [%csl Ye5] [%cal Rd7e5,Re8e5,Ge1e5,Bf2f4] }
+*`;
+
+		const config = {
+			consigne: 'La pièce en jaune est-elle attaquée ?',
+			variante: 'qcm_multiple',
+			propositions: [
+				'Le Cavalier en e5 est attaqué 2 fois ?',
+				'Le Cavalier en e5 est défendu 2 fois ?',
+			],
+			exercices: [
+				{
+					pgn: pgnWithGuide,
+					reponses_multiple: [ true, true ],
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 1409,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		const chessboard = wrapper.findComponent( { name: 'EgChessboard' } );
+		expect( chessboard.exists() ).toBe( true );
+
+		// Pendant la réflexion : seul le cercle jaune (Ye5) est affiché
+		const initialDiagram = chessboard.props( 'diagram' );
+		expect( initialDiagram.shapes ).toEqual( [
+			{ orig: 'e5', brush: 'yellow' },
+		] );
+
+		// Répondre correctement aux propositions
+		const rows = wrapper.findAll( '.proposition-row' );
+		const row0Oui = rows[ 0 ].find( '.toggle-btn--oui' );
+		const row1Oui = rows[ 1 ].find( '.toggle-btn--oui' );
+		await row0Oui.trigger( 'click' );
+		await row1Oui.trigger( 'click' );
+
+		// Après validation : toutes les formes (cercle + flèches) sont révélées
+		const solvedDiagram = chessboard.props( 'diagram' );
+		expect( solvedDiagram.shapes.length ).toBeGreaterThan( 1 );
+		expect( solvedDiagram.shapes ).toEqual(
+			expect.arrayContaining( [
+				{ orig: 'e5', brush: 'yellow' },
+				{ orig: 'd7', dest: 'e5', brush: 'red' },
+				{ orig: 'e8', dest: 'e5', brush: 'red' },
+				{ orig: 'e1', dest: 'e5', brush: 'green' },
+				{ orig: 'f2', dest: 'f4', brush: 'blue' },
+			] )
+		);
+	} );
 } );
