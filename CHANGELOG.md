@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Préservation des Pièces Posées après « Revoir la position » (Type 14 Setup Mémoire) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `USING.md`)** :
+  - Différenciation de la première consultation de la position (où la bascule initialise un échiquier vierge) des consultations suivantes via le bouton *« 👁️ Revoir la position »*.
+  - Maintien et restauration intégrale des pièces déjà reconstituées sur l'échiquier lors du retour à la reconstitution (bouton *« Reprendre la reconstitution »*), évitant la perte du travail déjà accompli par l'apprenant.
+
+## [1.6.7] - 2026-09-17
+
 - **Refonte et Alignement Architectural de l'Exercice Type 13 (Ouvre'boîte) (`OuvreBoiteViewer.vue`, `TypeOuvreBoite.vue`, `ouvreBoiteParser.ts`, `ContenuPage.vue`, `README.md`, `USING.md`, `roi`)** :
   - **Série de 6 Mini-PGN** : Déroulement séquentiel en 6 cartes sous consigne générale avec en-tête unifié `ContentHeader` (badge `Carte X / 6`) et pied fixe `SeriesCardFooter` (`TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14]`).
   - **Déduction & Traduction Automatique des Déplacements** : Extraction automatique depuis le PGN de la position de départ (FEN), des flèches indicatrices `[%cal]`, de la bonne réponse (branche principale avec commentaire) et des mauvais choix (variantes alternatives avec commentaires d'explications). Traduction des coups en notation française naturelle (*Pion e2 en e4*, *Fou f1 en b5*, *Cavalier g1 en f3*, *Petit roque (O-O)*...).

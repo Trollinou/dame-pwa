@@ -354,4 +354,90 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			'Bravo ! Toutes les notations de pièces sont exactes.'
 		);
 	} );
+
+	test( 'gère la variante Setup en mode mémoire et préserve les pièces placées lors de Revoir la position', async () => {
+		const targetFen = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
+		const config = {
+			consigne: 'Reconstituez la position de mémoire.',
+			variante: 'setup',
+			mode_setup: 'memoire' as const,
+			exercices: [
+				{
+					pgn: `[SetUp "1"]\n[FEN "${ targetFen }"]\n\n*`,
+					conseil: 'Regardez la position des Rois.',
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 1407,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		// Étape 1 : Phase de mémorisation initiale
+		expect( wrapper.text() ).toContain( 'Mémorisez bien la position' );
+		expect( wrapper.text() ).toContain( 'Regardez la position des Rois.' );
+		const memoriseBtn = wrapper.find(
+			'.setup-memorize-panel .action-btn--primary'
+		);
+		expect( memoriseBtn.exists() ).toBe( true );
+		expect( memoriseBtn.text() ).toContain( "J'ai mémorisé !" );
+
+		// Étape 2 : Clic sur "J'ai mémorisé !" -> passage en reconstitution
+		await memoriseBtn.trigger( 'click' );
+		expect( wrapper.find( '.setup-reconstruct-panel' ).exists() ).toBe(
+			true
+		);
+
+		const chessboard = wrapper.findComponent( { name: 'EgChessboard' } );
+		expect( chessboard.exists() ).toBe( true );
+
+		// Sélectionner le Roi blanc dans la palette (1er bouton blanc)
+		const paletteBtns = wrapper.findAll( '.palette-btn' );
+		const kingWhiteBtn = paletteBtns[ 0 ]; // roi blanc
+		await kingWhiteBtn.trigger( 'click' );
+
+		// Poser le Roi blanc en e1
+		await chessboard.vm.$emit( 'square-click', 'e1' );
+
+		// Étape 3 : Clic sur "Revoir la position"
+		const revoirBtn = wrapper.find( '.action-btn--peek' );
+		expect( revoirBtn.exists() ).toBe( true );
+		await revoirBtn.trigger( 'click' );
+
+		// On est de retour en mémorisation, le bouton indique "Reprendre la reconstitution"
+		expect( wrapper.find( '.setup-memorize-panel' ).exists() ).toBe( true );
+		const reprendreBtn = wrapper.find(
+			'.setup-memorize-panel .action-btn--primary'
+		);
+		expect( reprendreBtn.text() ).toContain(
+			'Reprendre la reconstitution'
+		);
+
+		// Étape 4 : Clic sur "Reprendre la reconstitution"
+		await reprendreBtn.trigger( 'click' );
+		expect( wrapper.find( '.setup-reconstruct-panel' ).exists() ).toBe(
+			true
+		);
+
+		// Sélectionner le Roi noir dans la palette (7e bouton = roi noir)
+		const kingBlackBtn = paletteBtns[ 6 ];
+		await kingBlackBtn.trigger( 'click' );
+
+		// Poser le Roi noir en e8
+		const chessboardAfterResume = wrapper.findComponent( {
+			name: 'EgChessboard',
+		} );
+		await chessboardAfterResume.vm.$emit( 'square-click', 'e8' );
+
+		// Étape 5 : L'échiquier reconstitué correspond à la position cible -> Succès
+		expect( wrapper.text() ).toContain(
+			'Parfait ! Vous avez reproduit exactement la position.'
+		);
+	} );
 } );

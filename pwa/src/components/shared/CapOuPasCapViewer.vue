@@ -194,7 +194,7 @@
           </div>
 
           <button type="button" class="action-btn action-btn--primary" @click="passerEnReconstitution">
-            <span>J'ai mémorisé !</span>
+            <span>{{ hasMemorizedOnce ? 'Reprendre la reconstitution' : "J'ai mémorisé !" }}</span>
           </button>
         </div>
 
@@ -366,6 +366,7 @@ const foundMovesSan = ref<string[]>([]);
 
 // Setup Variant State
 const setupPhase = ref<'memorize' | 'reconstruct'>('memorize');
+const hasMemorizedOnce = ref(false);
 const selectedPalettePiece = ref<{ role: PieceInfo['role']; color: PieceInfo['color'] } | null>({
   role: 'pawn',
   color: 'white',
@@ -1204,13 +1205,24 @@ const toggleEraseTool = () => {
 
 const passerEnReconstitution = () => {
   setupPhase.value = 'reconstruct';
-  placedPieces.value = new Map();
-  nextTick(() => {
-    if (boardApi.value) {
-      boardApi.value.setPosition('8/8/8/8/8/8/8/8 w - - 0 1');
-      boardApi.value.setShapes([]);
-    }
-  });
+  if (!hasMemorizedOnce.value) {
+    hasMemorizedOnce.value = true;
+    placedPieces.value = new Map();
+    nextTick(() => {
+      if (boardApi.value) {
+        boardApi.value.setPosition('8/8/8/8/8/8/8/8 w - - 0 1');
+        boardApi.value.setShapes([]);
+      }
+    });
+  } else {
+    nextTick(() => {
+      if (boardApi.value) {
+        const fenReconstituee = buildFenFromPlacedPieces(placedPieces.value, couleurJoueur.value);
+        boardApi.value.setPosition(fenReconstituee);
+        boardApi.value.setShapes([]);
+      }
+    });
+  }
 };
 
 // Square Click Handler
@@ -1257,6 +1269,7 @@ const initCardState = () => {
   clicPhase.value = 'clic';
   foundMovesSan.value = [];
   setupPhase.value = modeSetup.value === 'texte' ? 'reconstruct' : 'memorize';
+  hasMemorizedOnce.value = modeSetup.value === 'texte';
   placedPieces.value = new Map();
 
   nextTick(() => {
