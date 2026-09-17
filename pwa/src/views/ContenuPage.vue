@@ -191,7 +191,7 @@ const isPageLoading = computed(() => isLoading.value || apprentissageStore.isCon
 const estReussi = ref(false);
 const contenuActuel = computed(() => apprentissageStore.contenuActuel);
 
-const TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14];
+const TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14];
 
 const aSeriesFooter = computed(() => {
   if (contenuActuel.value?.post_type === 'roi_video' || contenuActuel.value?.post_type === 'roi_lecon') {

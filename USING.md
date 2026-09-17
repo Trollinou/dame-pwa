@@ -136,6 +136,14 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - Présentation d'un échiquier vide interactif.
           - L'apprenant touche la case de l'échiquier déduite des indices.
           - Dès la bonne case touchée, un cercle vert s'affiche sur la case cible avec feedback de succès et déblocage du passage à la carte suivante.
+      - **Exercices Ouvre'boîte (Type 13)** :
+        - Déroulement en **série de 6 mini-situations** avec `ContentHeader` (titre, consigne générale, badge `Carte X / 6`) et pied fixe `SeriesCardFooter`.
+        - Saisie auteur sous forme de 6 Mini-PGN (position de départ FEN avec flèches indicatrices `[%cal ...]`, branche principale comme coup gagnant avec son explication, et variantes alternatives comme mauvais coups avec leurs explications d'erreur).
+        - **Déduction & Traduction Automatique** : Le moteur traduit chaque coup en notation française accessible (ex: *Pion e2 en e4*, *Fou f1 en b5*, *Cavalier g1 en f3*, *Petit roque (O-O)*) et mélange aléatoirement les 3 options de boutons pour chaque carte.
+        - **Panneau Pédagogique Détaillé & Temps de Lecture** :
+          - En cas de mauvais choix, le bouton passe en rouge et l'explication complète d'erreur s'affiche dans un panneau stylisé dédié afin que l'élève puisse comprendre son erreur à son propre rythme avant de tenter un autre choix.
+          - En cas de bon choix, le coup est animé sur l'échiquier, le bouton passe en vert et l'explication détaillée de succès s'affiche.
+          - L'avancement vers la carte suivante s'effectue au rythme de l'élève via le bouton fixe du `SeriesCardFooter`.
       - **Exercices Cap ou pas Cap ? (Type 14)** :
         - Déroulement en **série de 5 mini-situations** sous une consigne commune avec `ContentHeader` (titre, consigne générale, badge `Carte X / 5`) et pied fixe `SeriesCardFooter`.
         - Saisie auteur en 5 Mini-PGN (position de départ FEN ou coup tactique à analyser, avec flèches/cercles pédagogiques).

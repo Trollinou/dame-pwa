@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte et Alignement Architectural de l'Exercice Type 13 (Ouvre'boîte) (`OuvreBoiteViewer.vue`, `TypeOuvreBoite.vue`, `ouvreBoiteParser.ts`, `ContenuPage.vue`, `README.md`, `USING.md`, `roi`)** :
+  - **Série de 6 Mini-PGN** : Déroulement séquentiel en 6 cartes sous consigne générale avec en-tête unifié `ContentHeader` (badge `Carte X / 6`) et pied fixe `SeriesCardFooter` (`TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14]`).
+  - **Déduction & Traduction Automatique des Déplacements** : Extraction automatique depuis le PGN de la position de départ (FEN), des flèches indicatrices `[%cal]`, de la bonne réponse (branche principale avec commentaire) et des mauvais choix (variantes alternatives avec commentaires d'explications). Traduction des coups en notation française naturelle (*Pion e2 en e4*, *Fou f1 en b5*, *Cavalier g1 en f3*, *Petit roque (O-O)*...).
+  - **Mélange Aléatoire des Choix (Fisher-Yates)** : Présentation des 3 choix dans un ordre aléatoire à chaque carte pour éviter que la bonne réponse ne soit toujours la première.
+  - **Panneau Pédagogique Détaillé & Rythme de Lecture** : Affichage d'un panneau d'explication dédié (vert pour la bonne réponse avec animation du coup sur l'échiquier, rouge pour l'erreur avec possibilité de réessayer) permettant à l'élève de lire l'explication complète sans restriction de hauteur ni contrainte de temps, et d'avancer à son rythme vers la carte suivante via `SeriesCardFooter`.
+  - **Constructeur WordPress ROI** : Interface d'administration pour Type 13 refondue avec saisie des 6 Mini-PGN (`PgnInput`) et aperçus interactifs en temps réel.
+
 - **Navigation, Fin de Cours & Persistance de Progression (`ContenuPage.vue`, `apprentissage.ts`, `CoursPage.vue`)** :
   - **Redirection vers la Liste des Cours** : Correction de la navigation lors de la complétion du dernier élément d'un cours (bouton *« Terminer le cours »* et transition automatique), renvoyant désormais directement vers la liste des cours (`/apprentissage/cours`) au lieu du hub d'apprentissage (`/tabs/apprentissage`).
   - **Mise à Jour Optimiste Instantanée de la Progression** : Ajout de la mise à jour synchrone du cache TanStack Query (`queryProgression`) dès la réussite d'un exercice/leçon, rendant l'état validé immédiatement disponible en mémoire sans latence réseau.

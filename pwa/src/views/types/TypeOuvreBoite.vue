@@ -1,43 +1,22 @@
 <template>
   <div class="exercice-type-ouvre-boite">
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="config.question || 'Trouvez la faille dans la position.'"
-      stepBadgeText="1 / 1"
-    />
-
-    <InteractiveQcmViewer
-      :fenDepart="config.fen_depart"
-      :couleurJoueur="config.couleur_joueur"
-      :etapes="etapesFormatees"
-      :shapes="config.shapes || []"
+    <OuvreBoiteViewer
+      :consigne="config.consigne"
+      :exercices="config.exercices"
+      :metaTitre="config.metaTitre"
+      :metaTypeLabel="config.metaTypeLabel"
+      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
       @success="onSuccess"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useApprentissageStore } from '@/stores/apprentissage';
-import InteractiveQcmViewer from '@/components/shared/InteractiveQcmViewer.vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import type { DrawShape } from 'eg-chessboard';
+import OuvreBoiteViewer, { type ExerciceItem } from '@/components/shared/OuvreBoiteViewer.vue';
 
-interface Choix {
-  texte: string;
-  san: string;
-  explication: string;
-}
-
-interface ConfigOuvreBoite {
-  fen_depart: string;
-  couleur_joueur: 'white' | 'black';
-  question: string;
-  choix: Choix[];
-  bonne_reponse: number;
-  shapes?: DrawShape[];
+export interface ConfigOuvreBoite {
+  consigne?: string;
+  exercices?: Array<ExerciceItem | string>;
   metaTitre?: string;
   metaTypeLabel?: string;
   metaChapitreNiveauLabel?: string;
@@ -51,26 +30,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'success'): void;
 }>();
-
-const headerMeta = computed(() => {
-  return {
-    title: props.config?.metaTitre || 'T13 - Ouvre-Boîte',
-    typeLabel: props.config?.metaTypeLabel || 'Ouvre-Boîte',
-    chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
-  };
-});
-
-const store = useApprentissageStore();
-
-const etapesFormatees = computed(() => {
-  return [
-    {
-      question: props.config.question,
-      choix: props.config.choix,
-      bonne_reponse: props.config.bonne_reponse
-    }
-  ];
-});
 
 const onSuccess = () => {
   emit('success');
