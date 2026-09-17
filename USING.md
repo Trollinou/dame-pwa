@@ -157,7 +157,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
         - **Variante Move (`move`)** :
           - Résolution du coup attendu directement sur l'échiquier interactif avec révélation des annotations et validation de l'étape.
-          - **Mode Multi-coups** : Si le PGN contient des variantes de coups multiples (ex: *Quels sont les échecs possibles ?*), l'apprenant doit trouver l'ensemble des coups légaux valides. Un badge affiche la progression (`Trouvés : X / Total`), l'échiquier se réinitialise après chaque coup trouvé, et la carte se valide dès que tous les coups ont été découverts.
+          - **Mode Multi-coups** : Si le PGN contient des variantes de coups multiples (ex: *Quels sont les échecs possibles ?*), l'apprenant doit trouver l'ensemble des coups légaux valides. Un badge affiche la progression (`Trouvés : X / Total`), les pastilles des coups découverts s'affichent au fur et à mesure en notation française (ex: `Cf3`, `Fxb5+`, `Dd1`), l'échiquier se réinitialise après chaque coup trouvé, et la carte se valide avec le message récapitulatif dès que tous les coups ont été découverts.
         - **Variante Notation (`notation`)** :
           - Présentation de la position FEN sur l'échiquier en lecture seule (non interactif).
           - Sous l'échiquier, affichage d'une ligne pour chaque pièce présente avec son icône graphique thématisée selon sa couleur (blanche/noire) et son libellé (ex: *Tour blanche*, *Dame noire*, *Pion blanc*).

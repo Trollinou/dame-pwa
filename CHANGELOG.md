@@ -19,6 +19,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Attente des Requêtes en Vol lors du Départ de Page (`onBeforeRouteLeave`)** : Sécurisation de la navigation via le hook de routeur garantissant que tout départ (boutons header, retour arrière, navigation fluide) attend la validation de progression réseau avant de changer de page.
   - **Re-synchronisation Automatique au Montage du Cours (`CoursPage.vue`)** : Chargement systématique de la progression lors de l'accès à un cours pour garantir un statut d'éléments toujours conforme au serveur.
 
+- **Notation Française pour les Coups Trouvés en Multi-coups (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`)** :
+  - Conversion et affichage des pastilles de coups trouvés en notation française (R, D, T, F, C au lieu de K, Q, R, B, N) sous le message de complétion/succès (`toFrenchNotation`).
+
 - **Affichage du Conseil pendant la Phase de Mémorisation (Type 14 Setup Mémoire) (`CapOuPasCapViewer.vue`)** :
   - Déplacement de l'encart *Conseil de l'entraîneur* directement dans le panneau de mémorisation sous l'échiquier complet (phase 1) pour guider l'élève pendant l'observation avant la phase de reconstitution de mémoire (phase 2).
 

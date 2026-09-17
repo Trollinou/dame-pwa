@@ -212,6 +212,61 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		expect( wrapper.text() ).toContain( 'Le roque est le meilleur coup.' );
 	} );
 
+	test( 'affiche les puces de coups trouvés en notation française dans la variante Move multi-coups', async () => {
+		const multiMovePgn = `[SetUp "1"]
+[FEN "r1bqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]
+
+1. Nf3 (1. Nc3) *`;
+
+		const config = {
+			consigne: 'Trouvez tous les coups de cavalier possibles.',
+			variante: 'move',
+			exercices: [
+				{
+					pgn: multiMovePgn,
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 14041,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		const chessboard = wrapper.findComponent( { name: 'EgChessboard' } );
+		expect( chessboard.exists() ).toBe( true );
+
+		// Jouer Nf3
+		await chessboard.vm.$emit( 'move', {
+			san: 'Nf3',
+			from: 'g1',
+			to: 'f3',
+			lan: 'g1f3',
+			color: 'w',
+		} );
+		expect( wrapper.text() ).toContain( '✓ Cf3' );
+		expect( wrapper.text() ).not.toContain( '✓ Nf3' );
+
+		// Jouer Nc3
+		await chessboard.vm.$emit( 'move', {
+			san: 'Nc3',
+			from: 'b1',
+			to: 'c3',
+			lan: 'b1c3',
+			color: 'w',
+		} );
+		expect( wrapper.text() ).toContain( '✓ Cf3' );
+		expect( wrapper.text() ).toContain( '✓ Cc3' );
+		expect( wrapper.text() ).toContain(
+			'Bravo ! Tous les coups ont été trouvés.'
+		);
+	} );
+
 	test( 'gère la variante Notation avec extraction FEN et saisie des coordonnées', async () => {
 		// FEN avec Tour blanche en c2, Dame noire en d4, Pion blanc en c3
 		const fenNotation = '8/8/8/8/3q4/2P5/2R5/8 w - - 0 1';

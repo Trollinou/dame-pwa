@@ -100,7 +100,7 @@
             <span v-else class="multi-move-success">✓ Bravo ! Tous les coups ont été trouvés.</span>
           </div>
           <div v-if="foundMovesSan.length > 0" class="found-moves-chips">
-            <span v-for="m in foundMovesSan" :key="m" class="move-chip">✓ {{ m }}</span>
+            <span v-for="m in foundMovesSan" :key="m" class="move-chip">✓ {{ toFrenchNotation(m) }}</span>
           </div>
         </div>
         <div v-else>
@@ -298,6 +298,7 @@ import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { Chess } from 'chessops';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
+import { toFrenchNotation } from '@/utils/partieHerosParser';
 
 const chessPreferences = useChessPreferencesStore();
 
