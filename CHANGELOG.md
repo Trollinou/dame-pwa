@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Affichage du Conseil pendant la Phase de Mémorisation (Type 14 Setup Mémoire) (`CapOuPasCapViewer.vue`)** :
+  - Déplacement de l'encart *Conseil de l'entraîneur* directement dans le panneau de mémorisation sous l'échiquier complet (phase 1) pour guider l'élève pendant l'observation avant la phase de reconstitution de mémoire (phase 2).
+
 ## [1.6.6] - 2026-09-16
 
 - **Extension des Variantes du Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `README.md`, `USING.md`)** :

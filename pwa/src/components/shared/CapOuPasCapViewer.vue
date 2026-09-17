@@ -187,6 +187,12 @@
         <!-- Mode Mémoire - Phase 1: Mémorisation -->
         <div v-if="modeSetup === 'memoire' && setupPhase === 'memorize'" class="setup-memorize-panel">
           <p class="setup-hint">👀 Mémorisez bien la position des pièces sur l'échiquier.</p>
+
+          <div v-if="exerciceCourant.conseil" class="conseil-card">
+            <span class="conseil-title">💡 Conseil de l'entraîneur :</span>
+            <p class="conseil-text">{{ exerciceCourant.conseil }}</p>
+          </div>
+
           <button type="button" class="action-btn action-btn--primary" @click="passerEnReconstitution">
             <span>J'ai mémorisé !</span>
           </button>
@@ -210,7 +216,7 @@
             <p class="texte-description-content">{{ textualPieceDescription }}</p>
           </div>
 
-          <div v-if="exerciceCourant.conseil" class="conseil-card">
+          <div v-if="modeSetup === 'texte' && exerciceCourant.conseil" class="conseil-card">
             <span class="conseil-title">💡 Conseil de l'entraîneur :</span>
             <p class="conseil-text">{{ exerciceCourant.conseil }}</p>
           </div>
@@ -1703,11 +1709,14 @@ const passerCarteSuivante = () => {
 }
 
 .conseil-card {
+  width: 100%;
+  box-sizing: border-box;
   background: #fff8e1;
   border: 1px solid #ffe082;
   border-radius: 8px;
   padding: 8px 10px;
   margin-bottom: 8px;
+  text-align: left;
 }
 
 .conseil-title {
