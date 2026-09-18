@@ -21,6 +21,10 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
   - `src/utils/safeFetch.ts` & `src/utils/wpApi.ts` : Couche réseau unifiée avec timeouts de protection, rafraîchissement transparent des jetons JWT en cas de session expirée (retry automatique) et pagination multi-pages WP REST automatique (`fetchWpCollection`).
   - `src/queryClient.ts` : Configuration de TanStack Query avec persistance et invalidation automatique des caches de requêtes lors des montées de version PWA.
 - **Rendu Visuel Unifié (`mode: 'ios'`) & Adaptation Dynamique en Hauteur (`vh` / `clamp`)** : Initialisation d'Ionic configurée en mode `ios` global associée à une échelle typographique et des variables de mise en page réactives en hauteur (`--app-section-gap`, `--app-item-min-height`, `--app-card-padding`), assurant une occupation à 100 % de l'écran et une lisibilité immédiate sans zoom sur tous les smartphones (iPhone, Samsung One UI, Xiaomi et Pixel 9 sous Android 14/15).
+- **Stratégie de Performance & Découpage de Bundle (`pwa/vite.config.ts`)** :
+  - **Manual Chunks** : Découpage ciblé des dépendances lourdes (`chess-vendor` pour `eg-chessboard` et `chessops`, `confetti-vendor` pour `canvas-confetti`, `ionic-vendor`, `tanstack-vendor`, `vue-vendor`) afin de différer le chargement du moteur d'échecs aux seules pages de jeu et d'analyse.
+  - **Service Worker Allégé & Cache Stockfish à la Demande** : Retrait du binaire Stockfish WASM (7.3 Mo) du pré-cache initial (`globPatterns`) au profit d'une mise en cache dynamique (`runtimeCaching` en `CacheFirst` pendant 30 jours), réduisant l'empreinte d'installation initiale de la PWA à ~3.2 Mo.
+  - **Nettoyage Automatique de Production** : Purge systématique des `console.log` et `debugger` en build de production via `esbuild.drop`.
 
 ## Espace de Jeu & Apprentissage
 
@@ -64,11 +68,11 @@ Pour garantir la cohérence technique, l'application s'appuie sur un socle de co
 ### 1. Composant Wrapper `<Chessboard>` (`src/components/shared/Chessboard/`)
 Encapsule la bibliothèque `eg-chessboard` et centralise la configuration globale de l'échiquier :
 - **Injection automatique des préférences** : Applique de manière réactive le style de pièces (`pieceSet`) et le thème du plateau (`boardTheme`) issus de `useChessPreferencesStore`.
-- **Nettoyage automatique du cycle de vie** : Détruit proprement l'instance sous-jacente (`boardApi.destroy()`) à la destruction du composant (`onUnmounted`) pour prévenir les fuites de mémoire.
-- **Props principales** : `fen`, `shapes`, `viewOnly` (défaut: `true`), `orientation`, `playerColor`, `coordinates`, `autoCastling`, `highlightLastMove`, `lastMove`, `stockfishEnabled`, `stockfishConfig`, `zoomable` (défaut: `false` sur `Chessboard`, `true` sur `DiagramViewer`).
+- **Nettoyage automatique du cycle de vie** : Détruit proprement l'instance principale (`boardApi.destroy()`) et l'instance de zoom modal (`zoomBoardApi.destroy()`) à la destruction du composant (`onUnmounted`) pour prévenir toute fuite de mémoire ou persistance des Web Workers Stockfish.
+- **Props principales** : `fen`, `shapes`, `viewOnly` (défaut: `true`), `orientation`, `playerColor`, `coordinates`, `autoCastling`, `highlightLastMove`, `lastMove`, `stockfishEnabled`, `stockfishConfig`, `zoomable` (défaut: `false` sur `Chessboard`, `true` sur `DiagramViewer`), `fitContainer` (défaut: `false`).
 - **Zoom plein écran universel intégré** : Lorsqu'activé (`zoomable="true"`), l'échiquier prend en charge l'appui prolongé (touch 500ms) et le clic droit pour ouvrir une modale plein écran haute résolution téléportée (`<Teleport to="body">`) avec neutralisation des clics parasites au relâchement.
 - **Événements supportés** : `@board-created`, `@move`, `@turn-change`, `@check`, `@checkmate`, `@stalemate`, `@draw`, `@stockfish-hint`, `@square-click`, `@shapes-change`, `@promotion`.
-- **Adoption unifiée** : Utilisé de façon homogène par tous les viewers d'apprentissage (`ABCDaireTactiqueViewer`, `PuzzleViewer`, `QcmViewer`, `ParcoursViewer`, `VisionViewer`, `CapOuPasCapViewer`, `InteractiveQcmViewer`, `MatchingViewer`, `EvalViewer`, `JugementFinalViewer`, `DiagramViewer`, `PgnViewer`, `PlacementViewer`, `QuiSuisJeViewer`, `OuvreBoiteViewer`).
+- **Adoption unifiée** : Utilisé de façon homogène et exclusive par l'intégralité de l'application (pages `PlayPage.vue`, `AnalysisPage.vue`, `ChessThemeCustomizer.vue`, `TypePartieHeros.vue` et tous les viewers d'apprentissage : `ABCDaireTactiqueViewer`, `PuzzleViewer`, `QcmViewer`, `ParcoursViewer`, `VisionViewer`, `CapOuPasCapViewer`, `InteractiveQcmViewer`, `MatchingViewer`, `EvalViewer`, `JugementFinalViewer`, `DiagramViewer`, `PgnViewer`, `PlacementViewer`, `QuiSuisJeViewer`, `OuvreBoiteViewer`, `TextOrderViewer`, `OrderViewer`).
 
 ```vue
 <template>

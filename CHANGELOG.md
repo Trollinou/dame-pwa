@@ -18,6 +18,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Nettoyage de `tournament.ts`** : Suppression de la référence morte `cachedPages` non utilisée.
   - **Alignement Architectural** : Séparation claire et cohérente entre le *Client State* persistant (Pinia avec `pinia-plugin-persistedstate`) et le *Server State* asynchrone mis en cache (TanStack Query `useQuery`).
 
+- **Unification du Wrapper `<Chessboard>` et Centralisation du Lifecycle (`Chessboard.vue`, `types.ts`, `PlayPage.vue`, `AnalysisPage.vue`, `ChessThemeCustomizer.vue`)** :
+  - **Migration complète vers `<Chessboard>`** : Remplacement des imports directs de `TheChessboard` dans `PlayPage.vue`, `AnalysisPage.vue` et `ChessThemeCustomizer.vue` par le composant maître unifié `src/components/shared/Chessboard/Chessboard.vue`.
+  - **Suppression des duplications** : Élimination des imports redondants de `eg-chessboard/style.css` et du binding manuel des préférences `piece-set`/`board-theme` (gérés de manière transparente par le wrapper).
+  - **Support du conteneur flexible (`fitContainer`)** : Ajout de la prop `fitContainer?: boolean` sur `<Chessboard>` pour la gestion dynamique des dimensions sans ratio fixe.
+  - **Nettoyage et Lifecycle étanche** : Renforcement du hook `onUnmounted` dans `Chessboard.vue` pour détruire systématiquement à la fois l'échiquier principal (`boardApi`) et l'échiquier modal de zoom (`zoomBoardApi`), prévenant toute fuite de ressources ou de Web Workers Stockfish.
+
+- **Optimisation du Bundle PWA & Gestion de Cache Service Worker (`pwa/vite.config.ts`, `CHANGELOG.md`)** :
+  - **Isolation des Dépendances Lourdes (Manual Chunks)** : Découpage de `chess-vendor` (`eg-chessboard`, `chessops`) et `confetti-vendor` (`canvas-confetti`) dans des chunks séparés pour différer leur téléchargement aux seules routes d'échecs (`/play`, `/analysis`).
+  - **Allègement du Pré-cache Service Worker (Stockfish)** : Retrait du fichier Stockfish WASM (7.3 Mo) du pré-cache initial (`globPatterns`) au profit d'un téléchargement et d'une mise en cache à la demande (`runtimeCaching` en `CacheFirst`), réduisant le poids d'installation initial de la PWA de plus de 7 Mo.
+  - **Nettoyage Automatique des Traces de Debug en Production** : Configuration d'`esbuild` pour purger automatiquement les appels `console.log` et `debugger` lors des builds de production.
+
 ## [1.6.9] - 2026-09-17
 
 - **Maintien des Cercles Jaunes d'Observation sur Toutes les Variantes (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :

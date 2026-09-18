@@ -86,11 +86,11 @@
       <!-- ÉCHIQUIER DE PRÉVISUALISATION DIRECTEMENT DESSOUS -->
       <div class="preview-container">
         <div class="board-wrapper">
-          <TheChessboard
+          <Chessboard
             :key="`${stagedPieceSet}-${stagedBoardTheme}`"
             :piece-set="stagedPieceSet"
             :board-theme="stagedBoardTheme"
-            :board-config="{ viewOnly: true }"
+            :view-only="true"
             fit-container
           />
         </div>
@@ -149,8 +149,7 @@ import {
   refreshOutline,
   chevronDownOutline
 } from 'ionicons/icons';
-import TheChessboard from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { PieceSet, BoardTheme } from 'eg-chessboard';
 import { 
   useChessPreferencesStore, 
