@@ -23,12 +23,17 @@ export async function fetchCitySuggestions(
 	if ( query.trim().length < 3 ) {
 		return [];
 	}
+	const controller = new AbortController();
+	const timeoutId = setTimeout( () => controller.abort(), 3000 );
+
 	try {
 		const res = await fetch(
 			`https://geo.api.gouv.fr/communes?fields=nom,codesPostaux&nom=${ encodeURIComponent(
 				query
-			) }`
+			) }`,
+			{ signal: controller.signal }
 		);
+		clearTimeout( timeoutId );
 		if ( ! res.ok ) {
 			return [];
 		}
@@ -37,6 +42,7 @@ export async function fetchCitySuggestions(
 			.slice( 0, 5 )
 			.map( ( c ) => `${ c.nom } (${ c.codesPostaux[ 0 ] || '' })` );
 	} catch ( err ) {
+		clearTimeout( timeoutId );
 		console.error( 'Erreur API Geo Communes:', err );
 		return [];
 	}
@@ -52,18 +58,24 @@ export async function fetchAddressSuggestions(
 	if ( query.trim().length < 5 ) {
 		return [];
 	}
+	const controller = new AbortController();
+	const timeoutId = setTimeout( () => controller.abort(), 3000 );
+
 	try {
 		const res = await fetch(
 			`https://data.geopf.fr/geocodage/completion?text=${ encodeURIComponent(
 				query
-			) }&type=StreetAddress`
+			) }&type=StreetAddress`,
+			{ signal: controller.signal }
 		);
+		clearTimeout( timeoutId );
 		if ( ! res.ok ) {
 			return [];
 		}
 		const data = await res.json();
 		return data.results || [];
 	} catch ( err ) {
+		clearTimeout( timeoutId );
 		console.error( 'Erreur API Geo Adresse:', err );
 		return [];
 	}

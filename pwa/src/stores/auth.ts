@@ -2,13 +2,21 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { alertController } from '@ionic/vue';
 import { App } from '@capacitor/app';
-import { useQuery } from '@tanstack/vue-query';
 import { queryClient } from '../queryClient';
 import router from '../router';
+import type { WpUser } from '@/types/wp';
+import type { Identity, AssociatedMember } from './auth/types';
+import {
+	createJwtSdk,
+	getTokenExpiryInfo,
+	isTokenExpired,
+	translateErrorMessage,
+} from './auth/jwtService';
+import { useIdentitiesService } from './auth/identitiesService';
+import { useAppConfig } from './auth/appConfig';
 import { safeFetch } from '@/utils/safeFetch';
-import { SimpleJwtLogin, LocalStorageTokenStorage } from 'simple-jwt-login';
 
-// Import des autres stores pour nettoyage
+// Import des autres stores pour nettoyage au logout
 import { useAgendaStore } from './agenda';
 import { useContactStore } from './contacts';
 import { useDashboardStore } from './dashboard';
@@ -18,34 +26,8 @@ import { useBenevolatStore } from './benevolat';
 import { useTournamentStore } from './tournament';
 import { useNewsStore } from './news';
 import { useApprentissageStore } from './apprentissage';
-import type { WpUser } from '@/types/wp';
 
-export interface AssociatedMember {
-	firstname: string;
-	name?: string;
-	member_id: number;
-	elo_standard?: number | string;
-	elo_rapide?: number | string;
-	elo_blitz?: number | string;
-	already_registered?: boolean;
-	has_pre_inscription?: boolean;
-	pre_inscription_id?: number | null;
-}
-
-export interface Identity {
-	id: string;
-	name: string;
-	type: 'member' | 'representative' | 'admin';
-	member_id: number;
-	firstname?: string;
-	elo_standard?: number | string;
-	elo_rapide?: number | string;
-	elo_blitz?: number | string;
-	associated_members?: AssociatedMember[];
-	already_registered?: boolean;
-	has_pre_inscription?: boolean;
-	pre_inscription_id?: number | null;
-}
+export type { AssociatedMember, Identity };
 
 export const useAuthStore = defineStore(
 	'auth',
@@ -111,7 +93,6 @@ export const useAuthStore = defineStore(
 				'entraineur',
 			];
 
-			// Détection ultra-souple
 			return roles.some( ( role ) => {
 				if ( typeof role !== 'string' ) {
 					return false;
@@ -126,6 +107,14 @@ export const useAuthStore = defineStore(
 			}
 			return selectedIdentity.value?.type === 'member';
 		} );
+
+		// ─── Sous-modules ─────────────────────────────────────────────────────────
+		const {
+			isRoiActive,
+			currentSeason,
+			apprentissageAllowedRoles,
+			fetchPwaConfig,
+		} = useAppConfig();
 
 		const canAccessApprentissage = computed( () => {
 			if ( ! isRoiActive.value ) {
@@ -145,87 +134,23 @@ export const useAuthStore = defineStore(
 			);
 		} );
 
-		const selectIdentity = ( identity: Identity ) => {
-			selectedIdentity.value = identity;
-			localStorage.setItem(
-				'dame_selected_identity',
-				JSON.stringify( identity )
-			);
-			// Purge du cache agenda pour recharger avec les droits de la nouvelle identité
-			useAgendaStore().clearData();
-		};
+		const {
+			myIdentities,
+			isIdentitiesLoading,
+			selectIdentity,
+			fetchMyIdentities,
+			checkIdentities,
+		} = useIdentitiesService( token, selectedIdentity, router );
 
-		// ─── SDK simple-jwt-login ─────────────────────────────────────────────────
-		const jwtSdk = new SimpleJwtLogin(
-			( () => {
-				const url = import.meta.env.VITE_API_BASE_URL || '';
-				const base = url.replace( /\/wp-json\/?.*$/, '' );
-				// En production, VITE_API_BASE_URL = "/wp-json" (relatif)
-				// => base = "" => on utilise l'origine courante du navigateur
-				if ( ! base || base.startsWith( '/' ) ) {
-					return (
-						( typeof window !== 'undefined'
-							? window.location.origin
-							: '' ) + base
-					);
-				}
-				return base;
-			} )(),
-			{
-				tokenStorage: new LocalStorageTokenStorage( 'dame' ),
-				refreshBeforeExpirySeconds: 60,
-				onTokenRefreshed: ( jwt ) => {
-					token.value = jwt;
-					localStorage.setItem( 'dame_jwt_token', jwt );
-				},
-			}
-		);
+		// ─── SDK simple-jwt-login & Session ───────────────────────────────────────
+		const jwtSdk = createJwtSdk( ( jwt ) => {
+			token.value = jwt;
+			localStorage.setItem( 'dame_jwt_token', jwt );
+		} );
 
-		// Sync SDK depuis le token Pinia existant au démarrage (clé dame_jwt_token)
 		if ( token.value ) {
 			jwtSdk.setTokens( token.value );
 		}
-
-		const decodeJwtPayload = (
-			jwt: string
-		): Record< string, unknown > | null => {
-			try {
-				const parts = jwt.split( '.' );
-				if ( parts.length !== 3 ) {
-					return null;
-				}
-				return JSON.parse( atob( parts[ 1 ] ) );
-			} catch {
-				return null;
-			}
-		};
-
-		const getTokenExpiryInfo = ( jwt: string ) => {
-			const payload = decodeJwtPayload( jwt );
-			if ( ! payload || typeof payload.exp !== 'number' ) {
-				return {
-					isExpired: true,
-					secondsLeft: 0,
-					expDate: 'Inconnu/Invalide',
-					payload,
-				};
-			}
-			const nowSeconds = Math.floor( Date.now() / 1000 );
-			const secondsLeft = payload.exp - nowSeconds;
-			return {
-				isExpired: secondsLeft <= 0,
-				secondsLeft,
-				expDate: new Date( payload.exp * 1000 ).toLocaleTimeString(),
-				payload,
-			};
-		};
-
-		const isTokenExpired = ( jwt: string ): boolean => {
-			if ( ! jwt ) {
-				return true;
-			}
-			return getTokenExpiryInfo( jwt ).isExpired;
-		};
 
 		let activeRefreshPromise: Promise< string | null > | null = null;
 
@@ -271,7 +196,6 @@ export const useAuthStore = defineStore(
 					const msg = String(
 						err?.data?.message || err?.message || ''
 					).toLowerCase();
-					// Déconnecter SAUF si erreur réseau temporaire
 					if (
 						! msg.includes( 'network' ) &&
 						! msg.includes( 'offline' ) &&
@@ -294,7 +218,6 @@ export const useAuthStore = defineStore(
 			}
 			const info = getTokenExpiryInfo( token.value );
 
-			// Si le token est déjà expiré localement, tenter immédiatement un rafraîchissement
 			if ( info.isExpired ) {
 				await tryRefreshToken();
 				return;
@@ -321,7 +244,6 @@ export const useAuthStore = defineStore(
 					rawResponse = error;
 				}
 
-				// Si l'endpoint /auth/validate n'est pas activé dans le plugin WP Simple JWT Login (Code 82), on l'ignore silencieusement
 				if (
 					rawResponse.includes( 'not enabled' ) ||
 					rawResponse.includes( '82' )
@@ -340,55 +262,6 @@ export const useAuthStore = defineStore(
 					await tryRefreshToken();
 				}
 			}
-		};
-
-		const translateErrorMessage = ( msg: string ): string => {
-			if ( ! msg ) {
-				return 'Erreur de connexion.';
-			}
-			const lowerMsg = msg.toLowerCase().trim();
-
-			const translations: { [ key: string ]: string } = {
-				'wrong user credentials.': 'Identifiants incorrects.',
-				'wrong username or password.': 'Identifiants incorrects.',
-				'wrong email or password.': 'Identifiants incorrects.',
-				'user not found.': 'Utilisateur non trouvé.',
-				'missing username or email.':
-					"Nom d'utilisateur ou e-mail manquant.",
-				'missing password.': 'Mot de passe manquant.',
-				'token is expired.':
-					'Votre session a expiré. Veuillez vous reconnecter.',
-				'jwt is expired.':
-					'Votre session a expiré. Veuillez vous reconnecter.',
-				'invalid token.': 'Session de connexion invalide.',
-				'jwt is invalid.': 'Session de connexion invalide.',
-				'token has been revoked.':
-					'Votre session a été fermée sur le serveur.',
-				'validation failed.': 'Échec de la validation de session.',
-			};
-
-			if ( translations[ lowerMsg ] ) {
-				return translations[ lowerMsg ];
-			}
-
-			if (
-				lowerMsg.includes( 'credential' ) ||
-				lowerMsg.includes( 'wrong password' ) ||
-				lowerMsg.includes( 'incorrect' )
-			) {
-				return 'Identifiants incorrects.';
-			}
-			if ( lowerMsg.includes( 'expired' ) ) {
-				return 'Votre session a expiré. Veuillez vous reconnecter.';
-			}
-			if ( lowerMsg.includes( 'invalid' ) ) {
-				return 'Session invalide. Veuillez vous reconnecter.';
-			}
-			if ( lowerMsg.includes( 'not found' ) ) {
-				return 'Utilisateur non trouvé.';
-			}
-
-			return msg;
 		};
 
 		const login = async ( username: string, password: string ) => {
@@ -413,20 +286,18 @@ export const useAuthStore = defineStore(
 				}
 
 				const authResponse = await jwtSdk.authenticate( authParams );
-
 				const jwtToken = authResponse.data?.jwt;
 
 				if ( jwtToken ) {
 					token.value = jwtToken;
 					localStorage.setItem( 'dame_jwt_token', jwtToken );
 
-					// Récupérer le profil complet via l'API WordPress standard
 					let roles: string[] = [];
 					let displayName = username;
 					let email = '';
 
 					try {
-						const profileRes = await fetch(
+						const profileRes = await safeFetch(
 							`${
 								import.meta.env.VITE_API_BASE_URL
 							}/wp/v2/users/me?context=edit`,
@@ -449,7 +320,6 @@ export const useAuthStore = defineStore(
 								email = profile.email;
 							}
 
-							// Bloquer la connexion si l'utilisateur a uniquement le rôle "subscriber" (e-mail non validé)
 							if (
 								roles.length === 1 &&
 								roles.includes( 'subscriber' )
@@ -488,11 +358,8 @@ export const useAuthStore = defineStore(
 						JSON.stringify( user.value )
 					);
 
-					// Purger tout cache anonyme antérieur lors de la connexion réussie
 					useAgendaStore().clearData();
-
-					// 2. Vérification des identités (familles)
-					await checkIdentities( token.value );
+					await checkIdentities();
 				} else {
 					throw new Error( "Erreur d'identifiants" );
 				}
@@ -518,7 +385,6 @@ export const useAuthStore = defineStore(
 						errorMessage = err.response || errorMessage;
 					}
 				} else if ( err && err.message ) {
-					// Le SDK simple-jwt-login lève des erreurs du type "HTTP Error: 400 - {"code":..., "message":"..."}"
 					const match = err.message.match(
 						/^HTTP Error: \d+ - (.*)$/
 					);
@@ -548,58 +414,6 @@ export const useAuthStore = defineStore(
 			}
 		};
 
-		// Query TanStack pour les identités rattachées au compte
-		const {
-			data: queryIdentities,
-			refetch: refetchIdentities,
-			isLoading: isIdentitiesLoading,
-		} = useQuery< Identity[] >( {
-			queryKey: [ 'identities', token ],
-			enabled: computed( () => !! token.value ),
-			queryFn: async () => {
-				if ( ! token.value ) {
-					return [];
-				}
-				const response = await safeFetch(
-					`${
-						import.meta.env.VITE_API_BASE_URL
-					}/dame/v1/my-identities`,
-					{
-						headers: { Authorization: `Bearer ${ token.value }` },
-					}
-				);
-				if ( ! response.ok ) {
-					throw new Error( 'Impossible de charger les identités.' );
-				}
-				return response.json();
-			},
-		} );
-
-		const myIdentities = computed( () => queryIdentities.value || [] );
-
-		const fetchMyIdentities = async () => {
-			const res = await refetchIdentities();
-			return res.data || [];
-		};
-
-		const checkIdentities = async ( currentToken?: string ) => {
-			try {
-				if ( currentToken ) {
-					// Utilisation du jeton si nécessaire
-				}
-				const identities = await fetchMyIdentities();
-
-				if ( identities.length === 1 ) {
-					selectIdentity( identities[ 0 ] );
-					router.push( '/tabs/profil' );
-				} else {
-					router.push( '/select-person' );
-				}
-			} catch {
-				router.push( '/select-person' );
-			}
-		};
-
 		const logout = () => {
 			if ( token.value ) {
 				jwtSdk.revokeToken( { JWT: token.value } ).catch( ( e ) => {
@@ -612,7 +426,7 @@ export const useAuthStore = defineStore(
 			}
 
 			try {
-				queryClient.clear(); // Vide le cache mémoire + le cache persistant LocalStorage de TanStack Query
+				queryClient.clear();
 			} catch ( e ) {
 				console.warn(
 					"Erreur lors de l'effacement du QueryClient:",
@@ -638,80 +452,6 @@ export const useAuthStore = defineStore(
 			router.push( '/tabs/home' );
 		};
 
-		const isRoiActive = ref(
-			localStorage.getItem( 'dame_roi_active' ) !== 'false'
-		);
-
-		const currentSeason = ref(
-			localStorage.getItem( 'dame_current_season' ) || ''
-		);
-		const apprentissageAllowedRoles = ref< string[] >(
-			JSON.parse(
-				localStorage.getItem( 'dame_apprentissage_allowed_roles' ) ||
-					'["administrator", "staff", "entraineur", "editor"]'
-			)
-		);
-
-		const fetchPwaConfig = async () => {
-			try {
-				const response = await safeFetch(
-					`${ import.meta.env.VITE_API_BASE_URL }/dame/v1/pwa-config`
-				);
-				if ( response.ok ) {
-					const data = await response.json();
-					isRoiActive.value = !! data.roi_active;
-
-					currentSeason.value = data.current_season || '';
-					localStorage.setItem(
-						'dame_roi_active',
-						String( isRoiActive.value )
-					);
-
-					localStorage.setItem(
-						'dame_current_season',
-						currentSeason.value
-					);
-
-					if ( isRoiActive.value ) {
-						try {
-							const roiResponse = await safeFetch(
-								`${
-									import.meta.env.VITE_API_BASE_URL
-								}/roi/v1/config`
-							);
-							if ( roiResponse.ok ) {
-								const roiData = await roiResponse.json();
-								if (
-									Array.isArray(
-										roiData.apprentissage_allowed_roles
-									)
-								) {
-									apprentissageAllowedRoles.value =
-										roiData.apprentissage_allowed_roles;
-									localStorage.setItem(
-										'dame_apprentissage_allowed_roles',
-										JSON.stringify(
-											roiData.apprentissage_allowed_roles
-										)
-									);
-								}
-							}
-						} catch ( roiError ) {
-							console.warn(
-								'Impossible de charger la configuration de ROI, utilisation de la configuration par défaut :',
-								roiError
-							);
-						}
-					}
-				}
-			} catch ( error ) {
-				console.warn(
-					'Erreur chargement pwa-config, utilisation du cache :',
-					error
-				);
-			}
-		};
-
 		let isSessionValidating = false;
 		const debouncedValidateSession = async () => {
 			if ( isSessionValidating ) {
@@ -727,7 +467,6 @@ export const useAuthStore = defineStore(
 			}
 		};
 
-		// Écoute du retour au premier plan (Foreground)
 		try {
 			App.addListener( 'appStateChange', ( { isActive } ) => {
 				if ( isActive ) {
@@ -746,7 +485,6 @@ export const useAuthStore = defineStore(
 			} );
 		}
 
-		// Validation initiale au démarrage du store
 		debouncedValidateSession();
 
 		return {
@@ -763,7 +501,6 @@ export const useAuthStore = defineStore(
 			selectIdentity,
 			checkIdentities,
 			isRoiActive,
-
 			currentSeason,
 			fetchPwaConfig,
 			validateSession,

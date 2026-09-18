@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
@@ -26,13 +26,10 @@ export interface Post {
 export const useNewsStore = defineStore( 'news', () => {
 	const queryClient = useQueryClient();
 
-	const isCustomLoading = ref( false );
-	const customPosts = ref< Post[] | null >( null );
-
 	// Liste des actualités (Clé de cache public)
 	const {
 		data: queryPosts,
-		isLoading: isQueryLoading,
+		isLoading,
 		refetch,
 	} = useQuery< Post[] >( {
 		queryKey: [ 'news', 'list' ],
@@ -52,19 +49,9 @@ export const useNewsStore = defineStore( 'news', () => {
 	} );
 
 	const posts = computed( {
-		get: () =>
-			customPosts.value !== null
-				? customPosts.value
-				: queryPosts.value || [],
-		set: ( val ) => {
-			customPosts.value = val;
-		},
-	} );
-
-	const isLoading = computed( {
-		get: () => isQueryLoading.value || isCustomLoading.value,
-		set: ( val ) => {
-			isCustomLoading.value = val;
+		get: () => queryPosts.value || [],
+		set: ( val: Post[] ) => {
+			queryClient.setQueryData< Post[] >( [ 'news', 'list' ], val );
 		},
 	} );
 
@@ -102,7 +89,6 @@ export const useNewsStore = defineStore( 'news', () => {
 	};
 
 	const clearData = () => {
-		customPosts.value = null;
 		queryClient.setQueryData( [ 'news', 'list' ], [] );
 	};
 

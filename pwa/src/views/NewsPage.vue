@@ -47,7 +47,7 @@
           </ion-toolbar>
         </ion-header>
         <!-- État de chargement initial -->
-        <div v-if="newsStore.isLoading && newsStore.posts.length === 0" class="ion-text-center ion-padding">
+        <div v-if="isLoading && newsStore.posts.length === 0" class="ion-text-center ion-padding">
           <ion-spinner name="crescent"></ion-spinner>
           <p>Chargement des actualités...</p>
         </div>
@@ -93,7 +93,7 @@
           </ion-card>
 
           <!-- Aucun article -->
-          <div v-if="newsStore.posts.length === 0 && !newsStore.isLoading" class="ion-text-center ion-padding">
+          <div v-if="newsStore.posts.length === 0 && !isLoading" class="ion-text-center ion-padding">
             <p>Aucune actualité trouvée.</p>
           </div>
         </div>
@@ -139,7 +139,7 @@ import {
   onIonViewWillEnter
 } from '@ionic/vue';
 import { cloudOfflineOutline } from 'ionicons/icons';
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNewsStore, type Post } from '@/stores/news';
 import { safeFetch } from '@/utils/safeFetch';
@@ -154,6 +154,8 @@ const router = useRouter();
 const newsStore = useNewsStore();
 const categories = ref<WPCategory[]>([]);
 const error = ref<string | null>(null);
+const isPageLoading = ref(false);
+const isLoading = computed(() => newsStore.isLoading || isPageLoading.value);
 
 // Filtres et Pagination
 const page = ref(1);
@@ -208,7 +210,7 @@ const fetchPosts = async (reset = false) => {
     return;
   }
 
-  newsStore.isLoading = true;
+  isPageLoading.value = true;
   try {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     let url = `${apiUrl}/wp/v2/posts?_embed&page=${page.value}&per_page=10`;
@@ -245,7 +247,7 @@ const fetchPosts = async (reset = false) => {
   } catch (err: unknown) {
     handleFetchError(err);
   } finally {
-    newsStore.isLoading = false;
+    isPageLoading.value = false;
   }
 };
 

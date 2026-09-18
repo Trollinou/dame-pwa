@@ -6,6 +6,18 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Standardisation Intégrale des Appels HTTP vers `safeFetch` (`usePreInscriptionApi.ts`, `BenevolatDetailContent.vue`, `TournamentDetailContent.vue`, `auth.ts`, `RegisterPage.vue`, `geoApi.ts`)** :
+  - **Pré-inscription (`usePreInscriptionApi.ts`)** : Remplacement des `fetch` natifs par `safeFetch` pour le pré-remplissage adhérent, la soumission du formulaire et le téléchargement des attestations/autorisations PDF. Suppression du retry 401 artisanal au profit du rafraîchissement transparent du jeton JWT natif à `safeFetch`.
+  - **Bénévolat & Tournois (`BenevolatDetailContent.vue`, `TournamentDetailContent.vue`)** : Migration de la récupération des votes, de la soumission de proposition d'aide bénévole et du chargement des fiches tournois vers `safeFetch` avec protection par timeout d'invalidation (4s).
+  - **Auth & Inscription (`auth.ts`, `RegisterPage.vue`)** : Sécurisation de la récupération du profil utilisateur et de l'inscription avec les délais de timeout réseau appropriés.
+  - **API Gouv (`geoApi.ts`)** : Ajout d'un garde-fou `AbortController` (3s) sur les suggestions d'adresses et de communes pour éviter tout gel d'interface en cas d'indisponibilité des services de l'État.
+
+- **Harmonisation des Stores Pinia & Modularisation de l'Authentification (`auth.ts`, `news.ts`, `tournament.ts`, `NewsPage.vue`, `types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`)** :
+  - **Modularisation de `auth.ts`** : Découpage du méga-store monolithique de 780 lignes en sous-modules spécialisés dans `pwa/src/stores/auth/` (`types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`) tout en conservant une façade `useAuthStore` unifiée garantissant 100% de rétrocompatibilité pour tous les composants.
+  - **Harmonisation TanStack Query dans `news.ts`** : Suppression du double état (*Dual State* avec `customPosts` et `isCustomLoading`) au profit du cache TanStack Query réactif direct (`queryClient.setQueryData`), avec gestion locale du chargement de recherche/pagination dans `NewsPage.vue`.
+  - **Nettoyage de `tournament.ts`** : Suppression de la référence morte `cachedPages` non utilisée.
+  - **Alignement Architectural** : Séparation claire et cohérente entre le *Client State* persistant (Pinia avec `pinia-plugin-persistedstate`) et le *Server State* asynchrone mis en cache (TanStack Query `useQuery`).
+
 - **Unification du Wrapper `<Chessboard>` et Centralisation du Lifecycle (`Chessboard.vue`, `types.ts`, `PlayPage.vue`, `AnalysisPage.vue`, `ChessThemeCustomizer.vue`)** :
   - **Migration complète vers `<Chessboard>`** : Remplacement des imports directs de `TheChessboard` dans `PlayPage.vue`, `AnalysisPage.vue` et `ChessThemeCustomizer.vue` par le composant maître unifié `src/components/shared/Chessboard/Chessboard.vue`.
   - **Suppression des duplications** : Élimination des imports redondants de `eg-chessboard/style.css` et du binding manuel des préférences `piece-set`/`board-theme` (gérés de manière transparente par le wrapper).

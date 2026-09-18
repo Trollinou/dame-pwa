@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
@@ -20,7 +20,6 @@ export interface CachedPage {
 
 export const useTournamentStore = defineStore( 'tournament', () => {
 	const queryClient = useQueryClient();
-	const cachedPages = ref< Record< number, CachedPage > >( {} );
 
 	// Query pour récupérer le menu des tournois
 	const {
@@ -111,7 +110,6 @@ export const useTournamentStore = defineStore( 'tournament', () => {
 
 	return {
 		menuItems,
-		cachedPages,
 		isLoading,
 		fetchMenu,
 		fetchPage,
