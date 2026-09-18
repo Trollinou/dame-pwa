@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Optimisation du Bundle PWA & Gestion de Cache Service Worker (`pwa/vite.config.ts`, `CHANGELOG.md`)** :
+  - **Isolation des Dépendances Lourdes (Manual Chunks)** : Découpage de `chess-vendor` (`eg-chessboard`, `chessops`) et `confetti-vendor` (`canvas-confetti`) dans des chunks séparés pour différer leur téléchargement aux seules routes d'échecs (`/play`, `/analysis`).
+  - **Allègement du Pré-cache Service Worker (Stockfish)** : Retrait du fichier Stockfish WASM (7.3 Mo) du pré-cache initial (`globPatterns`) au profit d'un téléchargement et d'une mise en cache à la demande (`runtimeCaching` en `CacheFirst`), réduisant le poids d'installation initial de la PWA de plus de 7 Mo.
+  - **Nettoyage Automatique des Traces de Debug en Production** : Configuration d'`esbuild` pour purger automatiquement les appels `console.log` et `debugger` lors des builds de production.
+
 ## [1.6.9] - 2026-09-17
 
 - **Maintien des Cercles Jaunes d'Observation sur Toutes les Variantes (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :

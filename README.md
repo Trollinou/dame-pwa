@@ -19,6 +19,10 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
   - `src/stores/agenda.ts` : Store Pinia gérant la récupération des événements de l'agenda et leurs catégories.
   - `src/queryClient.ts` : Configuration de TanStack Query avec persistance et invalidation automatique des caches de requêtes lors des montées de version PWA.
 - **Rendu Visuel Unifié (`mode: 'ios'`) & Adaptation Dynamique en Hauteur (`vh` / `clamp`)** : Initialisation d'Ionic configurée en mode `ios` global associée à une échelle typographique et des variables de mise en page réactives en hauteur (`--app-section-gap`, `--app-item-min-height`, `--app-card-padding`), assurant une occupation à 100 % de l'écran et une lisibilité immédiate sans zoom sur tous les smartphones (iPhone, Samsung One UI, Xiaomi et Pixel 9 sous Android 14/15).
+- **Stratégie de Performance & Découpage de Bundle (`pwa/vite.config.ts`)** :
+  - **Manual Chunks** : Découpage ciblé des dépendances lourdes (`chess-vendor` pour `eg-chessboard` et `chessops`, `confetti-vendor` pour `canvas-confetti`, `ionic-vendor`, `tanstack-vendor`, `vue-vendor`) afin de différer le chargement du moteur d'échecs aux seules pages de jeu et d'analyse.
+  - **Service Worker Allégé & Cache Stockfish à la Demande** : Retrait du binaire Stockfish WASM (7.3 Mo) du pré-cache initial (`globPatterns`) au profit d'une mise en cache dynamique (`runtimeCaching` en `CacheFirst` pendant 30 jours), réduisant l'empreinte d'installation initiale de la PWA à ~3.2 Mo.
+  - **Nettoyage Automatique de Production** : Purge systématique des `console.log` et `debugger` en build de production via `esbuild.drop`.
 
 ## Espace de Jeu & Apprentissage
 
