@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Harmonisation des Stores Pinia & Modularisation de l'Authentification (`auth.ts`, `news.ts`, `tournament.ts`, `NewsPage.vue`, `types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`)** :
+  - **Modularisation de `auth.ts`** : Découpage du méga-store monolithique de 780 lignes en sous-modules spécialisés dans `pwa/src/stores/auth/` (`types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`) tout en conservant une façade `useAuthStore` unifiée garantissant 100% de rétrocompatibilité pour tous les composants.
+  - **Harmonisation TanStack Query dans `news.ts`** : Suppression du double état (*Dual State* avec `customPosts` et `isCustomLoading`) au profit du cache TanStack Query réactif direct (`queryClient.setQueryData`), avec gestion locale du chargement de recherche/pagination dans `NewsPage.vue`.
+  - **Nettoyage de `tournament.ts`** : Suppression de la référence morte `cachedPages` non utilisée.
+  - **Alignement Architectural** : Séparation claire et cohérente entre le *Client State* persistant (Pinia avec `pinia-plugin-persistedstate`) et le *Server State* asynchrone mis en cache (TanStack Query `useQuery`).
+
 ## [1.6.9] - 2026-09-17
 
 - **Maintien des Cercles Jaunes d'Observation sur Toutes les Variantes (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
