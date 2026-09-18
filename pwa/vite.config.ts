@@ -18,6 +18,9 @@ export default defineConfig( {
 		__APP_VERSION__: JSON.stringify( packageJson.version ),
 	},
 	base: './', // Chemins relatifs pour les assets (indispensable pour WordPress)
+	esbuild: {
+		drop: process.env.NODE_ENV === 'production' ? [ 'console', 'debugger' ] : [],
+	},
 	plugins: [
 		vue( {
 			template: {
@@ -56,9 +59,8 @@ export default defineConfig( {
 			workbox: {
 				skipWaiting: true,
 				clientsClaim: true,
-				// On s'assure que tous les assets nécessaires sont mis en cache
-				globPatterns: [ '**/*.{js,css,html,ico,png,svg,wasm}' ],
-				// On augmente la limite de taille pour le fichier WASM de Stockfish (environ 7Mo)
+				// Assets essentiels mis en cache (sans wasm pour alléger le pré-cache initial)
+				globPatterns: [ '**/*.{js,css,html,ico,png,svg}' ],
 				maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 				runtimeCaching: [
 					{
@@ -72,6 +74,17 @@ export default defineConfig( {
 							},
 							cacheableResponse: {
 								statuses: [ 0, 200 ],
+							},
+						},
+					},
+					{
+						urlPattern: /.*\.(?:png|jpg|jpeg|svg|ico|webp)$/,
+						handler: 'CacheFirst',
+						options: {
+							cacheName: 'pwa-images-cache',
+							expiration: {
+								maxEntries: 60,
+								maxAgeSeconds: 15 * 24 * 60 * 60,
 							},
 						},
 					},
@@ -109,6 +122,15 @@ export default defineConfig( {
 						}
 						if ( id.includes( 'node_modules/@tanstack/' ) ) {
 							return 'tanstack-vendor';
+						}
+						if (
+							id.includes( 'node_modules/eg-chessboard/' ) ||
+							id.includes( 'node_modules/chessops/' )
+						) {
+							return 'chess-vendor';
+						}
+						if ( id.includes( 'node_modules/canvas-confetti/' ) ) {
+							return 'confetti-vendor';
 						}
 					}
 				},
