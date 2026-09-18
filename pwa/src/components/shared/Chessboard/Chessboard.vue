@@ -21,6 +21,7 @@
       :stockfish-config="resolvedStockfishConfig"
       :piece-set="props.pieceSet || chessPreferences.pieceSet"
       :board-theme="props.boardTheme || chessPreferences.boardTheme"
+      :fit-container="props.fitContainer"
       @board-created="handleBoardCreated"
       @move="(move: Move) => emit('move', move)"
       @turn-change="(turn: 'white' | 'black', ply: number) => emit('turn-change', turn, ply)"
@@ -87,7 +88,8 @@ const props = withDefaults(defineProps<ChessboardProps>(), {
   coordinates: true,
   autoCastling: true,
   stockfishEnabled: false,
-  zoomable: false
+  zoomable: false,
+  fitContainer: false
 });
 
 const emit = defineEmits<ChessboardEmits>();
@@ -337,6 +339,14 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
   if (pressTimer) clearTimeout(pressTimer);
   if (clickSuppressionTimer) clearTimeout(clickSuppressionTimer);
+  if (zoomBoardApi.value && typeof zoomBoardApi.value.destroy === 'function') {
+    try {
+      zoomBoardApi.value.destroy();
+    } catch {
+      // Nettoyage sécurisé
+    }
+    zoomBoardApi.value = null;
+  }
   if (boardApi.value && typeof boardApi.value.destroy === 'function') {
     try {
       boardApi.value.destroy();

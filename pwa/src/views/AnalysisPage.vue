@@ -32,12 +32,10 @@
           <div class="board-section">
             <div class="board-container">
               <!-- Échiquier (Mode Lecture Seule) -->
-              <TheChessboard 
+              <Chessboard 
                 v-if="isReady"
                 :key="`board-${isLandscape ? 'l' : 'p'}-${renderKey}`"
                 :board-config="boardConfig"
-                :piece-set="chessPreferences.pieceSet"
-                :board-theme="chessPreferences.boardTheme"
                 @board-created="handleBoardCreated"
                 @move="handleMove"
               />
@@ -137,11 +135,9 @@ import {
   playForwardOutline 
 } from 'ionicons/icons';
 import { ref, onMounted, onUnmounted, reactive, watch, computed } from 'vue';
-import TheChessboard from 'eg-chessboard/vue';
+import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore } from 'eg-chessboard';
-import 'eg-chessboard/style.css';
 import { useChessStore } from '@/stores/chess';
-import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
 export interface HistoryMoveItem {
   number: number;
@@ -150,7 +146,6 @@ export interface HistoryMoveItem {
 }
 
 const chessStore = useChessStore();
-const chessPreferences = useChessPreferencesStore();
 let boardApi: BoardCore | null = null;
 const isReady = ref(false);
 const currentPly = ref(0);
