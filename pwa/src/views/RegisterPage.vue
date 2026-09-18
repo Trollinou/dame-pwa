@@ -116,6 +116,7 @@ import {
 } from 'ionicons/icons';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { safeFetch } from '@/utils/safeFetch';
 
 const router = useRouter();
 
@@ -154,7 +155,7 @@ const handleRegister = async () => {
 
   try {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
-    const response = await fetch(`${apiUrl}/dame/v1/register`, {
+    const response = await safeFetch(`${apiUrl}/dame/v1/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -164,7 +165,7 @@ const handleRegister = async () => {
         email: email.value,
         password: password.value,
       }),
-    });
+    }, 8000);
 
     const data = await response.json();
 

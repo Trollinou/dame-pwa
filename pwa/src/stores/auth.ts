@@ -14,6 +14,7 @@ import {
 } from './auth/jwtService';
 import { useIdentitiesService } from './auth/identitiesService';
 import { useAppConfig } from './auth/appConfig';
+import { safeFetch } from '@/utils/safeFetch';
 
 // Import des autres stores pour nettoyage au logout
 import { useAgendaStore } from './agenda';
@@ -296,7 +297,7 @@ export const useAuthStore = defineStore(
 					let email = '';
 
 					try {
-						const profileRes = await fetch(
+						const profileRes = await safeFetch(
 							`${
 								import.meta.env.VITE_API_BASE_URL
 							}/wp/v2/users/me?context=edit`,

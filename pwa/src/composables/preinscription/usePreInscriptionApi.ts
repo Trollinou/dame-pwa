@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { safeFetch } from '@/utils/safeFetch';
 import {
 	useAuthStore,
 	type Identity,
@@ -141,8 +142,8 @@ export function usePreInscriptionApi() {
 		isExistingPreInscription.value = false;
 		currentPreInscriptionId.value = null;
 
-		const makeRequest = async () => {
-			return fetch(
+		try {
+			const response = await safeFetch(
 				`${
 					import.meta.env.VITE_API_BASE_URL
 				}/dame/v1/adherent-details?adherent_id=${ memberId }`,
@@ -150,18 +151,6 @@ export function usePreInscriptionApi() {
 					headers: { Authorization: `Bearer ${ authStore.token }` },
 				}
 			);
-		};
-
-		try {
-			let response = await makeRequest();
-
-			if ( response.status === 401 ) {
-				console.warn(
-					'Token expiré ou invalide (401), tentative de rafraîchissement...'
-				);
-				await authStore.validateSession();
-				response = await makeRequest();
-			}
 
 			if ( response.ok ) {
 				const data = await response.json();
@@ -250,7 +239,7 @@ export function usePreInscriptionApi() {
 				bodyData.pre_inscription_id = currentPreInscriptionId.value;
 			}
 
-			const response = await fetch(
+			const response = await safeFetch(
 				`${
 					import.meta.env.VITE_API_BASE_URL
 				}/dame/v1/pre-inscription`,
@@ -314,7 +303,7 @@ export function usePreInscriptionApi() {
 				headers.Authorization = `Bearer ${ authStore.token }`;
 			}
 
-			const response = await fetch( url, { headers } );
+			const response = await safeFetch( url, { headers } );
 			if ( ! response.ok ) {
 				throw new Error( 'Erreur de téléchargement' );
 			}

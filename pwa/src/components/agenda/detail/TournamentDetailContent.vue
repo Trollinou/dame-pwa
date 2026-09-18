@@ -35,6 +35,7 @@ import {
   IonIcon
 } from '@ionic/vue';
 import { cloudOfflineOutline } from 'ionicons/icons';
+import { safeFetch } from '@/utils/safeFetch';
 import { useTournamentStore } from '@/stores/tournament';
 import { useInternalLinks } from '@/composables/useInternalLinks';
 import type { WpPage } from '@/types/wp';
@@ -108,7 +109,7 @@ const loadPage = async () => {
       url += `?slug=${idOrSlug}`;
     }
 
-    const response = await fetch(url);
+    const response = await safeFetch(url, {}, 4000);
     if (response.ok) {
       const data = await response.json();
       localPage.value = isId ? data : data[0];

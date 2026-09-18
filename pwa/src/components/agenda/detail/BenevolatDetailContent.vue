@@ -149,6 +149,7 @@ import {
   toastController
 } from '@ionic/vue';
 import { alertCircle } from 'ionicons/icons';
+import { safeFetch } from '@/utils/safeFetch';
 import { useBenevolatStore, type Benevolat, type BenevolatReponse } from '@/stores/benevolat';
 import { useAuthStore } from '@/stores/auth';
 
@@ -237,7 +238,7 @@ const fetchMyVote = async () => {
   }
 
   try {
-    const response = await fetch(
+    const response = await safeFetch(
       `${import.meta.env.VITE_API_BASE_URL}/dame/v1/benevolats/${activeId.value}/my-vote`,
       {
         headers: {
@@ -267,7 +268,7 @@ const submitVote = async () => {
   isSubmitting.value = true;
 
   try {
-    const response = await fetch(
+    const response = await safeFetch(
       `${import.meta.env.VITE_API_BASE_URL}/dame/v1/benevolats/${activeId.value}/vote`,
       {
         method: 'POST',
