@@ -62,11 +62,11 @@ Pour garantir la cohérence technique, l'application s'appuie sur un socle de co
 ### 1. Composant Wrapper `<Chessboard>` (`src/components/shared/Chessboard/`)
 Encapsule la bibliothèque `eg-chessboard` et centralise la configuration globale de l'échiquier :
 - **Injection automatique des préférences** : Applique de manière réactive le style de pièces (`pieceSet`) et le thème du plateau (`boardTheme`) issus de `useChessPreferencesStore`.
-- **Nettoyage automatique du cycle de vie** : Détruit proprement l'instance sous-jacente (`boardApi.destroy()`) à la destruction du composant (`onUnmounted`) pour prévenir les fuites de mémoire.
-- **Props principales** : `fen`, `shapes`, `viewOnly` (défaut: `true`), `orientation`, `playerColor`, `coordinates`, `autoCastling`, `highlightLastMove`, `lastMove`, `stockfishEnabled`, `stockfishConfig`, `zoomable` (défaut: `false` sur `Chessboard`, `true` sur `DiagramViewer`).
+- **Nettoyage automatique du cycle de vie** : Détruit proprement l'instance principale (`boardApi.destroy()`) et l'instance de zoom modal (`zoomBoardApi.destroy()`) à la destruction du composant (`onUnmounted`) pour prévenir toute fuite de mémoire ou persistance des Web Workers Stockfish.
+- **Props principales** : `fen`, `shapes`, `viewOnly` (défaut: `true`), `orientation`, `playerColor`, `coordinates`, `autoCastling`, `highlightLastMove`, `lastMove`, `stockfishEnabled`, `stockfishConfig`, `zoomable` (défaut: `false` sur `Chessboard`, `true` sur `DiagramViewer`), `fitContainer` (défaut: `false`).
 - **Zoom plein écran universel intégré** : Lorsqu'activé (`zoomable="true"`), l'échiquier prend en charge l'appui prolongé (touch 500ms) et le clic droit pour ouvrir une modale plein écran haute résolution téléportée (`<Teleport to="body">`) avec neutralisation des clics parasites au relâchement.
 - **Événements supportés** : `@board-created`, `@move`, `@turn-change`, `@check`, `@checkmate`, `@stalemate`, `@draw`, `@stockfish-hint`, `@square-click`, `@shapes-change`, `@promotion`.
-- **Adoption unifiée** : Utilisé de façon homogène par tous les viewers d'apprentissage (`ABCDaireTactiqueViewer`, `PuzzleViewer`, `QcmViewer`, `ParcoursViewer`, `VisionViewer`, `CapOuPasCapViewer`, `InteractiveQcmViewer`, `MatchingViewer`, `EvalViewer`, `JugementFinalViewer`, `DiagramViewer`, `PgnViewer`, `PlacementViewer`, `QuiSuisJeViewer`, `OuvreBoiteViewer`).
+- **Adoption unifiée** : Utilisé de façon homogène et exclusive par l'intégralité de l'application (pages `PlayPage.vue`, `AnalysisPage.vue`, `ChessThemeCustomizer.vue`, `TypePartieHeros.vue` et tous les viewers d'apprentissage : `ABCDaireTactiqueViewer`, `PuzzleViewer`, `QcmViewer`, `ParcoursViewer`, `VisionViewer`, `CapOuPasCapViewer`, `InteractiveQcmViewer`, `MatchingViewer`, `EvalViewer`, `JugementFinalViewer`, `DiagramViewer`, `PgnViewer`, `PlacementViewer`, `QuiSuisJeViewer`, `OuvreBoiteViewer`, `TextOrderViewer`, `OrderViewer`).
 
 ```vue
 <template>

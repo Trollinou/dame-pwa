@@ -109,6 +109,11 @@ export interface ChessboardProps {
 	 * Active la possibilité d'ouvrir un aperçu zoomé grand format via un appui prolongé ou clic droit.
 	 */
 	zoomable?: boolean;
+
+	/**
+	 * Étend l'échiquier à 100% de la hauteur/largeur du conteneur parent (supprime les ratios fixes).
+	 */
+	fitContainer?: boolean;
 }
 
 export type ChessboardEmits = {

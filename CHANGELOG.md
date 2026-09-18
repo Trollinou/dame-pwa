@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Unification du Wrapper `<Chessboard>` et Centralisation du Lifecycle (`Chessboard.vue`, `types.ts`, `PlayPage.vue`, `AnalysisPage.vue`, `ChessThemeCustomizer.vue`)** :
+  - **Migration complète vers `<Chessboard>`** : Remplacement des imports directs de `TheChessboard` dans `PlayPage.vue`, `AnalysisPage.vue` et `ChessThemeCustomizer.vue` par le composant maître unifié `src/components/shared/Chessboard/Chessboard.vue`.
+  - **Suppression des duplications** : Élimination des imports redondants de `eg-chessboard/style.css` et du binding manuel des préférences `piece-set`/`board-theme` (gérés de manière transparente par le wrapper).
+  - **Support du conteneur flexible (`fitContainer`)** : Ajout de la prop `fitContainer?: boolean` sur `<Chessboard>` pour la gestion dynamique des dimensions sans ratio fixe.
+  - **Nettoyage et Lifecycle étanche** : Renforcement du hook `onUnmounted` dans `Chessboard.vue` pour détruire systématiquement à la fois l'échiquier principal (`boardApi`) et l'échiquier modal de zoom (`zoomBoardApi`), prévenant toute fuite de ressources ou de Web Workers Stockfish.
+
 ## [1.6.9] - 2026-09-17
 
 - **Maintien des Cercles Jaunes d'Observation sur Toutes les Variantes (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
