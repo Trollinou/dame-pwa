@@ -622,10 +622,7 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			consigne: 'Comptez le nombre d’attaquants et de défenseurs.',
 			variante: 'qcm_multiple',
 			options_reponse: [ '0', '1', '2', '3' ],
-			propositions: [
-				'Nb Attaquant',
-				'Nb Defenseur',
-			],
+			propositions: [ 'Nb Attaquant', 'Nb Defenseur' ],
 			exercices: [
 				{
 					pgn: samplePgn,
@@ -658,10 +655,14 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		// Choix inexact : Nb Attaquant = '1', Nb Defenseur = '1'
 		await row0Btns[ 1 ].trigger( 'click' );
 		await row1Btns[ 1 ].trigger( 'click' );
-		expect( wrapper.text() ).toContain( 'Certaines réponses sont inexactes' );
+		expect( wrapper.text() ).toContain(
+			'Certaines réponses sont inexactes'
+		);
 
 		// Correction : Nb Attaquant = '2' (index 2), Nb Defenseur = '1' (index 1)
 		await row0Btns[ 2 ].trigger( 'click' );
-		expect( wrapper.text() ).toContain( 'Excellent ! Toutes vos réponses sont exactes.' );
+		expect( wrapper.text() ).toContain(
+			'Excellent ! Toutes vos réponses sont exactes.'
+		);
 	} );
 } );
