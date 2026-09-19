@@ -128,7 +128,7 @@ describe( 'TypePartieHeros.vue', () => {
 		const choiceBtns = wrapper.findAll( '.choice-btn' );
 		expect( choiceBtns.length ).toBeGreaterThanOrEqual( 2 );
 		const correctBtn = choiceBtns.find(
-			( btn ) => btn.text().trim() === 'a6'
+			( btn ) => btn.text().includes( 'a6' )
 		);
 		expect( correctBtn ).toBeDefined();
 		await correctBtn!.trigger( 'click' );

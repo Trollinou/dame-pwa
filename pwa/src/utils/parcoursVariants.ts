@@ -321,16 +321,10 @@ export function extractPieceTypeFromFen( fen: string ): PieceRole | null {
 	return null;
 }
 
+import { getPieceLabel } from './chessNotation';
+
 export function getPieceRoleLabel( role: string ): string {
-	const labels: Record< string, string > = {
-		k: 'Roi',
-		q: 'Dame',
-		r: 'Tour',
-		b: 'Fou',
-		n: 'Cavalier',
-		p: 'Pion',
-	};
-	return labels[ role.toLowerCase() ] || 'Pièce';
+	return getPieceLabel( role );
 }
 
 const variantRegistry = new Map< string, ParcoursVariant >();

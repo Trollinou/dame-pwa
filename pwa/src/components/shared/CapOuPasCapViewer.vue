@@ -284,7 +284,13 @@ import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { Chess } from 'chessops';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
-import { toFrenchNotation } from '@/utils/partieHerosParser';
+import {
+  toFrenchNotation,
+  getPieceDisplayName,
+  ROLE_LETTERS_FR,
+  CHAR_TO_ROLE,
+  extractShapesAndComment,
+} from '@/utils/chessNotation';
 
 const chessPreferences = useChessPreferencesStore();
 
@@ -617,39 +623,10 @@ const currentPgnData = computed<ParsedPgnData>(() => {
 
       // Parser les flèches et cercles dans les commentaires
       if (allComments.length > 0) {
-        const fullText = allComments.join(' ');
-        const calRegex = /\[%(?:cal|cpl)\s+([^\]]+)\]/gi;
-        let calMatch: RegExpExecArray | null;
-        while ((calMatch = calRegex.exec(fullText)) !== null) {
-          const items = calMatch[1].split(',');
-          for (const item of items) {
-            const clean = item.trim();
-            if (clean.length >= 5) {
-              const brushChar = clean[0].toLowerCase();
-              const orig = clean.substring(1, 3).toLowerCase() as Key;
-              const dest = clean.substring(3, 5).toLowerCase() as Key;
-              const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
-              if (!extractedShapes.some((s) => s.orig === orig && s.dest === dest)) {
-                extractedShapes.push({ orig, dest, brush });
-              }
-            }
-          }
-        }
-
-        const cslRegex = /\[%(?:csl)\s+([^\]]+)\]/gi;
-        let cslMatch: RegExpExecArray | null;
-        while ((cslMatch = cslRegex.exec(fullText)) !== null) {
-          const items = cslMatch[1].split(',');
-          for (const item of items) {
-            const clean = item.trim();
-            if (clean.length >= 3) {
-              const brushChar = clean[0].toLowerCase();
-              const orig = clean.substring(1, 3).toLowerCase() as Key;
-              const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
-              if (!extractedShapes.some((s) => s.orig === orig && !s.dest)) {
-                extractedShapes.push({ orig, brush });
-              }
-            }
+        const parsed = extractShapesAndComment(allComments);
+        for (const s of parsed.shapes) {
+          if (!extractedShapes.some((exist) => exist.orig === s.orig && exist.dest === s.dest)) {
+            extractedShapes.push(s);
           }
         }
       }
@@ -659,38 +636,10 @@ const currentPgnData = computed<ParsedPgnData>(() => {
   }
 
   // Fallback direct sur le texte brut du PGN pour extraire les annotations de forme si non trouvées
-  const calRegex = /\[%(?:cal|cpl)\s+([^\]]+)\]/gi;
-  let calMatch: RegExpExecArray | null;
-  while ((calMatch = calRegex.exec(rawPgn)) !== null) {
-    const items = calMatch[1].split(',');
-    for (const item of items) {
-      const clean = item.trim();
-      if (clean.length >= 5) {
-        const brushChar = clean[0].toLowerCase();
-        const orig = clean.substring(1, 3).toLowerCase() as Key;
-        const dest = clean.substring(3, 5).toLowerCase() as Key;
-        const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
-        if (!extractedShapes.some((s) => s.orig === orig && s.dest === dest)) {
-          extractedShapes.push({ orig, dest, brush });
-        }
-      }
-    }
-  }
-
-  const cslRegex = /\[%(?:csl)\s+([^\]]+)\]/gi;
-  let cslMatch: RegExpExecArray | null;
-  while ((cslMatch = cslRegex.exec(rawPgn)) !== null) {
-    const items = cslMatch[1].split(',');
-    for (const item of items) {
-      const clean = item.trim();
-      if (clean.length >= 3) {
-        const brushChar = clean[0].toLowerCase();
-        const orig = clean.substring(1, 3).toLowerCase() as Key;
-        const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
-        if (!extractedShapes.some((s) => s.orig === orig && !s.dest)) {
-          extractedShapes.push({ orig, brush });
-        }
-      }
+  const rawParsed = extractShapesAndComment(rawPgn);
+  for (const s of rawParsed.shapes) {
+    if (!extractedShapes.some((exist) => exist.orig === s.orig && exist.dest === s.dest)) {
+      extractedShapes.push(s);
     }
   }
 
@@ -884,51 +833,9 @@ function extractPiecesFromFen(fen: string): BoardPieceItem[] {
         const color: 'white' | 'black' = isWhite ? 'white' : 'black';
         const lower = char.toLowerCase();
 
-        let role: 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn' = 'pawn';
-        let letterFr = '';
-        let nameFr = 'Pion';
-        let isFeminine = false;
-
-        switch (lower) {
-          case 'k':
-            role = 'king';
-            letterFr = 'R';
-            nameFr = 'Roi';
-            break;
-          case 'q':
-            role = 'queen';
-            letterFr = 'D';
-            nameFr = 'Dame';
-            isFeminine = true;
-            break;
-          case 'r':
-            role = 'rook';
-            letterFr = 'T';
-            nameFr = 'Tour';
-            isFeminine = true;
-            break;
-          case 'b':
-            role = 'bishop';
-            letterFr = 'F';
-            nameFr = 'Fou';
-            break;
-          case 'n':
-            role = 'knight';
-            letterFr = 'C';
-            nameFr = 'Cavalier';
-            break;
-          case 'p':
-          default:
-            role = 'pawn';
-            letterFr = '';
-            nameFr = 'Pion';
-            break;
-        }
-
-        const colorAdjective = isWhite
-          ? (isFeminine ? 'blanche' : 'blanc')
-          : (isFeminine ? 'noire' : 'noir');
-        const label = `${nameFr} ${colorAdjective}`;
+        const role = CHAR_TO_ROLE[lower] || 'pawn';
+        const letterFr = ROLE_LETTERS_FR[role] || '';
+        const label = getPieceDisplayName(role, color);
         const expectedNotation = `${letterFr}${square}`;
 
         pieces.push({

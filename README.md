@@ -62,6 +62,7 @@ L'application suit un principe de découplage strict :
   - Déroulement en série de 6 situations pour Ouvre'boîte (Type 13) : parsing automatique de 6 Mini-PGN avec flèches indicatrices `[%cal]`, déduction de la bonne réponse (branche principale) et des variantes d'erreur, traduction en libellés français clairs (*Pion e2 en e4*, *Fou f1 en b5*...), mélange aléatoire des choix, panneau d'explications détaillées et navigation unifiée avec `ContentHeader` et `SeriesCardFooter`.
   - Déroulement en série de 5 mini-situations pour Cap ou pas Cap ? (Type 14) : support des variantes `qcm_multiple`, `qcm_oui_non` (avec options de réponses dynamiques configurables, ex: OUI/NON, BLANC/NOIR/ÉGALE, 0/1/2/3 et rétrocompatibilité totale), `move` (support des coups simples et multi-solutions avec variantes PGN et récapitulatif des coups trouvés en notation française), `notation` (apprentissage du repérage et notation française des pièces), `clic` (sélection/cerclage des pièces cibles ou différentiel de matériel avec bouton d'égalité) et `setup` (reconstitution sur échiquier vierge d'après texte descriptif ou de mémoire avec bouton pour revoir la position et conseil de l'entraîneur), sélecteurs neutres tactiles, masquage initial puis révélation complète des shapes et navigation `SeriesCardFooter`.
   - Déroulement en série de 6 devinettes pour Qui-suis-je ? (Type 12) : support des variantes `pieces` (indices textuels multilignes + palette des 6 pièces blanches en notation française) et `cases` (indices textuels multilignes + échiquier interactif avec révélation par cercle vert), enchaînement fluide avec `ContentHeader` et `SeriesCardFooter`.
+  - Déroulement par cartes pour 100 Commandements (Type 1), Pop'Echecs (Type 2) et ABCDaire Tactique (Type 3) : prise en charge des consignes globales et surcharges par diagramme/Mini-PGN, indicateur visuel de la pièce à placer (`ion-chip` avec `ion-avatar` SVG et concordance grammaticale de genre en français pour Pop'Echecs).
   - Masquage initial des `shapes` de solution pendant la recherche, avec **maintien visible du cercle jaune (`brush: 'yellow'`)** pour mettre en évidence la pièce d'étude (Types 2 Pop'Echecs, 3 ABCDaire Tactique et 14 Cap ou pas Cap ? dans toutes les variantes), puis révélation complète des annotations dès la réussite.
   - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
   - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec mode plein écran universel (hybride Fullscreen natif Android/Desktop + Pseudo-Fullscreen CSS iOS sans blocage), bascule automatique en immersion lors de la rotation paysage sur mobile et validation de progression au seuil de 95%.
@@ -254,6 +255,25 @@ Centralise la gestion du cycle de vie des mises à jour applicatives et la purge
 - **Rechargement sur `controllerchange`** : Dès qu'un nouveau Service Worker s'active (`skipWaiting`), l'application est rechargée instantanément.
 - **Cache-Busting d'URL Dynamique** : Paramètre de version `?v=` injecté lors de la redirection `/pwa` (`Plugin.php`) pour forcer WebKit à bypasser le cache local sur les WebClips iOS.
 - **Purge d'urgence & Préservation de session** : Fonction `clearCacheAndReload()` nettoyant le `CacheStorage` et `DAME_QUERY_CACHE` tout en maintenant intacts les jetons JWT et l'identité sélectionnée.
+
+### 10. Utilitaires de Notation d'Échecs & Manipulation PGN (`src/utils/chessNotation.ts`)
+Centralise et standardise toutes les opérations sur la notation échiquéenne française, les libellés de pièces, l'extraction de formes PGN et les algorithmes de mélange aléatoire :
+- **Dictionnaires & Mappings de Rôles** :
+  - `ROLE_NAMES_FR` : Noms en français (`pawn` -> `'Pion'`, `knight` -> `'Cavalier'`, `bishop` -> `'Fou'`, `rook` -> `'Tour'`, `queen` -> `'Dame'`, `king` -> `'Roi'`).
+  - `ROLE_LETTERS_FR` : Initiales SAN françaises (`'C'`, `'F'`, `'T'`, `'D'`, `'R'`).
+  - `CHAR_TO_ROLE` & `ROLE_TO_CHAR` : Conversion bidirectionnelle caractères FEN $\leftrightarrow$ rôles `chessops`.
+- **Verbalisation & Libellés** :
+  - `getPieceLabel(roleOrChar)` : Nom simple de la pièce en français (ex: `'n'` $\rightarrow$ `'Cavalier'`).
+  - `getPieceDisplayName(roleOrChar, color)` : Nom avec accord en genre et en couleur (ex: `('r', 'white')` $\rightarrow$ `'Tour blanche'`, `('n', 'black')` $\rightarrow$ `'Cavalier noir'`).
+  - `cleanNotation(raw)` : Nettoyage et normalisation de saisies textuelles de coups (ex: `' ta1 '` $\rightarrow$ `'Ta1'`).
+  - `toFrenchNotation(san)` : Conversion SAN international vers français (ex: `'Nf3'` $\rightarrow$ `'Cf3'`).
+  - `toInternationalNotation(san)` : Conversion SAN français vers international (ex: `'Cf3'` $\rightarrow$ `'Nf3'`).
+  - `formatMoveInFrench(pos, san)` : Traduit un coup sur une position en libellé d'action clair (ex: `'Fou f1 en c4'`).
+  - `formatMoveWithFrenchSan(pos, san)` : Libellé complet avec rappel SAN (ex: `'Fou f1 en c4 (Fc4)'`).
+- **Extraction des Annotations PGN (`[%csl]`, `[%cal]`)** :
+  - `extractShapesAndComment(comments)` / `extractShapesAndText(comments)` : Analyse les balises de cercles/flèches Lichess/ChessBase, applique la palette `PGN_BRUSH_MAP` et renvoie `{ comment, shapes }`.
+- **Algorithme de Mélange Aléatoire** :
+  - `shuffleArray<T>(array, rng?)` : Mélange de Fisher-Yates immuable préservant le tableau original.
 
 ## API REST & Hooks Partagés
 

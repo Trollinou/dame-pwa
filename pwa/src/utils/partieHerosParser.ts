@@ -45,104 +45,24 @@ export interface QcmStage {
 
 export type PartieHerosStage = PgnStage | QcmStage;
 
-const brushMap: Record< string, string > = {
-	g: 'green',
-	r: 'red',
-	b: 'blue',
-	y: 'yellow',
-	c: 'green',
-	o: 'yellow',
+import {
+	toFrenchNotation,
+	formatMoveWithFrenchSan,
+	extractShapesAndComment,
+	shuffleArray,
+} from './chessNotation';
+
+export {
+	toFrenchNotation,
+	formatMoveWithFrenchSan,
+	extractShapesAndComment,
+	shuffleArray,
 };
 
 /**
- * Convertit un coup SAN de notation internationale (K, Q, R, B, N)
- * en notation française (R, D, T, F, C).
- * @param san
+ * Mélange aléatoirement les choix d'un QCM (alias vers shuffleArray).
  */
-export function toFrenchNotation( san: string ): string {
-	if ( ! san ) {
-		return '';
-	}
-	const pieceMap: Record< string, string > = {
-		K: 'R', // Roi
-		Q: 'D', // Dame
-		R: 'T', // Tour
-		B: 'F', // Fou
-		N: 'C', // Cavalier
-	};
-	return san.replace( /[KQRBN]/g, ( match ) => pieceMap[ match ] || match );
-}
-
-/**
- * Extrait les formes graphiques ([%csl ...], [%cal ...]) et le texte de commentaire nettoyé.
- * @param comments
- */
-export function extractShapesAndComment( comments?: string[] ): {
-	comment: string;
-	shapes: DrawShape[];
-} {
-	if ( ! comments || comments.length === 0 ) {
-		return { comment: '', shapes: [] };
-	}
-
-	const fullText = comments.join( '\n' );
-	const shapes: DrawShape[] = [];
-
-	// 1. Cercles/cases [%csl ...] ou [%cpl ...]
-	const cslRegex = /\[%(?:csl|cpl)\s+([^\]]+)\]/gi;
-	let cslMatch: RegExpExecArray | null;
-	while ( ( cslMatch = cslRegex.exec( fullText ) ) !== null ) {
-		const items = cslMatch[ 1 ].split( ',' );
-		for ( const item of items ) {
-			const clean = item.trim();
-			if ( clean.length >= 3 ) {
-				const brush = brushMap[ clean[ 0 ].toLowerCase() ] || 'green';
-				const orig = clean.substring( 1, 3 ).toLowerCase() as Key;
-				shapes.push( { orig, brush } );
-			}
-		}
-	}
-
-	// 2. Flèches [%cal ...]
-	const calRegex = /\[%cal\s+([^\]]+)\]/gi;
-	let calMatch: RegExpExecArray | null;
-	while ( ( calMatch = calRegex.exec( fullText ) ) !== null ) {
-		const items = calMatch[ 1 ].split( ',' );
-		for ( const item of items ) {
-			const clean = item.trim();
-			if ( clean.length >= 5 ) {
-				const brush = brushMap[ clean[ 0 ].toLowerCase() ] || 'green';
-				const orig = clean.substring( 1, 3 ).toLowerCase() as Key;
-				const dest = clean.substring( 3, 5 ).toLowerCase() as Key;
-				shapes.push( { orig, dest, brush } );
-			}
-		}
-	}
-
-	// 3. Commentaire texte sans les annotations de formes
-	const cleanComment = fullText
-		.replace( /\[%(?:cal|csl|cpl)\s+[^\]]+\]/gi, '' )
-		.trim();
-
-	return { comment: cleanComment, shapes };
-}
-
-/**
- * Mélange aléatoirement les choix d'un QCM (algorithme de Fisher-Yates).
- * @param choices
- * @param rng     Fonction aléatoire optionnelle (par défaut Math.random)
- */
-export function shuffleChoices(
-	choices: QcmChoice[],
-	rng: () => number = Math.random
-): QcmChoice[] {
-	const shuffled = [ ...choices ];
-	for ( let i = shuffled.length - 1; i > 0; i-- ) {
-		const j = Math.floor( rng() * ( i + 1 ) );
-		[ shuffled[ i ], shuffled[ j ] ] = [ shuffled[ j ], shuffled[ i ] ];
-	}
-	return shuffled;
-}
+export const shuffleChoices = shuffleArray;
 
 /**
  * Analyse une étude PGN complète et la découpe en étapes séquentielles
@@ -294,16 +214,19 @@ export function parsePartieHerosPgn(
 
 			const choices: QcmChoice[] = [];
 
-			// 1. Coup principal (succès) en notation française sans numéro de coup
+			// 1. Coup principal (succès) avec description en français et notation SAN entre parenthèses
 			choices.push( {
 				san: mainChild.data.san,
-				label: toFrenchNotation( mainChild.data.san ),
+				label: formatMoveWithFrenchSan(
+					currentPos,
+					mainChild.data.san
+				),
 				isCorrect: true,
 				explanation:
 					mainParsed.comment || "Super ! C'est le meilleur coup.",
 			} );
 
-			// 2. Variantes (erreurs avec explications dédiées) en notation française sans numéro de coup
+			// 2. Variantes (erreurs avec explications dédiées)
 			for ( let v = 1; v < node.children.length; v++ ) {
 				const varChild = node.children[ v ];
 				const varParsed = extractShapesAndComment(
@@ -311,10 +234,14 @@ export function parsePartieHerosPgn(
 				);
 				choices.push( {
 					san: varChild.data.san,
-					label: toFrenchNotation( varChild.data.san ),
+					label: formatMoveWithFrenchSan(
+						currentPos,
+						varChild.data.san
+					),
 					isCorrect: false,
 					explanation:
-						varParsed.comment || 'Mauvais choix ! Cherchez encore.',
+						varParsed.comment ||
+						'Mauvais choix ! Cherchez encore.',
 				} );
 			}
 

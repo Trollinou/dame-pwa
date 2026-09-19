@@ -22,6 +22,18 @@
           @square-click="verifierPlacement"
         />
       </div>
+
+      <!-- Indicateur de la pièce à placer -->
+      <div v-if="pieceInfo && pieceDisplayName" class="target-piece-container animate-fade-in">
+        <ion-chip class="target-piece-chip" :class="[`piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
+          <ion-avatar class="piece-avatar">
+            <cg-board class="piece-icon-box">
+              <piece :class="[pieceRole, pieceColor]"></piece>
+            </cg-board>
+          </ion-avatar>
+          <ion-label class="piece-chip-label">Pièce à placer : <strong>{{ pieceDisplayName }}</strong></ion-label>
+        </ion-chip>
+      </div>
     </div>
 
     <!-- Footer de Navigation par Carte avec Feedback Fixe -->
@@ -37,8 +49,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue';
+import { IonChip, IonAvatar, IonLabel } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import {
   findBlueCircledSquare,
   findPieceOnSquare,
@@ -46,8 +60,11 @@ import {
   getActiveColorFromFen,
   filterYellowShapes
 } from '@/utils/fenUtils';
+import { CHAR_TO_ROLE, getPieceDisplayName } from '@/utils/chessNotation';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+
+const chessPreferences = useChessPreferencesStore();
 
 export interface DiagrammePopEchecs {
   consigne?: string;
@@ -100,7 +117,7 @@ const diagrammeCourant = computed<DiagrammePopEchecs>(() => {
 });
 
 const consigneCourante = computed<string>(() => {
-  return diagrammeCourant.value.consigne || props.consigne || 'Placez la pièce sur la bonne case.';
+  return diagrammeCourant.value.consigne || props.consigne || 'Place la pièce sur la meilleure case.';
 });
 
 const couleurJoueur = computed<'white' | 'black'>(() => {
@@ -116,6 +133,23 @@ const pieceInfo = computed(() => {
     return null;
   }
   return findPieceOnSquare(diagrammeCourant.value.fen, caseCible.value);
+});
+
+const pieceRole = computed(() => {
+  if (!pieceInfo.value) return '';
+  return CHAR_TO_ROLE[pieceInfo.value.type.toLowerCase()] || pieceInfo.value.type;
+});
+
+const pieceColor = computed<'white' | 'black'>(() => {
+  if (!pieceInfo.value) return 'white';
+  return pieceInfo.value.color === 'w' ? 'white' : 'black';
+});
+
+const pieceDisplayName = computed<string | null>(() => {
+  if (!pieceInfo.value) {
+    return null;
+  }
+  return getPieceDisplayName(pieceInfo.value.type, pieceInfo.value.color);
 });
 
 const fenDepart = computed<string>(() => {
@@ -247,6 +281,75 @@ const passerCarteSuivante = () => {
   margin: 10px 0;
 }
 
+.target-piece-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
 
+.target-piece-chip {
+  background: var(--ion-color-light-tint, #f4f5f8);
+  border: 1px solid var(--ion-color-light-shade, #e0e0e0);
+  padding: 4px 12px;
+  height: auto;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.piece-avatar {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+}
+
+/* Suppression du fond damier échiquier derrière la pièce SVG */
+cg-board.piece-icon-box {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  background-image: none !important;
+  background: transparent !important;
+}
+
+cg-board.piece-icon-box piece,
+cg-board.piece-icon-box .piece {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.piece-chip-label {
+  font-size: 0.95rem;
+  color: var(--ion-color-dark, #222222);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>
 

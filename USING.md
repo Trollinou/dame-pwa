@@ -79,12 +79,17 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
    - **Structure des Exercices, Vidéos & Leçons** :
       - **En-tête unifié (`ContentHeader`)** : Affiche le titre de l'étape, le type adapté (« Exercice / Type », « Vidéo » ou « Leçon ») et le chapitre/niveau. Pour les Vidéos et Leçons, le deuxième panneau (consigne / question) est masqué automatiquement.
       - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, dimensionnement stable et constant sur chaque appareil (non altéré par l'apparition de commentaires ou de boutons de choix), ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
+      - **Exercices 100 Commandements (Type 1)** :
+        - Consigne globale par défaut (« Sélectionne la bonne réponse. »), personnalisable dans l'éditeur et surchargeable par diagramme/QCM.
+        - Progression carte par carte avec questions QCM textuelles et choix multiples interactifs.
       - **Exercices Pop'Echecs (Type 2)** :
-        - Série de 4 diagrammes avec consigne propre à chaque position.
-        - Masquage des annotations/formes de solution initiales pendant la phase de réflexion, **à l'exception du cercle jaune optionnel** entourant la pièce d'étude (qui reste visible pour guider l'analyse de situation).
+        - Consigne globale par défaut (« Place la pièce sur la meilleure case. »), surchargeable au niveau de chaque diagramme.
+        - **Indicateur de pièce à placer** : Affichage sous l'échiquier d'un badge interactif (`ion-chip` + `ion-avatar`) présentant l'icône SVG du jeu de pièces actif et l'intitulé complet accordé (ex. *« Dame blanche »*, *« Fou noir »*, *« Pion blanc »*).
+        - Série de 4 diagrammes avec masquage des annotations/formes de solution initiales pendant la phase de réflexion, **à l'exception du cercle jaune optionnel** entourant la pièce d'étude (qui reste visible pour guider l'analyse de situation).
         - Clic sur la case cible : placement de la pièce, validation instantanée, révélation des flèches/formes du diagramme complet.
         - Retrait automatique avec feedback rouge en cas d'erreur de case et rétablissement rigoureux de l'échiquier de départ (préservant intactes toutes les pièces existantes).
       - **Exercices ABCDaire Tactique (Type 3)** :
+        - Consigne globale par défaut (« Trouve le meilleur coup. »), avec possibilité de définir une consigne spécifique pour chaque Mini-PGN.
         - Série de 4 Mini-PGN contenant 1 ou plusieurs coups (attaque, défense, mat, gain matériel).
         - Orientation automatique de l'échiquier selon le trait de la position initiale (Blancs ou Noirs en bas).
         - Masquage des flèches et formes tactiques pendant la recherche et le jeu du coup, **avec maintien visible du cercle jaune** sur la pièce d'étude si défini par l'entraîneur à la racine du PGN.
@@ -96,7 +101,8 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
         - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté pas-à-pas (boutons Début, Précédent, Suivant avec désactivation contextuelle au début et à la fin de la séquence, sans saut direct à la fin pour garantir l'assimilation des coups et commentaires) et embranchements QCM interactifs.
         - Moments de choix QCM identifiés par les 3 flèches indicatrices `[%cal ...]` et les 2 variantes associées au coup principal.
-        - Choix QCM présentés en notation française (R, D, T, F, C) sans numéro de coup parasite, avec mélange aléatoire (Fisher-Yates) des options garantissant que le bon coup n'apparaît pas systématiquement en première position.
+        - Barre de consigne fixe insérée entre l'échiquier et les choix : *« Trouve le coup suivant »*.
+        - Choix QCM présentés sous forme descriptive complète en français suivie de la notation SAN française entre parenthèses (ex : *« Fou f1 en c4 (Fc4) »*, *« Pion e2 en e4 (e4) »*, *« Petit roque (O-O) »*), avec mélange aléatoire (Fisher-Yates) des options garantissant que le bon coup n'apparaît pas systématiquement en première position.
         - Sélection interactive d'un coup parmi les 3 choix :
           - Choix d'une variante : feedback rouge avec l'explication spécifique du mauvais coup rédigée par l'auteur.
           - Choix du coup principal : feedback vert avec l'explication du bon coup, coup joué sur l'échiquier et déblocage de l'étape suivante.

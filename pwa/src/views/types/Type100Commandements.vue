@@ -4,14 +4,14 @@
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="qcmActuel?.question"
+      :consigne="consigneActive"
       :stepBadgeText="`Question ${qcmIndex + 1} / ${qcmsList.length}`"
     />
 
     <QcmViewer
       v-if="qcmActuel"
       :key="qcmIndex"
-      :question="qcmActuel.question"
+      :question="qcmActuel.question || qcmActuel.consigne || ''"
       :hideQuestion="true"
       :choix="qcmActuel.reponses || qcmActuel.choix || []"
       :bonneReponse="qcmActuel.bonne_reponse ?? qcmActuel.bonneReponse ?? 0"
@@ -32,7 +32,8 @@ import { useApprentissageStore } from '@/stores/apprentissage';
 import type { DrawShape } from 'eg-chessboard';
 
 export interface QcmItem {
-  question: string;
+  question?: string;
+  consigne?: string;
   reponses?: string[];
   choix?: string[];
   bonne_reponse?: number;
@@ -42,6 +43,7 @@ export interface QcmItem {
 }
 
 export interface Config100Commandements {
+  consigne?: string;
   qcms?: QcmItem[];
   // Rétrocompatibilité pour QCM unique
   question?: string;
@@ -98,6 +100,15 @@ const qcmsList = computed<QcmItem[]>(() => {
 const qcmActuel = computed<QcmItem | null>(() => {
   if (qcmsList.value.length === 0) return null;
   return qcmsList.value[qcmIndex.value] || qcmsList.value[0];
+});
+
+const consigneActive = computed<string>(() => {
+  return (
+    qcmActuel.value?.consigne ||
+    qcmActuel.value?.question ||
+    props.config?.consigne ||
+    'Sélectionne la bonne réponse.'
+  );
 });
 
 const estDernierQcm = computed(() => {

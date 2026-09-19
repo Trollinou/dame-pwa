@@ -118,6 +118,7 @@ import {
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { DrawShape } from 'eg-chessboard';
+import { shuffleArray } from '@/utils/chessNotation';
 
 export interface MatchingFeedback {
   type: 'success' | 'danger' | 'warning' | 'info';
@@ -183,13 +184,7 @@ const initEchiquiers = () => {
     originalIndex: idx
   }));
 
-  // Fisher-Yates shuffle
-  for (let i = items.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [items[i], items[j]] = [items[j], items[i]];
-  }
-
-  echiquiersMelanges.value = items;
+  echiquiersMelanges.value = shuffleArray(items);
   liaisons.value = {};
   selectionEchiquier.value = null;
   boardsCorrects.value = [];

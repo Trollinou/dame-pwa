@@ -76,6 +76,7 @@ import { ref, onMounted, watch } from 'vue';
 import { IonButton } from '@ionic/vue';
 import DiagramViewer from '@/components/shared/DiagramViewer.vue';
 import { useFeedback } from '@/composables/useFeedback';
+import { shuffleArray } from '@/utils/chessNotation';
 
 const { showError } = useFeedback();
 
@@ -101,15 +102,7 @@ const selectionSlot = ref<number | null>(null);
 
 // Initialisation et mélange
 const initOrder = () => {
-  const itemsCopy = [...props.correctItems];
-  
-  // Mélange de Fisher-Yates
-  for (let i = itemsCopy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [itemsCopy[i], itemsCopy[j]] = [itemsCopy[j], itemsCopy[i]];
-  }
-
-  bank.value = itemsCopy;
+  bank.value = shuffleArray(props.correctItems);
   // Génère dynamiquement le bon nombre de cases vides (3 ou 5)
   slots.value = Array(props.correctItems.length).fill(null);
   selectionBank.value = null;

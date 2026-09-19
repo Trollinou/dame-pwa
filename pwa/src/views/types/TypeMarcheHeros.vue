@@ -100,6 +100,7 @@ import DiagramViewer from '@/components/shared/DiagramViewer.vue';
 import PuzzleViewer from '@/components/shared/PuzzleViewer.vue';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import { shuffleArray } from '@/utils/chessNotation';
 
 import type { Key, DrawShape } from 'eg-chessboard';
 
@@ -387,12 +388,7 @@ const passerEtapeSuivante = () => {
     diagrammesBank.value = diagrammesBank.value.filter(i => !idsToRemove.has(i.id));
 
     // Préparer les cartes mélangées pour l'étape d'ordonnancement
-    const melange = [...itemsSelectionnes.value];
-    for (let i = melange.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [melange[i], melange[j]] = [melange[j], melange[i]];
-    }
-    itemsEnCoursOrdonnancement.value = melange;
+    itemsEnCoursOrdonnancement.value = shuffleArray(itemsSelectionnes.value);
     itemsSelectionnes.value = [];
     sousEtape.value = 'ordonnancement';
     return;
@@ -415,12 +411,7 @@ const passerEtapeSuivante = () => {
       // Pour la dernière série, si les cartes restantes correspondent exactement à la dernière série
       if (serieCouranteIndex.value === nbSeries.value - 1) {
         // Passer directement à l'étape d'ordonnancement !
-        const melange = [...diagrammesBank.value];
-        for (let i = melange.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [melange[i], melange[j]] = [melange[j], melange[i]];
-        }
-        itemsEnCoursOrdonnancement.value = melange;
+        itemsEnCoursOrdonnancement.value = shuffleArray(diagrammesBank.value);
         diagrammesBank.value = [];
         sousEtape.value = 'ordonnancement';
       } else {
@@ -543,13 +534,7 @@ const initExercice = () => {
     });
   }
 
-  // Mélange aléatoire de la banque initiale pour le tri
-  for (let i = bank.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [bank[i], bank[j]] = [bank[j], bank[i]];
-  }
-
-  diagrammesBank.value = bank;
+  diagrammesBank.value = shuffleArray(bank);
   solutionsSeries.value = [...solutions];
 };
 

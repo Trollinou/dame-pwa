@@ -58,6 +58,7 @@ import { Chessboard } from '@/components/shared/Chessboard';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
 import { getActiveColorFromFen, filterYellowShapes } from '@/utils/fenUtils';
+import { extractShapesAndComment } from '@/utils/chessNotation';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 import { parsePgn } from 'chessops/pgn';
@@ -66,6 +67,7 @@ import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { Chess } from 'chessops';
 
 export interface ExerciceABCDaire {
+  consigne?: string;
   pgn: string;
 }
 
@@ -121,12 +123,12 @@ const exercicesListe = computed<ExerciceABCDaire[]>(() => {
   ];
 });
 
-const consigneTexte = computed<string>(() => {
-  return props.consigne || 'Trouver le meilleur coup.';
-});
-
 const exerciceCourant = computed<ExerciceABCDaire>(() => {
   return exercicesListe.value[indexCourant.value] || exercicesListe.value[0];
+});
+
+const consigneTexte = computed<string>(() => {
+  return exerciceCourant.value?.consigne || props.consigne || 'Trouve le meilleur coup.';
 });
 
 const currentPgnForViewer = computed<string>(() => {
@@ -217,23 +219,8 @@ const parsedPgnData = computed(() => {
   }
 
   if (rootComments.length > 0) {
-    const commentsText = rootComments.join(' ');
-    const cslRegex = /\[%(?:csl|cpl)\s+([^\]]+)\]/gi;
-    let cslMatch: RegExpExecArray | null;
-    const rawShapes: DrawShape[] = [];
-    while ((cslMatch = cslRegex.exec(commentsText)) !== null) {
-      const items = cslMatch[1].split(',');
-      for (const item of items) {
-        const cleanItem = item.trim();
-        if (cleanItem.length >= 3) {
-          const brushChar = cleanItem[0].toLowerCase();
-          const orig = cleanItem.substring(1, 3).toLowerCase() as Key;
-          const brush = brushChar === 'y' || brushChar === 'o' ? 'yellow' : brushChar === 'b' ? 'blue' : brushChar === 'r' ? 'red' : 'green';
-          rawShapes.push({ orig, brush });
-        }
-      }
-    }
-    rootYellowShapes = filterYellowShapes(rawShapes);
+    const parsed = extractShapesAndComment(rootComments);
+    rootYellowShapes = filterYellowShapes(parsed.shapes);
   }
 
   // Fallback token extraction si chessops n'a pas trouvé de coups

@@ -84,6 +84,7 @@ import {
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useFeedback } from '@/composables/useFeedback';
+import { shuffleArray } from '@/utils/chessNotation';
 import PgnViewer from '@/components/shared/PgnViewer.vue';
 
 const { showSuccess, showError } = useFeedback();
@@ -126,15 +127,6 @@ const boardConfig = computed(() => ({
   orientation: couleurJoueurTyped.value,
   viewOnly: true
 }));
-
-const shuffleArray = <T,>(array: T[]): T[] => {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-};
 
 const initShuffledEtapes = () => {
   if (!props.etapesCorrectes || props.etapesCorrectes.length === 0) {

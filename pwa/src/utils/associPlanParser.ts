@@ -11,68 +11,7 @@ export interface AssociPlanPaire {
 	pgn: string;
 }
 
-const brushMap: Record< string, string > = {
-	g: 'green',
-	r: 'red',
-	b: 'blue',
-	y: 'yellow',
-	c: 'green',
-	o: 'yellow',
-};
-
-/**
- * Extrait les formes graphiques ([%csl ...], [%cal ...]) et le texte épuré.
- * @param commentText
- */
-function extractShapesAndText( commentText: string ): {
-	cleanedText: string;
-	shapes: DrawShape[];
-} {
-	if ( ! commentText ) {
-		return { cleanedText: '', shapes: [] };
-	}
-
-	const shapes: DrawShape[] = [];
-
-	// 1. Cercles [%csl ...] ou [%cpl ...]
-	const cslRegex = /\[%(?:csl|cpl)\s+([^\]]+)\]/gi;
-	let cslMatch: RegExpExecArray | null;
-	while ( ( cslMatch = cslRegex.exec( commentText ) ) !== null ) {
-		const items = cslMatch[ 1 ].split( ',' );
-		for ( const item of items ) {
-			const clean = item.trim();
-			if ( clean.length >= 3 ) {
-				const brush = brushMap[ clean[ 0 ].toLowerCase() ] || 'green';
-				const orig = clean.substring( 1, 3 ).toLowerCase() as Key;
-				shapes.push( { orig, brush } );
-			}
-		}
-	}
-
-	// 2. Flèches [%cal ...]
-	const calRegex = /\[%cal\s+([^\]]+)\]/gi;
-	let calMatch: RegExpExecArray | null;
-	while ( ( calMatch = calRegex.exec( commentText ) ) !== null ) {
-		const items = calMatch[ 1 ].split( ',' );
-		for ( const item of items ) {
-			const clean = item.trim();
-			if ( clean.length >= 5 ) {
-				const brush = brushMap[ clean[ 0 ].toLowerCase() ] || 'green';
-				const orig = clean.substring( 1, 3 ).toLowerCase() as Key;
-				const dest = clean.substring( 3, 5 ).toLowerCase() as Key;
-				shapes.push( { orig, dest, brush } );
-			}
-		}
-	}
-
-	// Nettoyage de toutes les balises [%...]
-	const cleanedText = commentText
-		.replace( /\[%[^\]]+\]/g, '' )
-		.trim()
-		.replace( /\s{2,}/g, ' ' );
-
-	return { cleanedText, shapes };
-}
+import { extractShapesAndText } from './chessNotation';
 
 /**
  * Parse un PGN unique pour en extraire :

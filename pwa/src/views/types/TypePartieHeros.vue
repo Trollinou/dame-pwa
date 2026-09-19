@@ -82,6 +82,11 @@
           />
         </div>
 
+        <!-- Consigne fixe entre l'échiquier et les 3 boutons de choix -->
+        <div class="qcm-instruction-bar">
+          <span class="qcm-instruction-text">Trouve le coup suivant</span>
+        </div>
+
         <ion-card class="exercise-card">
           <ion-card-content>
             <div class="qcm-choices">
@@ -691,9 +696,41 @@ const passerEtapeSuivante = () => {
   font-style: italic;
 }
 
+/* Consigne / Instruction QCM */
+.qcm-instruction-bar {
+  width: 100%;
+  background: var(--ion-color-step-100, #f4f5f8);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  text-align: center;
+  border: 1px solid var(--ion-color-step-200, #e0e0e0);
+  margin: 4px 0 2px 0;
+}
+
+.qcm-instruction-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ion-color-dark, #222);
+}
+
 /* Carte de Choix QCM */
 .exercise-card {
   margin: 0;
+}
+
+.qcm-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.choice-btn {
+  margin: 0;
+  --border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-transform: none;
 }
 
 .animate-fade-in {
