@@ -31,19 +31,19 @@
       </div>
     </div>
 
-    <!-- SOUS-ÉTAPE 2 : Ordonnancement chronologique combiné (Glisser-Déposer Ionic + Clic pour permuter) -->
+    <!-- SOUS-ÉTAPE 2 : Ordonnancement chronologique en grille 2 colonnes (Tap & Swap) -->
     <div v-else-if="sousEtape === 'ordonnancement'" class="phase-container order-phase animate-fade-in">
       <div class="order-instructions-bar">
         <span class="order-instructions-text">
-          Glissez avec la poignée <ion-icon :icon="reorderTwoOutline" class="inline-handle-icon" /> ou cliquez sur deux cartes pour permuter leur position.
+          Touchez deux cartes pour permuter leur position chronologique.
         </span>
       </div>
 
-      <ion-reorder-group :disabled="false" class="reorder-group-column" @ionItemReorder="handleReorder($event)">
+      <div class="cards-grid-2col order-cards-grid">
         <div
           v-for="(item, index) in itemsEnCoursOrdonnancement"
           :key="'order-' + item.id"
-          class="diagram-card-item order-card-item"
+          class="diagram-card-item grid-card-item order-card-item"
           :class="{ 'is-swap-selected': selectedSwapIndex === index }"
           @click="handleCardClickSwap(index)"
         >
@@ -54,17 +54,8 @@
           <div class="card-board-wrapper">
             <DiagramViewer :fen="item.fen" :orientation="item.orientation" class="board-display" />
           </div>
-
-          <!-- Poignée Ionic Reorder latérale -->
-          <div class="reorder-handle-wrapper" @click.stop>
-            <ion-reorder>
-              <div class="custom-drag-handle" title="Glisser pour réordonner">
-                <ion-icon :icon="reorderTwoOutline" />
-              </div>
-            </ion-reorder>
-          </div>
         </div>
-      </ion-reorder-group>
+      </div>
     </div>
 
     <!-- SOUS-ÉTAPE 3 : Résolution du coup suivant -->
@@ -109,8 +100,6 @@ import DiagramViewer from '@/components/shared/DiagramViewer.vue';
 import PuzzleViewer from '@/components/shared/PuzzleViewer.vue';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
-import { IonReorderGroup, IonReorder, IonIcon } from '@ionic/vue';
-import { reorderTwoOutline } from 'ionicons/icons';
 
 import type { Key, DrawShape } from 'eg-chessboard';
 
@@ -308,9 +297,9 @@ const currentStepPendingHint = computed(() => {
   }
   if (sousEtape.value === 'ordonnancement') {
     if (selectedSwapIndex.value !== null) {
-      return `Position ${selectedSwapIndex.value + 1} sélectionnée. Cliquez sur une autre position pour permuter.`;
+      return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touchez une autre position pour permuter.`;
     }
-    return 'Glissez la poignée ou touchez 2 cartes pour les permuter';
+    return 'Touchez 2 cartes pour permuter leur ordre chronologique';
   }
   return 'Trouvez le bon coup sur l\'échiquier';
 });
@@ -357,12 +346,6 @@ const toggleSelection = (item: Diagramme) => {
       itemsSelectionnes.value.push(item);
     }
   }
-};
-
-// Glisser-déposer Ionic
-const handleReorder = (event: CustomEvent) => {
-  itemsEnCoursOrdonnancement.value = event.detail.complete(itemsEnCoursOrdonnancement.value);
-  selectedSwapIndex.value = null;
 };
 
 // Clic pour permuter (Tap & Swap)
@@ -703,19 +686,21 @@ watch(
 }
 
 /* Étape d'ordonnancement */
-.reorder-group-column {
+.order-cards-grid {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+}
+
+.order-cards-grid .order-card-item:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  max-width: calc(50% - 6px);
+  margin: 0 auto;
+  width: 100%;
 }
 
 .order-card-item {
   cursor: pointer;
-  padding: 12px;
-  padding-right: 48px;
   position: relative;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .order-card-item:hover {
@@ -724,51 +709,26 @@ watch(
 
 .order-card-item.is-swap-selected {
   border-color: var(--ion-color-primary, #3880ff);
-  box-shadow: 0 0 0 3px rgba(56, 128, 255, 0.35), 0 4px 14px rgba(56, 128, 255, 0.2);
-  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(56, 128, 255, 0.4), 0 4px 16px rgba(56, 128, 255, 0.25);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .order-rank-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
   background: var(--ion-color-primary, #3880ff);
   color: #fff;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   z-index: 10;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.reorder-handle-wrapper {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-}
-
-.custom-drag-handle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 48px;
-  color: var(--ion-color-step-600, #666);
-  font-size: 1.8rem;
-  cursor: grab;
-  touch-action: none;
-}
-
-.custom-drag-handle:active {
-  cursor: grabbing;
-  color: var(--ion-color-primary, #3880ff);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* Phase de résolution */

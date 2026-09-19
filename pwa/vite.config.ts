@@ -12,6 +12,26 @@ const packageJson = JSON.parse(
 	)
 );
 
+function versionJsonPlugin() {
+	return {
+		name: 'vite-plugin-version-json',
+		generateBundle() {
+			this.emitFile( {
+				type: 'asset',
+				fileName: 'version.json',
+				source: JSON.stringify(
+					{
+						version: packageJson.version,
+						buildTime: Date.now(),
+					},
+					null,
+					2
+				),
+			} );
+		},
+	};
+}
+
 // https://vitejs.dev/config/
 export default defineConfig( {
 	define: {
@@ -19,7 +39,10 @@ export default defineConfig( {
 	},
 	base: './', // Chemins relatifs pour les assets (indispensable pour WordPress)
 	esbuild: {
-		drop: process.env.NODE_ENV === 'production' ? [ 'console', 'debugger' ] : [],
+		drop:
+			process.env.NODE_ENV === 'production'
+				? [ 'console', 'debugger' ]
+				: [],
 	},
 	plugins: [
 		vue( {
@@ -29,6 +52,7 @@ export default defineConfig( {
 				},
 			},
 		} ),
+		versionJsonPlugin(),
 		VitePWA( {
 			registerType: 'autoUpdate',
 			includeManifestIcons: false,
@@ -61,6 +85,7 @@ export default defineConfig( {
 				clientsClaim: true,
 				// Assets essentiels mis en cache (sans wasm pour alléger le pré-cache initial)
 				globPatterns: [ '**/*.{js,css,html,ico,png,svg}' ],
+				globIgnores: [ '**/version.json' ],
 				maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 				runtimeCaching: [
 					{

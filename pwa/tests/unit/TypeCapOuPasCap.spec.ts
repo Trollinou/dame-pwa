@@ -575,4 +575,93 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			] )
 		);
 	} );
+
+	test( 'gère la validation d’un QCM Simple avec 3 options personnalisées (ex: BLANC / NOIR / ÉGALE)', async () => {
+		const config = {
+			consigne: 'Évaluez la position.',
+			variante: 'qcm_oui_non',
+			question: 'Qui a l’avantage ?',
+			options_reponse: [ 'BLANC', 'NOIR', 'ÉGALE' ],
+			exercices: [
+				{
+					pgn: samplePgn,
+					reponse_attendue: 'BLANC',
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 1410,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		expect( wrapper.text() ).toContain( 'Qui a l’avantage ?' );
+
+		const buttons = wrapper.findAll( '.qcm-oui-non-panel .toggle-btn' );
+		expect( buttons.length ).toBe( 3 );
+		expect( buttons[ 0 ].text() ).toContain( 'BLANC' );
+		expect( buttons[ 1 ].text() ).toContain( 'NOIR' );
+		expect( buttons[ 2 ].text() ).toContain( 'ÉGALE' );
+
+		// Mauvais choix (NOIR)
+		await buttons[ 1 ].trigger( 'click' );
+		expect( wrapper.text() ).toContain( 'Mauvaise réponse' );
+
+		// Bon choix (BLANC)
+		await buttons[ 0 ].trigger( 'click' );
+		expect( wrapper.text() ).toContain( 'Bravo !' );
+	} );
+
+	test( 'gère la validation d’un QCM Multiple avec des options personnalisées (ex: 0, 1, 2, 3)', async () => {
+		const config = {
+			consigne: 'Comptez le nombre d’attaquants et de défenseurs.',
+			variante: 'qcm_multiple',
+			options_reponse: [ '0', '1', '2', '3' ],
+			propositions: [
+				'Nb Attaquant',
+				'Nb Defenseur',
+			],
+			exercices: [
+				{
+					pgn: samplePgn,
+					reponses_multiple: [ '2', '1' ],
+				},
+			],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 1411,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		expect( wrapper.text() ).toContain( 'Nb Attaquant' );
+		expect( wrapper.text() ).toContain( 'Nb Defenseur' );
+
+		const rows = wrapper.findAll( '.proposition-row' );
+		expect( rows.length ).toBe( 2 );
+
+		const row0Btns = rows[ 0 ].findAll( '.toggle-btn' );
+		const row1Btns = rows[ 1 ].findAll( '.toggle-btn' );
+		expect( row0Btns.length ).toBe( 4 );
+		expect( row1Btns.length ).toBe( 4 );
+
+		// Choix inexact : Nb Attaquant = '1', Nb Defenseur = '1'
+		await row0Btns[ 1 ].trigger( 'click' );
+		await row1Btns[ 1 ].trigger( 'click' );
+		expect( wrapper.text() ).toContain( 'Certaines réponses sont inexactes' );
+
+		// Correction : Nb Attaquant = '2' (index 2), Nb Defenseur = '1' (index 1)
+		await row0Btns[ 2 ].trigger( 'click' );
+		expect( wrapper.text() ).toContain( 'Excellent ! Toutes vos réponses sont exactes.' );
+	} );
 } );

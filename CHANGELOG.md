@@ -6,6 +6,25 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Automatisation Intégrale des Mises à Jour & Système Anti-Cache PWA (`pwa/vite.config.ts`, `pwa/src/main.ts`, `pwa/src/composables/usePwaUpdate.ts`, `pwa/src/views/ProfilePage.vue`, `pwa/public/.htaccess`, `README.md`, `USING.md`)** :
+  - **Génération Dynamique de `version.json`** : Plugin Vite personnalisé générant automatiquement `version.json` dans `pwa/dist/` à chaque build (avec version de `package.json` et horodatage `buildTime`), exclu du pré-cache Service Worker (`globIgnores: ['**/version.json']`).
+  - **Enregistrement Service Worker avec `updateViaCache: 'none'`** : Remplacement de l'enregistrement générique par un enregistrement natif forçant le navigateur à ignorer le cache HTTP pour les vérifications de `sw.js` (crucial sous iOS Safari WebClip et Android).
+  - **Contrôle Actif avec Cache-Buster** : Requêtes directes `fetch('./version.json?_t=' + Date.now(), { cache: 'no-store' })` exécutées au lancement, au réveil de l'écran (`visibilitychange`, `pageshow`, reprise Capacitor `appStateChange`), toutes les 15 minutes et sur le bouton du profil.
+  - **Auto-Purge & Actualisation Transparente** : Dès qu'une nouvelle version serveur est détectée (`versionServeur !== versionLocale`), purge immédiate du `CacheStorage` (`window.caches`) et de `DAME_QUERY_CACHE` (TanStack) puis rechargement de la page avec préservation intégrale de la session utilisateur.
+  - **En-têtes HTTP Anti-Cache (`pwa/public/.htaccess`)** : Directives ciblées `mod_headers` (`no-cache, no-store, must-revalidate`) sur `sw.js`, `index.html`, `version.json` et les manifestes sans aucune règle de réécriture d'URL (`RewriteRule`).
+
+- **Options de Réponses Dynamiques & Rétrocompatibilité QCM pour le Type 14 (Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.vue`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
+  - **Moteur QCM Dynamique** : Support d'une liste configurable d'options de réponses (`options_reponse`) aussi bien pour le QCM Simple (1 question, ex: 3 choix *« BLANC / NOIR / ÉGALE »*) que pour le QCM Multiple (N propositions, ex: 4 choix numériques *« 0 / 1 / 2 / 3 »*).
+  - **Rétrocompatibilité Totale** : Rétention et interprétation transparente de l'ensemble des 50+ exercices existants sans `options_reponse` (repli automatique sur *« OUI / NON »*, support des booléens `true`/`false` et index `qcm_bonne_reponse`).
+  - **Styles Adaptatifs** : Rendu visuel soigné avec pastilles colorées standardisées pour OUI (vert) / NON (rouge) et style neutre/actif pour les choix personnalisés.
+  - **Couverture de Tests Unitaires Vitest** : Ajout de tests unitaires validant le QCM Simple 3 choix et le QCM Multiple à choix numériques.
+
+- **Refonte UX Mobile de l'Étape 2 pour la Marche du Héros (Type 7) (`TypeMarcheHeros.vue`, `README.md`, `USING.md`)** :
+  - **Grille Compacte à 2 Colonnes** : Remplacement de l'affichage vertical 1 colonne par une grille à 2 colonnes (`cards-grid-2col`) identique à l'Étape 1, permettant d'afficher simultanément l'ensemble des 5 (ou 3) diagrammes sur un seul écran de smartphone en mode portrait sans aucun défilement.
+  - **Réordonnancement par *Tap & Swap* Tactile** : Échange fluide et instantané des positions par simple toucher successif de deux cartes avec mise en surbrillance bleue (`is-swap-selected`), éliminant les frottements et imprécisions du glisser-déposer Ionic (`<ion-reorder-group>`) sur mobile.
+  - **Centrage Visuel de la Carte Impaire** : Alignement centré automatique de la 5e position sur la rangée finale pour un équilibre visuel optimal.
+  - **Nettoyage Architectural** : Suppression des dépendances et imports Ionic superflus (`IonReorderGroup`, `IonReorder`, `IonIcon`, `reorderTwoOutline`) dans le composant.
+
 - **Standardisation Intégrale des Appels HTTP vers `safeFetch` (`usePreInscriptionApi.ts`, `BenevolatDetailContent.vue`, `TournamentDetailContent.vue`, `auth.ts`, `RegisterPage.vue`, `geoApi.ts`)** :
   - **Pré-inscription (`usePreInscriptionApi.ts`)** : Remplacement des `fetch` natifs par `safeFetch` pour le pré-remplissage adhérent, la soumission du formulaire et le téléchargement des attestations/autorisations PDF. Suppression du retry 401 artisanal au profit du rafraîchissement transparent du jeton JWT natif à `safeFetch`.
   - **Bénévolat & Tournois (`BenevolatDetailContent.vue`, `TournamentDetailContent.vue`)** : Migration de la récupération des votes, de la soumission de proposition d'aide bénévole et du chargement des fiches tournois vers `safeFetch` avec protection par timeout d'invalidation (4s).

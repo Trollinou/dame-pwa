@@ -113,7 +113,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - Saisie simplifiée de 3 ou 5 séries de parties d'échecs (modes 3x5 ou 5x3) avec détection automatique de l'orientation et prévisualisation interactive.
         - Parcours itératif et progressif par série avec `ContentHeader` et `SeriesCardFooter` :
           - **Étape 1 (Sélection / Tri de la série en grille 2 colonnes)** : Présentation des diagrammes restants dans la banque sous forme d'une grille à 2 colonnes divisant la hauteur de défilement par deux. Chaque position peut être agrandie en plein écran par appui prolongé (500ms) ou clic droit. L'apprenant sélectionne par un clic le nombre requis de diagrammes ($N = 5$ ou $3$). Le décompte des cartes sélectionnées et restantes s'affiche en direct dans l'indication d'attente du `SeriesCardFooter` fixe et immobile. Dès l'atteinte des $N$ cartes, la cohérence de la série est vérifiée : si elles appartiennent à la même partie, le feedback vert s'affiche et le bouton *« Classer la série »* se débloque. Sinon, une indication rouge invite à désélectionner une position erronée.
-          - **Étape 2 (Ordre chronologique combiné : glisser-déposer Ionic ou permutation au clic)** : Présentation des cartes de la série en colonne unique avec grands échiquiers lisibles. L'ordre de 1 à $N$ peut être ajusté de deux façons complémentaires : soit en faisant glisser la carte via sa poignée latérale native Ionic (`<ion-reorder-group>`), soit en touchant successivement deux cartes pour permuter leur place (*Tap & Swap* avec surbrillance bleue). Dès que la chronologie est exacte, le bouton *« Coup suivant »* s'active dans le footer. Pour la dernière série, cette étape démarre directement avec les cartes restantes.
+          - **Étape 2 (Ordre chronologique en grille 2 colonnes & Tap & Swap)** : Présentation des cartes de la série sous forme d'une grille compacte à 2 colonnes où l'ensemble des diagrammes ($N = 5$ ou $3$) reste visible à l'écran sans défilement sur smartphone en mode portrait. L'ordre chronologique de 1 à $N$ est ajusté par *Tap & Swap* tactile : en touchant successivement deux cartes, celles-ci permutent instantanément leur place avec une mise en surbrillance bleue. Dès que la chronologie est exacte, le bouton *« Coup suivant »* s'active dans le footer. Pour la dernière série, cette étape démarre directement avec les cartes restantes.
           - **Étape 3 (Coup suivant)** : Résolution interactive du coup décisif sur grand échiquier via `PuzzleViewer`. La réussite valide la série et débloque le passage à la série suivante ou la fin de l'exercice avec célébration confettis.
       - **Exercices Parcours (Type 9)** :
         - Série de **3 parcours tactiques séquentiels** avec consignes contextuelles, en-tête unifié `ContentHeader` et pied fixe `SeriesCardFooter`.
@@ -149,10 +149,10 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - Saisie auteur en 5 Mini-PGN (position de départ FEN ou coup tactique à analyser, avec flèches/cercles pédagogiques).
         - **Variante QCM Multiple (`qcm_multiple`)** :
           - Présentation de la liste d'affirmations définies pour la série sous l'échiquier.
-          - Chaque affirmation dispose d'un **toggle tactile neutre** (position initiale neutre, sélectionnable entre OUI vert et NON rouge).
+          - Chaque affirmation dispose d'un **groupe de boutons de choix tactiles** configurables (par défaut : OUI vert et NON rouge, ou choix personnalisés tels que `0`, `1`, `2`, `3`).
           - L'échiquier maintient visible le repère visuel d'observation (cercle jaune `[%csl Y...]` sur la pièce d'étude ciblée par l'énoncé) tout en masquant les flèches et annotations de solution. Dès que toutes les affirmations sont complétées avec la combinaison exacte, les shapes de l'entraîneur (flèches, attaques, défenses) sont révélées sur l'échiquier, le feedback vert s'affiche et le bouton *« Carte suivante »* s'active.
-        - **Variante QCM Oui/Non (`qcm_oui_non`)** :
-          - Une question commune affichée au-dessus d'un grand toggle tactile neutre OUI / NON.
+        - **Variante QCM Oui/Non / QCM Simple (`qcm_oui_non`)** :
+          - Une question commune affichée au-dessus d'un groupe de boutons de choix tactiles (par défaut OUI / NON, ou 2, 3 choix ou plus personnalisés tels que `BLANC`, `NOIR`, `ÉGALE`).
           - L'échiquier affiche fidèlement la position FEN de départ (les éventuels coups PGN ne sont pas auto-joués afin de préserver l'énigme), maintient visible le cercle jaune d'observation s'il est présent (`[%csl Y...]`), et masque les annotations visuelles de solution (flèches `[%cal]`) pendant la réflexion.
           - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
         - **Variante Move (`move`)** :
@@ -232,11 +232,15 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
 En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou non), une section dédiée permet de suivre l'état de l'application et de forcer la mise à niveau :
 
 1. **Version Applicative** :
-   - Affiche la version courante de la PWA (ex: `Version 1.6.1`), synchronisée avec le plugin WordPress.
+   - Affiche la version courante de la PWA (ex: `Version 1.6.9`), synchronisée avec le plugin WordPress.
 2. **Rechercher les mises à jour** :
-   - Interroge immédiatement le Service Worker pour vérifier si un nouveau paquet applicatif est disponible sur le serveur.
-   - Affiche une notification toast confirmant si l'application est déjà à jour ou si une mise à jour est en cours d'installation.
-3. **Vider le cache & actualiser** :
-   - Permet de résoudre tout problème de cache persistant (notamment sous iOS en mode écran d'accueil).
+   - Interroge directement le serveur avec un paramètre anti-cache unique (`version.json?_t=...`) en ignorant le cache HTTP pour comparer la version réelle déployée avec la version locale du terminal.
+   - En cas de nouvelle version détectée, déclenche automatiquement la purge des caches et recharge l'application avec notification toast.
+   - Si l'application est à jour, confirme la version exacte en cours d'exécution.
+3. **Mises à Jour Automatiques en Arrière-Plan** :
+   - L'application vérifie en toute transparence la version serveur à chaque ouverture, réveil de l'écran (`visibilitychange`, `pageshow`, reprise Capacitor) et à intervalle régulier.
+   - L'enregistrement du Service Worker avec `updateViaCache: 'none'` et les en-têtes HTTP anti-cache garantissent le déploiement immédiat des nouveautés sur iOS et Android sans intervention manuelle de l'utilisateur.
+4. **Vider le cache & actualiser** :
+   - Permet de forcer un nettoyage complet manuel si nécessaire.
    - Purge le `CacheStorage` d'assets et le cache des requêtes tout en **préservant scrupuleusement la session active** (aucun mot de passe à resaisir).
    - Recharge immédiatement l'application pour afficher la dernière version disponible.

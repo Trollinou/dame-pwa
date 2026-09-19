@@ -5,6 +5,7 @@
       :variante="config.variante || config.type_reponse"
       :mode_clic="config.mode_clic"
       :mode_setup="config.mode_setup"
+      :options_reponse="config.options_reponse"
       :propositions="config.propositions"
       :question="config.question"
       :exercices="config.exercices || config.diagrammes"
@@ -25,6 +26,7 @@ export interface ConfigCapOuPasCap {
   type_reponse?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | 'clic' | 'setup' | string;
   mode_clic?: 'cibles' | 'materiel' | 'prises_meilleur_coup';
   mode_setup?: 'texte' | 'memoire';
+  options_reponse?: string[];
   propositions?: string[];
   question?: string;
   exercices?: ExerciceCapOuPasCap[];

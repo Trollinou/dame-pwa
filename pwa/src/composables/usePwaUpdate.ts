@@ -1,4 +1,4 @@
-﻿import { ref } from 'vue';
+import { ref } from 'vue';
 import { queryClient } from '@/queryClient';
 
 const appVersion =
@@ -11,47 +11,112 @@ const updateAvailable = ref( false );
  */
 export function usePwaUpdate() {
 	/**
-	 * Déclenche une vérification manuelle auprès du Service Worker.
+	 * Interroge le serveur en direct avec un cache-buster pour vérifier si une nouvelle version est déployée.
+	 * Si autoReload est à true et qu'une mise à jour est trouvée, déclenche la purge et le rechargement.
+	 *
+	 * @param autoReload Indique s'il faut déclencher automatiquement le rechargement et la purge.
+	 */
+	const checkServerVersion = async (
+		autoReload = false
+	): Promise< {
+		isOutdated: boolean;
+		serverVersion: string;
+		currentVersion: string;
+	} > => {
+		try {
+			const res = await fetch( `./version.json?_t=${ Date.now() }`, {
+				cache: 'no-store',
+				headers: {
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					Pragma: 'no-cache',
+				},
+			} );
+
+			if ( res.ok ) {
+				const data = ( await res.json() ) as {
+					version?: string;
+					buildTime?: number;
+				};
+				if ( data?.version && data.version !== appVersion ) {
+					updateAvailable.value = true;
+					if ( autoReload ) {
+						await clearCacheAndReload();
+					}
+					return {
+						isOutdated: true,
+						serverVersion: data.version,
+						currentVersion: appVersion,
+					};
+				}
+				return {
+					isOutdated: false,
+					serverVersion: data?.version || appVersion,
+					currentVersion: appVersion,
+				};
+			}
+		} catch ( error ) {
+			console.warn(
+				'Vérification de version serveur non disponible (hors-ligne):',
+				error
+			);
+		}
+
+		return {
+			isOutdated: false,
+			serverVersion: appVersion,
+			currentVersion: appVersion,
+		};
+	};
+
+	/**
+	 * Déclenche une vérification manuelle auprès du serveur et du Service Worker.
 	 */
 	const checkForUpdates = async (): Promise< {
 		updated: boolean;
 		message: string;
 	} > => {
-		if (
-			typeof window === 'undefined' ||
-			! ( 'serviceWorker' in navigator )
-		) {
-			return {
-				updated: false,
-				message: 'Service Worker non supporté sur ce navigateur.',
-			};
-		}
-
 		isChecking.value = true;
 		try {
-			const registration =
-				await navigator.serviceWorker.getRegistration();
-			if ( ! registration ) {
+			// 1. Vérification prioritaire de la version réelle sur le serveur
+			const versionCheck = await checkServerVersion( false );
+			if ( versionCheck.isOutdated ) {
+				updateAvailable.value = true;
+				// Déclenche le rechargement immédiat
+				setTimeout( async () => {
+					await clearCacheAndReload();
+				}, 600 );
 				return {
-					updated: false,
-					message: 'Aucun Service Worker actif.',
+					updated: true,
+					message: `Nouvelle version (${ versionCheck.serverVersion }) détectée ! Mise à jour en cours...`,
 				};
 			}
 
-			// Force la vérification du fichier sw.js sur le serveur
-			await registration.update();
-
-			if ( registration.waiting || registration.installing ) {
-				updateAvailable.value = true;
-				return {
-					updated: true,
-					message: 'Nouvelle version en cours d’installation...',
-				};
+			// 2. Vérification complémentaire auprès du Service Worker
+			if (
+				typeof window !== 'undefined' &&
+				'serviceWorker' in navigator
+			) {
+				const registration =
+					await navigator.serviceWorker.getRegistration();
+				if ( registration ) {
+					await registration.update();
+					if ( registration.waiting || registration.installing ) {
+						updateAvailable.value = true;
+						setTimeout( async () => {
+							await clearCacheAndReload();
+						}, 600 );
+						return {
+							updated: true,
+							message:
+								'Nouvelle version en cours d’installation...',
+						};
+					}
+				}
 			}
 
 			return {
 				updated: false,
-				message: 'Votre application est déjà à jour.',
+				message: `Votre application est à jour (v${ appVersion }).`,
 			};
 		} catch ( error ) {
 			console.warn(
@@ -116,6 +181,7 @@ export function usePwaUpdate() {
 		appVersion,
 		isChecking,
 		updateAvailable,
+		checkServerVersion,
 		checkForUpdates,
 		clearCacheAndReload,
 	};

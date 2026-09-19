@@ -1,0 +1,16 @@
+# ----------------------------------------------------------------------
+# DAME PWA - Directives d'en-têtes HTTP Anti-Cache
+# Note : Aucune règle de réécriture (RewriteRule) pour ne pas interférer
+# avec le routage racine de WordPress et la PWA.
+# ----------------------------------------------------------------------
+
+<IfModule mod_headers.c>
+    # Désactivation stricte du cache pour les fichiers de cycle de vie PWA et manifestes
+    <FilesMatch "^(sw\.js|index\.html|version\.json|manifest\.webmanifest|manifest\.json)$">
+        FileETag None
+        Header unset ETag
+        Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+</IfModule>

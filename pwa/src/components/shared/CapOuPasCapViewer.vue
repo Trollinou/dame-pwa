@@ -29,7 +29,7 @@
 
     <!-- Zone d'interaction sous l'échiquier -->
     <div class="interaction-card animate-fade-in">
-      <!-- Variante 1 : QCM Multiple (liste de propositions avec toggle Oui/Non) -->
+      <!-- Variante 1 : QCM Multiple (liste de propositions avec options de choix) -->
       <div v-if="resolvedVariante === 'qcm_multiple'" class="qcm-multiple-panel">
         <div
           v-for="(prop, pIdx) in propositionsListe"
@@ -39,54 +39,40 @@
           <div class="proposition-text">{{ prop }}</div>
           <div class="neutral-toggle">
             <button
+              v-for="(opt, optIdx) in optionsReponseListe"
+              :key="optIdx"
               type="button"
-              class="toggle-btn toggle-btn--oui"
-              :class="{ 'is-selected': multipleAnswers[pIdx] === true }"
+              class="toggle-btn"
+              :class="getOptionBtnClass(opt, optIdx, multipleAnswers[pIdx])"
               :disabled="isCardSolved"
-              @click="setMultipleAnswer(pIdx, true)"
+              @click="setMultipleAnswer(pIdx, opt, optIdx)"
             >
-              <span class="toggle-icon">✓</span>
-              <span class="toggle-label">OUI</span>
-            </button>
-            <button
-              type="button"
-              class="toggle-btn toggle-btn--non"
-              :class="{ 'is-selected': multipleAnswers[pIdx] === false }"
-              :disabled="isCardSolved"
-              @click="setMultipleAnswer(pIdx, false)"
-            >
-              <span class="toggle-icon">✗</span>
-              <span class="toggle-label">NON</span>
+              <span v-if="opt.toUpperCase() === 'OUI' || (isStandardOuiNon && optIdx === 0)" class="toggle-icon">✓</span>
+              <span v-else-if="opt.toUpperCase() === 'NON' || (isStandardOuiNon && optIdx === 1)" class="toggle-icon">✗</span>
+              <span class="toggle-label">{{ opt }}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Variante 2 : QCM Oui/Non (question commune avec toggle Oui/Non) -->
+      <!-- Variante 2 : QCM Oui/Non (question commune avec boutons de choix) -->
       <div v-else-if="resolvedVariante === 'qcm_oui_non'" class="qcm-oui-non-panel">
         <div class="question-header">
           <span class="question-text">{{ questionTexte }}</span>
         </div>
         <div class="neutral-toggle neutral-toggle--large">
           <button
+            v-for="(opt, optIdx) in optionsReponseListe"
+            :key="optIdx"
             type="button"
-            class="toggle-btn toggle-btn--oui"
-            :class="{ 'is-selected': singleAnswer === true }"
+            class="toggle-btn"
+            :class="getOptionBtnClass(opt, optIdx, singleAnswer)"
             :disabled="isCardSolved"
-            @click="setSingleAnswer(true)"
+            @click="setSingleAnswer(opt, optIdx)"
           >
-            <span class="toggle-icon">✓</span>
-            <span class="toggle-label">OUI</span>
-          </button>
-          <button
-            type="button"
-            class="toggle-btn toggle-btn--non"
-            :class="{ 'is-selected': singleAnswer === false }"
-            :disabled="isCardSolved"
-            @click="setSingleAnswer(false)"
-          >
-            <span class="toggle-icon">✗</span>
-            <span class="toggle-label">NON</span>
+            <span v-if="opt.toUpperCase() === 'OUI' || (isStandardOuiNon && optIdx === 0)" class="toggle-icon">✓</span>
+            <span v-else-if="opt.toUpperCase() === 'NON' || (isStandardOuiNon && optIdx === 1)" class="toggle-icon">✗</span>
+            <span class="toggle-label">{{ opt }}</span>
           </button>
         </div>
       </div>
@@ -307,8 +293,9 @@ export interface ExerciceCapOuPasCap {
   fen?: string;
   couleur_joueur?: 'white' | 'black';
   shapes?: DrawShape[];
-  reponses_multiple?: boolean[];
-  reponse_oui_non?: boolean;
+  reponses_multiple?: (boolean | string | number)[];
+  reponse_oui_non?: boolean | string | number;
+  reponse_attendue?: boolean | string | number;
   qcm_bonne_reponse?: number;
   move_san?: string;
   move_explication?: string;
@@ -321,6 +308,7 @@ const props = withDefaults(
     variante?: string;
     mode_clic?: 'cibles' | 'materiel' | 'prises_meilleur_coup';
     mode_setup?: 'texte' | 'memoire';
+    options_reponse?: string[];
     propositions?: string[];
     question?: string;
     exercices?: ExerciceCapOuPasCap[];
@@ -333,6 +321,7 @@ const props = withDefaults(
     variante: 'qcm_oui_non',
     mode_clic: 'cibles',
     mode_setup: 'memoire',
+    options_reponse: () => [],
     propositions: () => [],
     question: '',
     exercices: () => [],
@@ -354,8 +343,8 @@ const isCardSolved = ref(false);
 const boardApi = ref<BoardCore | null>(null);
 const feedback = ref<CardFeedback | null>(null);
 
-const multipleAnswers = ref<(boolean | null)[]>([]);
-const singleAnswer = ref<boolean | null>(null);
+const multipleAnswers = ref<(string | boolean | number | null)[]>([]);
+const singleAnswer = ref<string | boolean | number | null>(null);
 
 // Clic Variant State
 const userSelectedSquares = ref<Set<string>>(new Set());
@@ -431,6 +420,69 @@ const propositionsListe = computed<string[]>(() => {
 const questionTexte = computed<string>(() => {
   return props.question || 'Cette action est-elle possible dans cette position ?';
 });
+
+const optionsReponseListe = computed<string[]>(() => {
+  if (props.options_reponse && Array.isArray(props.options_reponse) && props.options_reponse.length > 0) {
+    return props.options_reponse;
+  }
+  return ['OUI', 'NON'];
+});
+
+const isStandardOuiNon = computed<boolean>(() => {
+  const list = optionsReponseListe.value;
+  return list.length === 2 && list[0].trim().toUpperCase() === 'OUI' && list[1].trim().toUpperCase() === 'NON';
+});
+
+function isOptionSelected(opt: string, optIdx: number, selectedValue: string | number | boolean | null): boolean {
+  if (selectedValue === null || typeof selectedValue === 'undefined') {
+    return false;
+  }
+  if (typeof selectedValue === 'boolean') {
+    return (selectedValue && optIdx === 0) || (!selectedValue && optIdx === 1);
+  }
+  if (typeof selectedValue === 'number') {
+    return selectedValue === optIdx;
+  }
+  return String(selectedValue).trim().toLowerCase() === opt.trim().toLowerCase();
+}
+
+function getOptionBtnClass(opt: string, optIdx: number, selectedValue: string | number | boolean | null): Record<string, boolean> {
+  const isSelected = isOptionSelected(opt, optIdx, selectedValue);
+  const upper = opt.trim().toUpperCase();
+  const isOui = upper === 'OUI' || (isStandardOuiNon.value && optIdx === 0);
+  const isNon = upper === 'NON' || (isStandardOuiNon.value && optIdx === 1);
+
+  return {
+    'is-selected': isSelected,
+    'toggle-btn--oui': isOui,
+    'toggle-btn--non': isNon,
+    'toggle-btn--custom': !isOui && !isNon,
+  };
+}
+
+function checkAnswerMatch(selectedOpt: string, selectedIdx: number, expected: any, optionsList: string[]): boolean {
+  if (typeof expected === 'boolean') {
+    if (expected === true) {
+      return selectedIdx === 0 || selectedOpt.trim().toUpperCase() === 'OUI' || (Boolean(optionsList[0]) && selectedOpt.trim().toLowerCase() === optionsList[0].trim().toLowerCase());
+    } else {
+      return selectedIdx === 1 || selectedOpt.trim().toUpperCase() === 'NON' || (Boolean(optionsList[1]) && selectedOpt.trim().toLowerCase() === optionsList[1].trim().toLowerCase());
+    }
+  }
+  if (typeof expected === 'number') {
+    return selectedIdx === expected || String(expected) === selectedOpt.trim();
+  }
+  if (typeof expected === 'string') {
+    const expClean = expected.trim().toLowerCase();
+    const selClean = selectedOpt.trim().toLowerCase();
+    if (expClean === selClean) return true;
+    if (expClean === 'oui' && (selectedIdx === 0 || selClean === 'true')) return true;
+    if (expClean === 'non' && (selectedIdx === 1 || selClean === 'false')) return true;
+    if (expClean === '1' && selectedIdx === 0) return true;
+    if (expClean === '0' && selectedIdx === 1) return true;
+    return false;
+  }
+  return false;
+}
 
 const exercicesListe = computed<ExerciceCapOuPasCap[]>(() => {
   if (props.exercices && Array.isArray(props.exercices) && props.exercices.length > 0) {
@@ -1292,21 +1344,28 @@ const onBoardCreated = (api: BoardCore) => {
   }
 };
 
-const setMultipleAnswer = (propIdx: number, val: boolean) => {
+const setMultipleAnswer = (propIdx: number, val: boolean | string, optIdx?: number) => {
   if (isCardSolved.value) return;
 
-  multipleAnswers.value[propIdx] = val;
+  const actualIdx = typeof optIdx === 'number' ? optIdx : (val === true ? 0 : 1);
+  const actualStr = typeof val === 'string' ? val : (val === true ? (optionsReponseListe.value[0] || 'OUI') : (optionsReponseListe.value[1] || 'NON'));
+
+  multipleAnswers.value[propIdx] = actualStr;
 
   const allAnswered = multipleAnswers.value.length > 0 &&
-    multipleAnswers.value.every((ans) => ans !== null);
+    multipleAnswers.value.every((ans) => ans !== null && typeof ans !== 'undefined');
 
   if (allAnswered) {
     const expected = exerciceCourant.value.reponses_multiple || [];
     let isAllCorrect = true;
 
     for (let i = 0; i < propositionsListe.value.length; i++) {
-      const expVal = typeof expected[i] === 'boolean' ? expected[i] : true;
-      if (multipleAnswers.value[i] !== expVal) {
+      const expVal = typeof expected[i] !== 'undefined' ? expected[i] : true;
+      const userAns = multipleAnswers.value[i];
+      const userOptIdx = optionsReponseListe.value.findIndex(
+        (o) => o.trim().toLowerCase() === String(userAns).trim().toLowerCase()
+      );
+      if (!checkAnswerMatch(String(userAns), userOptIdx >= 0 ? userOptIdx : actualIdx, expVal, optionsReponseListe.value)) {
         isAllCorrect = false;
         break;
       }
@@ -1332,19 +1391,26 @@ const setMultipleAnswer = (propIdx: number, val: boolean) => {
   }
 };
 
-const setSingleAnswer = (val: boolean) => {
+const setSingleAnswer = (val: boolean | string, optIdx?: number) => {
   if (isCardSolved.value) return;
 
-  singleAnswer.value = val;
+  const actualIdx = typeof optIdx === 'number' ? optIdx : (val === true ? 0 : 1);
+  const actualStr = typeof val === 'string' ? val : (val === true ? (optionsReponseListe.value[0] || 'OUI') : (optionsReponseListe.value[1] || 'NON'));
 
-  let expected = true;
-  if (typeof exerciceCourant.value.reponse_oui_non === 'boolean') {
+  singleAnswer.value = actualStr;
+
+  let expected: any = true;
+  if (typeof exerciceCourant.value.reponse_attendue !== 'undefined') {
+    expected = exerciceCourant.value.reponse_attendue;
+  } else if (typeof exerciceCourant.value.reponse_oui_non !== 'undefined') {
     expected = exerciceCourant.value.reponse_oui_non;
   } else if (typeof exerciceCourant.value.qcm_bonne_reponse === 'number') {
-    expected = exerciceCourant.value.qcm_bonne_reponse === 0;
+    expected = exerciceCourant.value.qcm_bonne_reponse;
   }
 
-  if (val === expected) {
+  const isMatch = checkAnswerMatch(actualStr, actualIdx, expected, optionsReponseListe.value);
+
+  if (isMatch) {
     isCardSolved.value = true;
     feedback.value = {
       type: 'success',
@@ -1967,6 +2033,11 @@ const passerCarteSuivante = () => {
   background: rgba(220, 53, 69, 0.08);
 }
 
+.toggle-btn--custom:hover:not(:disabled) {
+  color: var(--ion-color-primary, #3880ff);
+  background: rgba(56, 128, 255, 0.08);
+}
+
 .toggle-btn--oui.is-selected {
   background: #198754 !important;
   color: #ffffff !important;
@@ -1977,6 +2048,12 @@ const passerCarteSuivante = () => {
   background: #dc3545 !important;
   color: #ffffff !important;
   box-shadow: 0 2px 6px rgba(220, 53, 69, 0.35);
+}
+
+.toggle-btn--custom.is-selected {
+  background: var(--ion-color-primary, #3880ff) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(56, 128, 255, 0.35);
 }
 
 .toggle-btn:disabled {
