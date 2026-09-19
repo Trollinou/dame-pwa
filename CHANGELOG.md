@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.6.10] - 2026-09-19
+
 - **Automatisation Intégrale des Mises à Jour & Système Anti-Cache PWA (`pwa/vite.config.ts`, `pwa/src/main.ts`, `pwa/src/composables/usePwaUpdate.ts`, `pwa/src/views/ProfilePage.vue`, `pwa/public/.htaccess`, `README.md`, `USING.md`)** :
   - **Génération Dynamique de `version.json`** : Plugin Vite personnalisé générant automatiquement `version.json` dans `pwa/dist/` à chaque build (avec version de `package.json` et horodatage `buildTime`), exclu du pré-cache Service Worker (`globIgnores: ['**/version.json']`).
   - **Enregistrement Service Worker avec `updateViaCache: 'none'`** : Remplacement de l'enregistrement générique par un enregistrement natif forçant le navigateur à ignorer le cache HTTP pour les vérifications de `sw.js` (crucial sous iOS Safari WebClip et Android).
