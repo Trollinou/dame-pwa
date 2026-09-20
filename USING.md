@@ -109,6 +109,20 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - Reprise de la séquence PGN post-QCM directement sur la position résultante (un demi-coup plus tard) avec restitution du commentaire et des formes du coup validé.
         - Bulle de commentaires PGN ergonomique : affichage propre des retours à la ligne (`pre-line`) pour préserver les listes pédagogiques, défilement vertical fluide dès que le commentaire dépasse la hauteur réservée, réinitialisation automatique du défilement au début du texte à chaque coup, sans rognage du haut du commentaire.
         - Progression fluide avec `ContentHeader` et `SeriesCardFooter` jusqu'au coup final de la partie et validation de la progression. Lorsque la partie se poursuit après le dernier QCM, la séquence PGN finale exige de visionner l'intégralité des coups jusqu'au terme de la partie pour afficher `🎉 Exercice réussi !` et déclencher la célébration.
+      - **Exercices Posi'Plan (Type 5)** :
+        - Saisie d'une étude PGN complète dans le CMS auteur (partie avec choix initial, variantes explorables et commentaires).
+        - **Choix Initial & Exploration des Variantes** :
+          - Dès la position initiale, présentation d'un choix clé parmi 3 options : le coup principal et deux variantes alternatives.
+          - L'échiquier affiche la position de départ (FEN) ainsi que les flèches et formes d'annotation initiales (`[%cal]`, `[%csl]`).
+          - Barre d'instruction *« Trouve le bon plan »* et boutons de choix au format français avec notation SAN entre parenthèses (ex : *« Cavalier c1 en e2 (Ce2) »*, *« Tour d1 en d5 (Td5) »*).
+          - Si l'apprenant clique sur une variante alternative : bascule en mode exploration de la variante avec boutons de navigation PGN (*Début*, *Précédent*, *Suivant*), restitution des flèches et commentaires du coup courant, et bouton d'action proéminent **« ⬅️ Retourner au choix initial »** pour réexaminer la position de départ.
+        - **Déroulement de la Branche Principale** :
+          - Dès le bon plan initial sélectionné, l'étape est validée dans le `SeriesCardFooter` (feedback vert) et l'apprenant avance sur la branche principale.
+          - Enchaînement séquentiel des réponses adverses et des étapes QCM sur les décisions clés suivantes :
+            - Les mauvais choix affichent l'explication spécifique dans la zone de feedback rouge du `SeriesCardFooter` sans lancer de sous-variante complexe.
+            - Le bon choix avance sur l'échiquier vers les coups suivants.
+          - Au terme du dernier coup de la ligne principale, restitution du commentaire explicatif final et validation de l'exercice avec célébration confettis.
+        - Intégration complète et harmonisée de `ContentHeader` (titre, type, consigne contextuelle, badge d'étape) et `SeriesCardFooter` (feedback vert/rouge, bouton *« Étape suivante »* et validation finale).
       - **Exercices Associ'Plan (Type 6)** :
         - Saisie simplifiée dans le CMS de 4 PGNs purs : chaque PGN porte sa FEN de départ `[FEN "..."]`, ses annotations graphiques `[%csl]/[%cal]` et sa description pédagogique dans son commentaire initial `{ ... }`.
         - Déroulement structuré en **5 cartes séquentielles** avec `ContentHeader` et `SeriesCardFooter` :

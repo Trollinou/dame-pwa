@@ -6,7 +6,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-- **Centralisation & Standardisation DRY de la Notation d'Échecs et Utilitaires (`chessNotation.ts`, parsers, viewers, tests, `README.md`)** :
+- **Refonte Complète du Type 5 (Posi'Plan) basée sur Étude PGN avec Embranchements et Variantes (`TypePosiPlan.vue`, `posiPlanParser.ts`, `posiPlanParser.spec.ts`, `TypePosiPlan.spec.ts`, `README.md`, `USING.md`)** :
+  - **Saisie PGN Unique & Découpage Automatique** : Parsing automatique d'une étude PGN complète (ex: export Lichess) avec détection du choix initial à 3 branches et des moments de choix QCM sur la ligne principale.
+  - **Choix Initial & Exploration des Variantes** :
+    - Dès la position de départ, affichage de l'échiquier avec formes initiales (`[%cal]`, `[%csl]`), instruction claire et 3 boutons de choix (labels français + SAN).
+    - Exploration interactive des variantes alternatives avec contrôles de navigation PGN (`Début`, `Précédent`, `Suivant`), bulles de commentaires et formes dynamiques.
+    - Bouton d'action proéminent **« ⬅️ Retourner au choix initial »** pour réexaminer la position de départ à tout moment.
+  - **Progression sur la Branche Principale** :
+    - Enchaînement fluide des étapes de défilement PGN et des QCM de choix tactiques/stratégiques avec explications détaillées pour chaque coup.
+  - **Harmonisation Visuelle et Ergonomique** : Intégration complète de `ContentHeader` (métadonnées, consigne dynamique, badge d'étape) et `SeriesCardFooter` (feedback vert/rouge, transition d'étape fluide et célébration finale).
+
   - **Constantes & Libellés Centralisés** : `ROLE_NAMES_FR`, `ROLE_LETTERS_FR`, `ROLE_FEMININE`, `CHAR_TO_ROLE`, `getPieceLabel`, `getPieceDisplayName` (gestion automatique des accords en genre/couleur) et `cleanNotation`.
   - **Notation & Verbalisation** : `toFrenchNotation`, `toInternationalNotation`, `squareIndexToString`, `formatMoveInFrench`, `formatMoveWithFrenchSan`.
   - **Parsing des Formes PGN** : `extractShapesAndComment` et `extractShapesAndText` pour dédupliquer l'analyse des annotations `[%csl]`, `[%cal]`, `[%cpl]` à travers tous les parsers et viewers (`partieHerosParser`, `ouvreBoiteParser`, `associPlanParser`, `ABCDaireTactiqueViewer`, `CapOuPasCapViewer`).

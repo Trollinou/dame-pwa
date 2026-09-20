@@ -5,7 +5,7 @@ import type { Key, DrawShape } from 'eg-chessboard';
 /**
  * Noms des rôles de pièces en français (clé en anglais ou initiale FEN).
  */
-export const ROLE_NAMES_FR: Record<string, string> = {
+export const ROLE_NAMES_FR: Record< string, string > = {
 	pawn: 'Pion',
 	knight: 'Cavalier',
 	bishop: 'Fou',
@@ -23,7 +23,7 @@ export const ROLE_NAMES_FR: Record<string, string> = {
 /**
  * Initiales françaises des pièces (notation SAN).
  */
-export const ROLE_LETTERS_FR: Record<string, string> = {
+export const ROLE_LETTERS_FR: Record< string, string > = {
 	pawn: '',
 	knight: 'C',
 	bishop: 'F',
@@ -41,7 +41,7 @@ export const ROLE_LETTERS_FR: Record<string, string> = {
 /**
  * Rôles de pièces ayant le genre féminin en français (Tour, Dame).
  */
-export const ROLE_FEMININE: Record<string, boolean> = {
+export const ROLE_FEMININE: Record< string, boolean > = {
 	queen: true,
 	rook: true,
 	q: true,
@@ -51,7 +51,10 @@ export const ROLE_FEMININE: Record<string, boolean> = {
 /**
  * Correspondance entre caractère FEN minuscule et nom de rôle standard.
  */
-export const CHAR_TO_ROLE: Record<string, 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king'> = {
+export const CHAR_TO_ROLE: Record<
+	string,
+	'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king'
+> = {
 	p: 'pawn',
 	n: 'knight',
 	b: 'bishop',
@@ -63,7 +66,7 @@ export const CHAR_TO_ROLE: Record<string, 'pawn' | 'knight' | 'bishop' | 'rook' 
 /**
  * Correspondance entre nom de rôle standard et caractère FEN minuscule.
  */
-export const ROLE_TO_CHAR: Record<string, string> = {
+export const ROLE_TO_CHAR: Record< string, string > = {
 	pawn: 'p',
 	knight: 'n',
 	bishop: 'b',
@@ -72,12 +75,12 @@ export const ROLE_TO_CHAR: Record<string, string> = {
 	king: 'k',
 };
 
-const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+const FILES = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ];
 
 /**
  * Palette de correspondance des codes de couleur Lichess/ChessBase vers les noms de brosses standard.
  */
-export const PGN_BRUSH_MAP: Record<string, string> = {
+export const PGN_BRUSH_MAP: Record< string, string > = {
 	g: 'green',
 	r: 'red',
 	b: 'blue',
@@ -89,93 +92,113 @@ export const PGN_BRUSH_MAP: Record<string, string> = {
 /**
  * Retourne le nom simple en français d'une pièce à partir de son rôle ou caractère.
  * Ex: 'n' -> 'Cavalier', 'rook' -> 'Tour'
+ * @param roleOrChar
  */
-export function getPieceLabel(roleOrChar: string): string {
-	if (!roleOrChar) return 'Pièce';
+export function getPieceLabel( roleOrChar: string ): string {
+	if ( ! roleOrChar ) {
+		return 'Pièce';
+	}
 	const key = roleOrChar.toLowerCase();
-	return ROLE_NAMES_FR[key] || 'Pièce';
+	return ROLE_NAMES_FR[ key ] || 'Pièce';
 }
 
 /**
  * Retourne le nom complet d'une pièce en français avec accord en genre et en couleur.
  * Ex: ('r', 'white') -> 'Tour blanche', ('n', 'black') -> 'Cavalier noir'
+ * @param roleOrChar
+ * @param color
  */
 export function getPieceDisplayName(
 	roleOrChar: string,
 	color: 'white' | 'black' | 'w' | 'b'
 ): string {
-	if (!roleOrChar) return '';
+	if ( ! roleOrChar ) {
+		return '';
+	}
 	const key = roleOrChar.toLowerCase();
-	const name = getPieceLabel(key);
-	const isFem = !!ROLE_FEMININE[key];
+	const name = getPieceLabel( key );
+	const isFem = !! ROLE_FEMININE[ key ];
 	const isWhite = color === 'white' || color === 'w';
-	const colorAdjective = isWhite
-		? (isFem ? 'blanche' : 'blanc')
-		: (isFem ? 'noire' : 'noir');
-	return `${name} ${colorAdjective}`;
+	let colorAdjective: string;
+	if ( isWhite ) {
+		colorAdjective = isFem ? 'blanche' : 'blanc';
+	} else {
+		colorAdjective = isFem ? 'noire' : 'noir';
+	}
+	return `${ name } ${ colorAdjective }`;
 }
 
 /**
  * Nettoie et normalise une chaîne de notation entrée par l'utilisateur.
  * Ex: " ta1 " -> "Ta1", " e4 " -> "e4"
+ * @param raw
  */
-export function cleanNotation(raw: string): string {
-	if (!raw) return '';
-	const trimmed = raw.trim().replace(/\s+/g, '');
-	if (trimmed.length >= 3) {
-		return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+export function cleanNotation( raw: string ): string {
+	if ( ! raw ) {
+		return '';
+	}
+	const trimmed = raw.trim().replace( /\s+/g, '' );
+	if ( trimmed.length >= 3 ) {
+		return (
+			trimmed.charAt( 0 ).toUpperCase() + trimmed.slice( 1 ).toLowerCase()
+		);
 	}
 	return trimmed.toLowerCase();
 }
 
 /**
  * Convertit un indice de case chessops (0..63) en chaîne (ex: 12 -> "e2").
+ * @param sq
  */
-export function squareIndexToString(sq: number): string {
+export function squareIndexToString( sq: number ): string {
 	const file = sq % 8;
-	const rank = Math.floor(sq / 8) + 1;
-	return `${FILES[file]}${rank}`;
+	const rank = Math.floor( sq / 8 ) + 1;
+	return `${ FILES[ file ] }${ rank }`;
 }
 
 /**
  * Convertit un coup SAN de notation internationale (K, Q, R, B, N)
  * en notation française (R, D, T, F, C).
+ * @param san
  */
-export function toFrenchNotation(san: string): string {
-	if (!san) {
+export function toFrenchNotation( san: string ): string {
+	if ( ! san ) {
 		return '';
 	}
-	const pieceMap: Record<string, string> = {
+	const pieceMap: Record< string, string > = {
 		K: 'R', // Roi
 		Q: 'D', // Dame
 		R: 'T', // Tour
 		B: 'F', // Fou
 		N: 'C', // Cavalier
 	};
-	return san.replace(/[KQRBN]/g, (match) => pieceMap[match] || match);
+	return san.replace( /[KQRBN]/g, ( match ) => pieceMap[ match ] || match );
 }
 
 /**
  * Convertit un coup SAN de notation française (R, D, T, F, C)
  * en notation internationale (K, Q, R, B, N).
+ * @param san
  */
-export function toInternationalNotation(san: string): string {
-	if (!san) {
+export function toInternationalNotation( san: string ): string {
+	if ( ! san ) {
 		return '';
 	}
-	const pieceMap: Record<string, string> = {
+	const pieceMap: Record< string, string > = {
 		R: 'K', // Roi
 		D: 'Q', // Dame
 		T: 'R', // Tour
 		F: 'B', // Fou
 		C: 'N', // Cavalier
 	};
-	return san.replace(/[RDTFC]/g, (match) => pieceMap[match] || match);
+	return san.replace( /[RDTFC]/g, ( match ) => pieceMap[ match ] || match );
 }
 
 /**
  * Traduit un coup SAN sur une position d'échecs en libellé français clair.
  * Ex: "Pion e2 en e4", "Fou f1 en b5", "Petit roque (O-O)", "Grand roque (O-O-O)"
+ * @param pos
+ * @param san
  */
 export function formatMoveInFrench(
 	pos: Chess,
@@ -184,27 +207,27 @@ export function formatMoveInFrench(
 	const trimmedSan = san.trim();
 
 	// Gestion des roques
-	if (trimmedSan === 'O-O' || trimmedSan === '0-0') {
+	if ( trimmedSan === 'O-O' || trimmedSan === '0-0' ) {
 		const rank = pos.turn === 'white' ? '1' : '8';
 		return {
 			texte: 'Petit roque (O-O)',
-			orig: `e${rank}`,
-			dest: `g${rank}`,
+			orig: `e${ rank }`,
+			dest: `g${ rank }`,
 		};
 	}
-	if (trimmedSan === 'O-O-O' || trimmedSan === '0-0-0') {
+	if ( trimmedSan === 'O-O-O' || trimmedSan === '0-0-0' ) {
 		const rank = pos.turn === 'white' ? '1' : '8';
 		return {
 			texte: 'Grand roque (O-O-O)',
-			orig: `e${rank}`,
-			dest: `c${rank}`,
+			orig: `e${ rank }`,
+			dest: `c${ rank }`,
 		};
 	}
 
-	const standardSan = toInternationalNotation(trimmedSan);
+	const standardSan = toInternationalNotation( trimmedSan );
 
-	const parsedMove = parseSan(pos, standardSan);
-	if (!parsedMove || !('from' in parsedMove)) {
+	const parsedMove = parseSan( pos, standardSan );
+	if ( ! parsedMove || ! ( 'from' in parsedMove ) ) {
 		return {
 			texte: san,
 			orig: '',
@@ -214,18 +237,18 @@ export function formatMoveInFrench(
 
 	const fromSquare = parsedMove.from;
 	const toSquare = parsedMove.to;
-	const orig = squareIndexToString(fromSquare);
-	const dest = squareIndexToString(toSquare);
+	const orig = squareIndexToString( fromSquare );
+	const dest = squareIndexToString( toSquare );
 
-	const piece = pos.board.get(fromSquare);
+	const piece = pos.board.get( fromSquare );
 	const role = piece ? piece.role : 'pawn';
-	const roleName = ROLE_NAMES_FR[role] || 'Pion';
+	const roleName = ROLE_NAMES_FR[ role ] || 'Pion';
 
-	let texte = `${roleName} ${orig} en ${dest}`;
-	if ('promotion' in parsedMove && parsedMove.promotion) {
+	let texte = `${ roleName } ${ orig } en ${ dest }`;
+	if ( 'promotion' in parsedMove && parsedMove.promotion ) {
 		const promoRole =
-			ROLE_NAMES_FR[parsedMove.promotion] || parsedMove.promotion;
-		texte += ` (${promoRole})`;
+			ROLE_NAMES_FR[ parsedMove.promotion ] || parsedMove.promotion;
+		texte += ` (${ promoRole })`;
 	}
 
 	return { texte, orig, dest };
@@ -234,29 +257,34 @@ export function formatMoveInFrench(
 /**
  * Formate un coup complet avec description française suivie de la notation SAN française entre parenthèses.
  * Ex: "Fou f1 en c4 (Fc4)", "Pion e2 en e4 (e4)", "Petit roque (O-O)", "Grand roque (O-O-O)"
+ * @param pos
+ * @param san
  */
-export function formatMoveWithFrenchSan(pos: Chess, san: string): string {
-	const formatted = formatMoveInFrench(pos, san);
-	const frSan = toFrenchNotation(san);
-	if (formatted.texte.endsWith(`(${frSan})`)) {
+export function formatMoveWithFrenchSan( pos: Chess, san: string ): string {
+	const formatted = formatMoveInFrench( pos, san );
+	const frSan = toFrenchNotation( san );
+	if ( formatted.texte.endsWith( `(${ frSan })` ) ) {
 		return formatted.texte;
 	}
-	return `${formatted.texte} (${frSan})`;
+	return `${ formatted.texte } (${ frSan })`;
 }
 
 /**
  * Extrait les formes graphiques ([%csl ...], [%cal ...], [%cpl ...]) et le texte épuré d'un ou plusieurs commentaires PGN.
+ * @param comments
  */
-export function extractShapesAndComment(comments?: string[] | string): {
+export function extractShapesAndComment( comments?: string[] | string ): {
 	comment: string;
 	shapes: DrawShape[];
 } {
-	if (!comments) {
+	if ( ! comments ) {
 		return { comment: '', shapes: [] };
 	}
 
-	const fullText = Array.isArray(comments) ? comments.join('\n') : comments;
-	if (!fullText.trim()) {
+	const fullText = Array.isArray( comments )
+		? comments.join( '\n' )
+		: comments;
+	if ( ! fullText.trim() ) {
 		return { comment: '', shapes: [] };
 	}
 
@@ -265,15 +293,16 @@ export function extractShapesAndComment(comments?: string[] | string): {
 	// 1. Cercles/cases [%csl ...] ou [%cpl ...]
 	const cslRegex = /\[%(?:csl|cpl)\s+([^\]]+)\]/gi;
 	let cslMatch: RegExpExecArray | null;
-	while ((cslMatch = cslRegex.exec(fullText)) !== null) {
-		const items = cslMatch[1].split(',');
-		for (const item of items) {
+	while ( ( cslMatch = cslRegex.exec( fullText ) ) !== null ) {
+		const items = cslMatch[ 1 ].split( ',' );
+		for ( const item of items ) {
 			const clean = item.trim();
-			if (clean.length >= 3) {
-				const brush = PGN_BRUSH_MAP[clean[0].toLowerCase()] || 'green';
-				const orig = clean.substring(1, 3).toLowerCase() as Key;
-				if (!shapes.some((s) => s.orig === orig && !s.dest)) {
-					shapes.push({ orig, brush });
+			if ( clean.length >= 3 ) {
+				const brush =
+					PGN_BRUSH_MAP[ clean[ 0 ].toLowerCase() ] || 'green';
+				const orig = clean.substring( 1, 3 ).toLowerCase() as Key;
+				if ( ! shapes.some( ( s ) => s.orig === orig && ! s.dest ) ) {
+					shapes.push( { orig, brush } );
 				}
 			}
 		}
@@ -282,16 +311,19 @@ export function extractShapesAndComment(comments?: string[] | string): {
 	// 2. Flèches [%cal ...]
 	const calRegex = /\[%cal\s+([^\]]+)\]/gi;
 	let calMatch: RegExpExecArray | null;
-	while ((calMatch = calRegex.exec(fullText)) !== null) {
-		const items = calMatch[1].split(',');
-		for (const item of items) {
+	while ( ( calMatch = calRegex.exec( fullText ) ) !== null ) {
+		const items = calMatch[ 1 ].split( ',' );
+		for ( const item of items ) {
 			const clean = item.trim();
-			if (clean.length >= 5) {
-				const brush = PGN_BRUSH_MAP[clean[0].toLowerCase()] || 'green';
-				const orig = clean.substring(1, 3).toLowerCase() as Key;
-				const dest = clean.substring(3, 5).toLowerCase() as Key;
-				if (!shapes.some((s) => s.orig === orig && s.dest === dest)) {
-					shapes.push({ orig, dest, brush });
+			if ( clean.length >= 5 ) {
+				const brush =
+					PGN_BRUSH_MAP[ clean[ 0 ].toLowerCase() ] || 'green';
+				const orig = clean.substring( 1, 3 ).toLowerCase() as Key;
+				const dest = clean.substring( 3, 5 ).toLowerCase() as Key;
+				if (
+					! shapes.some( ( s ) => s.orig === orig && s.dest === dest )
+				) {
+					shapes.push( { orig, dest, brush } );
 				}
 			}
 		}
@@ -299,33 +331,38 @@ export function extractShapesAndComment(comments?: string[] | string): {
 
 	// 3. Commentaire texte sans les balises [%...]
 	const cleanComment = fullText
-		.replace(/\[%[^\]]+\]/g, '')
+		.replace( /\[%[^\]]+\]/g, '' )
 		.trim()
-		.replace(/\s{2,}/g, ' ');
+		.replace( /\s{2,}/g, ' ' );
 
 	return { comment: cleanComment, shapes };
 }
 
 /**
  * Alias de compatibilité pour extractShapesAndComment retournant cleanedText.
+ * @param commentText
  */
-export function extractShapesAndText(commentText?: string[] | string): {
+export function extractShapesAndText( commentText?: string[] | string ): {
 	cleanedText: string;
 	shapes: DrawShape[];
 } {
-	const res = extractShapesAndComment(commentText);
+	const res = extractShapesAndComment( commentText );
 	return { cleanedText: res.comment, shapes: res.shapes };
 }
 
 /**
  * Mélange aléatoirement les éléments d'un tableau (algorithme de Fisher-Yates, sans effet de bord).
+ * @param array
+ * @param rng
  */
-export function shuffleArray<T>(array: T[], rng: () => number = Math.random): T[] {
-	const copy = [...array];
-	for (let i = copy.length - 1; i > 0; i--) {
-		const j = Math.floor(rng() * (i + 1));
-		[copy[i], copy[j]] = [copy[j], copy[i]];
+export function shuffleArray< T >(
+	array: T[],
+	rng: () => number = Math.random
+): T[] {
+	const copy = [ ...array ];
+	for ( let i = copy.length - 1; i > 0; i-- ) {
+		const j = Math.floor( rng() * ( i + 1 ) );
+		[ copy[ i ], copy[ j ] ] = [ copy[ j ], copy[ i ] ];
 	}
 	return copy;
 }
-

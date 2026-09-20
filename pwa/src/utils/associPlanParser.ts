@@ -1,5 +1,5 @@
 import { parsePgn } from 'chessops/pgn';
-import type { DrawShape, Key } from 'eg-chessboard';
+import type { DrawShape } from 'eg-chessboard';
 import { getActiveColorFromFen } from './fenUtils';
 
 export interface AssociPlanPaire {

@@ -1,9 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { Chess } from 'chessops';
-import { parseFen } from 'chessops/fen';
 import {
-	ROLE_NAMES_FR,
-	ROLE_LETTERS_FR,
 	getPieceLabel,
 	getPieceDisplayName,
 	cleanNotation,
@@ -34,7 +31,9 @@ describe( 'chessNotation.ts', () => {
 		expect( getPieceDisplayName( 'q', 'white' ) ).toBe( 'Dame blanche' );
 		expect( getPieceDisplayName( 'queen', 'black' ) ).toBe( 'Dame noire' );
 		expect( getPieceDisplayName( 'n', 'white' ) ).toBe( 'Cavalier blanc' );
-		expect( getPieceDisplayName( 'knight', 'black' ) ).toBe( 'Cavalier noir' );
+		expect( getPieceDisplayName( 'knight', 'black' ) ).toBe(
+			'Cavalier noir'
+		);
 		expect( getPieceDisplayName( 'p', 'white' ) ).toBe( 'Pion blanc' );
 		expect( getPieceDisplayName( 'b', 'b' ) ).toBe( 'Fou noir' );
 		expect( getPieceDisplayName( 'k', 'w' ) ).toBe( 'Roi blanc' );

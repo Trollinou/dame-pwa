@@ -1,6 +1,5 @@
 import { parsePgn } from 'chessops/pgn';
 import { parseFen } from 'chessops/fen';
-import { parseSan } from 'chessops/san';
 import { Chess } from 'chessops';
 import type { Key, DrawShape } from 'eg-chessboard';
 
