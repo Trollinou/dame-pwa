@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Rétablissement de l'Animation Différée du Coup Initial en QCM (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `USING.md`)** :
+  - Rétablissement de l'exécution animée du premier coup PGN (`boardApi.value.move(moveSan)`) après un court délai (300ms) dans `initCardState()` pour les variantes QCM lorsque le mini-PGN comporte un déplacement à observer par l'élève, tout en conservant l'affichage statique pur lorsque le mini-PGN ne contient qu'une position FEN sans coup joué.
+
 - **Harmonisation et Unification des Feuilles de Styles de l'Apprentissage (Principe KISS) (`pwa/src/theme/learning/`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `PgnViewer.vue`, `CapOuPasCapViewer.vue`, `TypePartieHeros.vue`, `TypePosiPlan.vue`, `README.md`, `USING.md`)** :
   - **Architecture Modulaire Partagée** : Centralisation complète de l'ensemble des règles visuelles de l'Apprentissage dans `pwa/src/theme/learning/` (`_learning-layout.scss` et `_learning-components.scss`) et interdiction absolue d'ajouter des balises `<style>` locales dans les 16 types d'exercices.
   - **Ergonomie Mobile First & Zéro-Scroll** : Budget vertical optimisé (`38dvh`), échiquiers carrés stricts (1:1) sans arrondis pour un alignement parfait des pièces, et bascule automatique en 2 colonnes (`split-view`) pour tablettes paysage et ordinateurs.

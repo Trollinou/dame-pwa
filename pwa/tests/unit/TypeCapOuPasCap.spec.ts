@@ -129,15 +129,15 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		expect( wrapper.text() ).toContain( 'Bravo !' );
 	} );
 
-	test( 'affiche uniquement la FEN initiale pour la variante QCM Oui/Non même si le PGN contient un coup joué', () => {
+	test( 'affiche la FEN initiale pour la variante QCM Oui/Non avec un PGN de position pure', () => {
 		const initialFen = '8/8/8/P6p/6pP/3qk1P1/8/4K3 w - - 0 1';
-		const pgnWithMove = `[SetUp "1"]\n[FEN "${ initialFen }"]\n\n{ [%csl Ga6][%cal Ga5a6] }\n1. a6 *`;
+		const pgnPureFen = `[SetUp "1"]\n[FEN "${ initialFen }"]\n\n{ [%csl Ga6][%cal Ga5a6] }\n*`;
 
 		const config = {
 			consigne: 'Cap ou pas cap ?',
 			variante: 'qcm_oui_non',
 			question: 'Le pion va-t-il à dame ?',
-			exercices: [ { pgn: pgnWithMove, reponse_oui_non: true } ],
+			exercices: [ { pgn: pgnPureFen, reponse_oui_non: true } ],
 		};
 
 		const wrapper = mount( TypeCapOuPasCap, {
@@ -153,6 +153,48 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		const mockFen = wrapper.find( '.mock-fen' );
 		expect( mockFen.exists() ).toBe( true );
 		expect( mockFen.text() ).toBe( initialFen );
+	} );
+
+	test( 'anime le premier coup du PGN de façon différée pour la variante QCM Oui/Non', async () => {
+		vi.useFakeTimers();
+		const moveMock = vi.fn();
+		const setPositionMock = vi.fn();
+		const setShapesMock = vi.fn();
+
+		const initialFen = '8/8/8/P6p/6pP/3qk1P1/8/4K3 w - - 0 1';
+		const pgnWithMove = `[SetUp "1"]\n[FEN "${ initialFen }"]\n\n1. a6 *`;
+
+		const config = {
+			consigne: 'Cap ou pas cap ?',
+			variante: 'qcm_oui_non',
+			question: 'Le pion va-t-il à dame ?',
+			exercices: [ { pgn: pgnWithMove, reponse_oui_non: true } ],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 14022,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		const chessboard = wrapper.findComponent( { name: 'EgChessboard' } );
+		chessboard.vm.$emit( 'board-created', {
+			move: moveMock,
+			setPosition: setPositionMock,
+			setShapes: setShapesMock,
+		} );
+
+		await wrapper.vm.$nextTick();
+		expect( moveMock ).not.toHaveBeenCalled();
+
+		vi.advanceTimersByTime( 350 );
+		expect( moveMock ).toHaveBeenCalledWith( 'a6' );
+
+		vi.useRealTimers();
 	} );
 
 	test( 'gère la validation d’une variante QCM Multiple avec plusieurs propositions', async () => {

@@ -178,7 +178,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - L'échiquier maintient visible le repère visuel d'observation (cercle jaune `[%csl Y...]` sur la pièce d'étude ciblée par l'énoncé) tout en masquant les flèches et annotations de solution. Dès que toutes les affirmations sont complétées avec la combinaison exacte, les shapes de l'entraîneur (flèches, attaques, défenses) sont révélées sur l'échiquier, le feedback vert s'affiche et le bouton *« Carte suivante »* s'active.
         - **Variante QCM Oui/Non / QCM Simple (`qcm_oui_non`)** :
           - Une question commune affichée au-dessus d'un groupe de boutons de choix tactiles (par défaut OUI / NON, ou 2, 3 choix ou plus personnalisés tels que `BLANC`, `NOIR`, `ÉGALE`).
-          - L'échiquier affiche fidèlement la position FEN de départ (les éventuels coups PGN ne sont pas auto-joués afin de préserver l'énigme), maintient visible le cercle jaune d'observation s'il est présent (`[%csl Y...]`), et masque les annotations visuelles de solution (flèches `[%cal]`) pendant la réflexion.
+          - Si le mini-PGN comporte un coup initial, celui-ci s'anime de façon différée sur l'échiquier pour situer l'action à évaluer (ou reste statique en FEN pure si le PGN ne contient aucun coup). Le cercle jaune d'observation est maintenu visible (`[%csl Y...]`) et les annotations visuelles de solution (flèches `[%cal]`) restent masquées pendant la réflexion.
           - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
         - **Variante Move (`move`)** :
           - Résolution du coup attendu directement sur l'échiquier interactif avec révélation des annotations et validation de l'étape.

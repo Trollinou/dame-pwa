@@ -1236,6 +1236,17 @@ const initCardState = () => {
 
       boardApi.value.setPosition(initialFen);
       boardApi.value.setShapes(shapesAffichees.value);
+
+      // Si le mini-pgn contient 1 coup d'animation initial (sauf si mode move, setup ou clic)
+      if (currentPgnData.value.moves.length > 0 && resolvedVariante.value !== 'move' && resolvedVariante.value !== 'setup' && resolvedVariante.value !== 'clic') {
+        const moveSan = currentPgnData.value.moves[0];
+        setTimeout(() => {
+          if (boardApi.value) {
+            boardApi.value.move(moveSan);
+            boardApi.value.setShapes(shapesAffichees.value);
+          }
+        }, 300);
+      }
     }
   });
 };
