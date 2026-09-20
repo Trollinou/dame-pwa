@@ -197,6 +197,52 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		vi.useRealTimers();
 	} );
 
+	test( 'anime le premier coup des Noirs (1... d5) avec commentaire initial en variante QCM Oui/Non', async () => {
+		vi.useFakeTimers();
+		const moveMock = vi.fn();
+		const setPositionMock = vi.fn();
+		const setShapesMock = vi.fn();
+
+		const pgnBlackMove = `[Event "EA_Matérialité_DéplacementDesPièces: EA_Niv1_M_CB-1_CapOuPasCap_Prise en passant (QCM Oui/non)"]
+[FEN "7k/3p4/8/4P3/8/8/8/7K b - - 0 1"]
+[SetUp "1"]
+
+{ Peut-on réaliser la prise en passant ? }
+1... d5 { [%csl Rd5,Ge5][%cal Re5d6] } *`;
+
+		const config = {
+			consigne: 'Cap ou pas cap ?',
+			variante: 'qcm_oui_non',
+			question: 'Peut-on réaliser la prise en passant ?',
+			exercices: [ { pgn: pgnBlackMove, reponse_oui_non: true } ],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 14023,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		const chessboard = wrapper.findComponent( { name: 'EgChessboard' } );
+		chessboard.vm.$emit( 'board-created', {
+			move: moveMock,
+			setPosition: setPositionMock,
+			setShapes: setShapesMock,
+		} );
+
+		await wrapper.vm.$nextTick();
+		expect( moveMock ).not.toHaveBeenCalled();
+
+		vi.advanceTimersByTime( 350 );
+		expect( moveMock ).toHaveBeenCalledWith( 'd5' );
+
+		vi.useRealTimers();
+	} );
+
 	test( 'gère la validation d’une variante QCM Multiple avec plusieurs propositions', async () => {
 		const config = {
 			consigne: 'Évaluez les possibilités de roque.',

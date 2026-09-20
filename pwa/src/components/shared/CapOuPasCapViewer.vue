@@ -273,7 +273,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, onUnmounted } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
 import { getActiveColorFromFen, parseFenPieces, filterYellowShapes, type PieceInfo } from '@/utils/fenUtils';
@@ -1215,7 +1215,43 @@ const onSquareClick = (square: string) => {
   }
 };
 
+let moveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const triggerDelayedMove = () => {
+  if (moveTimeout) {
+    clearTimeout(moveTimeout);
+    moveTimeout = null;
+  }
+
+  if (
+    currentPgnData.value.moves.length > 0 &&
+    resolvedVariante.value !== 'move' &&
+    resolvedVariante.value !== 'setup' &&
+    resolvedVariante.value !== 'clic'
+  ) {
+    const moveSan = currentPgnData.value.moves[0];
+    moveTimeout = setTimeout(() => {
+      if (boardApi.value) {
+        boardApi.value.move(moveSan);
+        boardApi.value.setShapes(shapesAffichees.value);
+      }
+    }, 300);
+  }
+};
+
+onUnmounted(() => {
+  if (moveTimeout) {
+    clearTimeout(moveTimeout);
+    moveTimeout = null;
+  }
+});
+
 const initCardState = () => {
+  if (moveTimeout) {
+    clearTimeout(moveTimeout);
+    moveTimeout = null;
+  }
+
   isCardSolved.value = false;
   feedback.value = null;
   singleAnswer.value = null;
@@ -1236,17 +1272,7 @@ const initCardState = () => {
 
       boardApi.value.setPosition(initialFen);
       boardApi.value.setShapes(shapesAffichees.value);
-
-      // Si le mini-pgn contient 1 coup d'animation initial (sauf si mode move, setup ou clic)
-      if (currentPgnData.value.moves.length > 0 && resolvedVariante.value !== 'move' && resolvedVariante.value !== 'setup' && resolvedVariante.value !== 'clic') {
-        const moveSan = currentPgnData.value.moves[0];
-        setTimeout(() => {
-          if (boardApi.value) {
-            boardApi.value.move(moveSan);
-            boardApi.value.setShapes(shapesAffichees.value);
-          }
-        }, 300);
-      }
+      triggerDelayedMove();
     }
   });
 };
@@ -1260,6 +1286,7 @@ const onBoardCreated = (api: BoardCore) => {
   if (shapesAffichees.value.length > 0) {
     api.setShapes(shapesAffichees.value);
   }
+  triggerDelayedMove();
 };
 
 const setMultipleAnswer = (propIdx: number, val: boolean | string, optIdx?: number) => {
