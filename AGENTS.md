@@ -6,7 +6,7 @@
 
 ## 2. Stack Technique
 - **Plugin** : `DAME-PWA` | Slug: `dame-pwa` | Prefix: `dame_pwa_` | Namespace: `DAME_PWA\` | Table: `{$wpdb->prefix}dame_pwa_`
-- **WordPress** : 7.0.1 (Interactivity API, Transients).
+- **WordPress** : 7.1 (Interactivity API, Transients).
 - **PHP** : 8.4 avec `declare(strict_types=1);`. Composer AUTORISÉ en prod (`composer install --no-dev --optimize-autoloader`). Inclure `vendor/autoload.php` + Autoloader SPL natif fallback dans `dame-pwa.php`.
 - **JS / CSS** : ES2021 Vanilla (pas de jQuery), SCSS avec BEM. Sources dans `src/`, compilés dans `build/` et `assets/`.
 
