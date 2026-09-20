@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-abcdaire">
+  <div class="exercise-stage">
     <ABCDaireTactiqueViewer
       :consigne="config.consigne"
       :exercices="config.exercices"
@@ -48,10 +48,3 @@ const gererSucces = () => {
 };
 </script>
 
-<style scoped>
-.exercice-type-abcdaire {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-}
-</style>

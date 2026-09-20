@@ -78,7 +78,12 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - **Liste** (`listOutline`) : retour au sommaire du cours actif (`/cours/:id`).
    - **Structure des Exercices, Vidéos & Leçons** :
       - **En-tête unifié (`ContentHeader`)** : Affiche le titre de l'étape, le type adapté (« Exercice / Type », « Vidéo » ou « Leçon ») et le chapitre/niveau. Pour les Vidéos et Leçons, le deuxième panneau (consigne / question) est masqué automatiquement.
-      - **Échiquiers & Palettes normalisés** : Rendu visuel homogène, dimensionnement stable et constant sur chaque appareil (non altéré par l'apparition de commentaires ou de boutons de choix), ratio carré parfait (1:1), orientation dynamique en fonction du trait (Noirs en bas si trait aux Noirs).
+      - **Échiquiers, Grilles & Contrôles unifiés (Charte Apprentissage KISS)** :
+        - **Ergonomie Mobile Portrait (Zéro-scroll)** : Échiquier calibré dynamiquement en hauteur (`38dvh`, ratio 1:1 sans arrondi), boutons de choix tactiles à hauteur stricte de **44px** et encarts compacts pour que l'exercice et ses interactions tiennent sur l'écran sans ascenseur obligatoire.
+        - **Multi-Échiquiers 2 par ligne** : Disposition préservée et harmonisée (`.learning-board-grid-2col`) pour les exercices nécessitant la comparaison ou le tri de diagrammes (*La Marche du Héros*, *Ordonnancement / Class'échecs*, *Matching*).
+        - **Tablette Paysage & Ordinateur (2 colonnes)** : Bascule automatique en écran scindé où l'échiquier s'agrandit sur la gauche et les consignes/choix s'alignent confortablement sur la droite.
+        - **Encarts pédagogiques unifiés (`.learning-callout`)** : Rendu graphique harmonieux pour les conseils d'entraîneurs (jaune), les indices (bleu), les descriptions (indigo) et les explications (vert/rouge).
+        - **Palettes de pièces tactiles** : Boutons de 44x44px avec suppression automatique du damier de fond sous les pièces SVG isolées.
       - **Exercices 100 Commandements (Type 1)** :
         - Consigne globale par défaut (« Sélectionne la bonne réponse. »), personnalisable dans l'éditeur et surchargeable par diagramme/QCM.
         - Progression carte par carte avec questions QCM textuelles et choix multiples interactifs.

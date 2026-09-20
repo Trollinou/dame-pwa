@@ -1,31 +1,31 @@
 <!-- src/components/shared/OrderViewer.vue -->
 <template>
-  <div class="order-viewer-container">
+  <div class="exercise-stage">
     
     <div class="columns-layout">
       <!-- Colonne Gauche : La Banque (À classer) -->
       <div class="column bank-column">
         <div class="column-header">
           <h3 class="column-title">À trier</h3>
-          <span class="column-subtitle">Appui long pour zoomer ou clic droit</span>
+          <span class="column-subtitle">Toucher pour sélectionner</span>
         </div>
         
         <div class="column-content">
           <div 
             v-for="(item, index) in bank" 
             :key="'bank-' + item.id"
-            class="item-wrapper"
+            class="learning-board-card"
             :class="{ 'is-selected': selectionBank === index }"
             @click="selectBank(index)"
           >
-            <div class="miniature-wrapper">
-              <DiagramViewer :fen="item.fen" :orientation="item.orientation" class="board-miniature" />
+            <div class="chessboard-container chessboard-container--mini">
+              <DiagramViewer :fen="item.fen" :orientation="item.orientation" />
             </div>
           </div>
 
-          <div v-if="bank.length === 0" class="empty-msg">
-            <span class="empty-icon">✓</span>
-            <p>Tout est placé</p>
+          <div v-if="bank.length === 0" class="learning-callout learning-callout--success ion-text-center">
+            <span class="empty-icon" style="font-size: 1.5rem; display: block; margin-bottom: 4px;">✓</span>
+            <p><strong>Tout est placé</strong></p>
           </div>
         </div>
       </div>
@@ -41,19 +41,19 @@
           <div 
             v-for="(slot, index) in slots" 
             :key="'slot-' + index"
-            class="item-wrapper slot-wrapper"
-            :class="{ 'is-empty': !slot, 'is-selected': selectionSlot === index }"
+            class="learning-board-card"
+            :class="{ 'is-selected': selectionSlot === index, 'is-linked': !!slot }"
             @click="selectSlot(index)"
           >
             <!-- Badge de numérotation universel (Ordre ou Force) -->
-            <div class="slot-badge" :class="{ 'filled': slot }">{{ index + 1 }}</div>
+            <div class="learning-board-card__badge">{{ index + 1 }}</div>
 
             <template v-if="slot">
-              <div class="miniature-wrapper">
-                <DiagramViewer :fen="slot.fen" :orientation="slot.orientation" class="board-miniature" />
+              <div class="chessboard-container chessboard-container--mini">
+                <DiagramViewer :fen="slot.fen" :orientation="slot.orientation" />
               </div>
             </template>
-            <div v-else class="empty-placeholder">
+            <div v-else class="empty-placeholder" style="aspect-ratio: 1; width: 100%; display: flex; align-items: center; justify-content: center; color: var(--ion-color-step-400);">
               <span>Libre</span>
             </div>
           </div>
@@ -61,9 +61,9 @@
       </div>
     </div>
 
-    <!-- Bouton d'action -->
-    <div class="action-bar">
-      <ion-button expand="block" @click="validerOrdre" :disabled="bank.length > 0">
+    <!-- Bouton d'action 44px -->
+    <div style="width: 100%; max-width: 320px; margin-top: 12px;">
+      <ion-button expand="block" class="choice-btn" @click="validerOrdre" :disabled="bank.length > 0">
         Valider l'ordre
       </ion-button>
     </div>
@@ -160,156 +160,41 @@ const validerOrdre = async () => {
 </script>
 
 <style scoped>
-.order-viewer-container {
-  width: 100%;
-}
-
 .columns-layout {
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   width: 100%;
-  margin-bottom: 24px;
 }
 
 .column {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Empêche le débordement sur les petits écrans */
+  min-width: 0;
 }
 
 .column-header {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 .column-title {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--ion-color-dark);
-  margin: 0 0 4px 0;
+  margin: 0 0 2px 0;
 }
 
 .column-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--ion-color-step-500);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .column-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-/* Items et Slots (Échiquiers) */
-.item-wrapper {
-  width: 100%;
-  aspect-ratio: 1; /* Garantit que la div reste un carré parfait */
-  border: 2px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-  position: relative;
-  background: var(--ion-color-step-100);
-}
-
-.miniature-wrapper {
-  width: 100%;
-  height: 100%;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.board-miniature {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-}
-
-.item-wrapper.is-selected {
-  border-color: var(--ion-color-primary);
-  box-shadow: 0 4px 12px rgba(56, 128, 255, 0.3);
-  transform: scale(1.03);
-}
-
-/* Spécifique aux Slots */
-.slot-wrapper {
-  border-color: var(--ion-color-step-300);
-  background: var(--ion-color-step-50);
-}
-
-.slot-wrapper.is-empty {
-  border-style: dashed;
-}
-
-.slot-wrapper.is-selected {
-  border-color: var(--ion-color-primary);
-  border-style: solid;
-}
-
-/* Badge du numéro de slot (1, 2, 3...) */
-.slot-badge {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  background: var(--ion-color-step-300);
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.9rem;
-  z-index: 10;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background-color 0.3s;
-}
-
-.slot-badge.filled {
-  background: var(--ion-color-primary);
-}
-
-.empty-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--ion-color-step-400);
-  font-weight: 600;
-  font-size: 0.95rem;
-  text-transform: uppercase;
-}
-
-/* Message Banque vide */
-.empty-msg {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1;
-  background: var(--ion-color-success-tint);
-  border-radius: 8px;
-  color: var(--ion-color-success-shade);
-  border: 2px dashed var(--ion-color-success);
-}
-
-.empty-icon {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.empty-msg p {
-  margin: 0;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.action-bar {
-  margin-top: 16px;
+  gap: 8px;
 }
 </style>

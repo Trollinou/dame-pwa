@@ -1,6 +1,6 @@
 <!-- src/views/types/TypeMarcheHeros.vue -->
 <template>
-  <div class="exercice-type-marche-heros">
+  <div class="exercise-stage">
     <!-- En-tête Unifié -->
     <ContentHeader
       :title="headerMeta.title"
@@ -11,56 +11,52 @@
     />
 
     <!-- SOUS-ÉTAPE 1 : Sélection / Tri de la série en grille 2 colonnes -->
-    <div v-if="sousEtape === 'selection'" class="phase-container selection-phase animate-fade-in">
-      <div class="cards-grid-2col">
-        <div
-          v-for="item in diagrammesBank"
-          :key="'bank-' + item.id"
-          class="diagram-card-item grid-card-item"
-          :class="{ 'is-selected': isItemSelected(item.id) }"
-          @click="toggleSelection(item)"
-        >
-          <div class="card-selection-indicator">
-            <span v-if="isItemSelected(item.id)" class="check-mark">✓</span>
-            <span v-else class="empty-circle"></span>
-          </div>
-          <div class="card-board-wrapper">
-            <DiagramViewer :fen="item.fen" :orientation="item.orientation" class="board-display" />
-          </div>
+    <div v-if="sousEtape === 'selection'" class="learning-board-grid-2col animate-fade-in">
+      <div
+        v-for="item in diagrammesBank"
+        :key="'bank-' + item.id"
+        class="learning-board-card"
+        :class="{ 'is-selected': isItemSelected(item.id) }"
+        @click="toggleSelection(item)"
+      >
+        <div class="learning-board-card__indicator">
+          <span v-if="isItemSelected(item.id)" class="check-mark">✓</span>
+          <span v-else class="empty-circle"></span>
+        </div>
+        <div class="chessboard-container chessboard-container--mini">
+          <DiagramViewer :fen="item.fen" :orientation="item.orientation" />
         </div>
       </div>
     </div>
 
     <!-- SOUS-ÉTAPE 2 : Ordonnancement chronologique en grille 2 colonnes (Tap & Swap) -->
-    <div v-else-if="sousEtape === 'ordonnancement'" class="phase-container order-phase animate-fade-in">
-      <div class="order-instructions-bar">
-        <span class="order-instructions-text">
-          Touchez deux cartes pour permuter leur position chronologique.
-        </span>
+    <div v-else-if="sousEtape === 'ordonnancement'" class="animate-fade-in" style="width: 100%;">
+      <div class="learning-callout learning-callout--info ion-text-center">
+        <span>Touchez deux cartes pour permuter leur position chronologique.</span>
       </div>
 
-      <div class="cards-grid-2col order-cards-grid">
+      <div class="learning-board-grid-2col">
         <div
           v-for="(item, index) in itemsEnCoursOrdonnancement"
           :key="'order-' + item.id"
-          class="diagram-card-item grid-card-item order-card-item"
+          class="learning-board-card"
           :class="{ 'is-swap-selected': selectedSwapIndex === index }"
           @click="handleCardClickSwap(index)"
         >
-          <div class="order-rank-badge">
+          <div class="learning-board-card__badge">
             {{ index + 1 }}
           </div>
 
-          <div class="card-board-wrapper">
-            <DiagramViewer :fen="item.fen" :orientation="item.orientation" class="board-display" />
+          <div class="chessboard-container chessboard-container--mini">
+            <DiagramViewer :fen="item.fen" :orientation="item.orientation" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- SOUS-ÉTAPE 3 : Résolution du coup suivant -->
-    <div v-else-if="sousEtape === 'resolution'" class="phase-container resolution-phase animate-fade-in">
-      <div v-if="solutionCourante" class="puzzle-container">
+    <div v-else-if="sousEtape === 'resolution'" class="animate-fade-in" style="width: 100%; display: flex; justify-content: center;">
+      <div v-if="solutionCourante" style="width: 100%;">
         <PuzzleViewer
           :key="`puzzle-${serieCouranteIndex}`"
           :fen="solutionCourante.fenDepart"
@@ -550,191 +546,3 @@ watch(
   { deep: true }
 );
 </script>
-
-<style scoped>
-.exercice-type-marche-heros {
-  width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 12px 16px 80px 16px;
-  box-sizing: border-box;
-}
-
-.phase-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  margin-top: 12px;
-}
-
-/* Consignes / Instructions */
-.order-instructions-bar {
-  width: 100%;
-  background: var(--ion-color-step-100, #f4f5f8);
-  border-radius: 8px;
-  padding: 10px 14px;
-  box-sizing: border-box;
-  text-align: center;
-  font-size: 0.95rem;
-  color: var(--ion-color-dark, #222);
-  border: 1px solid var(--ion-color-step-200, #e0e0e0);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.inline-handle-icon {
-  font-size: 1.2rem;
-  vertical-align: middle;
-  color: var(--ion-color-primary, #3880ff);
-}
-
-/* Grille 2 colonnes pour l'étape de sélection */
-.cards-grid-2col {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.diagram-card-item {
-  position: relative;
-  width: 100%;
-  background: var(--ion-card-background, #fff);
-  border: 2px solid var(--ion-color-step-200, #e0e0e0);
-  border-radius: 12px;
-  padding: 10px;
-  box-sizing: border-box;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.diagram-card-item:hover {
-  border-color: var(--ion-color-step-400, #b0b0b0);
-}
-
-.diagram-card-item.is-selected {
-  border-color: var(--ion-color-primary, #3880ff);
-  box-shadow: 0 4px 16px rgba(56, 128, 255, 0.25);
-  transform: translateY(-2px);
-}
-
-.card-selection-indicator {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-}
-
-.empty-circle {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid var(--ion-color-step-400, #bbb);
-  background: #fff;
-  transition: all 0.2s ease;
-}
-
-.check-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--ion-color-primary, #3880ff);
-  color: #fff;
-  font-weight: bold;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(56, 128, 255, 0.4);
-}
-
-.card-board-wrapper {
-  width: 100%;
-  aspect-ratio: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.board-display {
-  width: 100%;
-  height: 100%;
-}
-
-/* Étape d'ordonnancement */
-.order-cards-grid {
-  width: 100%;
-}
-
-.order-cards-grid .order-card-item:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-  max-width: calc(50% - 6px);
-  margin: 0 auto;
-  width: 100%;
-}
-
-.order-card-item {
-  cursor: pointer;
-  position: relative;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.order-card-item:hover {
-  border-color: var(--ion-color-step-400, #999);
-}
-
-.order-card-item.is-swap-selected {
-  border-color: var(--ion-color-primary, #3880ff);
-  box-shadow: 0 0 0 3px rgba(56, 128, 255, 0.4), 0 4px 16px rgba(56, 128, 255, 0.25);
-  transform: translateY(-2px) scale(1.02);
-}
-
-.order-rank-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: var(--ion-color-primary, #3880ff);
-  color: #fff;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.9rem;
-  z-index: 10;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-/* Phase de résolution */
-.puzzle-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-</style>

@@ -174,9 +174,9 @@
         <div v-if="modeSetup === 'memoire' && setupPhase === 'memorize'" class="setup-memorize-panel">
           <p class="setup-hint">👀 Mémorisez bien la position des pièces sur l'échiquier.</p>
 
-          <div v-if="exerciceCourant.conseil" class="conseil-card">
-            <span class="conseil-title">💡 Conseil de l'entraîneur :</span>
-            <p class="conseil-text">{{ exerciceCourant.conseil }}</p>
+          <div v-if="exerciceCourant.conseil" class="learning-callout learning-callout--tip">
+            <div class="learning-callout__title">💡 Conseil de l'entraîneur :</div>
+            <p class="learning-callout-text">{{ exerciceCourant.conseil }}</p>
           </div>
 
           <button type="button" class="action-btn action-btn--primary" @click="passerEnReconstitution">
@@ -197,14 +197,14 @@
             </button>
           </div>
 
-          <div v-if="modeSetup === 'texte'" class="texte-description-box">
-            <span class="texte-description-title">Position à reproduire :</span>
-            <p class="texte-description-content">{{ textualPieceDescription }}</p>
+          <div v-if="modeSetup === 'texte'" class="learning-callout learning-callout--quote">
+            <div class="learning-callout__title">Position à reproduire :</div>
+            <p class="learning-callout-text">{{ textualPieceDescription }}</p>
           </div>
 
-          <div v-if="modeSetup === 'texte' && exerciceCourant.conseil" class="conseil-card">
-            <span class="conseil-title">💡 Conseil de l'entraîneur :</span>
-            <p class="conseil-text">{{ exerciceCourant.conseil }}</p>
+          <div v-if="modeSetup === 'texte' && exerciceCourant.conseil" class="learning-callout learning-callout--tip">
+            <div class="learning-callout__title">💡 Conseil de l'entraîneur :</div>
+            <p class="learning-callout-text">{{ exerciceCourant.conseil }}</p>
           </div>
 
           <!-- Palette des 12 pièces + Outil gomme (Grille 7 colonnes unifiée) -->
@@ -1481,11 +1481,11 @@ const passerCarteSuivante = () => {
 
 .interaction-card {
   width: 100%;
-  margin: 6px 0 12px 0;
+  margin: 6px 0;
   background: var(--ion-card-background, #ffffff);
-  border-radius: 10px;
-  border: 1px solid var(--ion-color-step-150, #e2e4e7);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   padding: 8px 10px;
   box-sizing: border-box;
 }
@@ -1681,149 +1681,9 @@ const passerCarteSuivante = () => {
   margin-bottom: 6px;
 }
 
-.conseil-card {
-  width: 100%;
-  box-sizing: border-box;
-  background: #fff8e1;
-  border: 1px solid #ffe082;
-  border-radius: 8px;
-  padding: 8px 10px;
-  margin-bottom: 8px;
-  text-align: left;
-}
 
-.conseil-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #f57f17;
-  display: block;
-  margin-bottom: 2px;
-}
 
-.conseil-text {
-  font-size: 0.88rem;
-  color: #3e2723;
-  margin: 0;
-  line-height: 1.35;
-}
 
-.texte-description-box {
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
-  border-radius: 8px;
-  padding: 8px 10px;
-  margin-bottom: 8px;
-}
-
-.texte-description-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #4338ca;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.texte-description-content {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1e1b4b;
-  margin: 0;
-}
-
-.setup-palette {
-  width: 100%;
-  margin: 0 auto;
-  box-sizing: border-box;
-  background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border: 1px solid var(--ion-color-step-150, #e5e7eb);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  padding: 8px;
-  background-image: none !important;
-
-  :deep(:is(piece, .piece)) {
-    position: relative !important;
-    width: 100% !important;
-    height: 100% !important;
-    top: 0 !important;
-    left: 0 !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    display: block !important;
-    pointer-events: none;
-  }
-}
-
-.setup-palette-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-template-rows: repeat(2, 1fr);
-  gap: 6px;
-  width: 100%;
-  box-sizing: border-box;
-
-  @media (min-width: 400px) {
-    gap: 8px;
-  }
-}
-
-.palette-btn {
-  width: 100%;
-  min-width: 0;
-  aspect-ratio: 1 / 1;
-  box-sizing: border-box;
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-light-shade, #ddd);
-  background: var(--ion-color-light, #fafafa);
-  cursor: pointer;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-  touch-action: manipulation;
-
-  &:hover:not(:disabled) {
-    transform: scale(1.05);
-    border-color: var(--ion-color-primary);
-    background: var(--ion-color-primary-tint, #e8f0fe);
-  }
-
-  &.is-selected {
-    border-color: var(--ion-color-primary);
-    background: var(--ion-color-primary-tint, #e8f0fe);
-    box-shadow: 0 0 0 2px var(--ion-color-primary);
-  }
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.85;
-    pointer-events: none;
-  }
-}
-
-.palette-btn--erase {
-  grid-column: 7;
-  grid-row: 1 / span 2;
-  aspect-ratio: auto;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .erase-icon {
-    font-size: 1.35rem;
-    line-height: 1;
-  }
-
-  &.is-selected {
-    border-color: #dc3545;
-    background: rgba(220, 53, 69, 0.1);
-    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.3);
-  }
-}
 
 .setup-instruction {
   font-size: 0.82rem;
@@ -1880,92 +1740,6 @@ const passerCarteSuivante = () => {
 
 .action-btn--peek:hover:not(:disabled) {
   background: #ddd6fe;
-}
-
-/* Neutral Toggle (3-state: neutral -> Oui/Non) */
-.neutral-toggle {
-  display: inline-flex;
-  align-items: center;
-  background: var(--ion-color-step-100, #f1f3f5);
-  border: 1px solid var(--ion-color-step-250, #d1d5db);
-  border-radius: 30px;
-  padding: 2px 3px;
-  gap: 3px;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-.neutral-toggle--large {
-  padding: 4px;
-  gap: 8px;
-  border-radius: 36px;
-}
-
-.toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  border: none;
-  background: transparent;
-  color: var(--ion-color-step-600, #6b7280);
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-}
-
-.neutral-toggle--large .toggle-btn {
-  font-size: 0.95rem;
-  padding: 8px 24px;
-  border-radius: 28px;
-}
-
-.toggle-icon {
-  font-size: 0.9rem;
-  font-weight: 800;
-}
-
-.toggle-btn--oui:hover:not(:disabled) {
-  color: #198754;
-  background: rgba(25, 135, 84, 0.08);
-}
-
-.toggle-btn--non:hover:not(:disabled) {
-  color: #dc3545;
-  background: rgba(220, 53, 69, 0.08);
-}
-
-.toggle-btn--custom:hover:not(:disabled) {
-  color: var(--ion-color-primary, #3880ff);
-  background: rgba(56, 128, 255, 0.08);
-}
-
-.toggle-btn--oui.is-selected {
-  background: #198754 !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(25, 135, 84, 0.35);
-}
-
-.toggle-btn--non.is-selected {
-  background: #dc3545 !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.35);
-}
-
-.toggle-btn--custom.is-selected {
-  background: var(--ion-color-primary, #3880ff) !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(56, 128, 255, 0.35);
-}
-
-.toggle-btn:disabled {
-  opacity: 0.8;
-  cursor: default;
 }
 
 /* Notation Panel */

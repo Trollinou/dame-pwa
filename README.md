@@ -177,7 +177,50 @@ import ContentHeader from '@/components/shared/ContentHeader.vue';
 ### 5. Composant Pied de Série `<SeriesCardFooter>` (`src/components/shared/SeriesCardFooter.vue`)
 Barre de navigation et zone d'action fixe pour les exercices, vidéos et leçons :
 - **Zone de feedback masquable (`hideFeedback`)** : Affiche les messages dynamiques d'encouragement ou d'erreur (`feedback: { message, type }`) lors des exercices interactifs. Pour les Vidéos et les Leçons où il n'y a pas d'évaluation de choix bon/mauvais, la prop `:hide-feedback="true"` masque intégralement cette zone sans réserver d'espace vide.
-- **Badge d'étape & Métamorphose de fin de contenu** : Indique l'avancement (`Carte X / Y`, `Étape 1 / 1` ou `Leçon 1 / 1` via `badgePrefix`). Dès la dernière carte résolue ou validée, le badge fait place à un bouton compact *« Cours »* et le bouton d'action devient directement *« Élément suivant »* (ou *« Terminer le cours »*) avec pulsation lumineuse (`pulseGlow`), évitant tout panel redondant sur mobile.
+### 6. Architecture CSS & Charte de Styles Unifiée de l'Apprentissage (Principe KISS)
+
+Pour garantir une expérience graphique et tactile fluide sans dispersion de code, toute la section Apprentissage est régie par une architecture SCSS centralisée dans `pwa/src/theme/learning/` :
+- **`_learning-layout.scss`** : Gestion des conteneurs (Mobile portrait centré sans scroll avec budget `38dvh`, Grille multi-échiquiers 2 par ligne `.learning-board-grid-2col`, et bascule automatique en 2 colonnes côte-à-côte pour Tablette Paysage et Ordinateur `@media (orientation: landscape) and (min-width: 768px)`).
+- **`_learning-components.scss`** : Composants maîtres réutilisables basés sur les variables natives Ionic.
+
+#### ⚠️ Règle d'Or d'Architecture (KISS & Maintenance)
+> **Il est strictement interdit d'ajouter des balises `<style>` ou règles CSS locales dans les vues et viewers d'apprentissage.**  
+> Toute nouvelle vue s'assemble exclusivement à l'aide des **briques Lego communes** :
+> 1. **Conteneur de stage** : `<div class="exercise-stage">` ou `<div class="exercise-viewer-layout">`.
+> 2. **Échiquier** : `<div class="chessboard-container">` (solo 1:1 sans coins arrondis pour alignement parfait des pièces) ou `<div class="learning-board-grid-2col">` avec `<div class="learning-board-card">` (grille 2 par ligne).
+> 3. **Encart pédagogique d'explication** : `<div class="learning-callout learning-callout--info|--tip|--quote|--success|--error">` (bordure latérale gauche colorée pour conseils/citations).
+> 4. **Bandeau d'instruction / action sous échiquier** : `<div class="learning-instruction-bar">` (bandeau centré neutre avec bordure 1px subtile, sans barre latérale).
+> 5. **Boutons de choix / QCM** : `<div class="qcm-choices">` avec `<ion-button class="choice-btn">` (hauteur compacte ergonomique **38px**, `--border-radius: 6px`).
+> 6. **Boutons bascules OUI / NON** : `.neutral-toggle` / `.neutral-toggle--large` avec `.toggle-btn` (32px / 36px).
+> 7. **Palettes tactiles & PGN** : `<div class="learning-piece-palette">` (6 colonnes), `<div class="setup-palette-grid">` (7 colonnes x 2 lignes pour 12 pièces + gomme), `.navigation-controls` / `.nav-btn` et `.comment-container` avec `.comment-empty`.
+
+```vue
+<template>
+  <div class="exercise-stage">
+    <ContentHeader title="Mon Exercice" consigne="Trouvez le bon coup" />
+
+    <div class="chessboard-container">
+      <Chessboard :fen="fen" :view-only="true" />
+    </div>
+
+    <!-- Bandeau d'action sous l'échiquier -->
+    <div class="learning-instruction-bar">
+      <span>Trouve le coup suivant</span>
+    </div>
+
+    <!-- Carte de choix QCM harmonisée avec ContentHeader (sans bordure, ombre douce) -->
+    <ion-card class="exercise-card">
+      <ion-card-content>
+        <div class="qcm-choices">
+          <ion-button v-for="c in choix" :key="c.id" class="choice-btn" @click="valider(c)">
+            {{ c.texte }}
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</template>
+```
 - **Validation au seuil de 95% (Vidéos & Leçons)** :
   - Sur les Vidéos : le bouton reste verrouillé jusqu'à ce que 95% de la vidéo soient visionnés (`useYouTubePlayer`).
   - Sur les Leçons : le bouton se débloque dès que 95% du document ont été défilés / lus (ou immédiatement si le contenu tient sans ascenseur).

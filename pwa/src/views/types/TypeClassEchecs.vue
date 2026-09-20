@@ -1,13 +1,8 @@
 <template>
-  <div class="exercice-type-class-echecs">
-    <ion-card class="ion-margin-bottom">
-      <ion-card-header>
-        <ion-card-title>Class'échecs</ion-card-title>
-      </ion-card-header>
-      <p v-if="config.consigne" class="ion-padding-horizontal" style="font-size: 1.05rem; font-weight: 500;">
-        {{ config.consigne }}
-      </p>
-    </ion-card>
+  <div class="exercise-stage">
+    <div v-if="config.consigne" class="learning-callout learning-callout--info ion-text-center" style="width: 100%;">
+      <span>{{ config.consigne }}</span>
+    </div>
 
     <OrderViewer
       v-if="itemsAOrdonner && itemsAOrdonner.length > 0"
@@ -19,11 +14,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import {
-  IonCard,
-  IonCardHeader,
-  IonCardTitle
-} from '@ionic/vue';
 import OrderViewer from '@/components/shared/OrderViewer.vue';
 import type { DrawShape } from 'eg-chessboard';
 
@@ -60,8 +50,3 @@ const itemsAOrdonner = computed(() => {
 });
 </script>
 
-<style scoped>
-.exercice-type-class-echecs {
-  width: 100%;
-}
-</style>

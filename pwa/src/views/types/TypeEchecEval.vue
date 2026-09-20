@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-echec-eval">
+  <div class="exercise-stage">
     <ContentHeader
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
@@ -63,11 +63,3 @@ const onSuccess = () => {
 };
 </script>
 
-<style scoped>
-.exercice-type-echec-eval {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-</style>

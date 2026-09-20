@@ -1,5 +1,5 @@
 <template>
-  <div class="qui-suis-je-viewer-wrapper">
+  <div class="exercise-stage">
     <!-- En-tête Unifié de l'exercice avec consigne et badge d'étape -->
     <ContentHeader
       :title="headerMeta.title"
@@ -10,24 +10,22 @@
     />
 
     <!-- Zone des Indices (Multiligne) -->
-    <div class="indices-container animate-fade-in">
-      <div class="indices-card">
-        <div class="indices-header">
-          <ion-icon :icon="helpCircleOutline" class="indices-icon" />
-          <span class="indices-title">Indices & Affirmations</span>
+    <div class="animate-fade-in" style="width: 100%;">
+      <div class="learning-callout learning-callout--info">
+        <div class="learning-callout__title">
+          <ion-icon :icon="helpCircleOutline" />
+          <span>Indices & Affirmations</span>
         </div>
-        <div class="indices-content">
-          <p class="indices-text">{{ carteCourante.indices || 'Aucun indice fourni.' }}</p>
-        </div>
+        <p class="learning-callout-text">{{ carteCourante.indices || 'Aucun indice fourni.' }}</p>
       </div>
     </div>
 
     <!-- Zone d'Interaction selon la Variante -->
-    <div class="interaction-zone animate-fade-in">
+    <div class="animate-fade-in" style="width: 100%;">
       <!-- Variante 1 : Pièces (Palette des 6 pièces blanches) -->
-      <div v-if="resolvedVariante === 'pieces'" class="pieces-panel">
-        <p class="section-instruction">Sélectionnez la pièce blanche mystère :</p>
-        <div :class="['piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
+      <div v-if="resolvedVariante === 'pieces'" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <p class="ion-text-center" style="margin: 4px 0; font-size: 0.9rem; font-weight: 600;">Sélectionnez la pièce blanche mystère :</p>
+        <div :class="['learning-piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
           <button
             v-for="item in whitePieces"
             :key="item.code"
@@ -44,8 +42,8 @@
       </div>
 
       <!-- Variante 2 : Cases (Échiquier vide interactif avec révélation cercle vert) -->
-      <div v-else-if="resolvedVariante === 'cases'" class="cases-panel">
-        <p class="section-instruction">Cliquez sur la case mystère sur l'échiquier :</p>
+      <div v-else-if="resolvedVariante === 'cases'" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <p class="ion-text-center" style="margin: 4px 0; font-size: 0.9rem; font-weight: 600;">Cliquez sur la case mystère sur l'échiquier :</p>
         <div class="chessboard-container" @contextmenu.prevent>
           <Chessboard
             :key="`t12-board-${indexCourant}`"
@@ -296,108 +294,4 @@ const passerCarteSuivante = () => {
 };
 </script>
 
-<style scoped>
-.qui-suis-je-viewer-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-.indices-container {
-  width: 100%;
-}
-
-.indices-card {
-  background: var(--ion-color-light, #f4f5f8);
-  border-radius: 8px;
-  border-left: 4px solid var(--ion-color-primary, #3880ff);
-  padding: 10px 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.indices-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.indices-icon {
-  font-size: 1.15rem;
-  color: var(--ion-color-primary, #3880ff);
-}
-
-.indices-title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--ion-color-primary, #3880ff);
-}
-
-.indices-content {
-  padding-left: 2px;
-}
-
-.indices-text {
-  white-space: pre-line;
-  font-size: 0.92rem;
-  line-height: 1.45;
-  color: var(--ion-color-dark, #222428);
-  font-weight: 500;
-  margin: 0;
-}
-
-.interaction-zone {
-  width: 100%;
-}
-
-.section-instruction {
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-align: center;
-  margin: 0 0 10px 0;
-  color: var(--ion-color-step-800, #333333);
-}
-
-.pieces-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px;
-  background: var(--ion-color-light, #f8f9fa);
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-step-150, #e9ecef);
-}
-
-.cases-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.chessboard-container {
-  width: 100%;
-  max-width: 420px;
-  aspect-ratio: 1;
-  margin: 0 auto;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(3px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-</style>
 

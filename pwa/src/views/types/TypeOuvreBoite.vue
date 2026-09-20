@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-ouvre-boite">
+  <div class="exercise-stage">
     <OuvreBoiteViewer
       :consigne="config.consigne"
       :exercices="config.exercices"
@@ -36,11 +36,3 @@ const onSuccess = () => {
 };
 </script>
 
-<style scoped>
-.exercice-type-ouvre-boite {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-</style>
