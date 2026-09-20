@@ -539,28 +539,17 @@ const validerAssociations = () => {
 .validation-container {
   display: flex;
   justify-content: center;
-  margin-top: 24px;
-  animation: fadeIn 0.4s ease;
+  margin-top: 16px;
 }
 
 .validate-btn {
-  --border-radius: 10px;
-  font-weight: 600;
-  font-size: 1.05rem;
-  height: 48px;
+  --border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  min-height: 44px;
+  height: 44px;
   width: 100%;
   max-width: 320px;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Responsiveness adjustments */
@@ -569,7 +558,7 @@ const validerAssociations = () => {
     gap: 8px;
   }
   .desc-card-content {
-    padding: 10px;
+    padding: 8px 10px;
   }
   .desc-text-content {
     font-size: 0.85rem;

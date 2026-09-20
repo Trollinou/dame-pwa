@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-cap-ou-pas-cap">
+  <div class="exercise-stage">
     <CapOuPasCapViewer
       :consigne="config.consigne"
       :variante="config.variante || config.type_reponse"
@@ -50,10 +50,3 @@ const onSuccess = () => {
 };
 </script>
 
-<style scoped>
-.exercice-type-cap-ou-pas-cap {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-}
-</style>

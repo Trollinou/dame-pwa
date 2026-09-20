@@ -6,6 +6,18 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Harmonisation et Unification des Feuilles de Styles de l'Apprentissage (Principe KISS) (`pwa/src/theme/learning/`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `PgnViewer.vue`, `CapOuPasCapViewer.vue`, `TypePartieHeros.vue`, `TypePosiPlan.vue`, `README.md`, `USING.md`)** :
+  - **Architecture Modulaire Partagée** : Centralisation complète de l'ensemble des règles visuelles de l'Apprentissage dans `pwa/src/theme/learning/` (`_learning-layout.scss` et `_learning-components.scss`) et interdiction absolue d'ajouter des balises `<style>` locales dans les 16 types d'exercices.
+  - **Ergonomie Mobile First & Zéro-Scroll** : Budget vertical optimisé (`38dvh`), échiquiers carrés stricts (1:1) sans arrondis pour un alignement parfait des pièces, et bascule automatique en 2 colonnes (`split-view`) pour tablettes paysage et ordinateurs.
+  - **Standardisation des Briques Communes** :
+    - *Encart pédagogique* `.learning-callout` avec 5 déclinaisons sémantiques (`--info`, `--tip`, `--quote`, `--success`, `--error`).
+    - *Bandeau d'action sous l'échiquier* `.learning-instruction-bar` (style neutre sans barre latérale).
+    - *Boutons de choix QCM* `.choice-btn` compacts (38px de hauteur, padding 6px 12px) et toggles OUI/NON `.neutral-toggle` (32px/36px).
+    - *Cartes d'interaction* `.interaction-card` et `.exercise-card` harmonisées avec le `ContentHeader` (fond blanc, sans bordure, ombre douce 1px 3px).
+    - *Palettes tactiles* `.learning-piece-palette` (6 colonnes) et `.setup-palette-grid` (7 colonnes x 2 lignes pour 12 pièces + gomme).
+    - *Lecteur PGN* unifié avec neutralisation propre des boîtes de commentaires vides via `.comment-empty`.
+  - **Réduction de la Dette Technique** : Élimination de plus de 400 lignes de CSS dupliquées et réduction de 28% de la taille du bundle CSS compilé sur `ContenuPage`.
+
 - **Refonte Complète du Type 5 (Posi'Plan) basée sur Étude PGN avec Embranchements et Variantes (`TypePosiPlan.vue`, `posiPlanParser.ts`, `posiPlanParser.spec.ts`, `TypePosiPlan.spec.ts`, `README.md`, `USING.md`)** :
   - **Saisie PGN Unique & Découpage Automatique** : Parsing automatique d'une étude PGN complète (ex: export Lichess) avec détection du choix initial à 3 branches et des moments de choix QCM sur la ligne principale.
   - **Choix Initial & Exploration des Variantes** :

@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-jugement-final">
+  <div class="exercise-stage">
     <JugementFinalViewer
       :consigne="config.consigne"
       :couleurJoueur="config.couleur_joueur"
@@ -37,11 +37,3 @@ const onSuccess = () => {
 };
 </script>
 
-<style scoped>
-.exercice-type-jugement-final {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-</style>

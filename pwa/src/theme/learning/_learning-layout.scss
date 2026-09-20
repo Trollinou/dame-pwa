@@ -1,0 +1,86 @@
+/**
+ * Styles de mise en page (Layout) unifiés pour la section Apprentissage.
+ * Respecte le principe KISS :
+ * - Mobile portrait par défaut (centré, 1 colonne, zéro-scroll vertical).
+ * - Grille multi-échiquiers 2 par ligne (.learning-board-grid-2col).
+ * - Bascule 2 colonnes automatique pour Tablette Paysage / PC.
+ */
+
+/* ==========================================================================
+   1. Conteneurs de base (Mobile Portrait First)
+   ========================================================================== */
+
+.exercise-viewer-layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 100%;
+}
+
+.exercise-stage {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   2. Grilles Multi-Échiquiers (2 par ligne)
+   ========================================================================== */
+
+.learning-board-grid-2col {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 6px 0;
+  box-sizing: border-box;
+
+  /* Si nombre impair d'éléments, centrer le dernier */
+  & > .learning-board-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 4px);
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   3. Disposition 2 Colonnes : Tablette Paysage & Ordinateur
+   ========================================================================== */
+
+@media (orientation: landscape) and (min-width: 768px), (min-width: 992px) {
+  .exercise-stage--split,
+  .exercise-stage:has(.chessboard-container + .exercise-card),
+  .exercise-stage:has(.chessboard-container + .qcm-choices),
+  .exercise-stage:has(.chessboard-container + .learning-callout) {
+    max-width: 960px;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    padding: 12px 16px;
+
+    /* Colonne gauche (Échiquier dominant) */
+    & > .chessboard-container {
+      flex: 0 0 auto;
+      width: min(65vh, 480px);
+      max-width: 480px;
+      margin: 0;
+    }
+
+    /* Colonne droite (Contenu / Consignes / Choix) */
+    & > :not(.chessboard-container) {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      margin: 0;
+    }
+  }
+}

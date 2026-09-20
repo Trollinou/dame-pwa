@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-destination-finale">
+  <div class="exercise-stage">
     <TextOrderViewer
       :consigne="config.consigne"
       :couleurJoueur="config.couleur_joueur"
@@ -37,11 +37,3 @@ const onSuccess = () => {
 };
 </script>
 
-<style scoped>
-.exercice-type-destination-finale {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-</style>

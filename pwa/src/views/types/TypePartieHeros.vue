@@ -83,8 +83,8 @@
         </div>
 
         <!-- Consigne fixe entre l'échiquier et les 3 boutons de choix -->
-        <div class="qcm-instruction-bar">
-          <span class="qcm-instruction-text">Trouve le coup suivant</span>
+        <div class="learning-instruction-bar">
+          <span>Trouve le coup suivant</span>
         </div>
 
         <ion-card class="exercise-card">
@@ -631,119 +631,6 @@ const passerEtapeSuivante = () => {
   flex-direction: column;
   min-height: 100%;
   gap: 6px;
-}
-
-/* Contrôles de Navigation PGN */
-.navigation-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.nav-btn {
-  --border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  --padding-start: 0;
-  --padding-end: 0;
-  --padding-top: 0;
-  --padding-bottom: 0;
-  margin: 0;
-}
-
-.nav-btn ion-icon {
-  font-size: 1.25rem;
-}
-
-/* Bulle de Commentaire */
-.comment-container {
-  width: 100%;
-  background: var(--ion-color-step-100, #f4f5f8);
-  border-radius: 6px;
-  border-left: 4px solid var(--ion-color-primary, #3880ff);
-  padding: 8px 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  min-height: 42px;
-  max-height: 120px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  display: flex;
-  align-items: flex-start;
-}
-
-.comment-empty {
-  visibility: hidden;
-  border-left-color: transparent;
-  background: transparent;
-  box-shadow: none;
-  min-height: 42px;
-  height: 42px;
-}
-
-.comment-text {
-  margin: 0;
-  width: 100%;
-  font-size: 0.88rem;
-  line-height: 1.4;
-  color: var(--ion-color-step-800, #333);
-  white-space: pre-line;
-}
-
-.placeholder-text {
-  color: var(--ion-color-step-400, #989aa2);
-  font-style: italic;
-}
-
-/* Consigne / Instruction QCM */
-.qcm-instruction-bar {
-  width: 100%;
-  background: var(--ion-color-step-100, #f4f5f8);
-  border-radius: 8px;
-  padding: 8px 12px;
-  box-sizing: border-box;
-  text-align: center;
-  border: 1px solid var(--ion-color-step-200, #e0e0e0);
-  margin: 4px 0 2px 0;
-}
-
-.qcm-instruction-text {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--ion-color-dark, #222);
-}
-
-/* Carte de Choix QCM */
-.exercise-card {
-  margin: 0;
-}
-
-.qcm-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.choice-btn {
-  margin: 0;
-  --border-radius: 8px;
-  font-size: 0.92rem;
-  font-weight: 600;
-  text-transform: none;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 </style>
 

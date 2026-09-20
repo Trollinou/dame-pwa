@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-popechecs">
+  <div class="exercise-stage">
     <PlacementViewer
       :consigne="config.consigne"
       :diagrammes="config.diagrammes"
@@ -37,10 +37,3 @@ const gererSucces = () => {
 };
 </script>
 
-<style scoped>
-.exercice-type-popechecs {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-}
-</style>

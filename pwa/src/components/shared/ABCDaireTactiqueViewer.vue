@@ -394,33 +394,3 @@ const passerCarteSuivante = () => {
 };
 </script>
 
-<style scoped>
-.abcdaire-viewer-wrapper {
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
-.chessboard-panel,
-.recap-stage {
-  width: 100%;
-  margin: 4px 0;
-}
-
-
-
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-</style>

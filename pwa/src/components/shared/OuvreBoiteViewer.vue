@@ -1,5 +1,5 @@
 <template>
-  <div class="exercise-viewer-layout ouvre-boite-viewer">
+  <div class="exercise-stage">
     <!-- En-tête Unifié ContentHeader -->
     <ContentHeader
       :title="metaTitre || 'Ouvre-Boîte'"
@@ -23,15 +23,15 @@
     </div>
 
     <!-- Choix de déplacements (3 choix possibles mélangés) -->
-    <ion-card v-if="carteActuelle" class="exercise-card choices-card">
+    <ion-card v-if="carteActuelle" class="exercise-card">
       <ion-card-header>
-        <ion-card-title class="choices-title">
+        <ion-card-title class="exercise-card-header">
           Quel coup choisissez-vous ?
         </ion-card-title>
       </ion-card-header>
 
       <ion-card-content>
-        <div class="choices-list">
+        <div class="qcm-choices">
           <ion-button
             v-for="choix in carteActuelle.choix"
             :key="choix.id"
@@ -42,7 +42,7 @@
             class="choice-btn"
             @click="selectionnerChoix(choix)"
           >
-            <span class="choice-text">{{ choix.texte }}</span>
+            <span class="choice-text" style="flex: 1; text-align: left;">{{ choix.texte }}</span>
             <ion-icon
               v-if="selectedChoixId === choix.id && choix.isCorrect"
               slot="end"
@@ -58,25 +58,22 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Panneau d'Explication Détaillée (Permet une lecture confortable et sans limite de longueur) -->
-    <transition name="fade">
-      <div
-        v-if="currentExplanation"
-        class="explanation-panel"
-        :class="`explanation-${currentExplanation.type}`"
-      >
-        <div class="explanation-header">
-          <ion-icon
-            :icon="currentExplanation.type === 'success' ? checkmarkCircleOutline : alertCircleOutline"
-            class="explanation-icon"
-          />
-          <span class="explanation-title">{{ currentExplanation.title }}</span>
-        </div>
-        <div class="explanation-body">
-          {{ currentExplanation.message }}
-        </div>
+    <!-- Panneau d'Explication Détaillée Unifié via learning-callout -->
+    <div
+      v-if="currentExplanation"
+      class="learning-callout animate-fade-in"
+      :class="currentExplanation.type === 'success' ? 'learning-callout--success' : 'learning-callout--error'"
+    >
+      <div class="learning-callout__title">
+        <ion-icon
+          :icon="currentExplanation.type === 'success' ? checkmarkCircleOutline : alertCircleOutline"
+        />
+        <span>{{ currentExplanation.title }}</span>
       </div>
-    </transition>
+      <p class="learning-callout-text">
+        {{ currentExplanation.message }}
+      </p>
+    </div>
 
     <!-- Footer Fixe Unifié SeriesCardFooter -->
     <SeriesCardFooter
@@ -268,100 +265,3 @@ const passerCarteSuivante = () => {
 };
 </script>
 
-<style scoped>
-.ouvre-boite-viewer {
-  width: 100%;
-  max-width: 540px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.choices-card {
-  margin: 0;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.choices-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ion-color-dark);
-  text-align: center;
-}
-
-.choices-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.choice-btn {
-  --border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: normal;
-  margin: 0;
-  min-height: 44px;
-}
-
-.choice-text {
-  flex: 1;
-  text-align: left;
-}
-
-/* Panneau d'explication pédagogique détaillée */
-.explanation-panel {
-  padding: 14px 16px;
-  border-radius: 10px;
-  margin: 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.explanation-success {
-  background: var(--ion-color-success-tint, #edfbf2);
-  border: 1.5px solid var(--ion-color-success, #2dd55b);
-  color: var(--ion-color-success-shade, #1e873b);
-}
-
-.explanation-error {
-  background: var(--ion-color-danger-tint, #fdf2f2);
-  border: 1.5px solid var(--ion-color-danger, #eb445a);
-  color: var(--ion-color-danger-shade, #b82a3c);
-}
-
-.explanation-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.explanation-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.explanation-body {
-  font-size: 0.92rem;
-  line-height: 1.45;
-  white-space: pre-line;
-  color: var(--ion-color-dark);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(-6px);
-}
-</style>

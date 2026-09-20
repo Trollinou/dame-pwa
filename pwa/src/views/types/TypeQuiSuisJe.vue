@@ -1,5 +1,5 @@
 <template>
-  <div class="exercice-type-qui-suis-je">
+  <div class="exercise-stage">
     <QuiSuisJeViewer
       :consigne="config.consigne"
       :variante="config.variante"
@@ -34,9 +34,4 @@ defineEmits<{
 }>();
 </script>
 
-<style scoped>
-.exercice-type-qui-suis-je {
-  width: 100%;
-}
-</style>
 

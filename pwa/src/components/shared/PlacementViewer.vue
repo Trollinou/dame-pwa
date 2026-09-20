@@ -272,20 +272,11 @@ const passerCarteSuivante = () => {
 </script>
 
 <style scoped>
-.placement-viewer-wrapper {
-  width: 100%;
-}
-
-.chessboard-panel {
-  width: 100%;
-  margin: 10px 0;
-}
-
 .target-piece-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .target-piece-chip {
@@ -300,56 +291,10 @@ const passerCarteSuivante = () => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.piece-avatar {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent !important;
-}
-
-/* Suppression du fond damier échiquier derrière la pièce SVG */
-cg-board.piece-icon-box {
-  width: 28px;
-  height: 28px;
-  position: relative;
-  display: block;
-  flex-shrink: 0;
-  background-image: none !important;
-  background: transparent !important;
-}
-
-cg-board.piece-icon-box piece,
-cg-board.piece-icon-box .piece {
-  position: absolute !important;
-  width: 100% !important;
-  height: 100% !important;
-  top: 0 !important;
-  left: 0 !important;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
 .piece-chip-label {
   font-size: 0.95rem;
+  font-weight: 600;
   color: var(--ion-color-dark, #222222);
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.25s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 </style>
 
