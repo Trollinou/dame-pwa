@@ -43,25 +43,25 @@ class Plugin {
 	 * Run the plugin logic.
 	 */
 	public function run(): void {
-		// Enregistre les assets frontend (bannière d'installation PWA)
+		// Enregistre les assets frontend (bannière d'installation PWA).
 		( new \DAME_PWA\Assets\FrontendAssets() )->init();
 
-		// Enregistre l'URL de la PWA auprès du plugin principal DAME
+		// Enregistre l'URL de la PWA auprès du plugin principal DAME.
 		add_filter( 'dame_pwa_url', array( $this, 'get_pwa_url' ) );
 
-		// Expose l'URL du Web Worker Stockfish pour les modules tiers (comme ROI)
+		// Expose l'URL du Web Worker Stockfish pour les modules tiers (comme ROI).
 		add_filter( 'dame_pwa_stockfish_worker_url', array( $this, 'get_stockfish_worker_url' ) );
 
-		// Intercepte les requêtes pour servir la PWA ou le manifest dès l'initialisation de WordPress
+		// Intercepte les requêtes pour servir la PWA ou le manifest dès l'initialisation de WordPress.
 		add_action( 'init', array( $this, 'handle_pwa_routing' ), 1 );
 
-		// Assure que les fichiers .wasm sont servis avec le bon Content-Type si interceptés
+		// Assure que les fichiers .wasm sont servis avec le bon Content-Type si interceptés.
 		add_action( 'init', array( $this, 'handle_wasm_mime_type' ) );
 
-		// Injecte la balise du manifest dans le <head> de WordPress
+		// Injecte la balise du manifest dans le <head> de WordPress.
 		add_action( 'wp_head', array( $this, 'inject_pwa_manifest_link' ) );
 
-		// Notice d'administration si le plugin parent DAME n'est pas présent/actif
+		// Notice d'administration si le plugin parent DAME n'est pas présent/actif.
 		add_action( 'admin_notices', array( $this, 'check_parent_plugin_notice' ) );
 	}
 
@@ -106,7 +106,7 @@ class Plugin {
 		// 1. Redirection vers l'index.html de la PWA
 		if ( 'pwa' === $clean_uri ) {
 			$pwa_url = $this->get_pwa_url();
-			wp_redirect( $pwa_url, 302 );
+			wp_safe_redirect( $pwa_url, 302 );
 			exit;
 		}
 
@@ -175,6 +175,7 @@ class Plugin {
 				header( 'Content-Type: application/wasm' );
 				header( 'Content-Length: ' . filesize( $file_path ) );
 				header( 'Cache-Control: public, max-age=2592000' );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Direct binary streaming of WASM file to client.
 				readfile( $file_path );
 				exit;
 			}

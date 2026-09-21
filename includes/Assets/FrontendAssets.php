@@ -25,7 +25,7 @@ class FrontendAssets {
 	 * Enqueues PWA installer scripts and styles on the front end.
 	 */
 	public function enqueue_pwa_installer_assets(): void {
-		// Do not enqueue on admin pages or if running in standalone mode request
+		// Do not enqueue on admin pages or if running in standalone mode request.
 		if ( is_admin() ) {
 			return;
 		}

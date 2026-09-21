@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       DAME - PWA
  * Description:       Interface Progressive Web App pour le gestionnaire d'adhérents et l'apprentissage.
- * Version:           1.6.10
- * Requires at least: 7.0.1
+ * Version:           1.7.0
+ * Requires at least: 7.1
  * Requires PHP:      8.4
  * Author:            Etienne Gagnon
  * Text Domain:       dame-pwa
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DAME_PWA_VERSION', '1.6.10' );
+define( 'DAME_PWA_VERSION', '1.7.0' );
 define( 'DAME_PWA_PLUGIN_FILE', __FILE__ );
 define( 'DAME_PWA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DAME_PWA_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -46,7 +46,7 @@ spl_autoload_register(
 	}
 );
 
-// Inclusion de Composer si disponible
+// Inclusion de Composer si disponible.
 if ( file_exists( DAME_PWA_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once DAME_PWA_PLUGIN_DIR . 'vendor/autoload.php';
 }

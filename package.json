@@ -1,6 +1,6 @@
 {
   "name": "dame-pwa",
-  "version": "1.6.10",
+  "version": "1.7.0",
   "description": "PWA de l'Échiquier Lédenien",
   "type": "module",
   "scripts": {

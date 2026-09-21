@@ -2,6 +2,13 @@
 
 Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'association DAME.
 
+## Prérequis & Qualité
+
+- **WordPress :** 7.1 ou supérieur
+- **PHP :** 8.4 avec typage strict (`declare(strict_types=1);` sur 100% des fichiers)
+- **Analyse Statique :** PHPStan Niveau 7 (0 erreur) et WPCS/PHPCS conforme (0 erreur)
+- **Frontend :** Node.js 20+, TypeScript strict, Vitest (tests unitaires 100% passants)
+
 ## Architecture
 
 - `includes/` : Classes PHP du plugin WordPress (`DAME_PWA`).

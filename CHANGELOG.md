@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Passage aux Prérequis WordPress 7.1 & PHP 8.4 Strict (`dame-pwa.php`, `phpcs.xml`, `phpstan.neon`)** :
+  - Rehaussement du prérequis WordPress à la version 7.1 (`Requires at least: 7.1` et `minimum_wp_version: 7.1`).
+  - Déclaration stricte `declare(strict_types=1);` appliquée systématiquement sur 100% des fichiers PHP.
+  - Niveau d'analyse statique PHPStan rehaussé au niveau 7 (`level: 7`) avec zéro erreur.
+  - Conformité PHPCS totale validée sur l'ensemble du projet.
+
+## [1.7.0] - 2026-09-20
+
 - **Rétablissement de l'Animation Différée du Coup Initial en QCM (Type 14 Cap ou pas cap ?) (`CapOuPasCapViewer.vue`, `TypeCapOuPasCap.spec.ts`, `USING.md`)** :
   - Rétablissement de l'exécution animée du premier coup PGN (`boardApi.value.move(moveSan)`) après un court délai (300ms) dans `initCardState()` pour les variantes QCM lorsque le mini-PGN comporte un déplacement à observer par l'élève, tout en conservant l'affichage statique pur lorsque le mini-PGN ne contient qu'une position FEN sans coup joué.
 
