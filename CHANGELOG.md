@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Interactivité, Adaptation Dynamique et Lisibilité de l'Exercice Type 13 (Ouvre'boîte) (`OuvreBoiteViewer.vue`, `TypeOuvreBoite.vue`, `_learning-components.scss`, `ouvreBoiteParser.spec.ts`, `README.md`, `USING.md`)** :
+  - **Double Mode d'Interaction Joueur** : Remplacement de l'échiquier passif (`view-only: true`) par un échiquier interactif permettant de jouer directement le coup d'ouverture sur l'échiquier (tactile ou glisser-déposer) en plus des boutons textuels sous l'échiquier. En cas de mauvais coup joué, l'explication est affichée et l'échiquier se réinitialise automatiquement après temporisation pour permettre de retenter.
+  - **Filtrage Dynamique des Cartes Vides** : Détection et exclusion automatique des slots PGN non renseignés. Le compteur de cartes s'ajuste désormais fidèlement au nombre réel de mini-PGNs configurés par l'entraîneur (ex: `Carte 1 / 1` au lieu de `1 / 6` quand 1 seul mini-PGN est renseigné). Prise en charge transparente des formats tableau `exercices: [...]` et objet racine `pgn: "..."`.
+  - **Harmonisation Visuelle & Lisibilité Optimale de l'Encart Pédagogique** : Refonte de `.learning-callout` pour adopter un fond neutre clair identique à la zone de commentaire PGN (`var(--ion-color-step-100, #f4f5f8)`), avec un texte sombre à fort contraste et coloration appliquée exclusivement sur la bordure latérale gauche (`--success` en vert `#00a32a`, `--error` en rouge `#d63638`).
+  - **Élimination des Redondances Visuelles & Centralisation SCSS** : Suppression du bandeau intermédiaire redondant (« ✓ Bonne réponse ! » / « ✗ Mauvais choix ») dans l'explication pour laisser place au texte pédagogique épuré, suppression de styles inline résiduels (`choice-text`, `TypeClassEchecs.vue`) et centralisation des règles dans `_learning-components.scss`.
+
 - **Passage aux Prérequis WordPress 7.1 & PHP 8.4 Strict (`dame-pwa.php`, `phpcs.xml`, `phpstan.neon`)** :
   - Rehaussement du prérequis WordPress à la version 7.1 (`Requires at least: 7.1` et `minimum_wp_version: 7.1`).
   - Déclaration stricte `declare(strict_types=1);` appliquée systématiquement sur 100% des fichiers PHP.

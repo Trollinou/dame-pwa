@@ -3,6 +3,7 @@
     <OuvreBoiteViewer
       :consigne="config.consigne"
       :exercices="config.exercices"
+      :pgn="config.pgn"
       :metaTitre="config.metaTitre"
       :metaTypeLabel="config.metaTypeLabel"
       :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
@@ -17,6 +18,7 @@ import OuvreBoiteViewer, { type ExerciceItem } from '@/components/shared/OuvreBo
 export interface ConfigOuvreBoite {
   consigne?: string;
   exercices?: Array<ExerciceItem | string>;
+  pgn?: string;
   metaTitre?: string;
   metaTypeLabel?: string;
   metaChapitreNiveauLabel?: string;

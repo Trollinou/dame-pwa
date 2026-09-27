@@ -115,4 +115,25 @@ describe( 'ouvreBoiteParser', () => {
 			'Grand roque (O-O-O)'
 		);
 	} );
+
+	it( 'filters out empty slots when an exercise series has only 1 configured PGN', () => {
+		const rawExercices = [
+			{ pgn: pgnExample1 },
+			{ pgn: '' },
+			{ pgn: '   ' },
+			{ pgn: '' },
+		];
+
+		const filteredCartes = rawExercices
+			.map( ( item ) =>
+				( typeof item === 'string' ? item : item?.pgn || '' ).trim()
+			)
+			.filter( ( rawPgn ) => rawPgn.length > 0 )
+			.map( ( rawPgn, idx ) => parseOuvreBoiteMiniPgn( rawPgn, idx ) )
+			.filter( ( carte ) => carte.choix.length > 0 );
+
+		expect( filteredCartes.length ).toBe( 1 );
+		expect( filteredCartes[ 0 ].choix.length ).toBe( 3 );
+		expect( filteredCartes[ 0 ].solutionSan ).toBe( 'e4' );
+	} );
 } );

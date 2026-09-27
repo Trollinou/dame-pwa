@@ -1,6 +1,6 @@
 <template>
   <div class="exercise-stage">
-    <div v-if="config.consigne" class="learning-callout learning-callout--info ion-text-center" style="width: 100%;">
+    <div v-if="config.consigne" class="learning-callout learning-callout--info ion-text-center">
       <span>{{ config.consigne }}</span>
     </div>
 

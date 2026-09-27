@@ -148,15 +148,15 @@
 .learning-callout {
   width: 100%;
   box-sizing: border-box;
-  background: var(--ion-color-step-50, #f8f9fa);
+  background: var(--ion-color-step-100, #f4f5f8);
   border-radius: 8px;
   border-left: 4px solid var(--ion-color-step-400, #9e9e9e);
   padding: 8px 12px;
   margin: 6px 0;
   font-size: 0.9rem;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--ion-color-step-900, #111827);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 
   p, span {
     margin: 0;
@@ -174,39 +174,44 @@
   margin-bottom: 4px;
 }
 
-/* Variantes sémantiques */
+.learning-callout-text {
+  margin: 0;
+  width: 100%;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ion-color-step-800, #333);
+  white-space: pre-line;
+}
+
+/* Variantes sémantiques (fond neutre clair identique à la zone de commentaire PGN, bordure gauche seule colorée) */
 .learning-callout--info {
-  background: var(--ion-color-step-100, #f0f4f8);
-  border-left-color: var(--ion-color-primary, #3880ff);
-  .learning-callout__title { color: var(--ion-color-primary, #3880ff); }
+  background: var(--ion-color-step-100, #f4f5f8);
+  border-left-color: var(--ion-color-primary, #0073aa);
+  .learning-callout__title { color: var(--ion-color-primary, #0073aa); }
 }
 
 .learning-callout--tip {
-  background: #fff8e1;
+  background: var(--ion-color-step-100, #f4f5f8);
   border-left-color: #f57f17;
-  color: #3e2723;
   .learning-callout__title { color: #f57f17; }
 }
 
 .learning-callout--quote {
-  background: #eef2ff;
+  background: var(--ion-color-step-100, #f4f5f8);
   border-left-color: #4338ca;
-  color: #1e1b4b;
   .learning-callout__title { color: #4338ca; }
 }
 
 .learning-callout--success {
-  background: var(--ion-color-success-tint, #edfbf2);
-  border-left-color: var(--ion-color-success, #2dd55b);
-  color: var(--ion-color-success-shade, #1e873b);
-  .learning-callout__title { color: var(--ion-color-success-shade, #1e873b); }
+  background: var(--ion-color-step-100, #f4f5f8);
+  border-left-color: var(--ion-color-success, #00a32a);
+  .learning-callout__title { color: var(--ion-color-success, #00a32a); }
 }
 
 .learning-callout--error {
-  background: var(--ion-color-danger-tint, #fdf2f2);
-  border-left-color: var(--ion-color-danger, #eb445a);
-  color: var(--ion-color-danger-shade, #b82a3c);
-  .learning-callout__title { color: var(--ion-color-danger-shade, #b82a3c); }
+  background: var(--ion-color-step-100, #f4f5f8);
+  border-left-color: var(--ion-color-danger, #d63638);
+  .learning-callout__title { color: var(--ion-color-danger, #d63638); }
 }
 
 /* Bandeau d'Instruction / Action sous l'échiquier (sans barre latérale) */
@@ -326,6 +331,11 @@
     min-height: 38px;
     padding: 6px 12px;
   }
+}
+
+.choice-text {
+  flex: 1;
+  text-align: left;
 }
 
 /* Boutons d'action génériques */
