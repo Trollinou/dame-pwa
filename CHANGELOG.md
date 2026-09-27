@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-09-27
+
 - **Mutualisation des Encarts Pédagogiques & Substitution d'Affichage Zero-Scroll en Types 13 et 14 (`LearningFeedbackCallout.vue`, `CapOuPasCapViewer.vue`, `OuvreBoiteViewer.vue`, `_learning-components.scss`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
   - **Création du composant partagé `LearningFeedbackCallout.vue`** : Encapsulation unifiée des encarts pédagogiques riches (`.learning-callout` avec types `success`, `error`, `info`, `tip`, `quote`, `warning`) avec titre, icône contextuelle et texte descriptif multi-lignes.
   - **Affichage des Commentaires & Explications en Type 14 (Cap ou pas cap ?)** :
