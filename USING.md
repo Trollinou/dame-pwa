@@ -166,9 +166,9 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
         - Saisie auteur sous forme de Mini-PGN (position de départ FEN avec flèches indicatrices `[%cal ...]`, branche principale comme coup gagnant avec son explication, et variantes alternatives comme mauvais coups avec leurs explications d'erreur).
         - **Double Mode d'Interaction Tactile & Visuel** :
           - L'apprenant peut soit **toucher/glisser directement la pièce sur l'échiquier** (déplacement interactif immédiat), soit **cliquer sur l'un des boutons de choix** traduits en français sous l'échiquier (*Pion e2 en e4*, *Fou f1 en b5*, etc.).
-        - **Panneau Pédagogique Détaillé & Temps de Lecture** :
-          - En cas de mauvais choix ou coup inadéquat, le bouton passe en rouge (ou l'échiquier se repositionne avec avertissement) et l'explication complète d'erreur s'affiche dans un panneau stylisé dédié afin que l'élève puisse comprendre son erreur à son propre rythme avant de tenter un autre choix.
-          - En cas de bon choix, le coup est validé et joué sur l'échiquier, le bouton passe en vert et l'explication détaillée de succès s'affiche.
+        - **Panneau Pédagogique Détaillé & Substitution Zero-Scroll Mobile** :
+          - En cas de mauvais choix ou coup inadéquat, le bouton passe en rouge (ou l'échiquier se repositionne avec avertissement) et l'explication complète d'erreur s'affiche de façon compacte dans la carte sous les choix afin que l'élève puisse comprendre son erreur à son propre rythme avant de tenter un autre choix.
+          - En cas de bon choix, le coup est validé et joué sur l'échiquier, et l'encart d'explication de succès (`LearningFeedbackCallout`) se substitue automatiquement à l'ensemble de la carte de choix pour garantir un confort de lecture optimal sans aucun défilement vertical sous le pied de page fixe.
           - L'avancement vers la carte suivante s'effectue au rythme de l'élève via le bouton fixe du `SeriesCardFooter`.
       - **Exercices Cap ou pas Cap ? (Type 14)** :
         - Déroulement en **série de 5 mini-situations** sous une consigne commune avec `ContentHeader` (titre, consigne générale, badge `Carte X / 5`) et pied fixe `SeriesCardFooter`.
@@ -177,10 +177,10 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
           - Présentation de la liste d'affirmations définies pour la série sous l'échiquier.
           - Chaque affirmation dispose d'un **groupe de boutons de choix tactiles** configurables (par défaut : OUI vert et NON rouge, ou choix personnalisés tels que `0`, `1`, `2`, `3`).
           - L'échiquier maintient visible le repère visuel d'observation (cercle jaune `[%csl Y...]` sur la pièce d'étude ciblée par l'énoncé) tout en masquant les flèches et annotations de solution. Dès que toutes les affirmations sont complétées avec la combinaison exacte, les shapes de l'entraîneur (flèches, attaques, défenses) sont révélées sur l'échiquier, le feedback vert s'affiche et le bouton *« Carte suivante »* s'active.
-        - **Variante QCM Oui/Non / QCM Simple (`qcm_oui_non`)** :
-          - Une question commune affichée au-dessus d'un groupe de boutons de choix tactiles (par défaut OUI / NON, ou 2, 3 choix ou plus personnalisés tels que `BLANC`, `NOIR`, `ÉGALE`).
+        - **Variante QCM Oui/Non / QCM Simple (`qcm_oui_non`) & QCM Multiple (`qcm_multiple`)** :
+          - Une question commune affichée au-dessus d'un groupe de boutons de choix tactiles (par défaut OUI / NON, ou choix personnalisés tels que `BLANC`, `NOIR`, `ÉGALE`).
           - Si le mini-PGN comporte un coup initial, celui-ci s'anime de façon différée sur l'échiquier pour situer l'action à évaluer (ou reste statique en FEN pure si le PGN ne contient aucun coup). Le cercle jaune d'observation est maintenu visible (`[%csl Y...]`) et les annotations visuelles de solution (flèches `[%cal]`) restent masquées pendant la réflexion.
-          - Dès la bonne réponse sélectionnée, le mini-PGN complet avec ses shapes est révélé et le bouton *« Carte suivante »* se débloque.
+          - **Explication Pédagogique & Substitution Zero-Scroll Mobile** : Dès la bonne réponse sélectionnée, les shapes de l'entraîneur sont révélées sur l'échiquier. Si le mini-PGN comporte un commentaire d'analyse de situation (ou `move_explication`), celui-ci s'affiche dans un encart pédagogique vert unifié (`LearningFeedbackCallout`) qui se substitue automatiquement à la zone de boutons/choix, garantissant un confort de lecture immédiat sans aucun défilement vertical sur mobile. Le bouton *« Carte suivante »* se débloque en bas d'écran.
         - **Variante Move (`move`)** :
           - Résolution du coup attendu directement sur l'échiquier interactif avec révélation des annotations et validation de l'étape.
           - **Mode Multi-coups** : Si le PGN contient des variantes de coups multiples (ex: *Quels sont les échecs possibles ?*), l'apprenant doit trouver l'ensemble des coups légaux valides. Un badge affiche la progression (`Trouvés : X / Total`), les pastilles des coups découverts s'affichent au fur et à mesure en notation française (ex: `Cf3`, `Fxb5+`, `Dd1`), l'échiquier se réinitialise après chaque coup trouvé, et la carte se valide avec le message récapitulatif dès que tous les coups ont été découverts.

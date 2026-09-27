@@ -195,7 +195,7 @@ Pour garantir une expérience graphique et tactile fluide sans dispersion de cod
 > Toute nouvelle vue s'assemble exclusivement à l'aide des **briques Lego communes** :
 > 1. **Conteneur de stage** : `<div class="exercise-stage">` ou `<div class="exercise-viewer-layout">`.
 > 2. **Échiquier** : `<div class="chessboard-container">` (solo 1:1 sans coins arrondis pour alignement parfait des pièces) ou `<div class="learning-board-grid-2col">` avec `<div class="learning-board-card">` (grille 2 par ligne).
-> 3. **Encart pédagogique d'explication** : `<div class="learning-callout learning-callout--info|--tip|--quote|--success|--error">` (bordure latérale gauche colorée pour conseils/citations).
+> 3. **Encart pédagogique d'explication** : `<LearningFeedbackCallout type="success|error|info|tip|quote|warning" :text="..." />` ou `<div class="learning-callout learning-callout--info|--tip|--quote|--success|--error|--warning">` (bordure latérale gauche colorée pour conseils/citations/explications).
 > 4. **Bandeau d'instruction / action sous échiquier** : `<div class="learning-instruction-bar">` (bandeau centré neutre avec bordure 1px subtile, sans barre latérale).
 > 5. **Boutons de choix / QCM** : `<div class="qcm-choices">` avec `<ion-button class="choice-btn">` (hauteur compacte ergonomique **38px**, `--border-radius: 6px`).
 > 6. **Boutons bascules OUI / NON** : `.neutral-toggle` / `.neutral-toggle--large` avec `.toggle-btn` (32px / 36px).

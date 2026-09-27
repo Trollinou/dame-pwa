@@ -129,6 +129,44 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		expect( wrapper.text() ).toContain( 'Bravo !' );
 	} );
 
+	test( 'affiche l’explication pédagogique via LearningFeedbackCallout en cas de bonne réponse', async () => {
+		const pgnWithComment = `[SetUp "1"]\n[FEN "8/8/8/P6p/6pP/3qk1P1/8/4K3 w - - 0 1"]\n\n{ [%cal Ga5a6] Le pion avance et la case est parfaitement contrôlée. }\n*`;
+
+		const config = {
+			consigne: 'Cap ou pas cap ?',
+			variante: 'qcm_oui_non',
+			question: 'Le pion peut-il avancer ?',
+			exercices: [ { pgn: pgnWithComment, reponse_oui_non: true } ],
+		};
+
+		const wrapper = mount( TypeCapOuPasCap, {
+			props: {
+				config,
+				id: 14022,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+			},
+		} );
+
+		// Initialement les boutons Oui/Non sont affichés
+		const ouiBtn = wrapper.find( '.toggle-btn--oui' );
+		expect( ouiBtn.exists() ).toBe( true );
+		expect( wrapper.find( '.learning-callout' ).exists() ).toBe( false );
+
+		// Clic sur la bonne réponse (OUI)
+		await ouiBtn.trigger( 'click' );
+
+		// La zone de choix est substituée par l'encart d'explication
+		const callout = wrapper.find( '.learning-callout' );
+		expect( callout.exists() ).toBe( true );
+		expect( callout.classes() ).toContain( 'learning-callout--success' );
+		expect( callout.text() ).toContain(
+			'Le pion avance et la case est parfaitement contrôlée.'
+		);
+		expect( wrapper.text() ).toContain( 'Bravo !' );
+	} );
+
 	test( 'affiche la FEN initiale pour la variante QCM Oui/Non avec un PGN de position pure', () => {
 		const initialFen = '8/8/8/P6p/6pP/3qk1P1/8/4K3 w - - 0 1';
 		const pgnPureFen = `[SetUp "1"]\n[FEN "${ initialFen }"]\n\n{ [%csl Ga6][%cal Ga5a6] }\n*`;

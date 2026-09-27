@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Mutualisation des Encarts Pédagogiques & Substitution d'Affichage Zero-Scroll en Types 13 et 14 (`LearningFeedbackCallout.vue`, `CapOuPasCapViewer.vue`, `OuvreBoiteViewer.vue`, `_learning-components.scss`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
+  - **Création du composant partagé `LearningFeedbackCallout.vue`** : Encapsulation unifiée des encarts pédagogiques riches (`.learning-callout` avec types `success`, `error`, `info`, `tip`, `quote`, `warning`) avec titre, icône contextuelle et texte descriptif multi-lignes.
+  - **Affichage des Commentaires & Explications en Type 14 (Cap ou pas cap ?)** :
+    - Extraction automatique des commentaires textuels attachés à la position finale du mini-PGN (nettoyés des balises `[%cal]` / `[%csl]`) ou de `move_explication`.
+    - En cas de bonne réponse en variante QCM Oui/Non ou QCM Multiple, l'encart d'explication pédagogique s'affiche simultanément avec la révélation des formes graphiques (flèches/cercles) sur l'échiquier.
+  - **Substitution Mobile First (Zero-Scroll) pour Types 13 (Ouvre'boîte) et 14 (Cap ou pas cap ?)** : Lorsque la carte est résolue, la zone d'options/choix QCM (carte de questions et boutons) s'efface au profit du composant `LearningFeedbackCallout`, garantissant un affichage d'explication parfaitement calé dans le viewport mobile sans aucun défilement vertical sous le pied de page fixe.
+
 - **Interactivité, Adaptation Dynamique et Lisibilité de l'Exercice Type 13 (Ouvre'boîte) (`OuvreBoiteViewer.vue`, `TypeOuvreBoite.vue`, `_learning-components.scss`, `ouvreBoiteParser.spec.ts`, `README.md`, `USING.md`)** :
   - **Double Mode d'Interaction Joueur** : Remplacement de l'échiquier passif (`view-only: true`) par un échiquier interactif permettant de jouer directement le coup d'ouverture sur l'échiquier (tactile ou glisser-déposer) en plus des boutons textuels sous l'échiquier. En cas de mauvais coup joué, l'explication est affichée et l'échiquier se réinitialise automatiquement après temporisation pour permettre de retenter.
   - **Filtrage Dynamique des Cartes Vides** : Détection et exclusion automatique des slots PGN non renseignés. Le compteur de cartes s'ajuste désormais fidèlement au nombre réel de mini-PGNs configurés par l'entraîneur (ex: `Carte 1 / 1` au lieu de `1 / 6` quand 1 seul mini-PGN est renseigné). Prise en charge transparente des formats tableau `exercices: [...]` et objet racine `pgn: "..."`.

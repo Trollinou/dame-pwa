@@ -31,50 +31,68 @@
     <div class="interaction-card animate-fade-in">
       <!-- Variante 1 : QCM Multiple (liste de propositions avec options de choix) -->
       <div v-if="resolvedVariante === 'qcm_multiple'" class="qcm-multiple-panel">
-        <div
-          v-for="(prop, pIdx) in propositionsListe"
-          :key="pIdx"
-          class="proposition-row"
-        >
-          <div class="proposition-text">{{ prop }}</div>
-          <div class="neutral-toggle">
+        <template v-if="isCardSolved && positionExplanation">
+          <LearningFeedbackCallout
+            type="success"
+            title="Explication"
+            :text="positionExplanation"
+          />
+        </template>
+        <template v-else>
+          <div
+            v-for="(prop, pIdx) in propositionsListe"
+            :key="pIdx"
+            class="proposition-row"
+          >
+            <div class="proposition-text">{{ prop }}</div>
+            <div class="neutral-toggle">
+              <button
+                v-for="(opt, optIdx) in optionsReponseListe"
+                :key="optIdx"
+                type="button"
+                class="toggle-btn"
+                :class="getOptionBtnClass(opt, optIdx, multipleAnswers[pIdx])"
+                :disabled="isCardSolved"
+                @click="setMultipleAnswer(pIdx, opt, optIdx)"
+              >
+                <span v-if="opt.toUpperCase() === 'OUI' || (isStandardOuiNon && optIdx === 0)" class="toggle-icon">✓</span>
+                <span v-else-if="opt.toUpperCase() === 'NON' || (isStandardOuiNon && optIdx === 1)" class="toggle-icon">✗</span>
+                <span class="toggle-label">{{ opt }}</span>
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Variante 2 : QCM Oui/Non (question commune avec boutons de choix) -->
+      <div v-else-if="resolvedVariante === 'qcm_oui_non'" class="qcm-oui-non-panel">
+        <template v-if="isCardSolved && positionExplanation">
+          <LearningFeedbackCallout
+            type="success"
+            title="Explication"
+            :text="positionExplanation"
+          />
+        </template>
+        <template v-else>
+          <div class="question-header">
+            <span class="question-text">{{ questionTexte }}</span>
+          </div>
+          <div class="neutral-toggle neutral-toggle--large">
             <button
               v-for="(opt, optIdx) in optionsReponseListe"
               :key="optIdx"
               type="button"
               class="toggle-btn"
-              :class="getOptionBtnClass(opt, optIdx, multipleAnswers[pIdx])"
+              :class="getOptionBtnClass(opt, optIdx, singleAnswer)"
               :disabled="isCardSolved"
-              @click="setMultipleAnswer(pIdx, opt, optIdx)"
+              @click="setSingleAnswer(opt, optIdx)"
             >
               <span v-if="opt.toUpperCase() === 'OUI' || (isStandardOuiNon && optIdx === 0)" class="toggle-icon">✓</span>
               <span v-else-if="opt.toUpperCase() === 'NON' || (isStandardOuiNon && optIdx === 1)" class="toggle-icon">✗</span>
               <span class="toggle-label">{{ opt }}</span>
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Variante 2 : QCM Oui/Non (question commune avec boutons de choix) -->
-      <div v-else-if="resolvedVariante === 'qcm_oui_non'" class="qcm-oui-non-panel">
-        <div class="question-header">
-          <span class="question-text">{{ questionTexte }}</span>
-        </div>
-        <div class="neutral-toggle neutral-toggle--large">
-          <button
-            v-for="(opt, optIdx) in optionsReponseListe"
-            :key="optIdx"
-            type="button"
-            class="toggle-btn"
-            :class="getOptionBtnClass(opt, optIdx, singleAnswer)"
-            :disabled="isCardSolved"
-            @click="setSingleAnswer(opt, optIdx)"
-          >
-            <span v-if="opt.toUpperCase() === 'OUI' || (isStandardOuiNon && optIdx === 0)" class="toggle-icon">✓</span>
-            <span v-else-if="opt.toUpperCase() === 'NON' || (isStandardOuiNon && optIdx === 1)" class="toggle-icon">✗</span>
-            <span class="toggle-label">{{ opt }}</span>
-          </button>
-        </div>
+        </template>
       </div>
 
       <!-- Variante 3 : Move (Déplacement attendu simple ou multi-coups) -->
@@ -279,6 +297,7 @@ import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
 import { getActiveColorFromFen, parseFenPieces, filterYellowShapes, type PieceInfo } from '@/utils/fenUtils';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import LearningFeedbackCallout from '@/components/shared/LearningFeedbackCallout.vue';
 import { parsePgn } from 'chessops/pgn';
 import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
@@ -537,6 +556,7 @@ interface ParsedPgnData {
   shapes: DrawShape[];
   moves: string[];
   alternativeMoves: string[];
+  comment: string;
 }
 
 const currentPgnData = computed<ParsedPgnData>(() => {
@@ -552,6 +572,7 @@ const currentPgnData = computed<ParsedPgnData>(() => {
       shapes: initialShapes,
       moves: [],
       alternativeMoves: [],
+      comment: (exerciceCourant.value?.move_explication || '').trim(),
     };
   }
 
@@ -565,6 +586,7 @@ const currentPgnData = computed<ParsedPgnData>(() => {
   const moves: string[] = [];
   const alternativeMoves: string[] = [];
   const extractedShapes: DrawShape[] = [];
+  let comment = '';
 
   try {
     const games = parsePgn(rawPgn);
@@ -629,18 +651,32 @@ const currentPgnData = computed<ParsedPgnData>(() => {
             extractedShapes.push(s);
           }
         }
+        if (parsed.comment) {
+          comment = parsed.comment;
+        }
       }
     }
   } catch (e) {
     console.warn('Erreur parsePgn dans CapOuPasCapViewer:', e);
   }
 
-  // Fallback direct sur le texte brut du PGN pour extraire les annotations de forme si non trouvées
-  const rawParsed = extractShapesAndComment(rawPgn);
-  for (const s of rawParsed.shapes) {
-    if (!extractedShapes.some((exist) => exist.orig === s.orig && exist.dest === s.dest)) {
-      extractedShapes.push(s);
+  // Fallback direct sur les blocs de commentaires { ... } du PGN si non trouvés par le parser
+  if (!comment || extractedShapes.length === 0) {
+    const commentMatches = rawPgn.match(/\{([^}]+)\}/g);
+    if (commentMatches) {
+      const parsedFallback = extractShapesAndComment(commentMatches.map((m) => m.slice(1, -1)));
+      for (const s of parsedFallback.shapes) {
+        if (!extractedShapes.some((exist) => exist.orig === s.orig && exist.dest === s.dest)) {
+          extractedShapes.push(s);
+        }
+      }
+      if (!comment && parsedFallback.comment) {
+        comment = parsedFallback.comment;
+      }
     }
+  }
+  if (!comment && exerciceCourant.value?.move_explication) {
+    comment = exerciceCourant.value.move_explication.trim();
   }
 
   if (extractedShapes.length === 0 && initialShapes.length > 0) {
@@ -674,7 +710,12 @@ const currentPgnData = computed<ParsedPgnData>(() => {
     shapes: extractedShapes,
     moves,
     alternativeMoves,
+    comment,
   };
+});
+
+const positionExplanation = computed<string>(() => {
+  return currentPgnData.value.comment || (exerciceCourant.value?.move_explication || '').trim();
 });
 
 // Multi-Move expected solutions

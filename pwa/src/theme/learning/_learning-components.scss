@@ -214,6 +214,12 @@
   .learning-callout__title { color: var(--ion-color-danger, #d63638); }
 }
 
+.learning-callout--warning {
+  background: var(--ion-color-step-100, #f4f5f8);
+  border-left-color: #ff9800;
+  .learning-callout__title { color: #ff9800; }
+}
+
 /* Bandeau d'Instruction / Action sous l'échiquier (sans barre latérale) */
 .learning-instruction-bar,
 .qcm-instruction-bar {

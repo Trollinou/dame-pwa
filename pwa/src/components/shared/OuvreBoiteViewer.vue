@@ -24,8 +24,16 @@
         />
       </div>
 
-      <!-- Choix de déplacements (3 choix possibles mélangés) -->
-      <ion-card class="exercise-card">
+      <!-- Substitution de la zone de choix par l'encart d'explication pédagogique dès que résolu -->
+      <LearningFeedbackCallout
+        v-if="isCurrentCardSolved && currentExplanation"
+        :type="currentExplanation.type"
+        title="Explication"
+        :text="currentExplanation.message"
+      />
+
+      <!-- Choix de déplacements (3 choix possibles mélangés) pendant la recherche -->
+      <ion-card v-else class="exercise-card">
         <ion-card-header>
           <ion-card-title class="exercise-card-header">
             Quel coup choisissez-vous ?
@@ -57,19 +65,15 @@
               />
             </ion-button>
           </div>
+
+          <!-- Explication d'erreur éventuelle affichée sous les choix pendant la recherche -->
+          <LearningFeedbackCallout
+            v-if="!isCurrentCardSolved && currentExplanation"
+            :type="currentExplanation.type"
+            :text="currentExplanation.message"
+          />
         </ion-card-content>
       </ion-card>
-
-      <!-- Panneau d'Explication Détaillée Unifié via learning-callout -->
-      <div
-        v-if="currentExplanation"
-        class="learning-callout animate-fade-in"
-        :class="currentExplanation.type === 'success' ? 'learning-callout--success' : 'learning-callout--error'"
-      >
-        <p class="learning-callout-text">
-          {{ currentExplanation.message }}
-        </p>
-      </div>
     </template>
 
     <div v-else class="ion-text-center ion-padding error-container">
@@ -104,6 +108,7 @@ import {
 import { Chessboard } from '@/components/shared/Chessboard';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import LearningFeedbackCallout from '@/components/shared/LearningFeedbackCallout.vue';
 import {
   parseOuvreBoiteMiniPgn,
   type CarteOuvreBoite,
