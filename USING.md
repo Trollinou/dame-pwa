@@ -32,7 +32,11 @@ Le module de préinscription (`/pre-inscription`) permet aux nouveaux visiteurs 
    - **Mineurs (Option groupée)** : Deux consentements explicites (Attestation de santé sur l'honneur pour l'enfant + Autorisation parentale) validés par une **signature unique** du représentant légal 1.
    - Les documents PDF officiels (attestation de santé FFE et autorisation parentale) sont automatiquement générés, signés et rattachés au dossier sans nécessiter d'impression papier.
 
-4. **Suivi sur la Page d'Accueil** :
+4. **Confirmation Immédiate par Courriel & Pièces Jointes Signées** :
+   - Dès la validation de la préinscription, un courriel d'accusé de réception est automatiquement expédié à l'adhérent et à ses responsables légaux.
+   - Le message récapitule les modalités de traitement (adhésion validée à réception du règlement), propose le lien direct vers le paiement en ligne (HelloAsso) et joint les copies PDF signées pour conservation.
+
+5. **Suivi sur la Page d'Accueil** :
    - Lorsque tous les membres du foyer non inscrits ont soumis leur préinscription, la carte d'accueil affiche un message de confirmation rassurant (*« Votre dossier de préinscription a bien été transmis et est en cours de traitement par le club »*) accompagné du bouton d'accès *« Consulter / Modifier ma préinscription »*.
 
 ## Module Le Club (Actualités, Agenda, Tournois, Bénévolat)

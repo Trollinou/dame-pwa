@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Intégration du flux de confirmation par courriel en Préinscription (`PreInscriptionPage.vue`, `usePreInscriptionApi.ts`, `USING.md`)** :
+  - **Prise en charge du courriel de confirmation** : Les soumissions de préinscription depuis la PWA (nouvelle demande ou modification) déclenchent désormais l'envoi d'un courriel d'accusé de réception automatique à l'adhérent et à ses représentants légaux, intégrant le rappel des modalités de paiement (HelloAsso) et les documents PDF complétés et signés électroniquement.
+
 ## [1.8.0] - 2026-09-27
 
 - **Mutualisation des Encarts Pédagogiques & Substitution d'Affichage Zero-Scroll en Types 13 et 14 (`LearningFeedbackCallout.vue`, `CapOuPasCapViewer.vue`, `OuvreBoiteViewer.vue`, `_learning-components.scss`, `TypeCapOuPasCap.spec.ts`, `README.md`, `USING.md`)** :
