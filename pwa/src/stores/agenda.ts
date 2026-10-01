@@ -3,38 +3,8 @@ import { ref } from 'vue';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQueryClient } from '@tanstack/vue-query';
 
-export interface AgendaEventCategory {
-	id: number;
-	name: string;
-	slug: string;
-	color: string;
-}
-
-export interface AgendaEvent {
-	id: number;
-	modified: string;
-	title: {
-		rendered: string;
-		raw: string;
-	};
-	_dame_agenda_description_html?: string;
-	categories_data?: AgendaEventCategory[];
-	dame_agenda_category?: number[];
-	meta: {
-		_dame_start_date: string;
-		_dame_end_date: string;
-		_dame_start_time: string;
-		_dame_end_time: string;
-		_dame_all_day: number;
-		_dame_competition_type?: string;
-		_dame_level?: string;
-		_dame_location_name?: string;
-		_dame_address?: string;
-		_dame_postal_code?: string;
-		_dame_city?: string;
-		_dame_agenda_description?: string;
-	};
-}
+import type { AgendaEvent, AgendaEventCategory } from 'dame-types';
+export type { AgendaEvent, AgendaEventCategory };
 
 export const useAgendaStore = defineStore( 'agenda', () => {
 	const queryClient = useQueryClient();

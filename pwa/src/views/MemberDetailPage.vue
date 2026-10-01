@@ -267,6 +267,7 @@ import {
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMemberStore } from '@/stores/members';
+import { Gender, type GenderType } from 'dame-types';
 
 const route = useRoute();
 const memberStore = useMemberStore();
@@ -291,14 +292,12 @@ const formatDate = (dateStr?: string) => {
 /**
  * Formate le genre pour l'affichage
  */
-const formatGender = (gender?: string) => {
+const formatGender = (gender?: GenderType | string) => {
   if (!gender) return '-';
-  const mapping: Record<string, string> = {
-    'M': 'Masculin',
-    'F': 'Féminin',
-    'H': 'Masculin'
-  };
-  return mapping[gender] || gender;
+  if (gender === Gender.MALE || gender === 'H' || gender === 'Masculin') return 'Masculin';
+  if (gender === Gender.FEMALE || gender === 'Féminin') return 'Féminin';
+  if (gender === Gender.OTHER || gender === 'Autre') return 'Autre';
+  return gender;
 };
 </script>
 
