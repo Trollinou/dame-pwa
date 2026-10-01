@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-10-01
+
 - **Harmonisation et Typage Strict avec le package partagé `dame-types` (`stores/`, `composables/`, `views/`, `package.json`)** :
   - **Stores Pinia & Contrats de Données** : Alignement de `benevolat.ts` (`Benevolat`, `BenevolatDay`, `BenevolatTimeSlot`, `BenevolatReponse`), `agenda.ts` (`AgendaEvent`, `AgendaEventCategory`) et `auth/types.ts` (`MemberIdentity as Identity`, `AssociatedMember`) pour consommer directement les types exposés par `dame-types`.
   - **Composables & Formulaires de Préinscription** : Typage strict de `usePreInscriptionForm.ts` et `usePreInscriptionApi.ts` avec `PreInscriptionFormData`, `PreInscriptionDTOData` et substitution des chaînes magiques par les énumérations partagées (`Gender`, `GenderType`).
