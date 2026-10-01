@@ -99,6 +99,7 @@ import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesC
 import { shuffleArray } from '@/utils/chessNotation';
 
 import type { Key, DrawShape } from 'eg-chessboard';
+import type { ExerciseType7Config } from '@/types/roi';
 
 interface Serie {
   pgn_data: string;
@@ -107,17 +108,8 @@ interface Serie {
   shapes?: DrawShape[];
 }
 
-interface ConfigMarcheHeros {
-  mode: '3x5' | '5x3';
-  series: Serie[];
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-  [key: string]: unknown;
-}
-
 const props = defineProps<{
-  config: ConfigMarcheHeros;
+  config: ExerciseType7Config;
   id?: number;
 }>();
 

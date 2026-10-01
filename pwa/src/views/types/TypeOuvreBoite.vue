@@ -2,30 +2,22 @@
   <div class="exercise-stage">
     <OuvreBoiteViewer
       :consigne="config.consigne"
-      :exercices="config.exercices"
-      :pgn="config.pgn"
-      :metaTitre="config.metaTitre"
-      :metaTypeLabel="config.metaTypeLabel"
-      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
+      :exercices="(config as any).exercices"
+      :pgn="(config as any).pgn"
+      :metaTitre="(config as any).metaTitre"
+      :metaTypeLabel="(config as any).metaTypeLabel"
+      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       @success="onSuccess"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import OuvreBoiteViewer, { type ExerciceItem } from '@/components/shared/OuvreBoiteViewer.vue';
-
-export interface ConfigOuvreBoite {
-  consigne?: string;
-  exercices?: Array<ExerciceItem | string>;
-  pgn?: string;
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import OuvreBoiteViewer from '@/components/shared/OuvreBoiteViewer.vue';
+import type { ExerciseType13Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigOuvreBoite;
+  config: ExerciseType13Config;
   id: number;
 }>();
 

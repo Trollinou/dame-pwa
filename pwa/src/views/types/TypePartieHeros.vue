@@ -148,27 +148,10 @@ import {
   type PgnStage,
   type QcmStage,
 } from '@/utils/partieHerosParser';
-
-export interface ConfigPartieHeros {
-  consigne?: string;
-  pgn?: string;
-  // Rétrocompatibilité ancien format
-  etapes?: Array<{
-    type: 'pgn' | 'qcm';
-    pgn_data?: string;
-    fen?: string;
-    question?: string;
-    choix?: string[];
-    bonne_reponse?: number;
-    shapes?: DrawShape[];
-  }>;
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import type { ExerciseType4Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigPartieHeros;
+  config: ExerciseType4Config;
   id: number;
 }>();
 

@@ -275,27 +275,10 @@ import {
   type PosiPlanQcmStage,
   type PosiPlanStage,
 } from '@/utils/posiPlanParser';
-
-export interface ConfigPosiPlan {
-  consigne?: string;
-  pgn?: string;
-  // Rétrocompatibilité ancien format JSON
-  fen_depart?: string;
-  couleur_joueur?: 'white' | 'black';
-  etapes?: Array<{
-    question: string;
-    choix: Array<{ texte: string; san: string; explication: string }>;
-    bonne_reponse: number;
-    reponse_ordinateur?: string;
-  }>;
-  shapes?: DrawShape[];
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import type { ExerciseType5Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigPosiPlan;
+  config: ExerciseType5Config;
   id: number;
 }>();
 

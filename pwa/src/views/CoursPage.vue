@@ -112,6 +112,7 @@ import {
 import { computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useApprentissageStore } from '@/stores/apprentissage';
+import type { CoursItem, PlaylistItem } from '@/types/roi';
 import { decodeHtmlEntities, getContenuTypeLabel } from '@/utils/stringUtils';
 import {
   lockClosedOutline,
@@ -135,9 +136,9 @@ const coursIndex = computed(() => {
   return apprentissageStore.parcours.findIndex(c => c.id === coursId.value);
 });
 
-const cours = computed(() => {
+const cours = computed<CoursItem | null>(() => {
   if (coursIndex.value !== -1) {
-    return apprentissageStore.parcours[coursIndex.value];
+    return apprentissageStore.parcours[coursIndex.value] || null;
   }
   return null;
 });

@@ -3,16 +3,10 @@ import { ref } from 'vue';
 import { useAuthStore } from './auth';
 import { useQueryClient } from '@tanstack/vue-query';
 import { safeFetch } from '@/utils/safeFetch';
+import type { SaveGameRequest, GameEntry } from '@/types/roi';
 
-export interface PendingGame {
-	member_id: number;
-	difficulty_level: number;
-	hints_count: number;
-	takebacks_count: number;
-	pgn: string;
-	duration: number;
-	game_date: string;
-}
+export type { GameEntry };
+export type PendingGame = SaveGameRequest;
 
 export const useChessStore = defineStore(
 	'chess',

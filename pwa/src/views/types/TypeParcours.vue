@@ -42,6 +42,7 @@ import ContentHeader from '@/components/shared/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
 import { getParcoursVariant } from '@/utils/parcoursVariants';
 import type { DrawShape } from 'eg-chessboard';
+import type { ExerciseType9Config } from '@/types/roi';
 
 export interface ParcoursItemConfig {
   variante: string;
@@ -54,16 +55,8 @@ export interface ParcoursItemConfig {
   shapes?: DrawShape[];
 }
 
-export interface ConfigTypeParcours {
-  consigne?: string;
-  series?: ParcoursItemConfig[];
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
-
 const props = defineProps<{
-  config: ConfigTypeParcours;
+  config: ExerciseType9Config;
   id: number;
 }>();
 
@@ -77,8 +70,9 @@ const feedback = ref<CardFeedback | null>(null);
 const viewerRef = ref<InstanceType<typeof ParcoursViewer> | null>(null);
 
 const seriesList = computed<ParcoursItemConfig[]>(() => {
-  if (props.config?.series && Array.isArray(props.config.series) && props.config.series.length > 0) {
-    return props.config.series;
+  const series = (props.config as any)?.series;
+  if (series && Array.isArray(series) && series.length > 0) {
+    return series;
   }
   return [
     {
@@ -131,9 +125,9 @@ const pendingHint = computed(() => {
 
 const headerMeta = computed(() => {
   return {
-    title: props.config?.metaTitre || 'T9 - Parcours',
-    typeLabel: props.config?.metaTypeLabel || 'Parcours',
-    chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
+    title: (props.config as any)?.metaTitre || 'T9 - Parcours',
+    typeLabel: (props.config as any)?.metaTypeLabel || 'Parcours',
+    chapitreNiveauLabel: (props.config as any)?.metaChapitreNiveauLabel || '',
   };
 });
 

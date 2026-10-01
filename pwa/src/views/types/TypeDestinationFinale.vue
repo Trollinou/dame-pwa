@@ -2,10 +2,10 @@
   <div class="exercise-stage">
     <TextOrderViewer
       :consigne="config.consigne"
-      :couleurJoueur="config.couleur_joueur"
-      :etapesCorrectes="config.etapes_texte"
-      :fenDepart="config.fen_depart"
-      :pgnExplication="config.pgn_explication"
+      :couleurJoueur="(config as any).couleur_joueur"
+      :etapesCorrectes="(config as any).etapes_texte"
+      :fenDepart="(config as any).fen_depart || config.fen"
+      :pgnExplication="(config as any).pgn_explication"
       @success="onSuccess"
     />
   </div>
@@ -14,17 +14,10 @@
 <script setup lang="ts">
 import { useApprentissageStore } from '@/stores/apprentissage';
 import TextOrderViewer from '@/components/shared/TextOrderViewer.vue';
-
-export interface ConfigDestinationFinale {
-  consigne: string;
-  fen_depart: string;
-  couleur_joueur: 'white' | 'black';
-  etapes_texte: string[];
-  pgn_explication: string;
-}
+import type { ExerciseType16Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigDestinationFinale;
+  config: ExerciseType16Config;
   id: number;
 }>();
 

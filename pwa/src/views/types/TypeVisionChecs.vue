@@ -1,33 +1,21 @@
 <template>
   <VisionViewer
     :consigne="config.consigne"
-    :diagrammes="config.diagrammes"
-    :metaTitre="config.metaTitre"
-    :metaTypeLabel="config.metaTypeLabel"
-    :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
-    :legacy-config="config"
+    :diagrammes="(config as any).diagrammes"
+    :metaTitre="(config as any).metaTitre"
+    :metaTypeLabel="(config as any).metaTypeLabel"
+    :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
+    :legacy-config="(config as any)"
     @success="$emit('success')"
   />
 </template>
 
 <script setup lang="ts">
-import VisionViewer, { type DiagrammeConfig } from '@/components/shared/VisionViewer.vue';
+import VisionViewer from '@/components/shared/VisionViewer.vue';
+import type { ExerciseType8Config } from '@/types/roi';
 
 defineProps<{
-  config: {
-    consigne?: string;
-    diagrammes?: DiagrammeConfig[];
-    metaTitre?: string;
-    metaTypeLabel?: string;
-    metaChapitreNiveauLabel?: string;
-    // Propriétés legacy pour rétrocompatibilité
-    fen_depart?: string;
-    couleur_joueur?: 'white' | 'black';
-    description?: string;
-    case_depart?: string;
-    case_arrivee?: string;
-    solution_san?: string;
-  };
+  config: ExerciseType8Config;
   id: number;
 }>();
 

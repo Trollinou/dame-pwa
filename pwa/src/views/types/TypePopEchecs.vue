@@ -2,10 +2,10 @@
   <div class="exercise-stage">
     <PlacementViewer
       :consigne="config.consigne"
-      :diagrammes="config.diagrammes"
-      :metaTitre="config.metaTitre"
-      :metaTypeLabel="config.metaTypeLabel"
-      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
+      :diagrammes="(config as any).diagrammes"
+      :metaTitre="(config as any).metaTitre"
+      :metaTypeLabel="(config as any).metaTypeLabel"
+      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       @success="gererSucces"
     />
   </div>
@@ -14,17 +14,10 @@
 <script setup lang="ts">
 import PlacementViewer, { type DiagrammePopEchecs } from '@/components/shared/PlacementViewer.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
-
-export interface ConfigPopEchecs {
-  consigne?: string;
-  diagrammes?: DiagrammePopEchecs[];
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import type { ExerciseType2Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigPopEchecs;
+  config: ExerciseType2Config;
   id: number;
 }>();
 

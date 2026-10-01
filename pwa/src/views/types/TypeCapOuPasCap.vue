@@ -2,42 +2,27 @@
   <div class="exercise-stage">
     <CapOuPasCapViewer
       :consigne="config.consigne"
-      :variante="config.variante || config.type_reponse"
-      :mode_clic="config.mode_clic"
-      :mode_setup="config.mode_setup"
-      :options_reponse="config.options_reponse"
-      :propositions="config.propositions"
-      :question="config.question"
-      :exercices="config.exercices || config.diagrammes"
-      :metaTitre="config.metaTitre"
-      :metaTypeLabel="config.metaTypeLabel"
-      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
+      :variante="(config as any).variante || (config as any).type_reponse"
+      :mode_clic="(config as any).mode_clic"
+      :mode_setup="(config as any).mode_setup"
+      :options_reponse="(config as any).options_reponse"
+      :propositions="(config as any).propositions"
+      :question="(config as any).question"
+      :exercices="(config as any).exercices || (config as any).diagrammes"
+      :metaTitre="(config as any).metaTitre"
+      :metaTypeLabel="(config as any).metaTypeLabel"
+      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       @success="onSuccess"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import CapOuPasCapViewer, { type ExerciceCapOuPasCap } from '@/components/shared/CapOuPasCapViewer.vue';
-
-export interface ConfigCapOuPasCap {
-  consigne?: string;
-  variante?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | 'clic' | 'setup' | string;
-  type_reponse?: 'qcm_multiple' | 'qcm_oui_non' | 'move' | 'notation' | 'clic' | 'setup' | string;
-  mode_clic?: 'cibles' | 'materiel' | 'prises_meilleur_coup';
-  mode_setup?: 'texte' | 'memoire';
-  options_reponse?: string[];
-  propositions?: string[];
-  question?: string;
-  exercices?: ExerciceCapOuPasCap[];
-  diagrammes?: ExerciceCapOuPasCap[];
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import CapOuPasCapViewer from '@/components/shared/CapOuPasCapViewer.vue';
+import type { ExerciseType14Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigCapOuPasCap;
+  config: ExerciseType14Config;
   id?: number;
 }>();
 
