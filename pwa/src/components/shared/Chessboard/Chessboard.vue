@@ -74,7 +74,20 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { default as TheChessboard } from 'eg-chessboard/vue';
-import 'eg-chessboard/style.css';
+// 1. Structure de base & thèmes d'échiquiers
+import 'eg-chessboard/base.css';
+
+// 2. Styles de pièces configurés dans l'application
+import 'eg-chessboard/pieces/cburnett.css';
+import 'eg-chessboard/pieces/merida.css';
+import 'eg-chessboard/pieces/alpha.css';
+import 'eg-chessboard/pieces/cardinal.css';
+import 'eg-chessboard/pieces/dubrovny.css';
+import 'eg-chessboard/pieces/fantasy.css';
+import 'eg-chessboard/pieces/firi.css';
+import 'eg-chessboard/pieces/maestro.css';
+import 'eg-chessboard/pieces/staunty.css';
+import 'eg-chessboard/pieces/tatiana.css';
 import type { BoardCore, StockfishConfig, Move, DrawShape } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import type { ChessboardProps, ChessboardEmits, ChessboardConfig } from './types';

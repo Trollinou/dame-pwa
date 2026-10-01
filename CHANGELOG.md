@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Optimisation des imports CSS de `eg-chessboard` (Passage à l'import granulaire) (`Chessboard.vue`, `CHANGELOG.md`)** :
+  - **Remplacement de l'import monolithique** : Abandon de l'import global `eg-chessboard/style.css` (~466 kB) au profit de la structure de base modulaire `eg-chessboard/base.css` et de l'import ciblé des 10 jeux de pièces supportés dans l'application (`cburnett`, `merida`, `alpha`, `cardinal`, `dubrovny`, `fantasy`, `firi`, `maestro`, `staunty`, `tatiana`).
+  - **Allégement du bundle CSS** : Réduction du poids des feuilles de style compilées et amélioration des performances de chargement.
+
 - **Intégration du flux de confirmation par courriel en Préinscription (`PreInscriptionPage.vue`, `usePreInscriptionApi.ts`, `USING.md`)** :
   - **Prise en charge du courriel de confirmation** : Les soumissions de préinscription depuis la PWA (nouvelle demande ou modification) déclenchent désormais l'envoi d'un courriel d'accusé de réception automatique à l'adhérent et à ses représentants légaux, intégrant le rappel des modalités de paiement (HelloAsso) et les documents PDF complétés et signés électroniquement.
 
