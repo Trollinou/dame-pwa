@@ -3,49 +3,25 @@ import { ref, computed, watch } from 'vue';
 import { useAuthStore } from './auth';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
-import type { DrawShape } from 'eg-chessboard';
+import type {
+	ContenuResponse,
+	ExerciceData,
+	LeconData,
+	VideoData,
+	CoursItem,
+	PlaylistItem,
+	ExerciseConfig,
+} from '@/types/roi';
 
-export interface ExerciceConfig {
-	shapes?: DrawShape[];
-	[ key: string ]: unknown;
-}
-
-export interface Contenu {
-	id: number;
-	titre: string;
-	post_type: string;
-	chapitre_nom: string;
-	chapitre_couleur: string;
-	niveau: number;
-	type?: number;
-	config?: ExerciceConfig;
-	contenu_html?: string;
-	video_url?: string;
-	video_id?: string;
-	duree?: string;
-	modified?: string;
-}
-
-export interface PlaylistItem {
-	type: string;
-	id: number;
-	titre?: string;
-	modified?: string;
-}
-
-export interface Cours {
-	id: number;
-	titre: string;
-	niveau: number;
-	chapitre_nom: string;
-	chapitre_couleur: string;
-	playlist: PlaylistItem[];
-	is_assigned?: boolean;
-	unlocked_by_assignment?: boolean;
-	audience_type?: string;
-	target_groups?: number[];
-	target_members?: number[];
-}
+export type {
+	ContenuResponse,
+	ExerciceData,
+	LeconData,
+	VideoData,
+	CoursItem,
+	PlaylistItem,
+	ExerciseConfig,
+};
 
 export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	const authStore = useAuthStore();
@@ -74,7 +50,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		data: queryParcours,
 		isLoading: isParcoursLoading,
 		refetch: refetchParcours,
-	} = useQuery< Cours[] >( {
+	} = useQuery< CoursItem[] >( {
 		queryKey: computed( () => [
 			'parcours',
 			authStore.selectedIdentity?.id || 'default',
@@ -122,7 +98,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 
 	// 3. Query du Contenu Actuel
 	const { data: queryContenu, isLoading: isContenuLoading } =
-		useQuery< Contenu | null >( {
+		useQuery< ContenuResponse | null >( {
 			queryKey: computed( () => [
 				'contenu',
 				contenuActuelId.value,
@@ -232,7 +208,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	 * Invalide uniquement les éléments modifiés côté serveur pour éviter les requêtes inutiles.
 	 * @param coursList
 	 */
-	const syncContenuCache = ( coursList: Cours[] ): void => {
+	const syncContenuCache = ( coursList: CoursItem[] ): void => {
 		if ( ! Array.isArray( coursList ) ) {
 			return;
 		}
@@ -245,7 +221,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 				if ( ! item.id || ! item.modified ) {
 					continue;
 				}
-				const cached = queryClient.getQueryData< Contenu >( [
+				const cached = queryClient.getQueryData< ContenuResponse >( [
 					'contenu',
 					item.id,
 					identityId,
@@ -284,7 +260,9 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		await refetchProgression();
 	};
 
-	const fetchContenu = async ( id: number ): Promise< Contenu | null > => {
+	const fetchContenu = async (
+		id: number
+	): Promise< ContenuResponse | null > => {
 		contenuActuelId.value = id;
 		const identityId = authStore.selectedIdentity?.id || 'default';
 
@@ -298,7 +276,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 			}
 		}
 
-		const cached = queryClient.getQueryData< Contenu >( [
+		const cached = queryClient.getQueryData< ContenuResponse >( [
 			'contenu',
 			id,
 			identityId,
@@ -316,7 +294,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 			} );
 		}
 
-		return await queryClient.ensureQueryData< Contenu | null >( {
+		return await queryClient.ensureQueryData< ContenuResponse | null >( {
 			queryKey: [ 'contenu', id, identityId ],
 			queryFn: async () => {
 				const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -409,7 +387,7 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 		coursTarget.playlist.forEach( ( item ) => {
-			const cached = queryClient.getQueryData< Contenu >( [
+			const cached = queryClient.getQueryData< ContenuResponse >( [
 				'contenu',
 				item.id,
 				identityId,

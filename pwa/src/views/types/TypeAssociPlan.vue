@@ -65,21 +65,10 @@ import {
   parseAssociPlanPaires,
   type AssociPlanPaire,
 } from '@/utils/associPlanParser';
-
-interface PaireRaw {
-  pgn?: string;
-  pgn_data?: string;
-}
-
-interface ConfigAssociPlan {
-  paires: PaireRaw[];
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import type { ExerciseType6Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigAssociPlan;
+  config: ExerciseType6Config;
   id: number;
 }>();
 
@@ -101,7 +90,7 @@ const pgnVisionne = ref(false);
 
 // Extraction et parsing des 4 PGNs
 const paires = computed<AssociPlanPaire[]>(() => {
-  return parseAssociPlanPaires(props.config?.paires || []);
+  return parseAssociPlanPaires((props.config as any)?.paires || []);
 });
 
 // Paires formatées pour le composant MatchingViewer
@@ -122,9 +111,9 @@ const paireActive = computed<AssociPlanPaire | null>(() => {
 
 // Métadonnées du ContentHeader
 const headerMeta = computed(() => ({
-  title: props.config?.metaTitre || 'T6 - Associ\'Plan',
-  typeLabel: props.config?.metaTypeLabel || 'Associ\'Plan',
-  chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
+  title: (props.config as any)?.metaTitre || 'T6 - Associ\'Plan',
+  typeLabel: (props.config as any)?.metaTypeLabel || 'Associ\'Plan',
+  chapitreNiveauLabel: (props.config as any)?.metaChapitreNiveauLabel || '',
 }));
 
 // Consigne contextuelle dynamique selon la carte

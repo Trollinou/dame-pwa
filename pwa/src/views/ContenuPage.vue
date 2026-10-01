@@ -70,7 +70,7 @@
                 metaTitre: decodeHtmlEntities(contenuActuel.titre),
                 metaTypeLabel: getContenuTypeLabel(contenuActuel),
                 metaChapitreNiveauLabel: formatChapitreNiveauLabel(contenuActuel.chapitre_nom, contenuActuel.niveau)
-              } as Record<string, unknown>)"
+              } as any)"
               :id="contenuActuel.id"
               :key="contenuActuel.id"
               @success="onSuccess"
@@ -180,6 +180,7 @@ import TypeJugementFinal from './types/TypeJugementFinal.vue';
 import TypeDestinationFinale from './types/TypeDestinationFinale.vue';
 import LeconReader from '@/components/apprentissage/LeconReader.vue';
 import VideoReader from '@/components/apprentissage/VideoReader.vue';
+import type { ContenuResponse, CoursItem, PlaylistItem } from '@/types/roi';
 import { listOutline, homeOutline } from 'ionicons/icons';
 import { decodeHtmlEntities, getContenuTypeLabel, formatChapitreNiveauLabel } from '@/utils/stringUtils';
 
@@ -189,7 +190,7 @@ const apprentissageStore = useApprentissageStore();
 const isLoading = ref(true);
 const isPageLoading = computed(() => isLoading.value || apprentissageStore.isContenuLoading);
 const estReussi = ref(false);
-const contenuActuel = computed(() => apprentissageStore.contenuActuel);
+const contenuActuel = computed<ContenuResponse | null>(() => apprentissageStore.contenuActuel);
 
 const TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14];
 
@@ -206,7 +207,7 @@ const ionContentRef = ref<ComponentPublicInstance | null>(null);
 
 provide('exerciseFooterPortal', footerPortalRef);
 
-const coursParentInfo = computed(() => {
+const coursParentInfo = computed<{ cours: CoursItem; idx: number } | null>(() => {
   if (!contenuActuel.value || apprentissageStore.parcours.length === 0) {
     return null;
   }
@@ -219,12 +220,12 @@ const coursParentInfo = computed(() => {
   return null;
 });
 
-const prochainElement = computed(() => {
+const prochainElement = computed<PlaylistItem | null>(() => {
   const info = coursParentInfo.value;
   if (!info) return null;
   const { cours, idx } = info;
   if (idx < cours.playlist.length - 1) {
-    return cours.playlist[idx + 1];
+    return cours.playlist[idx + 1] || null;
   }
   return null;
 });

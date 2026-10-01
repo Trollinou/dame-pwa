@@ -1,11 +1,14 @@
 import { ref } from 'vue';
 import { safeFetch } from '@/utils/safeFetch';
-import {
-	useAuthStore,
-	type Identity,
-	type AssociatedMember,
-} from '@/stores/auth';
-import type { PreInscriptionFormData } from './usePreInscriptionForm';
+import { useAuthStore } from '@/stores/auth';
+import type {
+	MemberIdentity as Identity,
+	AssociatedMember,
+	PreInscriptionDTOData,
+	PreInscriptionFormData,
+} from 'dame-types';
+
+export type { PreInscriptionDTOData, PreInscriptionFormData };
 
 export interface RegistrationTarget {
 	member_id: number;

@@ -2,14 +2,14 @@
   <div class="exercise-stage">
     <ABCDaireTactiqueViewer
       :consigne="config.consigne"
-      :exercices="config.exercices"
-      :metaTitre="config.metaTitre"
-      :metaTypeLabel="config.metaTypeLabel"
-      :metaChapitreNiveauLabel="config.metaChapitreNiveauLabel"
+      :exercices="(config as any).exercices"
+      :metaTitre="(config as any).metaTitre"
+      :metaTypeLabel="(config as any).metaTypeLabel"
+      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       :fen="config.fen"
-      :solution="config.solution"
-      :couleurJoueur="config.couleur_joueur"
-      :shapes="config.shapes"
+      :solution="(config as any).solution"
+      :couleurJoueur="(config as any).couleur_joueur"
+      :shapes="(config as any).shapes"
       @success="gererSucces"
     />
   </div>
@@ -18,24 +18,10 @@
 <script setup lang="ts">
 import ABCDaireTactiqueViewer, { type ExerciceABCDaire } from '@/components/shared/ABCDaireTactiqueViewer.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
-import type { DrawShape } from 'eg-chessboard';
-
-export interface ConfigABCDaire {
-  consigne?: string;
-  exercices?: ExerciceABCDaire[];
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-  id?: number;
-  // Rétrocompatibilité
-  fen?: string;
-  solution?: string[];
-  couleur_joueur?: 'white' | 'black';
-  shapes?: DrawShape[];
-}
+import type { ExerciseType3Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigABCDaire;
+  config: ExerciseType3Config;
   id?: number;
 }>();
 

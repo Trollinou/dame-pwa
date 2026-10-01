@@ -11,12 +11,12 @@
     <QcmViewer
       v-if="qcmActuel"
       :key="qcmIndex"
-      :question="qcmActuel.question || qcmActuel.consigne || ''"
+      :question="qcmActuel.question || (qcmActuel as any).consigne || ''"
       :hideQuestion="true"
-      :choix="qcmActuel.reponses || qcmActuel.choix || []"
-      :bonneReponse="qcmActuel.bonne_reponse ?? qcmActuel.bonneReponse ?? 0"
-      :shapes="qcmActuel.shapes || props.config?.shapes"
-      :fen="qcmActuel.fen || props.config?.fen"
+      :choix="qcmActuel.reponses || (qcmActuel as any).choix || []"
+      :bonneReponse="qcmActuel.bonne_reponse ?? (qcmActuel as any).bonneReponse ?? 0"
+      :shapes="(qcmActuel as any).shapes || (props.config as any)?.shapes"
+      :fen="(qcmActuel as any).fen || (props.config as any)?.fen"
       :currentCard="qcmIndex + 1"
       :totalCards="qcmsList.length"
       @success="gererSucces"
@@ -29,38 +29,10 @@ import { ref, computed, watch } from 'vue';
 import QcmViewer from '@/components/shared/QcmViewer.vue';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
-import type { DrawShape } from 'eg-chessboard';
-
-export interface QcmItem {
-  question?: string;
-  consigne?: string;
-  reponses?: string[];
-  choix?: string[];
-  bonne_reponse?: number;
-  bonneReponse?: number;
-  shapes?: DrawShape[];
-  fen?: string;
-}
-
-export interface Config100Commandements {
-  consigne?: string;
-  qcms?: QcmItem[];
-  // Rétrocompatibilité pour QCM unique
-  question?: string;
-  reponses?: string[];
-  choix?: string[];
-  bonne_reponse?: number;
-  bonneReponse?: number;
-  shapes?: DrawShape[];
-  fen?: string;
-  id?: number;
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import type { ExerciseType1Config, QcmItem } from '@/types/roi';
 
 const props = defineProps<{
-  config: Config100Commandements;
+  config: ExerciseType1Config;
   id?: number;
 }>();
 
@@ -69,10 +41,11 @@ const emit = defineEmits<{
 }>();
 
 const headerMeta = computed(() => {
+  const cfg = props.config as Record<string, any>;
   return {
-    title: props.config?.metaTitre || 'T1 - 100 Commandements',
-    typeLabel: props.config?.metaTypeLabel || '100 Commandements',
-    chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
+    title: (cfg?.metaTitre as string) || 'T1 - 100 Commandements',
+    typeLabel: (cfg?.metaTypeLabel as string) || '100 Commandements',
+    chapitreNiveauLabel: (cfg?.metaChapitreNiveauLabel as string) || '',
   };
 });
 
@@ -83,15 +56,16 @@ const qcmsList = computed<QcmItem[]>(() => {
   if (props.config?.qcms && Array.isArray(props.config.qcms) && props.config.qcms.length > 0) {
     return props.config.qcms;
   }
-  if (props.config?.question) {
+  const cfg = props.config as Record<string, any>;
+  if (cfg?.question) {
     return [
       {
-        question: props.config.question,
-        reponses: props.config.reponses || props.config.choix || [],
-        bonne_reponse: props.config.bonne_reponse ?? props.config.bonneReponse ?? 0,
-        shapes: props.config.shapes,
-        fen: props.config.fen
-      }
+        question: cfg.question,
+        reponses: cfg.reponses || cfg.choix || [],
+        bonne_reponse: cfg.bonne_reponse ?? cfg.bonneReponse ?? 0,
+        shapes: cfg.shapes,
+        fen: cfg.fen
+      } as unknown as QcmItem
     ];
   }
   return [];
@@ -104,7 +78,7 @@ const qcmActuel = computed<QcmItem | null>(() => {
 
 const consigneActive = computed<string>(() => {
   return (
-    qcmActuel.value?.consigne ||
+    (qcmActuel.value as any)?.consigne ||
     qcmActuel.value?.question ||
     props.config?.consigne ||
     'Sélectionne la bonne réponse.'

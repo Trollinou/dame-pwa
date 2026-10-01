@@ -2,10 +2,10 @@
   <div class="exercise-stage">
     <JugementFinalViewer
       :consigne="config.consigne"
-      :couleurJoueur="config.couleur_joueur"
-      :fenDepart="config.fen_depart"
-      :pgnExplication="config.pgn_explication"
-      :scenarios="config.scenarios"
+      :couleurJoueur="(config as any).couleur_joueur"
+      :fenDepart="(config as any).fen_depart || config.fen"
+      :pgnExplication="(config as any).pgn_explication"
+      :scenarios="(config as any).scenarios"
       @success="onSuccess"
     />
   </div>
@@ -13,18 +13,11 @@
 
 <script setup lang="ts">
 import { useApprentissageStore } from '@/stores/apprentissage';
-import JugementFinalViewer, { type ScenarioJugementFinal } from '@/components/shared/JugementFinalViewer.vue';
-
-export interface ConfigJugementFinal {
-  consigne: string;
-  fen_depart: string;
-  couleur_joueur: 'white' | 'black';
-  scenarios: ScenarioJugementFinal[];
-  pgn_explication: string;
-}
+import JugementFinalViewer from '@/components/shared/JugementFinalViewer.vue';
+import type { ExerciseType15Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigJugementFinal;
+  config: ExerciseType15Config;
   id: number;
 }>();
 

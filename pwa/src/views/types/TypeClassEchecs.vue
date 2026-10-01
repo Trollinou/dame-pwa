@@ -16,6 +16,7 @@
 import { computed } from 'vue';
 import OrderViewer from '@/components/shared/OrderViewer.vue';
 import type { DrawShape } from 'eg-chessboard';
+import type { ExerciseType11Config } from '@/types/roi';
 
 interface PositionItem {
   fen: string;
@@ -23,13 +24,8 @@ interface PositionItem {
   shapes?: DrawShape[];
 }
 
-interface ConfigClassEchecs {
-  consigne?: string;
-  positions: PositionItem[];
-}
-
 const props = defineProps<{
-  config: ConfigClassEchecs;
+  config: ExerciseType11Config;
   id: number;
 }>();
 
@@ -38,10 +34,11 @@ defineEmits<{
 }>();
 
 const itemsAOrdonner = computed(() => {
-  if (!props.config?.positions || !Array.isArray(props.config.positions)) {
+  const positions = (props.config as any)?.positions;
+  if (!positions || !Array.isArray(positions)) {
     return [];
   }
-  return props.config.positions.map((pos, index) => ({
+  return (positions as PositionItem[]).map((pos, index) => ({
     id: index,
     fen: pos.fen,
     orientation: pos.couleur_joueur,

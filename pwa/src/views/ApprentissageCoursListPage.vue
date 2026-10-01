@@ -145,8 +145,9 @@ import {
   type RefresherCustomEvent
 } from '@ionic/vue';
 import { onMounted, watch } from 'vue';
-import { useApprentissageStore, type Cours } from '@/stores/apprentissage';
+import { useApprentissageStore } from '@/stores/apprentissage';
 import { useAuthStore } from '@/stores/auth';
+import type { CoursItem } from '@/types/roi';
 import { decodeHtmlEntities } from '@/utils/stringUtils';
 import {
   schoolOutline,
@@ -158,7 +159,7 @@ import {
 const authStore = useAuthStore();
 const apprentissageStore = useApprentissageStore();
 
-const getCourseProgress = (cours: Cours): string => {
+const getCourseProgress = (cours: CoursItem): string => {
   const playlist = cours.playlist || [];
   if (playlist.length === 0) return '0/0';
   const validated = playlist.filter((item) =>
@@ -167,7 +168,7 @@ const getCourseProgress = (cours: Cours): string => {
   return `${validated}/${playlist.length}`;
 };
 
-const isCourseUnlocked = (cours: Cours): boolean => {
+const isCourseUnlocked = (cours: CoursItem): boolean => {
   const idx = apprentissageStore.parcours.findIndex((c) => c.id === cours.id);
   if (idx < 0) return true;
   return apprentissageStore.isCoursUnlocked(idx);

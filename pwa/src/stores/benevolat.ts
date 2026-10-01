@@ -4,43 +4,19 @@ import { useAuthStore } from './auth';
 import { safeFetch } from '@/utils/safeFetch';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 
-export interface BenevolatTimeSlot {
-	start: string;
-	end: string;
-	max_participants?: number;
-}
+import type {
+	Benevolat,
+	BenevolatDay,
+	BenevolatTimeSlot,
+	BenevolatReponse,
+} from 'dame-types';
 
-export interface BenevolatDay {
-	date: string;
-	time_slots?: BenevolatTimeSlot[];
-}
-
-export interface Benevolat {
-	id: number;
-	modified: string;
-	title: {
-		rendered: string;
-		raw?: string;
-	};
-	content?: {
-		rendered: string;
-	};
-	dame_benevolat_data: BenevolatDay[];
-}
-
-export interface BenevolatReponse {
-	id: number;
-	modified: string;
-	title: {
-		rendered: string;
-		raw?: string;
-	};
-	benevolat_id: number;
-	choices?: string[];
-	meta?: {
-		_dame_member_id?: number;
-	};
-}
+export type {
+	Benevolat,
+	BenevolatDay,
+	BenevolatTimeSlot,
+	BenevolatReponse,
+};
 
 export const useBenevolatStore = defineStore( 'benevolat', () => {
 	const authStore = useAuthStore();

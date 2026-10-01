@@ -4,18 +4,18 @@
       :title="headerMeta.title"
       :typeLabel="headerMeta.typeLabel"
       :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="config.questions?.[0]?.texte || `Évaluez la position (${config.theme || 'Échec & Éval'})`"
-      :stepBadgeText="`Question 1 / ${config.questions?.length || 1}`"
+      :consigne="(config as any).questions?.[0]?.texte || `Évaluez la position (${(config as any).theme || 'Échec & Éval'})`"
+      :stepBadgeText="`Question 1 / ${(config as any).questions?.length || 1}`"
     />
 
     <EvalViewer
-      :couleurJoueur="config.couleur_joueur"
-      :fenDepart="config.fen_depart"
-      :pgnExplication="config.pgn_explication"
-      :questions="config.questions"
-      :shapes="config.shapes || []"
-      :solutionMoves="config.solution_moves"
-      :theme="config.theme"
+      :couleurJoueur="(config as any).couleur_joueur"
+      :fenDepart="(config as any).fen_depart || config.fen"
+      :pgnExplication="(config as any).pgn_explication"
+      :questions="(config as any).questions"
+      :shapes="(config as any).shapes || []"
+      :solutionMoves="(config as any).solution_moves"
+      :theme="(config as any).theme"
       @success="onSuccess"
     />
   </div>
@@ -26,23 +26,10 @@ import { computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import EvalViewer, { type QuestionEval } from '@/components/shared/EvalViewer.vue';
 import ContentHeader from '@/components/shared/ContentHeader.vue';
-import type { DrawShape } from 'eg-chessboard';
-
-export interface ConfigEchecEval {
-  fen_depart: string;
-  couleur_joueur: 'white' | 'black';
-  shapes?: DrawShape[];
-  theme: string;
-  questions: QuestionEval[];
-  solution_moves: string[];
-  pgn_explication: string;
-  metaTitre?: string;
-  metaTypeLabel?: string;
-  metaChapitreNiveauLabel?: string;
-}
+import type { ExerciseType10Config } from '@/types/roi';
 
 const props = defineProps<{
-  config: ConfigEchecEval;
+  config: ExerciseType10Config;
   id: number;
 }>();
 
@@ -52,9 +39,9 @@ const emit = defineEmits<{
 
 const headerMeta = computed(() => {
   return {
-    title: props.config?.metaTitre || 'T10 - Échec & Éval',
-    typeLabel: props.config?.metaTypeLabel || 'Échec & Éval',
-    chapitreNiveauLabel: props.config?.metaChapitreNiveauLabel || '',
+    title: (props.config as any)?.metaTitre || 'T10 - Échec & Éval',
+    typeLabel: (props.config as any)?.metaTypeLabel || 'Échec & Éval',
+    chapitreNiveauLabel: (props.config as any)?.metaChapitreNiveauLabel || '',
   };
 });
 

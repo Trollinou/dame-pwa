@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Harmonisation et Typage Strict avec le package partagé `dame-types` (`stores/`, `composables/`, `views/`, `package.json`)** :
+  - **Stores Pinia & Contrats de Données** : Alignement de `benevolat.ts` (`Benevolat`, `BenevolatDay`, `BenevolatTimeSlot`, `BenevolatReponse`), `agenda.ts` (`AgendaEvent`, `AgendaEventCategory`) et `auth/types.ts` (`MemberIdentity as Identity`, `AssociatedMember`) pour consommer directement les types exposés par `dame-types`.
+  - **Composables & Formulaires de Préinscription** : Typage strict de `usePreInscriptionForm.ts` et `usePreInscriptionApi.ts` avec `PreInscriptionFormData`, `PreInscriptionDTOData` et substitution des chaînes magiques par les énumérations partagées (`Gender`, `GenderType`).
+  - **Vues & Composants** : Alignement des composants d'agenda, bénévolat et vue adhérent (`MemberDetailPage.vue`) sur les types stricts partagés sans `any` ni interfaces locales dupliquées.
+
 - **Optimisation des imports CSS de `eg-chessboard` (Passage à l'import granulaire) (`Chessboard.vue`, `CHANGELOG.md`)** :
   - **Remplacement de l'import monolithique** : Abandon de l'import global `eg-chessboard/style.css` (~466 kB) au profit de la structure de base modulaire `eg-chessboard/base.css` et de l'import ciblé des 10 jeux de pièces supportés dans l'application (`cburnett`, `merida`, `alpha`, `cardinal`, `dubrovny`, `fantasy`, `firi`, `maestro`, `staunty`, `tatiana`).
   - **Allégement du bundle CSS** : Réduction du poids des feuilles de style compilées et amélioration des performances de chargement.

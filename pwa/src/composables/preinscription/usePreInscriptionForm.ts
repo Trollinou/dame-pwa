@@ -1,51 +1,7 @@
 import { ref, reactive } from 'vue';
+import type { PreInscriptionFormData } from 'dame-types';
 
-export interface PreInscriptionFormData {
-	dame_birth_name: string;
-	dame_last_name: string;
-	dame_first_name: string;
-	dame_sexe: string;
-	dame_birth_date: string;
-	dame_birth_city: string;
-	dame_phone_number: string;
-	dame_email: string;
-	dame_profession: string;
-	dame_address_1: string;
-	dame_address_2: string;
-	dame_postal_code: string;
-	dame_city: string;
-	dame_taille_vetements: string;
-	dame_license_type: string;
-	dame_legal_rep_1_first_name: string;
-	dame_legal_rep_1_last_name: string;
-	dame_legal_rep_1_email: string;
-	dame_legal_rep_1_phone: string;
-	dame_legal_rep_1_address_1: string;
-	dame_legal_rep_1_address_2: string;
-	dame_legal_rep_1_postal_code: string;
-	dame_legal_rep_1_city: string;
-	dame_legal_rep_1_profession: string;
-	dame_legal_rep_1_date_naissance: string;
-	dame_legal_rep_1_commune_naissance: string;
-	dame_legal_rep_2_first_name: string;
-	dame_legal_rep_2_last_name: string;
-	dame_legal_rep_2_email: string;
-	dame_legal_rep_2_phone: string;
-	dame_legal_rep_2_address_1: string;
-	dame_legal_rep_2_address_2: string;
-	dame_legal_rep_2_postal_code: string;
-	dame_legal_rep_2_city: string;
-	dame_legal_rep_2_profession: string;
-	dame_legal_rep_2_date_naissance: string;
-	dame_legal_rep_2_commune_naissance: string;
-	dame_health_questionnaire: string;
-	dame_refuses_comms: boolean;
-	dame_legal_rep_1_refuses_comms: boolean;
-	dame_legal_rep_2_refuses_comms: boolean;
-	signature_image: string;
-	health_honor_consent: boolean;
-	parental_consent: boolean;
-}
+export type { PreInscriptionFormData };
 
 export function usePreInscriptionForm() {
 	const clothingSizes = [
