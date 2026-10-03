@@ -1,7 +1,4 @@
-import type {
-	AssociatedMember,
-	MemberIdentity as Identity,
-} from 'dame-types';
+import type { AssociatedMember, MemberIdentity as Identity } from 'dame-types';
 
 export type { AssociatedMember, Identity };
 

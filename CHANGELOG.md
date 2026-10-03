@@ -6,7 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [1.8.1] - 2026-10-01
+- **Modernisation WordPress 7.1, Directives Globales & QA Pré-Packaging (`AGENTS.md`, `scripts/package.cjs`, `pwa/src/stores/auth.ts`, `package.json`)** :
+  - **Contrôle Qualité Pré-Packaging Automatisé** : Intégration de la validation systématique de la suite QA (`type-check`, `lint`, `test:unit`, `phpstan`) avant génération de l'archive de production dans `scripts/package.cjs`.
+  - **Nettoyage & Synchronisation du Cache TanStack Query** : Purge systématique et complète des requêtes en cache (`queryClient.clear()`) lors de la déconnexion utilisateur (`logout()`) dans le store `auth`.
+  - **Directives de Développement & Options API** : Déclaration formelle des règles WP 7.1 (`autoload => false` sur les options volumineuses), PSR-4 / PHP 8.4 strict et harmonisation des scripts npm pour les exécutions CI/CD (`vitest run`).
 
 - **Harmonisation et Typage Strict avec le package partagé `dame-types` (`stores/`, `composables/`, `views/`, `package.json`)** :
   - **Stores Pinia & Contrats de Données** : Alignement de `benevolat.ts` (`Benevolat`, `BenevolatDay`, `BenevolatTimeSlot`, `BenevolatReponse`), `agenda.ts` (`AgendaEvent`, `AgendaEventCategory`) et `auth/types.ts` (`MemberIdentity as Identity`, `AssociatedMember`) pour consommer directement les types exposés par `dame-types`.

@@ -25,6 +25,23 @@ if (!versionMatch) {
 const version = versionMatch[1].trim();
 console.log(`ℹ️  Version détectée : ${version}`);
 
+// Contrôle Qualité Pré-Packaging
+console.log('🔍 Exécution des contrôles qualité pré-packaging...');
+try {
+    console.log('  → TypeCheck (Vue / TypeScript)...');
+    execSync('npm run type-check', { cwd: rootDir, stdio: 'inherit' });
+    console.log('  → ESLint...');
+    execSync('npm run lint', { cwd: rootDir, stdio: 'inherit' });
+    console.log('  → Vitest (Tests unitaires)...');
+    execSync('npm run test:unit', { cwd: rootDir, stdio: 'inherit' });
+    console.log('  → PHPStan...');
+    execSync('vendor/bin/phpstan analyze --debug --memory-limit=2G', { cwd: rootDir, stdio: 'inherit' });
+    console.log('✅ Suite QA validée avec succès.\n');
+} catch (qaErr) {
+    console.error('❌ Erreur : La suite QA a échoué. Packaging interrompu.');
+    process.exit(1);
+}
+
 const zipName = `${pluginSlug}-v${version}.zip`;
 const tempDestDir = path.join(buildDir, pluginSlug);
 
