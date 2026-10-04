@@ -16,9 +16,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Composables & Formulaires de Préinscription** : Typage strict de `usePreInscriptionForm.ts` et `usePreInscriptionApi.ts` avec `PreInscriptionFormData`, `PreInscriptionDTOData` et substitution des chaînes magiques par les énumérations partagées (`Gender`, `GenderType`).
   - **Vues & Composants** : Alignement des composants d'agenda, bénévolat et vue adhérent (`MemberDetailPage.vue`) sur les types stricts partagés sans `any` ni interfaces locales dupliquées.
 
-- **Optimisation des imports CSS de `eg-chessboard` (Passage à l'import granulaire) (`Chessboard.vue`, `CHANGELOG.md`)** :
-  - **Remplacement de l'import monolithique** : Abandon de l'import global `eg-chessboard/style.css` (~466 kB) au profit de la structure de base modulaire `eg-chessboard/base.css` et de l'import ciblé des 10 jeux de pièces supportés dans l'application (`cburnett`, `merida`, `alpha`, `cardinal`, `dubrovny`, `fantasy`, `firi`, `maestro`, `staunty`, `tatiana`).
-  - **Allégement du bundle CSS** : Réduction du poids des feuilles de style compilées et amélioration des performances de chargement.
+- **Intégration du bundle de styles standardisé de `eg-chessboard` (`Chessboard.vue`, `CHANGELOG.md`)** :
+  - **Adoption du bundle CSS unifié** : Remplacement des imports modulaires fragmentés par l'import standardisé `import 'eg-chessboard/style.css'`, intégrant nativement la structure de base, les thèmes et les 10 jeux de pièces avec SVGs inlinés en Data-URIs base64.
+  - **Maintenance et simplification** : Centralisation des styles de l'échiquier dans le wrapper maître `<Chessboard>` et élimination des multiples imports CSS redondants.
 
 - **Intégration du flux de confirmation par courriel en Préinscription (`PreInscriptionPage.vue`, `usePreInscriptionApi.ts`, `USING.md`)** :
   - **Prise en charge du courriel de confirmation** : Les soumissions de préinscription depuis la PWA (nouvelle demande ou modification) déclenchent désormais l'envoi d'un courriel d'accusé de réception automatique à l'adhérent et à ses représentants légaux, intégrant le rappel des modalités de paiement (HelloAsso) et les documents PDF complétés et signés électroniquement.
