@@ -440,6 +440,7 @@ export const useAuthStore = defineStore(
 			localStorage.removeItem( 'dame_jwt_token' );
 			localStorage.removeItem( 'dame_user' );
 			localStorage.removeItem( 'dame_selected_identity' );
+			queryClient.clear();
 			useAgendaStore().clearData();
 			useContactStore().clearData();
 			useDashboardStore().clearData();

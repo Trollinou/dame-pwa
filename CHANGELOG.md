@@ -6,16 +6,19 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [1.8.1] - 2026-10-01
+- **Modernisation WordPress 7.1, Directives Globales & QA Pré-Packaging (`AGENTS.md`, `scripts/package.cjs`, `pwa/src/stores/auth.ts`, `package.json`)** :
+  - **Contrôle Qualité Pré-Packaging Automatisé** : Intégration de la validation systématique de la suite QA (`type-check`, `lint`, `test:unit`, `phpstan`) avant génération de l'archive de production dans `scripts/package.cjs`.
+  - **Nettoyage & Synchronisation du Cache TanStack Query** : Purge systématique et complète des requêtes en cache (`queryClient.clear()`) lors de la déconnexion utilisateur (`logout()`) dans le store `auth`.
+  - **Directives de Développement & Options API** : Déclaration formelle des règles WP 7.1 (`autoload => false` sur les options volumineuses), PSR-4 / PHP 8.4 strict et harmonisation des scripts npm pour les exécutions CI/CD (`vitest run`).
 
 - **Harmonisation et Typage Strict avec le package partagé `dame-types` (`stores/`, `composables/`, `views/`, `package.json`)** :
   - **Stores Pinia & Contrats de Données** : Alignement de `benevolat.ts` (`Benevolat`, `BenevolatDay`, `BenevolatTimeSlot`, `BenevolatReponse`), `agenda.ts` (`AgendaEvent`, `AgendaEventCategory`) et `auth/types.ts` (`MemberIdentity as Identity`, `AssociatedMember`) pour consommer directement les types exposés par `dame-types`.
   - **Composables & Formulaires de Préinscription** : Typage strict de `usePreInscriptionForm.ts` et `usePreInscriptionApi.ts` avec `PreInscriptionFormData`, `PreInscriptionDTOData` et substitution des chaînes magiques par les énumérations partagées (`Gender`, `GenderType`).
   - **Vues & Composants** : Alignement des composants d'agenda, bénévolat et vue adhérent (`MemberDetailPage.vue`) sur les types stricts partagés sans `any` ni interfaces locales dupliquées.
 
-- **Optimisation des imports CSS de `eg-chessboard` (Passage à l'import granulaire) (`Chessboard.vue`, `CHANGELOG.md`)** :
-  - **Remplacement de l'import monolithique** : Abandon de l'import global `eg-chessboard/style.css` (~466 kB) au profit de la structure de base modulaire `eg-chessboard/base.css` et de l'import ciblé des 10 jeux de pièces supportés dans l'application (`cburnett`, `merida`, `alpha`, `cardinal`, `dubrovny`, `fantasy`, `firi`, `maestro`, `staunty`, `tatiana`).
-  - **Allégement du bundle CSS** : Réduction du poids des feuilles de style compilées et amélioration des performances de chargement.
+- **Intégration du bundle de styles standardisé de `eg-chessboard` (`Chessboard.vue`, `CHANGELOG.md`)** :
+  - **Adoption du bundle CSS unifié** : Remplacement des imports modulaires fragmentés par l'import standardisé `import 'eg-chessboard/style.css'`, intégrant nativement la structure de base, les thèmes et les 10 jeux de pièces avec SVGs inlinés en Data-URIs base64.
+  - **Maintenance et simplification** : Centralisation des styles de l'échiquier dans le wrapper maître `<Chessboard>` et élimination des multiples imports CSS redondants.
 
 - **Intégration du flux de confirmation par courriel en Préinscription (`PreInscriptionPage.vue`, `usePreInscriptionApi.ts`, `USING.md`)** :
   - **Prise en charge du courriel de confirmation** : Les soumissions de préinscription depuis la PWA (nouvelle demande ou modification) déclenchent désormais l'envoi d'un courriel d'accusé de réception automatique à l'adhérent et à ses représentants légaux, intégrant le rappel des modalités de paiement (HelloAsso) et les documents PDF complétés et signés électroniquement.

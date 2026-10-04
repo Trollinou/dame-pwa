@@ -11,12 +11,7 @@ import type {
 	BenevolatReponse,
 } from 'dame-types';
 
-export type {
-	Benevolat,
-	BenevolatDay,
-	BenevolatTimeSlot,
-	BenevolatReponse,
-};
+export type { Benevolat, BenevolatDay, BenevolatTimeSlot, BenevolatReponse };
 
 export const useBenevolatStore = defineStore( 'benevolat', () => {
 	const authStore = useAuthStore();
