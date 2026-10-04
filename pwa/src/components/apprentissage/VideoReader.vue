@@ -75,7 +75,7 @@
 
     <!-- Footer Fixe Unifié SeriesCardFooter (Carte 1/1 - masqué si plein écran immersif) -->
     <SeriesCardFooter
-      v-show="!isImmersiveFullscreen"
+      v-if="!isImmersiveFullscreen"
       :currentCard="1"
       :totalCards="1"
       :isSolved="estValide"

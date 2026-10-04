@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-04
+
 - **Modernisation WordPress 7.1, Directives Globales & QA Pré-Packaging (`AGENTS.md`, `scripts/package.cjs`, `pwa/src/stores/auth.ts`, `package.json`)** :
   - **Contrôle Qualité Pré-Packaging Automatisé** : Intégration de la validation systématique de la suite QA (`type-check`, `lint`, `test:unit`, `phpstan`) avant génération de l'archive de production dans `scripts/package.cjs`.
   - **Nettoyage & Synchronisation du Cache TanStack Query** : Purge systématique et complète des requêtes en cache (`queryClient.clear()`) lors de la déconnexion utilisateur (`logout()`) dans le store `auth`.

@@ -48,7 +48,8 @@ export default defineConfig( {
 		vue( {
 			template: {
 				compilerOptions: {
-					isCustomElement: ( tag ) => tag.startsWith( 'cg-' ),
+					isCustomElement: ( tag ) =>
+						tag.startsWith( 'cg-' ) || tag === 'piece',
 				},
 			},
 		} ),

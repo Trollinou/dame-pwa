@@ -1,4 +1,4 @@
-import { ref, computed, onUnmounted } from 'vue';
+import { ref, computed, onUnmounted, getCurrentInstance } from 'vue';
 
 interface YouTubePlayerInstance {
 	destroy: () => void;
@@ -364,9 +364,11 @@ export function useYouTubePlayer( options: UseYouTubePlayerOptions = {} ) {
 		window.addEventListener( 'message', handleWindowMessage );
 	}
 
-	onUnmounted( () => {
-		destroyPlayer();
-	} );
+	if ( getCurrentInstance() ) {
+		onUnmounted( () => {
+			destroyPlayer();
+		} );
+	}
 
 	const canValidate = computed( () => {
 		return hasReachedThreshold.value || isEnded.value || !! apiError.value;
