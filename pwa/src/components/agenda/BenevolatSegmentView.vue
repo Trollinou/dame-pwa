@@ -34,6 +34,12 @@
                 </ion-label>
                 <div slot="end" style="display: flex; align-items: center; gap: 8px;">
                   <ion-badge
+                    v-if="unreadStore.isBenevolatUnread(benevolat)"
+                    color="danger"
+                  >
+                    Nouveau
+                  </ion-badge>
+                  <ion-badge
                     v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode"
                     color="success"
                   >
@@ -119,6 +125,7 @@ import {
 import { handRightOutline } from 'ionicons/icons';
 import { useBenevolatStore, type Benevolat } from '@/stores/benevolat';
 import { useAuthStore } from '@/stores/auth';
+import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
 import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
@@ -126,6 +133,7 @@ import BenevolatDetailContent from '@/components/agenda/detail/BenevolatDetailCo
 
 const benevolatStore = useBenevolatStore();
 const authStore = useAuthStore();
+const unreadStore = useUnreadStore();
 const { isTabletLandscape } = useIsTabletLandscape();
 
 const props = defineProps<{
@@ -173,7 +181,11 @@ const autoSelectFirst = () => {
     const exists = all.some((b) => b.id === selectedBenevolatId.value);
     if (!exists) {
       // Priorité au premier appel en cours, sinon au premier terminé
-      selectedBenevolatId.value = openBenevolats.value[0]?.id || finishedBenevolats.value[0]?.id || null;
+      const first = openBenevolats.value[0] || finishedBenevolats.value[0];
+      selectedBenevolatId.value = first?.id || null;
+      if (isTabletLandscape.value && first) {
+        unreadStore.markBenevolatAsSeen(first.id, first.modified);
+      }
     }
   } else {
     selectedBenevolatId.value = null;
@@ -182,6 +194,7 @@ const autoSelectFirst = () => {
 
 const handleBenevolatClick = (benevolat: Benevolat) => {
   selectedBenevolatId.value = benevolat.id;
+  unreadStore.markBenevolatAsSeen(benevolat.id, benevolat.modified);
   if (!isTabletLandscape.value) {
     emit('view-benevolat', benevolat);
   }
@@ -227,25 +240,3 @@ onMounted(() => {
   autoSelectFirst();
 });
 </script>
-
-<style scoped>
-.benevolat-item {
-  border-radius: 8px;
-  margin-bottom: 4px;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.benevolat-item.is-active {
-  --background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.12);
-  border-left: 4px solid var(--ion-color-primary, #3880ff);
-  font-weight: 600;
-}
-
-.finished-item {
-  opacity: 0.75;
-}
-
-ion-list-header ion-label {
-  font-weight: bold;
-}
-</style>

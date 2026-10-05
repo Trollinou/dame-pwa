@@ -3,22 +3,46 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>{{ pageTitle }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            v-if="hasUnreadInCurrentSegment"
+            @click="markCurrentSegmentAsRead"
+            title="Tout marquer comme lu"
+          >
+            <ion-icon slot="icon-only" :icon="checkmarkDoneOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
 
       <!-- Sous-navigation (Segment) -->
       <ion-toolbar>
         <ion-segment :value="selectedSegment" @ionChange="onSegmentChange($event.detail.value as string, loadTabContent)">
           <ion-segment-button value="actualites">
-            <ion-label>Actualités</ion-label>
+            <ion-label class="segment-label-wrapper">
+              Actualités
+              <ion-badge v-if="unreadStore.newsUnreadCount > 0" color="danger" class="segment-badge">
+                {{ unreadStore.newsUnreadCount }}
+              </ion-badge>
+            </ion-label>
           </ion-segment-button>
           <ion-segment-button value="agenda">
             <ion-label>Agenda</ion-label>
           </ion-segment-button>
           <ion-segment-button value="tournois">
-            <ion-label>Tournois</ion-label>
+            <ion-label class="segment-label-wrapper">
+              Tournois
+              <ion-badge v-if="unreadStore.tournamentsUnreadCount > 0" color="danger" class="segment-badge">
+                {{ unreadStore.tournamentsUnreadCount }}
+              </ion-badge>
+            </ion-label>
           </ion-segment-button>
           <ion-segment-button value="benevolat">
-            <ion-label>Bénévolat</ion-label>
+            <ion-label class="segment-label-wrapper">
+              Bénévolat
+              <ion-badge v-if="unreadStore.benevolatsUnreadCount > 0" color="danger" class="segment-badge">
+                {{ unreadStore.benevolatsUnreadCount }}
+              </ion-badge>
+            </ion-label>
           </ion-segment-button>
         </ion-segment>
       </ion-toolbar>
@@ -96,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch, defineAsyncComponent } from 'vue';
+import { ref, computed, nextTick, watch, defineAsyncComponent } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -108,10 +132,13 @@ import {
   IonSegmentButton,
   IonLabel,
   IonIcon,
+  IonBadge,
+  IonButtons,
+  IonButton,
   onIonViewWillEnter,
   type InfiniteScrollCustomEvent
 } from '@ionic/vue';
-import { listOutline, calendarOutline } from 'ionicons/icons';
+import { listOutline, calendarOutline, checkmarkDoneOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
 
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
@@ -119,6 +146,7 @@ import { useTournamentStore } from '@/stores/tournament';
 import { useBenevolatStore, type Benevolat } from '@/stores/benevolat';
 import { useAuthStore } from '@/stores/auth';
 import { useNewsStore } from '@/stores/news';
+import { useUnreadStore } from '@/stores/unread';
 import { storeToRefs } from 'pinia';
 import { useAgendaSearch } from '@/composables/agenda/useAgendaSearch';
 
@@ -134,6 +162,7 @@ const agendaStore = useAgendaStore();
 const tournamentStore = useTournamentStore();
 const benevolatStore = useBenevolatStore();
 const newsStore = useNewsStore();
+const unreadStore = useUnreadStore();
 
 const { events, isLoading, hasMoreUpcoming, hasMorePast, upcomingPage, pastPage } = storeToRefs(agendaStore);
 const { selectedSegment, searchQuery, pageTitle, searchPlaceholder, onSegmentChange } = useAgendaSearch();
@@ -141,6 +170,23 @@ const { selectedSegment, searchQuery, pageTitle, searchPlaceholder, onSegmentCha
 const contentRef = ref();
 const todayStr = agendaStore.getTodayLocal();
 const tournamentError = ref<string | null>(null);
+
+const hasUnreadInCurrentSegment = computed(() => {
+  if (selectedSegment.value === 'actualites') {
+    return unreadStore.newsUnreadCount > 0;
+  }
+  if (selectedSegment.value === 'tournois') {
+    return unreadStore.tournamentsUnreadCount > 0;
+  }
+  if (selectedSegment.value === 'benevolat') {
+    return unreadStore.benevolatsUnreadCount > 0;
+  }
+  return false;
+});
+
+const markCurrentSegmentAsRead = () => {
+  unreadStore.markAllAsSeen(selectedSegment.value);
+};
 
 // Persistance du mode de vue Agenda dans localStorage (Défaut: 'calendar')
 const STORAGE_KEY = 'dame_agenda_view_mode';
@@ -159,21 +205,22 @@ const changeAgendaViewMode = (mode: 'list' | 'calendar') => {
   }
 };
 
-
-
 const goToDetail = (id: number) => {
   router.push('/agenda/' + id);
 };
 
 const goToTournamentDetail = (id: number) => {
+  unreadStore.markTournamentAsSeen(id);
   router.push(`/page/${id}`);
 };
 
 const goToNewsDetail = (id: number) => {
+  unreadStore.markNewsAsSeen(id);
   router.push('/news/' + id);
 };
 
 const viewBenevolat = (benevolat: Benevolat) => {
+  unreadStore.markBenevolatAsSeen(benevolat.id, benevolat.modified);
   if (authStore.adminMode) {
     router.push('/admin/benevolat/' + benevolat.id);
   } else {
@@ -353,10 +400,3 @@ onIonViewWillEnter(async () => {
   }
 });
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-</style>

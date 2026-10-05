@@ -270,31 +270,3 @@ const passerCarteSuivante = () => {
   }
 };
 </script>
-
-<style scoped>
-.target-piece-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 8px;
-}
-
-.target-piece-chip {
-  background: var(--ion-color-light-tint, #f4f5f8);
-  border: 1px solid var(--ion-color-light-shade, #e0e0e0);
-  padding: 4px 12px;
-  height: auto;
-  border-radius: 20px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.piece-chip-label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--ion-color-dark, #222222);
-}
-</style>
-

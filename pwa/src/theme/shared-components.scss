@@ -1,7 +1,31 @@
 /**
- * Styles partagés et normalisés pour les composants interactifs DAME PWA.
- * Architecture simplifiée (KISS) & Mobile First Portrait.
+ * Styles unifiés et normalisés pour DAME PWA.
+ * Architecture KISS en 3 groupes : Public, Apprentissage, Administration + Fondations Core.
  */
 
+/* ==========================================================================
+   0. Fondations Core & Transverses
+   ========================================================================== */
+@use './core/base';
+@use './core/club-badges';
+@use './core/datatable';
+@use './core/chessboard';
+@use './core/shared';
+
+/* ==========================================================================
+   1. Groupe Public & Vitrine / Joueur
+   ========================================================================== */
+@use './public/public-layout';
+@use './public/public-components';
+
+/* ==========================================================================
+   2. Groupe Apprentissage & Exercices
+   ========================================================================== */
 @use './learning/learning-layout';
 @use './learning/learning-components';
+
+/* ==========================================================================
+   3. Groupe Administration & Gestion Club
+   ========================================================================== */
+@use './admin/admin-layout';
+@use './admin/admin-components';

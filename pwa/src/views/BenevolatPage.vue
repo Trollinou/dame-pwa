@@ -230,10 +230,3 @@ onIonViewWillEnter(() => {
   benevolatStore.fetchBenevolatsData();
 });
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-</style>

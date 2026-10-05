@@ -1,0 +1,1211 @@
+/**
+ * Composants unifiés et normalisés pour le groupe Public & Vitrine / Joueur.
+ * Architecture KISS & Centralisée.
+ */
+
+/* ==========================================================================
+   1. Vitrine, Accueil & Actualités
+   ========================================================================== */
+
+.dashboard-section {
+  margin-top: 10px;
+}
+
+.news-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .featured-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+}
+
+.multiline-large-title {
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.cta-container {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  color: var(--ion-color-primary);
+  font-weight: 600;
+
+  .cta-text {
+    margin-right: 5px;
+  }
+}
+
+.offline-banner {
+  background: var(--ion-color-warning);
+  color: var(--ion-color-warning-contrast);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+/* Détails des actualités */
+.news-detail-content {
+  width: 100%;
+
+  .detail-image {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .detail-header {
+    margin-bottom: 16px;
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      line-height: 1.25;
+    }
+
+    .detail-date {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ion-color-medium);
+      font-size: 0.85rem;
+    }
+  }
+
+  .detail-lead {
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ion-color-step-800, #333333);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ion-color-step-150, #e0e0e0);
+  }
+
+  .detail-body {
+    line-height: 1.65;
+    font-size: 0.95rem;
+
+    p {
+      margin-bottom: 12px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+  }
+}
+
+/* ==========================================================================
+   2. Agenda, Événements & Bénévolat
+   ========================================================================== */
+
+.agenda-items-list {
+  margin-top: 8px;
+}
+
+.agenda-item {
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    --background: var(--ion-color-step-50, #f8f8f8);
+  }
+}
+
+.agenda-date-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 4px;
+  background: var(--ion-color-primary-tint, #e8f0fe);
+  border-radius: 8px;
+  margin-right: 12px;
+
+  .badge-day {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ion-color-primary, #3880ff);
+    line-height: 1;
+  }
+
+  .badge-month {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ion-color-primary-shade, #2f6cdb);
+    line-height: 1;
+    margin-top: 2px;
+  }
+}
+
+.benevolat-item {
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    --background: var(--ion-color-step-50, #f8f8f8);
+  }
+}
+
+/* Calendrier interactif */
+.calendar-day-cell {
+  &.other-month {
+    opacity: 0.35;
+  }
+
+  &.is-today {
+    font-weight: 700;
+
+    .calendar-day-num {
+      color: var(--ion-color-primary, #3880ff);
+    }
+  }
+
+  &.is-selected {
+    background: var(--ion-color-primary, #3880ff);
+    color: #ffffff !important;
+
+    .calendar-day-num {
+      color: #ffffff !important;
+      font-weight: 700;
+    }
+
+    .event-dot {
+      background: #ffffff !important;
+    }
+  }
+
+  &.has-events:not(.is-selected) {
+    background: var(--ion-color-step-50, #f9f9f9);
+  }
+
+  .calendar-day-num {
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+}
+
+.event-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ion-color-primary, #3880ff);
+
+  &.tournament {
+    background: var(--ion-color-warning, #ffc409);
+  }
+
+  &.animation {
+    background: var(--ion-color-success, #2dd36f);
+  }
+
+  &.general {
+    background: var(--ion-color-primary, #3880ff);
+  }
+}
+
+/* Contenu détaillé Événement Agenda */
+.agenda-detail-content {
+  width: 100%;
+
+  .event-main-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    line-height: 1.25;
+  }
+
+  .event-meta-card {
+    background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+    border-radius: 12px;
+    border: 1px solid var(--ion-color-step-150, #e0e0e0);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+
+    .meta-icon {
+      font-size: 1.1rem;
+      color: var(--ion-color-primary, #3880ff);
+      flex-shrink: 0;
+    }
+
+    .meta-text {
+      color: var(--ion-color-step-800, #333333);
+    }
+  }
+
+  .event-description {
+    line-height: 1.65;
+    font-size: 0.95rem;
+
+    p {
+      margin-bottom: 12px;
+    }
+  }
+}
+
+/* ==========================================================================
+   3. Tournois
+   ========================================================================== */
+
+.tournament-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .card-icon-container {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+  }
+}
+
+.tournaments-list {
+  background: transparent;
+}
+
+.tournament-item {
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    --background: var(--ion-color-step-50, #f8f8f8);
+  }
+}
+
+/* Détail Tournoi */
+.tournament-detail-content {
+  width: 100%;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    line-height: 1.25;
+  }
+
+  .tournament-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .info-item {
+    background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+    border-radius: 8px;
+    border: 1px solid var(--ion-color-step-150, #e0e0e0);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .info-label {
+    font-size: 0.75rem;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .info-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ion-color-step-800, #222222);
+  }
+
+  .detail-body {
+    line-height: 1.65;
+    font-size: 0.95rem;
+
+    p {
+      margin-bottom: 12px;
+    }
+  }
+}
+
+/* ==========================================================================
+   4. Jeu & Barre d'Information (PlayInfoBar, PlayActionsPanel)
+   ========================================================================== */
+
+.game-meta-card {
+  background: var(--ion-card-background, #ffffff);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ion-color-step-100, #e9ecef);
+}
+
+.meta-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ion-text-color, #111827);
+  letter-spacing: -0.2px;
+}
+
+.game-type-subtitle {
+  font-size: 0.78rem;
+  color: var(--ion-color-primary, #3880ff);
+  font-weight: 600;
+  margin: 2px 0 0 0;
+}
+
+.meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.elo-badge {
+  background: var(--ion-color-primary, #3880ff);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+
+  &.local-badge {
+    background: var(--ion-color-secondary, #3dc2ff);
+  }
+}
+
+.level-label {
+  font-size: 0.72rem;
+  color: var(--ion-color-step-600, #6b7280);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* Panneau d'actions & statuts */
+.message-zone {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-banner {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  &.warning {
+    background: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.15);
+    color: #b45309;
+    border: 1px solid rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.4);
+  }
+
+  &.danger {
+    background: rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.12);
+    color: var(--ion-color-danger, #eb445a);
+    border: 1px solid rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.3);
+  }
+
+  &.medium {
+    background: var(--ion-color-step-100, #f3f4f6);
+    color: var(--ion-color-step-800, #1f2937);
+    border: 1px solid var(--ion-color-step-200, #e5e7eb);
+  }
+}
+
+.status-placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ion-color-step-600, #6b7280);
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--ion-color-step-50, #f9fafb);
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--ion-color-step-100, #f3f4f6);
+}
+
+.turn-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+
+  &.white {
+    background: #ffffff;
+    border: 1.5px solid #4b5563;
+  }
+
+  &.black {
+    background: #111827;
+    border: 1.5px solid #111827;
+  }
+}
+
+.actions-row {
+  margin: 0 -4px;
+
+  ion-col {
+    padding: 0 4px;
+  }
+}
+
+.action-btn {
+  --border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  height: 38px;
+  margin: 0;
+  --padding-start: 6px;
+  --padding-end: 6px;
+
+  ion-icon {
+    font-size: 1rem;
+    margin-right: 4px;
+  }
+}
+
+.btn-counter-badge {
+  font-size: 0.65rem;
+  padding: 2px 5px;
+  margin-left: 4px;
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   5. Analyse & Échiquier (AnalysisPage)
+   ========================================================================== */
+
+.analysis-meta-card {
+  background: var(--ion-card-background, #ffffff);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ion-color-step-100, #e9ecef);
+}
+
+.ply-badge {
+  background: var(--ion-color-tertiary, #7044ff);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+.move-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.move-table-row {
+  display: flex;
+  border-bottom: 1px solid var(--ion-color-light);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.move-group {
+  display: flex;
+  flex: 1;
+  padding: 8px 4px;
+  align-items: center;
+  font-family: monospace;
+  font-size: 0.9rem;
+  border-right: 1px solid var(--ion-color-light);
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.move-num {
+  color: var(--ion-color-medium);
+  font-weight: bold;
+  width: 25px;
+  text-align: right;
+  margin-right: 4px;
+  font-size: 0.75rem;
+}
+
+.move-san {
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+
+  &.active-move {
+    background: var(--ion-color-tertiary);
+    color: #fff;
+    font-weight: bold;
+  }
+
+  &.empty {
+    cursor: default;
+  }
+}
+
+.chess-piece-symbol {
+  font-size: 1.3em !important;
+  font-weight: bold !important;
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   6. Profil Joueur & Personnalisation (ProfilePage, ChessThemeCustomizer)
+   ========================================================================== */
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0 4px;
+  text-align: center;
+
+  .avatar-container {
+    margin-bottom: 6px;
+  }
+
+  .avatar-icon {
+    font-size: 60px;
+    color: var(--ion-color-step-350, #8a8a8f);
+  }
+
+  h2 {
+    font-weight: 700;
+    margin: 0 0 2px 0;
+    font-size: 20px;
+  }
+
+  .email {
+    color: var(--ion-color-step-600, #666);
+    margin: 0 0 6px 0;
+    font-size: 13px;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.badge-admin {
+    background-color: var(--ion-color-danger-light, #ffdae0);
+    color: var(--ion-color-danger, #eb445a);
+  }
+
+  &.badge-rep {
+    background-color: var(--ion-color-warning-light, #ffd59a);
+    color: var(--ion-color-warning-shade, #b58000);
+  }
+
+  &.badge-member {
+    background-color: var(--ion-color-primary-light, #d2e3fc);
+    color: var(--ion-color-primary, #3880ff);
+  }
+}
+
+.admin-access-card {
+  background: rgba(0, 115, 170, 0.04);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid rgba(0, 115, 170, 0.22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.admin-access-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  h3 {
+    margin: 0 0 2px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ion-color-primary-shade, #006596);
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ion-color-step-600, #666);
+  }
+}
+
+.admin-icon {
+  font-size: 28px;
+  color: var(--ion-color-primary, #0073aa);
+  flex-shrink: 0;
+}
+
+.admin-btn {
+  --min-height: 48px;
+  --border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 14px;
+}
+
+.info-card {
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: 14px;
+  border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 12px;
+
+  ion-icon {
+    font-size: 18px;
+  }
+}
+
+.elo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  text-align: center;
+}
+
+.elo-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--ion-color-light, #f4f5f8);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.elo-label {
+  font-size: 11px;
+  color: var(--ion-color-step-600, #666);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.elo-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ion-color-dark, #000);
+}
+
+.associated-member-item {
+  --background: var(--ion-color-light, #f4f5f8);
+  --border-radius: 8px;
+  margin-bottom: 6px;
+  --min-height: 44px;
+}
+
+.member-icon {
+  color: var(--ion-color-medium);
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.identity-btn {
+  --min-height: 48px;
+  --border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.logout-btn {
+  --min-height: 48px;
+  --border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  --border-width: 1.5px;
+  margin-top: 0;
+}
+
+.system-card {
+  margin-top: 24px;
+  margin-bottom: 32px;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: 14px;
+  border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.system-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.system-icon {
+  font-size: 26px;
+  color: var(--ion-color-medium, #8a8a8f);
+  flex-shrink: 0;
+}
+
+.system-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 2px 0;
+  color: var(--ion-color-dark, #222);
+}
+
+.system-version {
+  font-size: 12px;
+  color: var(--ion-color-step-600, #666);
+  margin: 0;
+}
+
+.system-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Personnalisateur de Thème d'Échiquier */
+.chess-theme-customizer {
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: 14px;
+  border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.customizer-header {
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ion-color-dark, #1f1f1f);
+  }
+}
+
+.header-text {
+  flex: 1;
+
+  p {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: var(--ion-color-step-600, #666);
+    line-height: 1.35;
+  }
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.header-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.chevron-icon {
+  font-size: 18px;
+  color: var(--ion-color-step-600, #666);
+  transition: transform 0.25s ease;
+
+  &.is-rotated {
+    transform: rotate(180deg);
+  }
+}
+
+.summary-text {
+  font-size: 12.5px;
+}
+
+.summary-pill {
+  color: var(--ion-color-primary, #0073aa);
+  font-weight: 600;
+}
+
+.customizer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 4px;
+  animation: customizerFadeIn 0.2s ease-in-out;
+}
+
+@keyframes customizerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.customizer-save-btn {
+  --min-height: 48px;
+  --border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Double Rouleau Compact */
+.wheel-picker-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--ion-color-light, #f4f5f8);
+  border: 1px solid var(--ion-color-step-150, #e9ecef);
+  border-radius: 10px;
+  padding: 8px 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.wheel-headers {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 4px;
+  padding: 0 10px;
+}
+
+.wheel-header-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ion-color-step-700, #444);
+}
+
+.badge-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.wheel-columns-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 108px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 25%,
+    black 75%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 25%,
+    black 75%,
+    transparent 100%
+  );
+}
+
+.wheel-highlight-lens {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: var(--ion-color-primary-light, #e8f0fe);
+  border-radius: 8px;
+  border: 1px solid rgba(56, 128, 255, 0.2);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wheel-divider {
+  width: 1px;
+  height: 70%;
+  background: var(--ion-color-step-200, #dee2e6);
+  z-index: 2;
+}
+
+.wheel-scroll-col {
+  flex: 1;
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  z-index: 2;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.wheel-padding-top,
+.wheel-padding-bottom {
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.wheel-item {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ion-color-step-600, #777);
+  scroll-snap-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &.is-active {
+    color: var(--ion-color-primary-shade, #1a5cff);
+    font-weight: 700;
+    font-size: 14.5px;
+    transform: scale(1.04);
+  }
+}
+
+/* Prévisualisation de l'échiquier */
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.board-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f0d9b5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+
+  cg-board {
+    border-radius: 0 !important;
+  }
+}
+
+.actions-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.secondary-actions-row {
+  display: flex;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   7. Formulaires & Messages (Login / Register)
+   ========================================================================== */
+
+.redirect-banner {
+  display: flex;
+  align-items: center;
+  background: var(--ion-color-primary-contrast, #f4f5f8);
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 24px;
+  gap: 12px;
+
+  ion-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--ion-color-dark);
+  }
+}
+
+.input-item {
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.error-message {
+  text-align: center;
+  font-size: 0.9em;
+  margin-top: 10px;
+}
+
+.success-message {
+  background: var(--ion-color-success-tint);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ==========================================================================
+   8. Contenu WordPress & Exercices (ContenuPage, GenericPage)
+   ========================================================================== */
+
+.success-card {
+  border-left: 5px solid var(--ion-color-success);
+  margin-top: 16px;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: 8px;
+}
+
+.success-title {
+  color: var(--ion-color-success);
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.success-subtitle {
+  font-size: 1rem;
+  color: var(--ion-color-step-600, #666);
+  margin: 0;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.next-btn {
+  font-weight: 600;
+}
+
+.lecon-content {
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: 8px;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* Transitions de vue */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Rendu HTML WordPress générique */
+.content {
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--ion-color-light);
+    padding: 8px;
+    text-align: left;
+  }
+
+  p {
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+}

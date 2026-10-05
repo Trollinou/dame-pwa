@@ -11,6 +11,9 @@
         <ion-tab-button tab="agenda" href="/tabs/agenda">
           <ion-icon :icon="calendarOutline" />
           <ion-label>Le Club</ion-label>
+          <ion-badge v-if="unreadStore.clubUnreadCount > 0" color="danger" class="tab-badge">
+            {{ unreadStore.clubUnreadCount }}
+          </ion-badge>
         </ion-tab-button>
 
         <ion-tab-button tab="apprentissage" href="/tabs/apprentissage">
@@ -31,6 +34,7 @@
 import { watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { useUnreadStore } from '@/stores/unread';
 import {
   IonPage,
   IonTabs,
@@ -39,6 +43,7 @@ import {
   IonTabButton,
   IonIcon,
   IonLabel,
+  IonBadge,
   onIonViewWillEnter
 } from '@ionic/vue';
 import {
@@ -51,6 +56,7 @@ import {
 
 const route = useRoute();
 const authStore = useAuthStore();
+const unreadStore = useUnreadStore();
 
 const syncState = () => {
   if (route.path.startsWith('/tabs')) {
@@ -70,27 +76,3 @@ watch(
   { immediate: true }
 );
 </script>
-
-<style scoped>
-ion-tab-bar {
-  --border: 0;
-  height: clamp(56px, 6.5vh, 64px);
-}
-
-ion-tab-button {
-  --padding-start: 0px;
-  --padding-end: 0px;
-  min-width: 0;
-}
-
-ion-icon {
-  font-size: clamp(24px, 3vh, 28px);
-}
-
-ion-label {
-  font-size: clamp(11.5px, 1.4vh, 13px);
-  font-weight: 600;
-  letter-spacing: -0.1px;
-  white-space: nowrap;
-}
-</style>

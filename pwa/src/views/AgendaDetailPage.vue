@@ -48,15 +48,3 @@ const agendaStore = useAgendaStore();
 const eventId = computed(() => parseInt(route.params.id as string));
 const event = computed(() => agendaStore.events.find((e) => e.id === eventId.value));
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.multiline-large-title {
-  white-space: normal;
-  line-height: 1.2;
-}
-</style>

@@ -1,0 +1,31 @@
+/**
+ * Styles partagés et normalisés pour les badges de notification et segments Club.
+ */
+
+.segment-label-wrapper {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.segment-badge {
+	font-size: 10px;
+	font-weight: 700;
+	padding: 2px 6px;
+	border-radius: 10px;
+	line-height: 1.2;
+}
+
+.news-subtitle-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.news-unread-badge {
+	font-size: 10px;
+	font-weight: 700;
+	padding: 2px 6px;
+	border-radius: 8px;
+}

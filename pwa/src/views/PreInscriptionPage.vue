@@ -221,39 +221,3 @@ const onDownloadPdf = (type: 'health' | 'parental') => {
   downloadPdf(type, form);
 };
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.form-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding-bottom: 40px;
-}
-
-.info-banner {
-  background: var(--ion-color-light, #f4f5f8);
-  border-left: 4px solid var(--ion-color-primary, #3880ff);
-  border-radius: 8px;
-}
-
-.error-banner {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-weight: 500;
-}
-
-.privacy-disclaimer {
-  font-size: 0.82em;
-  color: var(--ion-color-medium);
-  margin-top: 12px;
-  line-height: 1.4;
-  text-align: center;
-}
-</style>

@@ -1,0 +1,529 @@
+/**
+ * Styles de mise en page (Layout) unifiés pour le groupe Public & Vitrine / Joueur.
+ * Architecture KISS & Mobile First.
+ */
+
+/* ==========================================================================
+   1. Conteneurs de Page & Safe Areas
+   ========================================================================== */
+
+.safe-area-wrapper {
+  padding-left: var(--ion-safe-area-left, 0);
+  padding-right: var(--ion-safe-area-right, 0);
+  width: 100%;
+}
+
+.offline-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+/* ==========================================================================
+   2. Layout Onglets / Tabs (TabsPage)
+   ========================================================================== */
+
+ion-tab-bar {
+  --border: 0;
+  height: clamp(56px, 6.5vh, 64px);
+
+  ion-tab-button {
+    --padding-start: 0px;
+    --padding-end: 0px;
+    min-width: 0;
+
+    ion-icon {
+      font-size: clamp(24px, 3vh, 28px);
+    }
+
+    ion-label {
+      font-size: clamp(11.5px, 1.4vh, 13px);
+      font-weight: 600;
+      letter-spacing: -0.1px;
+      white-space: nowrap;
+    }
+  }
+}
+
+/* ==========================================================================
+   3. Layout Authentification (Login / Register)
+   ========================================================================== */
+
+.login-container {
+  max-width: 400px;
+  margin: 40px auto;
+}
+
+.login-header,
+.register-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h2 {
+    font-weight: 700;
+    font-size: 24px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+  }
+}
+
+.register-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px 10px;
+}
+
+.form-list {
+  background: transparent;
+}
+
+/* ==========================================================================
+   4. Layout Profil & Utilisateur
+   ========================================================================== */
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 40px 20px;
+}
+
+.prompt-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 40px;
+
+  .prompt-icon {
+    font-size: 80px;
+    color: var(--ion-color-primary);
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-weight: 700;
+    margin-bottom: 12px;
+    font-size: 24px;
+  }
+
+  p {
+    color: var(--ion-color-step-600, #666);
+    line-height: 1.5;
+    max-width: 320px;
+    margin: 0;
+  }
+}
+
+/* ==========================================================================
+   5. Layout Contenu & Exercices (ContenuPage)
+   ========================================================================== */
+
+.contenu-ion-content {
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  --padding-start: max(16px, var(--ion-safe-area-left, 0px));
+  --padding-end: max(16px, var(--ion-safe-area-right, 0px));
+
+  &.has-series-footer {
+    --padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px) + var(--ion-safe-area-bottom, 0px));
+  }
+}
+
+.exercice-container {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.spinner-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  padding: 32px 16px;
+}
+
+.exercise-ion-footer {
+  background: var(--ion-background-color, #ffffff);
+  border-top: 1px solid var(--ion-color-step-150, #e0e0e0);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+  padding-top: 8px;
+  padding-bottom: max(16px, calc(12px + env(safe-area-inset-bottom, 0px)), calc(12px + var(--ion-safe-area-bottom, 0px)));
+  padding-left: max(12px, calc(12px + env(safe-area-inset-left, 0px)), calc(12px + var(--ion-safe-area-left, 0px)));
+  padding-right: max(12px, calc(12px + env(safe-area-inset-right, 0px)), calc(12px + var(--ion-safe-area-right, 0px)));
+  box-sizing: border-box;
+
+  &[style*="display: none"] {
+    display: none !important;
+  }
+}
+
+.exercise-footer-portal {
+  width: 100%;
+}
+
+/* ==========================================================================
+   6. Layout Jeu & Analyse (PlayPage / AnalysisPage)
+   ========================================================================== */
+
+.landscape-wrapper {
+  max-width: 100% !important;
+}
+
+.game-layout,
+.analysis-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.analysis-layout {
+  padding-bottom: 10px;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  margin: 0 auto;
+
+  &.landscape-mode {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+.board-section {
+  display: block;
+  width: 100%;
+  padding: 6px 0 10px 0;
+}
+
+.board-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  flex-shrink: 0;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.board-wrapper-with-bar {
+  width: 100%;
+  position: relative;
+}
+
+.side-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 250px;
+  min-height: 0;
+  height: 100%;
+}
+
+.analysis-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+}
+
+.history-controls {
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 5px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  ion-grid {
+    flex: 0 0 auto !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 300px;
+    width: 100%;
+  }
+
+  ion-row {
+    justify-content: center;
+  }
+
+  ion-col {
+    padding: 0 2px !important;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  ion-button {
+    height: 36px !important;
+    margin: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+}
+
+.move-history-container {
+  flex: 1 !important;
+  min-height: 0;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 5px;
+  border: 1px solid var(--ion-color-light-shade);
+  margin-top: 5px;
+}
+
+/* Adaptations Media Queries Jeu & Analyse */
+@media (min-width: 768px) and (orientation: portrait) {
+  .board-container {
+    max-width: min(680px, 58vh);
+  }
+
+  .board-section {
+    padding: 14px 0;
+  }
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+  .board-section {
+    padding-bottom: 5px !important;
+  }
+
+  .analysis-controls {
+    padding-top: 0 !important;
+  }
+}
+
+/* Stabilité Landscape Jeu & Analyse */
+.landscape-mode {
+  .main-wrap,
+  .main-board {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+  }
+
+  .main-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .board-section {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    width: auto;
+    padding: 0;
+  }
+
+  .board-container {
+    width: min(75vh, 50vw) !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    max-width: 100%;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .side-section {
+    max-width: 400px;
+    max-height: 85vh;
+  }
+
+  .analysis-controls {
+    padding: 0;
+  }
+}
+
+/* Optimisation iPhone Paysage */
+@media (max-height: 500px) and (orientation: landscape) {
+  ion-header {
+    display: none !important;
+  }
+
+  .analysis-layout {
+    padding-top: 2px !important;
+    height: 100% !important;
+  }
+
+  .main-container.landscape-mode {
+    align-items: center !important;
+    padding-bottom: 2px !important;
+    gap: 15px;
+  }
+
+  .landscape-mode .board-container {
+    width: 75vh !important;
+    height: 75vh !important;
+  }
+
+  .side-section {
+    min-width: 180px !important;
+    height: 75vh !important;
+    max-height: none;
+  }
+
+  .history-controls {
+    padding: 2px 2px !important;
+
+    ion-grid {
+      flex: 0 0 32px !important;
+      margin-bottom: 2px !important;
+    }
+
+    ion-button {
+      height: 28px !important;
+      margin: 0 !important;
+    }
+  }
+
+  .move-history-container {
+    font-size: 0.75rem !important;
+    margin-top: 2px;
+  }
+
+  .move-group {
+    padding: 4px 2px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .move-num {
+    width: 26px !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* ==========================================================================
+   7. Layout Calendrier & Vue Agenda (AgendaCalendarView)
+   ========================================================================== */
+
+.agenda-calendar-view {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  gap: 12px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.calendar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-grid {
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid var(--ion-color-step-150, #e0e0e0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--ion-color-step-100, #ececec);
+  margin-bottom: 4px;
+}
+
+.calendar-weekday {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ion-color-step-500, #888888);
+  text-transform: uppercase;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 2px;
+}
+
+.calendar-day-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 40px;
+  padding: 4px 2px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.calendar-events-preview {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+  align-items: center;
+  justify-content: center;
+  min-height: 6px;
+}
+
+.calendar-day-detail-panel {
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+  border-radius: 12px;
+  border: 1px solid var(--ion-color-step-150, #e0e0e0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 12px 14px;
+}
+
+.day-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.day-detail-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

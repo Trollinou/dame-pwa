@@ -104,29 +104,3 @@ onIonViewWillEnter(() => {
   }
 });
 </script>
-
-<style scoped>
-ion-menu {
-  --width: 280px;
-}
-
-.menu-item {
-  margin: 8px;
-  --border-radius: 8px;
-}
-
-.menu-item.active {
-  --background: var(--ion-color-primary-light, #d2e3fc);
-  color: var(--ion-color-primary, #3880ff);
-}
-
-.menu-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px;
-  background: var(--ion-background-color, #fff);
-  border-top: 1px solid var(--ion-color-light, #f4f5f8);
-}
-</style>

@@ -135,25 +135,3 @@ onIonViewWillEnter(() => {
   preloadAllData();
 });
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.dashboard-section {
-  margin-top: 10px;
-}
-
-ion-list-header {
-  --color: var(--ion-color-primary);
-  font-weight: bold;
-  font-size: 1.1em;
-}
-
-ion-badge {
-  font-size: 0.9em;
-  padding: 5px 10px;
-}
-</style>

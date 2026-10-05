@@ -24,7 +24,12 @@
                 class="featured-image"
               />
               <ion-card-header class="news-card-header">
-                <ion-card-subtitle>{{ formatDate(post.date) }}</ion-card-subtitle>
+                <div class="news-subtitle-row">
+                  <ion-card-subtitle>{{ formatDate(post.date) }}</ion-card-subtitle>
+                  <ion-badge v-if="unreadStore.isNewsUnread(post)" color="danger" class="news-unread-badge">
+                    Nouveau
+                  </ion-badge>
+                </div>
                 <ion-card-title class="news-card-title" v-safe-html="post.title.rendered"></ion-card-title>
               </ion-card-header>
             </ion-card>
@@ -57,15 +62,18 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardSubtitle,
-  IonCardContent
+  IonCardContent,
+  IonBadge
 } from '@ionic/vue';
 import { useNewsStore, type Post } from '@/stores/news';
+import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
 import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
 import NewsDetailContent from '@/components/agenda/detail/NewsDetailContent.vue';
 
 const newsStore = useNewsStore();
+const unreadStore = useUnreadStore();
 const { isTabletLandscape } = useIsTabletLandscape();
 
 const props = defineProps<{
@@ -96,7 +104,11 @@ const autoSelectFirst = () => {
   if (filteredNews.value.length > 0) {
     const exists = filteredNews.value.some((p) => p.id === selectedPostId.value);
     if (!exists) {
-      selectedPostId.value = filteredNews.value[0].id;
+      const first = filteredNews.value[0];
+      selectedPostId.value = first.id;
+      if (isTabletLandscape.value) {
+        unreadStore.markNewsAsSeen(first.id, first.modified);
+      }
     }
   } else {
     selectedPostId.value = null;
@@ -105,6 +117,7 @@ const autoSelectFirst = () => {
 
 const handlePostClick = (post: Post) => {
   selectedPostId.value = post.id;
+  unreadStore.markNewsAsSeen(post.id, post.modified);
   if (!isTabletLandscape.value) {
     emit('go-to-news-detail', post.id);
   }
@@ -138,36 +151,3 @@ onMounted(() => {
   autoSelectFirst();
 });
 </script>
-
-<style scoped>
-.news-card {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  border: 2px solid transparent;
-}
-
-.news-card.is-active {
-  border-color: var(--ion-color-primary, #3880ff);
-  box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.2);
-  transform: scale(1.01);
-}
-
-.featured-image {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-}
-
-.news-card-header {
-  padding: 10px 14px 14px 14px;
-}
-
-.news-card-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.3;
-  margin-top: 4px;
-}
-</style>

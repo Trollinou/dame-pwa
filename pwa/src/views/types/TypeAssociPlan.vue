@@ -160,35 +160,3 @@ const passerCarteSuivante = () => {
   }
 };
 </script>
-
-<style scoped>
-.exercice-type-associ-plan {
-  width: 100%;
-}
-
-.phase-container {
-  width: 100%;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.phase-container.matching-phase {
-  padding-bottom: 60px;
-}
-
-.pgn-card-wrapper {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-</style>
