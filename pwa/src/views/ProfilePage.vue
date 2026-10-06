@@ -18,13 +18,13 @@
             </div>
             <h2>{{ authStore.selectedIdentity?.name || authStore.user?.name }}</h2>
             <p class="email">{{ authStore.user?.email }}</p>
-            <span class="badge" :class="identityBadgeClass">
+            <span class="dame-badge" :class="identityBadgeClass">
               {{ identityTypeText }}
             </span>
           </div>
 
           <!-- Section administration (si admin) -->
-          <div v-if="authStore.isAdmin" class="admin-access-card">
+          <div v-if="authStore.isAdmin" class="dame-panel">
             <div class="admin-access-content">
               <ion-icon :icon="shieldCheckmarkOutline" color="primary" class="admin-icon"></ion-icon>
               <div>
@@ -36,7 +36,8 @@
               expand="block" 
               color="primary" 
               fill="solid" 
-              class="admin-btn"
+              class="dame-btn-large"
+              style="margin-top: 14px;"
               @click="goToAdmin"
             >
               <ion-icon slot="start" :icon="settingsOutline"></ion-icon>
@@ -45,29 +46,29 @@
           </div>
 
           <!-- Informations & ELO (si adhérent) -->
-          <div v-if="authStore.selectedIdentity?.type === 'member'" class="info-card">
+          <div v-if="authStore.selectedIdentity?.type === 'member'" class="dame-panel">
             <h3 class="card-title">
               <ion-icon :icon="trophyOutline" color="primary"></ion-icon>
               Classements ELO
             </h3>
-            <div class="elo-grid">
-              <div class="elo-item">
-                <span class="elo-label">Standard</span>
-                <span class="elo-val">{{ authStore.selectedIdentity?.elo_standard || 'N/A' }}</span>
+            <div class="dame-stat-grid dame-stat-grid--3col">
+              <div class="dame-stat-box">
+                <span class="dame-stat-label">Standard</span>
+                <span class="dame-stat-value">{{ authStore.selectedIdentity?.elo_standard || 'N/A' }}</span>
               </div>
-              <div class="elo-item">
-                <span class="elo-label">Rapide</span>
-                <span class="elo-val">{{ authStore.selectedIdentity?.elo_rapide || 'N/A' }}</span>
+              <div class="dame-stat-box">
+                <span class="dame-stat-label">Rapide</span>
+                <span class="dame-stat-value">{{ authStore.selectedIdentity?.elo_rapide || 'N/A' }}</span>
               </div>
-              <div class="elo-item">
-                <span class="elo-label">Blitz</span>
-                <span class="elo-val">{{ authStore.selectedIdentity?.elo_blitz || 'N/A' }}</span>
+              <div class="dame-stat-box">
+                <span class="dame-stat-label">Blitz</span>
+                <span class="dame-stat-value">{{ authStore.selectedIdentity?.elo_blitz || 'N/A' }}</span>
               </div>
             </div>
           </div>
 
           <!-- Membres Associés / Famille -->
-          <div v-if="hasAssociatedMembers" class="info-card">
+          <div v-if="hasAssociatedMembers" class="dame-panel">
             <h3 class="card-title">
               <ion-icon :icon="peopleOutline" color="primary"></ion-icon>
               Membres associés
@@ -76,7 +77,7 @@
               <ion-item 
                 v-for="member in authStore.selectedIdentity?.associated_members" 
                 :key="member.member_id"
-                class="associated-member-item"
+                class="dame-list-item"
               >
                 <ion-icon slot="start" :icon="personOutline" class="member-icon"></ion-icon>
                 <ion-label>
@@ -96,7 +97,7 @@
               v-if="hasMultipleIdentities" 
               expand="block" 
               fill="outline" 
-              class="identity-btn"
+              class="dame-btn-large"
               @click="changeIdentity"
             >
               <ion-icon slot="start" :icon="swapHorizontalOutline"></ion-icon>
@@ -108,7 +109,7 @@
               expand="block" 
               color="danger" 
               fill="outline"
-              class="logout-btn"
+              class="dame-btn-large"
               @click="handleLogout"
             >
               <ion-icon slot="start" :icon="logOutOutline"></ion-icon>
@@ -138,7 +139,7 @@
         </div>
 
         <!-- Section Système & Mises à jour PWA -->
-        <div class="system-card">
+        <div class="dame-panel" style="margin-top: 24px; margin-bottom: 32px;">
           <div class="system-info">
             <ion-icon :icon="informationCircleOutline" class="system-icon"></ion-icon>
             <div>
@@ -260,9 +261,9 @@ const identityTypeText = computed(() => {
 
 const identityBadgeClass = computed(() => {
   const type = authStore.selectedIdentity?.type;
-  if (type === 'admin') return 'badge-admin';
-  if (type === 'representative') return 'badge-rep';
-  return 'badge-member';
+  if (type === 'admin') return 'dame-badge--admin';
+  if (type === 'representative') return 'dame-badge--rep';
+  return 'dame-badge--member';
 });
 
 const hasAssociatedMembers = computed(() => {

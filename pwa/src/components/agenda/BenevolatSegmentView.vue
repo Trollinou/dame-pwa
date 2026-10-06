@@ -25,7 +25,7 @@
                 :key="benevolat.id"
                 button
                 @click="handleBenevolatClick(benevolat)"
-                :class="['benevolat-item', { 'is-active': isTabletLandscape && benevolat.id === selectedBenevolatId }]"
+                :class="['dame-list-item', { 'is-active': isTabletLandscape && benevolat.id === selectedBenevolatId }]"
               >
                 <ion-icon slot="start" :icon="handRightOutline" color="primary" class="ion-margin-end"></ion-icon>
                 <ion-label>
@@ -66,7 +66,7 @@
                 :key="benevolat.id"
                 button
                 @click="handleBenevolatClick(benevolat)"
-                :class="['benevolat-item', 'finished-item', { 'is-active': isTabletLandscape && benevolat.id === selectedBenevolatId }]"
+                :class="['dame-list-item', 'finished-item', { 'is-active': isTabletLandscape && benevolat.id === selectedBenevolatId }]"
               >
                 <ion-icon slot="start" :icon="handRightOutline" color="medium" class="ion-margin-end" style="opacity: 0.6;"></ion-icon>
                 <ion-label>

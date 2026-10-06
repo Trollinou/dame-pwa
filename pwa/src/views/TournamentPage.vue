@@ -28,7 +28,7 @@
 
         <div v-else>
           <!-- Message d'avertissement si on affiche des données en cache alors qu'on est hors-ligne -->
-          <div v-if="error && topLevelItems.length > 0" class="offline-banner">
+          <div v-if="error && topLevelItems.length > 0" class="dame-banner dame-banner--warning">
             <ion-icon :icon="cloudOfflineOutline"></ion-icon>
             <span>Mode hors-ligne : Affichage des données en cache</span>
           </div>

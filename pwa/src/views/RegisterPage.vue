@@ -18,11 +18,11 @@
             <p>Réservé aux adhérents et représentants légaux</p>
           </div>
 
-          <div v-if="successMessage" class="success-message ion-padding ion-text-center">
+          <div v-if="successMessage" class="dame-banner dame-banner--success dame-banner--block ion-margin-bottom">
             <ion-icon :icon="checkmarkCircleOutline" color="success" style="font-size: 3rem;"></ion-icon>
             <h3>Inscription réussie !</h3>
             <p>{{ successMessage }}</p>
-            <ion-button expand="block" router-link="/tabs/login" class="ion-margin-top">
+            <ion-button expand="block" router-link="/tabs/login" class="ion-margin-top" style="width: 100%;">
               Retour à la connexion
             </ion-button>
           </div>

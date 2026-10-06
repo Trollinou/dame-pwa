@@ -1,5 +1,5 @@
 <template>
-  <div class="chess-theme-customizer info-card">
+  <div class="dame-panel chess-theme-customizer">
     <div class="customizer-header" @click="toggleExpand" role="button" tabindex="0">
       <div class="header-title">
         <ion-icon :icon="colorPaletteOutline" color="primary" class="header-icon"></ion-icon>
@@ -102,7 +102,7 @@
           expand="block" 
           color="primary" 
           fill="solid"
-          class="customizer-save-btn"
+          class="dame-btn-large"
           :disabled="isSaving"
           @click="handleSavePreferences"
         >

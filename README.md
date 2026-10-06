@@ -331,6 +331,30 @@ Centralise et standardise toutes les opérations sur la notation échiquéenne f
 *   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
 *   **Filtre Web Worker Stockfish (`dame_pwa_stockfish_worker_url`) :** Fournit l'URL absolue du Web Worker Stockfish (`pwa/dist/stockfish/stockfish.js`) pour mutualiser le moteur d'échecs avec d'autres extensions (ex: plugin `roi`).
 
+## Architecture SCSS & Classes Canoniques Réutilisables
+
+Le styling suit une architecture centralisée KISS en 3 piliers métier + fondations communes (`pwa/src/theme/`), avec **interdiction absolue de balises `<style>` ou `<style scoped>` dans les composants Vue** :
+1. `theme/core/` (`_base.scss`, `_shared.scss`, `_club-badges.scss`, `_chessboard.scss`, `_datatable.scss`) : Fondations, variables et tokens universels.
+2. `theme/learning/` (`_learning-layout.scss`, `_learning-components.scss`) : Cours, leçons, viewers d'exercices, et modules de **Jeu (`PlayPage`)** et **Analyse (`AnalysisPage`)**.
+3. `theme/public/` (`_public-layout.scss`, `_public-components.scss`) : Vitrine, accueil, actualités, agenda, calendrier, tournois, bénévolat, profil et formulaires.
+4. `theme/admin/` (`_admin-layout.scss`, `_admin-components.scss`) : Shell d'administration club et gestion.
+
+### Catalogue des Classes Canoniques Explicites (`theme/core/`)
+
+| Classe Canonique | Destination & Rôle |
+| :--- | :--- |
+| **`.dame-panel`** | Panneaux, cartes d'information et conteneurs de contenu (fond blanc, coins arrondis `12px`, bordure et ombre subtile). |
+| **`.dame-list-item`** | Items de liste interactifs/cliquables (arrondi `8px`, marge basse `4px`, hover doux). |
+| **`.dame-btn-large`** | Boutons d'action pleine largeur et ergonomiques (hauteur minimale `48px`, arrondi `10px`). |
+| **`.dame-empty-state`** | Conteneurs d'état vide, non trouvé ou fin de vote (centrage vertical et aéré). |
+| **`.dame-meta-card`** | En-têtes compacts pour les métadonnées de jeu, match ou analyse. |
+| **`.dame-badge`** | Badges de rôle et d'identité (`--admin`, `--rep`, `--member`). |
+| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences (`--2col`, `--3col`). |
+| **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). |
+| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`). |
+| **`.detail-header`** | En-tête canonique des vues de détail (`h1` normalisé et métadonnées). |
+
+
 ## Développement & Release
 
 ```bash

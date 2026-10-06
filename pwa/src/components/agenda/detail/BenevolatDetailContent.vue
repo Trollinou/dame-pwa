@@ -7,14 +7,14 @@
 
     <div v-else-if="currentBenevolat" class="benevolat-detail-content__body">
       <!-- En-tête -->
-      <div class="header-section">
+      <div class="detail-header">
         <h1 v-safe-html="currentBenevolat.title.rendered"></h1>
-        <div
-          v-if="currentBenevolat.content?.rendered"
-          class="description-content"
-          v-safe-html="currentBenevolat.content.rendered"
-        ></div>
       </div>
+      <div
+        v-if="currentBenevolat.content?.rendered"
+        class="description-content ion-margin-bottom"
+        v-safe-html="currentBenevolat.content.rendered"
+      ></div>
 
       <!-- VUE ADMIN : Liste des participants par créneau -->
       <div v-if="authStore.adminMode">
@@ -111,7 +111,7 @@
               <ion-spinner v-if="isSubmitting" name="crescent"></ion-spinner>
               <span v-else>{{ hasInitialVote ? 'Mettre à jour ma participation' : 'Confirmer ma participation' }}</span>
             </ion-button>
-            <div v-else class="poll-ended-container">
+            <div v-else class="dame-empty-state">
               <p class="ion-text-center poll-ended-msg">
                 Cet appel est terminé. Vous pouvez consulter vos participations ci-dessus.
               </p>
@@ -122,7 +122,7 @@
     </div>
 
     <!-- Introuvable -->
-    <div v-else class="ion-text-center ion-padding not-found-container">
+    <div v-else class="ion-text-center ion-padding dame-empty-state">
       <p>Appel à bénévoles introuvable.</p>
     </div>
   </div>

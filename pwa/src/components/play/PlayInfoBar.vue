@@ -1,5 +1,5 @@
 <template>
-  <div class="game-meta-card">
+  <div class="dame-meta-card">
     <div class="meta-main">
       <div class="meta-left">
         <h2 class="player-title">{{ playerName }}</h2>

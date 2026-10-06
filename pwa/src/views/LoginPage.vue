@@ -13,7 +13,7 @@
       <div class="safe-area-wrapper">
         <div class="login-container">
           <!-- Message de redirection contextuel -->
-          <div v-if="redirectMessage" class="redirect-banner">
+          <div v-if="redirectMessage" class="dame-banner dame-banner--primary">
             <ion-icon :icon="informationCircleOutline" color="primary"></ion-icon>
             <p>{{ redirectMessage }}</p>
           </div>

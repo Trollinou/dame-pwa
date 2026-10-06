@@ -281,3 +281,55 @@ En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou
    - Permet de forcer un nettoyage complet manuel si nécessaire.
    - Purge le `CacheStorage` d'assets et le cache des requêtes tout en **préservant scrupuleusement la session active** (aucun mot de passe à resaisir).
    - Recharge immédiatement l'application pour afficher la dernière version disponible.
+
+## Système de Design & Classes Canoniques Réutilisables
+
+L'architecture CSS centralisée (`pwa/src/theme/core/`) met à disposition un catalogue de **classes canoniques explicites** et de **tokens de design** à réutiliser obligatoirement sur l'ensemble des vues pour garantir un rendu 100% homogène et éviter la duplication de styles :
+
+### 1. Classes Canoniques de Composants
+
+| Classe Canonique | Usage & Description | Rendu & Propriétés |
+| :--- | :--- | :--- |
+| **`.dame-panel`** | Cartes et panneaux d'information standard (Profil, Tournois, Détails d'événements, Customiseur). | Fond blanc, arrondi `12px` (`--dame-card-radius`), bordure subtile `var(--dame-card-border)` et ombre légère `var(--dame-card-shadow)`, padding `16px`. |
+| **`.dame-list-item`** | Items interactifs et cliquables dans les listes (Agenda, Tournois, Bénévolat, Membres associés). | Arrondi `8px` (`--dame-item-radius`), marge basse `4px`, retour hover/tactile doux avec fond `--ion-color-step-50`. |
+| **`.dame-btn-large`** | Grands boutons d'action pleine largeur / tactiles (48px de haut). | Hauteur minimale `48px`, arrondi `10px`, typographie `15px` semi-bold (`600`). |
+| **`.dame-empty-state`** | Zones d'état vide, introuvable ou confirmation de fin. | Centrage vertical/horizontal flex, padding aéré `32px 16px`, texte centré. |
+| **`.dame-meta-card`** | En-têtes compacts de match / partie / revue d'analyse. | Fond blanc, arrondi `12px`, padding compact `10px 14px`, bordure fine. |
+| **`.dame-badge`** | Badges de rôle et d'identité (`--admin`, `--rep`, `--member`). | Pilule arrondie `20px`, typographie `12px` uppercase bold, couleurs thématiques. |
+| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences (`--2col`, `--3col`). | Grille responsive avec gap de `10px` et centrage automatique du texte. |
+| **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). | Fond doux, arrondi `8px`, libellé uppercase et valeur en gras. |
+| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`). | Conteneur flexible avec icône et texte, fond et bordures harmonisés. |
+| **`.detail-header`** | En-tête canonique des pages et vues de détail (Actualités, Agenda, Tournois). | Titre `h1` normalisé (`1.5rem`, `700`) et métadonnées associées (`.detail-date`). |
+
+### 2. Tokens de Design SCSS (`pwa/src/theme/core/_base.scss`)
+
+Les variables CSS racine normalisent les espacements et géométries :
+- `--dame-card-radius: 12px;` : Rayon de courbure universel des cartes et panneaux.
+- `--dame-item-radius: 8px;` : Rayon de courbure des items de liste, badges et vignettes.
+- `--dame-card-border: 1px solid var(--ion-color-step-150, #e2e8f0);` : Bordure subtile standard.
+- `--dame-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);` : Ombrage doux pour les conteneurs élevés.
+
+### 3. Exemple d'Utilisation dans un Composant Vue
+
+```vue
+<template>
+  <!-- Panneau d'information standard -->
+  <div class="dame-panel">
+    <h3>Titre du panneau</h3>
+    <p>Contenu textuel formaté...</p>
+    
+    <!-- Grand bouton d'action -->
+    <ion-button expand="block" color="primary" class="dame-btn-large">
+      Valider l'action
+    </ion-button>
+  </div>
+
+  <!-- Liste d'items interactifs -->
+  <ion-list lines="none">
+    <ion-item button class="dame-list-item">
+      <ion-label>Élément interactif</ion-label>
+    </ion-item>
+  </ion-list>
+</template>
+```
+

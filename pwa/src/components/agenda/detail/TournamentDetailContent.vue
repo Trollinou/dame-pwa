@@ -6,7 +6,9 @@
     </div>
 
     <div v-else-if="currentPage" class="tournament-detail-content__body">
-      <h1 v-safe-html="currentPage.title.rendered"></h1>
+      <div class="detail-header">
+        <h1 v-safe-html="currentPage.title.rendered"></h1>
+      </div>
 
       <!-- Contenu de la page avec boutons injectés et interception des liens -->
       <div

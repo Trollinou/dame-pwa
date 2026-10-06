@@ -367,3 +367,98 @@
   pointer-events: none;
   user-select: none;
 }
+
+/* ==========================================================================
+   5. États Réseau & Chargement Transverses
+   ========================================================================== */
+
+.offline-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.spinner-container,
+.error-container,
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  padding: 32px 16px;
+}
+
+/* ==========================================================================
+   6. Rendu WordPress Générique & Vues de Détail
+   ========================================================================== */
+
+.content,
+.detail-body {
+  line-height: 1.65;
+  font-size: 0.95rem;
+
+  p {
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--dame-item-radius, 8px);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--ion-color-light);
+    padding: 8px;
+    text-align: left;
+  }
+}
+
+.detail-image {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: var(--dame-card-radius, 12px);
+  margin-bottom: 16px;
+}
+
+.detail-header {
+  margin-bottom: 16px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    line-height: 1.25;
+  }
+
+  .detail-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ion-color-medium);
+    font-size: 0.85rem;
+  }
+}
+
+.detail-lead {
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ion-color-step-800, #333333);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ion-color-step-150, #e0e0e0);
+}
+

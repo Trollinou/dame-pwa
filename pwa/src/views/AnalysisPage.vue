@@ -12,7 +12,7 @@
     <ion-content :fullscreen="true" :scroll-y="false" class="ion-padding">
       <div class="analysis-layout safe-area-wrapper" :class="{ 'landscape-wrapper': isLandscape }">
         <!-- Carte d'information méta -->
-        <div class="analysis-meta-card" v-if="isReady">
+        <div class="dame-meta-card" v-if="isReady">
           <div class="meta-main">
             <div class="meta-left">
               <h2 class="player-title">Revue de partie</h2>

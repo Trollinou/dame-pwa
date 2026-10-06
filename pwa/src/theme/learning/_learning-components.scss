@@ -1845,3 +1845,282 @@ cg-board.piece-icon-box {
     transform: translateY(0);
   }
 }
+
+/* ==========================================================================
+   12. Jeu & Barre d'Information (PlayInfoBar, PlayActionsPanel)
+   ========================================================================== */
+
+.game-meta-card,
+.analysis-meta-card {
+  background: var(--ion-card-background, #ffffff);
+  border-radius: var(--dame-card-radius, 12px);
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  box-shadow: var(--dame-card-shadow, 0 1px 4px rgba(0, 0, 0, 0.05));
+  border: var(--dame-card-border, 1px solid var(--ion-color-step-100, #e9ecef));
+}
+
+.meta-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ion-text-color, #111827);
+  letter-spacing: -0.2px;
+}
+
+.game-type-subtitle {
+  font-size: 0.78rem;
+  color: var(--ion-color-primary, #3880ff);
+  font-weight: 600;
+  margin: 2px 0 0 0;
+}
+
+.meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.elo-badge {
+  background: var(--ion-color-primary, #3880ff);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+
+  &.local-badge {
+    background: var(--ion-color-secondary, #3dc2ff);
+  }
+}
+
+.level-label {
+  font-size: 0.72rem;
+  color: var(--ion-color-step-600, #6b7280);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* Panneau d'actions & statuts */
+.message-zone {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-banner {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  &.warning {
+    background: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.15);
+    color: #b45309;
+    border: 1px solid rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.4);
+  }
+
+  &.danger {
+    background: rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.12);
+    color: var(--ion-color-danger, #eb445a);
+    border: 1px solid rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.3);
+  }
+
+  &.medium {
+    background: var(--ion-color-step-100, #f3f4f6);
+    color: var(--ion-color-step-800, #1f2937);
+    border: 1px solid var(--ion-color-step-200, #e5e7eb);
+  }
+}
+
+.status-placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ion-color-step-600, #6b7280);
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--ion-color-step-50, #f9fafb);
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--ion-color-step-100, #f3f4f6);
+}
+
+.turn-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+
+  &.white {
+    background: #ffffff;
+    border: 1.5px solid #4b5563;
+  }
+
+  &.black {
+    background: #111827;
+    border: 1.5px solid #111827;
+  }
+}
+
+.actions-row {
+  margin: 0 -4px;
+
+  ion-col {
+    padding: 0 4px;
+  }
+}
+
+.game-action-btn {
+  --border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  height: 38px;
+  margin: 0;
+  --padding-start: 6px;
+  --padding-end: 6px;
+
+  ion-icon {
+    font-size: 1rem;
+    margin-right: 4px;
+  }
+}
+
+.btn-counter-badge {
+  font-size: 0.65rem;
+  padding: 2px 5px;
+  margin-left: 4px;
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   13. Analyse & Échiquier (AnalysisPage)
+   ========================================================================== */
+
+.ply-badge {
+  background: var(--ion-color-tertiary, #7044ff);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+.move-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.move-table-row {
+  display: flex;
+  border-bottom: 1px solid var(--ion-color-light);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.move-group {
+  display: flex;
+  flex: 1;
+  padding: 8px 4px;
+  align-items: center;
+  font-family: monospace;
+  font-size: 0.9rem;
+  border-right: 1px solid var(--ion-color-light);
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.move-num {
+  color: var(--ion-color-medium);
+  font-weight: bold;
+  width: 25px;
+  text-align: right;
+  margin-right: 4px;
+  font-size: 0.75rem;
+}
+
+.move-san {
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+
+  &.active-move {
+    background: var(--ion-color-tertiary);
+    color: #fff;
+    font-weight: bold;
+  }
+
+  &.empty {
+    cursor: default;
+  }
+}
+
+.chess-piece-symbol {
+  font-size: 1.3em !important;
+  font-weight: bold !important;
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   14. Contenu WordPress & Exercices (ContenuPage)
+   ========================================================================== */
+
+.success-card {
+  border-left: 5px solid var(--ion-color-success);
+  margin-top: 16px;
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: var(--dame-item-radius, 8px);
+}
+
+.success-title {
+  color: var(--ion-color-success);
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.success-subtitle {
+  font-size: 1rem;
+  color: var(--ion-color-step-600, #666);
+  margin: 0;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.next-btn {
+  font-weight: 600;
+}
+
+.lecon-content {
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: var(--dame-item-radius, 8px);
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+

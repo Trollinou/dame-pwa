@@ -59,33 +59,33 @@
             <ion-card-content>
               <ion-list lines="none">
                 <!-- Grille Infos Licence -->
-                <div class="license-grid-container">
-                  <div class="license-box" v-if="member.meta?._dame_license_number">
-                    <span class="license-label">Licence FFE</span>
-                    <span class="license-value">
+                <div class="dame-stat-grid dame-stat-grid--2col ion-margin-bottom">
+                  <div class="dame-stat-box" v-if="member.meta?._dame_license_number">
+                    <span class="dame-stat-label">Licence FFE</span>
+                    <span class="dame-stat-value">
                       {{ member.meta._dame_license_number }}
                       <small v-if="member.meta._dame_license_type">({{ member.meta._dame_license_type }})</small>
                     </span>
                   </div>
-                  <div class="license-box" v-if="member.meta?._dame_fide_id">
-                    <span class="license-label">FIDE ID</span>
-                    <span class="license-value">{{ member.meta._dame_fide_id }}</span>
+                  <div class="dame-stat-box" v-if="member.meta?._dame_fide_id">
+                    <span class="dame-stat-label">FIDE ID</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_fide_id }}</span>
                   </div>
                 </div>
                 
                 <!-- Grille Elo -->
-                <div v-if="member.meta?._dame_elo_standard || member.meta?._dame_elo_rapide || member.meta?._dame_elo_blitz" class="elo-grid-container">
-                  <div class="elo-box" v-if="member.meta?._dame_elo_standard">
-                    <span class="elo-label">Standard</span>
-                    <span class="elo-value">{{ member.meta._dame_elo_standard }}</span>
+                <div v-if="member.meta?._dame_elo_standard || member.meta?._dame_elo_rapide || member.meta?._dame_elo_blitz" class="dame-stat-grid dame-stat-grid--3col">
+                  <div class="dame-stat-box" v-if="member.meta?._dame_elo_standard">
+                    <span class="dame-stat-label">Standard</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_elo_standard }}</span>
                   </div>
-                  <div class="elo-box" v-if="member.meta?._dame_elo_rapide">
-                    <span class="elo-label">Rapide</span>
-                    <span class="elo-value">{{ member.meta._dame_elo_rapide }}</span>
+                  <div class="dame-stat-box" v-if="member.meta?._dame_elo_rapide">
+                    <span class="dame-stat-label">Rapide</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_elo_rapide }}</span>
                   </div>
-                  <div class="elo-box" v-if="member.meta?._dame_elo_blitz">
-                    <span class="elo-label">Blitz</span>
-                    <span class="elo-value">{{ member.meta._dame_elo_blitz }}</span>
+                  <div class="dame-stat-box" v-if="member.meta?._dame_elo_blitz">
+                    <span class="dame-stat-label">Blitz</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_elo_blitz }}</span>
                   </div>
                 </div>
               </ion-list>

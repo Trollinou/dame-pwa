@@ -5,10 +5,12 @@
     </div>
 
     <div v-else-if="currentEvent" class="agenda-detail-content__body">
-      <h1 class="event-main-title" v-safe-html="currentEvent.title.rendered"></h1>
+      <div class="detail-header">
+        <h1 v-safe-html="currentEvent.title.rendered"></h1>
+      </div>
 
       <!-- Carte Détails -->
-      <ion-card class="ion-no-margin ion-margin-bottom detail-card">
+      <ion-card class="ion-no-margin ion-margin-bottom dame-panel">
         <ion-card-header>
           <ion-card-title>
             <ion-icon :icon="calendarOutline" color="primary"></ion-icon>
@@ -42,7 +44,7 @@
       <!-- Carte Lieu -->
       <ion-card
         v-if="currentEvent.meta._dame_location_name || currentEvent.meta._dame_address"
-        class="ion-no-margin ion-margin-bottom detail-card"
+        class="ion-no-margin ion-margin-bottom dame-panel"
       >
         <ion-card-header>
           <ion-card-title>
@@ -76,7 +78,7 @@
       </ion-card>
 
       <!-- Carte Description -->
-      <ion-card v-if="processedDescription.cleanHtml" class="ion-no-margin ion-margin-bottom detail-card">
+      <ion-card v-if="processedDescription.cleanHtml" class="ion-no-margin ion-margin-bottom dame-panel">
         <ion-card-header>
           <ion-card-title>
             <ion-icon :icon="informationCircleOutline" color="primary"></ion-icon>
@@ -94,7 +96,7 @@
     </div>
 
     <!-- Introuvable -->
-    <div v-else class="ion-text-center ion-padding not-found-container">
+    <div v-else class="ion-text-center ion-padding dame-empty-state">
       <ion-icon :icon="calendarOutline" size="large" color="medium"></ion-icon>
       <h2>Événement introuvable</h2>
       <p>Cet événement n'existe pas ou n'est pas encore disponible.</p>

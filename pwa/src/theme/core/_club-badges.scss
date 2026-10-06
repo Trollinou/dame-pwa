@@ -29,3 +29,30 @@
 	padding: 2px 6px;
 	border-radius: 8px;
 }
+
+/* Badges de rôle et d'identité canoniques DAME */
+.dame-badge {
+	display: inline-block;
+	padding: 6px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+
+	&--admin {
+		background-color: var(--ion-color-danger-light, #ffdae0);
+		color: var(--ion-color-danger, #eb445a);
+	}
+
+	&--rep {
+		background-color: var(--ion-color-warning-light, #ffd59a);
+		color: var(--ion-color-warning-shade, #b58000);
+	}
+
+	&--member {
+		background-color: var(--ion-color-primary-light, #d2e3fc);
+		color: var(--ion-color-primary, #3880ff);
+	}
+}
+

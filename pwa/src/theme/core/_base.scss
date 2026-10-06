@@ -7,6 +7,12 @@
   --app-safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --app-safe-area-left: env(safe-area-inset-left, 0px);
   --app-safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Tokens de design DAME (Cartes, Panneaux, Items) */
+  --dame-card-radius: 12px;
+  --dame-card-border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  --dame-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --dame-item-radius: 8px;
 }
 
 /* Utilitaires de conteneur & centrage */
@@ -51,3 +57,167 @@
 .dame-text-muted {
   color: var(--ion-color-medium);
 }
+
+/* ==========================================================================
+   Composants Canoniques Réutilisables DAME
+   ========================================================================== */
+
+/* Panneau / Carte d'information standard */
+.dame-panel {
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+  border-radius: var(--dame-card-radius, 12px);
+  border: var(--dame-card-border, 1px solid var(--ion-color-step-150, #e2e8f0));
+  box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
+  padding: 16px;
+  box-sizing: border-box;
+
+  ion-card-title,
+  .dame-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 8px;
+
+    ion-icon {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+/* Item de liste interactif standard (hover doux, rayon 8px) */
+.dame-list-item {
+  border-radius: var(--dame-item-radius, 8px);
+  margin-bottom: 4px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    --background: var(--ion-color-step-50, #f8f8f8);
+  }
+}
+
+/* Bouton pleine hauteur standardisé (48px) */
+.dame-btn-large {
+  --min-height: 48px;
+  --border-radius: var(--dame-item-radius, 10px);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Conteneur d'état vide / introuvable / fin de sondage */
+.dame-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+/* Carte d'en-tête de match / partie / analyse */
+.dame-meta-card {
+  background: var(--ion-card-background, #ffffff);
+  border-radius: var(--dame-card-radius, 12px);
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  box-shadow: var(--dame-card-shadow, 0 1px 4px rgba(0, 0, 0, 0.05));
+  border: var(--dame-card-border, 1px solid var(--ion-color-step-100, #e9ecef));
+}
+
+/* Grilles de statistiques / Données Clé-Valeur */
+.dame-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+  text-align: center;
+
+  &--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &--3col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.dame-stat-box {
+  display: flex;
+  flex-direction: column;
+  background: var(--ion-color-light, #f4f5f8);
+  padding: 10px;
+  border-radius: var(--dame-item-radius, 8px);
+  border: 1px solid var(--ion-color-step-100, #e9ecef);
+  box-sizing: border-box;
+
+  .dame-stat-label {
+    font-size: 0.72rem;
+    color: var(--ion-color-step-600, #666);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .dame-stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ion-color-dark, #000);
+    line-height: 1.2;
+  }
+}
+
+/* Bannières et encarts de message universels */
+.dame-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--dame-item-radius, 8px);
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+
+  ion-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  &--primary {
+    background: var(--ion-color-primary-contrast, #f4f5f8);
+    border: 1px solid var(--ion-color-primary);
+    color: var(--ion-color-dark);
+  }
+
+  &--warning {
+    background: var(--ion-color-warning);
+    color: var(--ion-color-warning-contrast);
+  }
+
+  &--success {
+    background: var(--ion-color-success-tint, #d4edda);
+    border: 1px solid var(--ion-color-success);
+    color: var(--ion-color-success-shade, #155724);
+  }
+
+  &--danger {
+    background: var(--ion-color-danger-tint, #f8d7da);
+    border: 1px solid var(--ion-color-danger);
+    color: var(--ion-color-danger-shade, #721c24);
+  }
+
+  &--block {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
+}
+
+

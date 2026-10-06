@@ -12,7 +12,7 @@
     </div>
 
     <div v-else>
-      <div v-if="tournamentError && filteredTournaments.length > 0" class="offline-banner ion-margin-bottom">
+      <div v-if="tournamentError && filteredTournaments.length > 0" class="dame-banner dame-banner--warning ion-margin-bottom">
         <ion-icon :icon="cloudOfflineOutline"></ion-icon>
         <span>Mode hors-ligne : Affichage des données en cache</span>
       </div>
@@ -31,7 +31,7 @@
                 :key="item.id"
                 button
                 @click="handleTournamentClick(item)"
-                :class="['tournament-item', { 'is-active': isTabletLandscape && item.object_id === selectedTournamentId }]"
+                :class="['dame-list-item', { 'is-active': isTabletLandscape && item.object_id === selectedTournamentId }]"
               >
                 <ion-icon slot="start" :icon="trophyOutline" color="primary" class="ion-margin-end"></ion-icon>
                 <ion-label>

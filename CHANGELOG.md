@@ -6,6 +6,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refactorisation de l'Architecture SCSS & Standardisation par Classes Canoniques (`pwa/src/theme/`, `views/`, `components/`, `README.md`, `USING.md`)** :
+  - **Reclassement Logique en Piliers Métier** : Transfert de l'ensemble des règles de style du module de jeu (`PlayPage`) et d'analyse interactive (`AnalysisPage`) depuis `theme/public/` vers `theme/learning/` (`_learning-layout.scss`, `_learning-components.scss`).
+  - **Système de Design & Classes Canoniques Explicites (`theme/core/`)** :
+    - Définition des tokens universels (`--dame-card-radius`, `--dame-item-radius`, `--dame-card-border`, `--dame-card-shadow`) dans `_base.scss`.
+    - Création des classes canoniques partagées : `.dame-panel` (cartes/panneaux standard), `.dame-list-item` (items interactifs avec hover doux), `.dame-btn-large` (boutons d'action 48px), `.dame-empty-state` (états vides ou introuvables), `.dame-meta-card` (en-têtes de match/analyse), `.dame-badge` (badges de rôle `--admin`, `--rep`, `--member`), `.dame-stat-grid` / `.dame-stat-box` (grilles de métriques, classements ELO et licences FFE), `.dame-banner` (bannières contextuelles et état hors-ligne), et `.detail-header` (en-tête de vues de détail).
+  - **Dédoublonnage & Remplacement par Classes Canoniques Uniques (Option 1)** :
+    - Élimination des doublons et règles obsolètes dans `_public-components.scss` (`.badge`, `.badge-admin/rep/member`, `.elo-grid`, `.elo-item`, `.elo-label`, `.elo-val`, `.tournament-info-grid`, `.info-item`, `.info-label`, `.info-value`, `.detail-card`, `.admin-access-card`, `.redirect-banner`, `.success-message`, `.offline-banner`, `.event-main-title`).
+    - Mise à jour et alignement direct des templates Vue (`ProfilePage.vue`, `TournamentDetailContent.vue`, `AgendaDetailContent.vue`, `BenevolatDetailContent.vue`, `LoginPage.vue`, `RegisterPage.vue`, `TournamentPage.vue`, `TournoisSegmentView.vue`, `NewsPage.vue`, `MemberDetailPage.vue`, `ChessThemeCustomizer.vue`, `PlayInfoBar.vue`, `AnalysisPage.vue`).
+  - **Documentation Vivante** : Mise à jour synchrone du catalogue des classes et conventions de style dans `README.md` et `USING.md`.
+
 ## [1.9.0] - 2026-10-04
 
 - **Modernisation WordPress 7.1, Directives Globales & QA Pré-Packaging (`AGENTS.md`, `scripts/package.cjs`, `pwa/src/stores/auth.ts`, `package.json`)** :

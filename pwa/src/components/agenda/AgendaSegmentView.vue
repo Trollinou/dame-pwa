@@ -41,7 +41,7 @@
               :id="'event-' + event.id"
               button
               @click="handleEventClick(event)"
-              :class="['agenda-item', { 'past-event': isPast(event), 'is-active': isTabletLandscape && event.id === selectedEventId }]"
+              :class="['dame-list-item', { 'past-event': isPast(event), 'is-active': isTabletLandscape && event.id === selectedEventId }]"
             >
               <!-- Indicateur de couleur de catégorie -->
               <div
