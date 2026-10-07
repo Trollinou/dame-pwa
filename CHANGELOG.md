@@ -6,6 +6,19 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Adaptation & Harmonisation du Mode Sombre (Dark Mode) pour les Thèmes Public & Core (`pwa/src/theme/`, `CHANGELOG.md`)** :
+  - **Calendrier & Vue Agenda (`_public-components.scss`, `_public-layout.scss`)** :
+    - Remplacement des variables de repli statiques blanches (`--ion-color-step-50: #f9f9f9`) dans les cellules avec événements (`.day-cell.has-events:not(.is-selected)`) par des variables adaptatives (`--ion-background-color-step-100`, `--ion-color-step-100`) pour éviter les cellules blanches en mode sombre.
+    - Application de la couleur de texte adaptative `--ion-text-color` sur les numéros de jours (`.day-number`), les titres de mois (`.month-title`), les en-têtes de jour sélectionné (`.selected-day-header h3`) et les jours de semaine (`.weekday-cell`).
+    - Adaptation du badge de date d'agenda (`.agenda-date-badge`) via le canal RGBA `--ion-color-primary-rgb` avec opacité douce.
+  - **Profil, Personnalisateur d'Échiquier & Éléments Publics (`_public-components.scss`, `_public-layout.scss`)** :
+    - Correction des contrastes du sélecteur de thèmes d'échiquier (`.wheel-picker-wrapper`, `.wheel-header-item`, `.wheel-highlight-lens`, `.wheel-divider`, `.wheel-item`).
+    - Remplacement des couleurs fixes sur `.system-title`, `.system-version`, `.avatar-icon`, `.admin-access-content` et le conteneur d'invitation de connexion (`.prompt-header p`).
+  - **Tokens & Classes Canoniques Core (`_base.scss`, `_club-badges.scss`, `_shared.scss`)** :
+    - Adaptation des bordures universelles `--dame-card-border` avec `--ion-background-color-step-150` et canal alpha textuel pour un fondu subtil en dark mode.
+    - Remplacement des fonds de badges `.dame-badge` (`--admin`, `--rep`, `--member`) par des opacités RGBA s'adaptant automatiquement au thème clair/sombre.
+    - Normalisation des contrastes pour `.dame-stat-box`, `.dame-banner`, `.meta-title`, `.consigne-text`, `.signature-label`, `.detail-lead` et les tableaux `.detail-body table`.
+
 - **Structuration du Thème Administration, Harmonisation Canonique & Compatibilité Dark Mode (`pwa/src/theme/`, `views/`, `components/`, `README.md`, `USING.md`)** :
   - **Correction du Contraste en Mode Sombre (`_datatable.scss`)** : Remplacement des variables de repli statiques blanches par les variables dynamiques Ionic (`--ion-card-background`, `--ion-item-background`, `--ion-background-color-step-*`, `--ion-text-color`) pour assurer une lisibilité parfaite des tableaux de données (`DataTable`), de la barre de recherche (`.custom-searchbar`) et des sélecteurs de filtre (`.filter-item`) en mode sombre automatique / nocturne.
   - **Structuration du Pilier Administration (`theme/admin/`)** :

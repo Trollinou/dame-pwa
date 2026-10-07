@@ -24,7 +24,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--ion-color-dark, #111827);
+  color: var(--ion-text-color, var(--ion-color-dark, #111827));
   margin-bottom: 2px;
 }
 
@@ -62,7 +62,7 @@
   font-size: 0.88rem;
   font-weight: 500;
   line-height: 1.25;
-  color: var(--ion-color-dark, #222222);
+  color: var(--ion-text-color, var(--ion-color-dark, #222222));
   flex: 1;
 }
 
@@ -337,7 +337,7 @@
 .signature-label {
   font-size: 0.95em;
   font-weight: 600;
-  color: var(--ion-color-step-800, #333);
+  color: var(--ion-text-color, var(--ion-color-dark, #333));
 }
 
 .canvas-wrapper {
@@ -419,7 +419,7 @@
 
   th,
   td {
-    border: 1px solid var(--ion-color-light);
+    border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12)));
     padding: 8px;
     text-align: left;
   }
@@ -456,9 +456,9 @@
   font-size: 1.05rem;
   font-weight: 500;
   line-height: 1.5;
-  color: var(--ion-color-step-800, #333333);
+  color: var(--ion-text-color, var(--ion-color-step-800, #333333));
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--ion-color-step-150, #e0e0e0);
+  border-bottom: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12)));
 }
 

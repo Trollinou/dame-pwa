@@ -110,7 +110,7 @@ ion-tab-bar {
   }
 
   p {
-    color: var(--ion-color-step-600, #666);
+    color: var(--ion-color-medium);
     line-height: 1.5;
     max-width: 340px;
     margin: 0;
@@ -141,7 +141,7 @@ ion-tab-bar {
   background: var(--ion-card-background, var(--ion-item-background, #ffffff));
   border-radius: var(--dame-card-radius, 12px);
   padding: 10px;
-  border: var(--dame-card-border, 1px solid var(--ion-color-step-150, #e0e0e0));
+  border: var(--dame-card-border);
   box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
 }
 
@@ -161,7 +161,7 @@ ion-tab-bar {
     font-size: 1.15rem;
     font-weight: 700;
     margin: 0;
-    color: var(--ion-color-dark, #222);
+    color: var(--ion-text-color, var(--ion-color-dark, #222));
   }
 
   .today-button {
@@ -188,14 +188,14 @@ ion-tab-bar {
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   padding-bottom: 6px;
-  border-bottom: 1px solid var(--ion-color-step-100, #ececec);
+  border-bottom: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12)));
   margin-bottom: 6px;
 }
 
 .weekday-cell {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--ion-color-step-500, #888888);
+  color: var(--ion-color-medium);
   text-transform: uppercase;
 }
 
@@ -208,7 +208,7 @@ ion-tab-bar {
 .selected-day-events {
   background: var(--ion-card-background, var(--ion-item-background, #ffffff));
   border-radius: var(--dame-card-radius, 12px);
-  border: var(--dame-card-border, 1px solid var(--ion-color-step-150, #e0e0e0));
+  border: var(--dame-card-border);
   box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
   padding: 12px 14px;
 }
@@ -223,7 +223,7 @@ ion-tab-bar {
     font-size: 1rem;
     font-weight: 700;
     margin: 0;
-    color: var(--ion-color-dark, #222);
+    color: var(--ion-text-color, var(--ion-color-dark, #222));
     text-transform: capitalize;
   }
 }

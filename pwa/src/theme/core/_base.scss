@@ -10,8 +10,8 @@
 
   /* Tokens de design DAME (Cartes, Panneaux, Items) */
   --dame-card-radius: 12px;
-  --dame-card-border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, #e2e8f0));
-  --dame-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --dame-card-border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12)));
+  --dame-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   --dame-item-radius: 8px;
 }
 
@@ -75,8 +75,8 @@
 .dame-panel {
   background: var(--ion-card-background, var(--ion-item-background, #ffffff));
   border-radius: var(--dame-card-radius, 12px);
-  border: var(--dame-card-border, 1px solid var(--ion-color-step-150, #e2e8f0));
-  box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
+  border: var(--dame-card-border);
+  box-shadow: var(--dame-card-shadow);
   padding: 16px;
   box-sizing: border-box;
 
@@ -104,7 +104,7 @@
   transition: background-color 0.15s ease;
 
   &:hover {
-    --background: var(--ion-color-step-50, #f8f8f8);
+    --background: var(--ion-background-color-step-50, var(--ion-color-step-50, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.04)));
   }
 }
 
@@ -128,12 +128,12 @@
 
 /* Carte d'en-tête de match / partie / analyse */
 .dame-meta-card {
-  background: var(--ion-card-background, #ffffff);
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
   border-radius: var(--dame-card-radius, 12px);
   padding: 10px 14px;
   margin-bottom: 6px;
-  box-shadow: var(--dame-card-shadow, 0 1px 4px rgba(0, 0, 0, 0.05));
-  border: var(--dame-card-border, 1px solid var(--ion-color-step-100, #e9ecef));
+  box-shadow: var(--dame-card-shadow);
+  border: var(--dame-card-border);
 }
 
 /* Grilles de statistiques / Données Clé-Valeur */
@@ -155,15 +155,15 @@
 .dame-stat-box {
   display: flex;
   flex-direction: column;
-  background: var(--ion-color-light, #f4f5f8);
+  background: var(--ion-background-color-step-50, var(--ion-card-background, var(--ion-color-light, #f4f5f8)));
   padding: 10px;
   border-radius: var(--dame-item-radius, 8px);
-  border: 1px solid var(--ion-color-step-100, #e9ecef);
+  border: var(--dame-card-border);
   box-sizing: border-box;
 
   .dame-stat-label {
     font-size: 0.72rem;
-    color: var(--ion-color-step-600, #666);
+    color: var(--ion-color-medium);
     text-transform: uppercase;
     font-weight: 600;
     margin-bottom: 4px;
@@ -172,7 +172,7 @@
   .dame-stat-value {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--ion-color-dark, #000);
+    color: var(--ion-text-color, var(--ion-color-dark, #000));
     line-height: 1.2;
   }
 }
@@ -200,9 +200,9 @@
   }
 
   &--primary {
-    background: var(--ion-color-primary-contrast, #f4f5f8);
+    background: rgba(var(--ion-color-primary-rgb, 0, 115, 170), 0.12);
     border: 1px solid var(--ion-color-primary);
-    color: var(--ion-color-dark);
+    color: var(--ion-text-color, var(--ion-color-dark));
   }
 
   &--warning {
@@ -211,15 +211,15 @@
   }
 
   &--success {
-    background: var(--ion-color-success-tint, #d4edda);
+    background: rgba(var(--ion-color-success-rgb, 0, 163, 42), 0.15);
     border: 1px solid var(--ion-color-success);
-    color: var(--ion-color-success-shade, #155724);
+    color: var(--ion-color-success-shade, var(--ion-color-success));
   }
 
   &--danger {
-    background: var(--ion-color-danger-tint, #f8d7da);
+    background: rgba(var(--ion-color-danger-rgb, 214, 54, 56), 0.15);
     border: 1px solid var(--ion-color-danger);
-    color: var(--ion-color-danger-shade, #721c24);
+    color: var(--ion-color-danger-shade, var(--ion-color-danger));
   }
 
   &--block {
