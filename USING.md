@@ -290,23 +290,25 @@ L'architecture CSS centralisée (`pwa/src/theme/core/`) met à disposition un ca
 
 | Classe Canonique | Usage & Description | Rendu & Propriétés |
 | :--- | :--- | :--- |
-| **`.dame-panel`** | Cartes et panneaux d'information standard (Profil, Tournois, Détails d'événements, Customiseur). | Fond blanc, arrondi `12px` (`--dame-card-radius`), bordure subtile `var(--dame-card-border)` et ombre légère `var(--dame-card-shadow)`, padding `16px`. |
-| **`.dame-list-item`** | Items interactifs et cliquables dans les listes (Agenda, Tournois, Bénévolat, Membres associés). | Arrondi `8px` (`--dame-item-radius`), marge basse `4px`, retour hover/tactile doux avec fond `--ion-color-step-50`. |
+| **`.dame-panel`** | Cartes et panneaux d'information standard (Profil, Tournois, Détails d'événements, Customiseur, Inscription). | Fond adaptatif (clair/sombre), arrondi `12px` (`--dame-card-radius`), bordure subtile `var(--dame-card-border)` et ombre légère `var(--dame-card-shadow)`, padding `16px`. |
+| **`.dame-list-item`** | Items interactifs et cliquables dans les listes (Agenda, Tournois, Bénévolat, Membres associés). | Arrondi `8px` (`--dame-item-radius`), marge basse `4px`, retour hover/tactile doux. |
 | **`.dame-btn-large`** | Grands boutons d'action pleine largeur / tactiles (48px de haut). | Hauteur minimale `48px`, arrondi `10px`, typographie `15px` semi-bold (`600`). |
 | **`.dame-empty-state`** | Zones d'état vide, introuvable ou confirmation de fin. | Centrage vertical/horizontal flex, padding aéré `32px 16px`, texte centré. |
-| **`.dame-meta-card`** | En-têtes compacts de match / partie / revue d'analyse. | Fond blanc, arrondi `12px`, padding compact `10px 14px`, bordure fine. |
+| **`.dame-meta-card`** | En-têtes compacts de match / partie / revue d'analyse. | Fond adaptatif, arrondi `12px`, padding compact `10px 14px`, bordure fine. |
 | **`.dame-badge`** | Badges de rôle et d'identité (`--admin`, `--rep`, `--member`). | Pilule arrondie `20px`, typographie `12px` uppercase bold, couleurs thématiques. |
-| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences (`--2col`, `--3col`). | Grille responsive avec gap de `10px` et centrage automatique du texte. |
+| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences / rapports (`--2col`, `--3col`). | Grille responsive avec gap de `10px` et centrage automatique du texte. |
 | **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). | Fond doux, arrondi `8px`, libellé uppercase et valeur en gras. |
-| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`). | Conteneur flexible avec icône et texte, fond et bordures harmonisés. |
+| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`, `--info`). | Conteneur flexible avec icône et texte, fond et bordures harmonisés. |
 | **`.detail-header`** | En-tête canonique des pages et vues de détail (Actualités, Agenda, Tournois). | Titre `h1` normalisé (`1.5rem`, `700`) et métadonnées associées (`.detail-date`). |
+| **`.detail-body`** | Corps de texte enrichi et descriptions HTML (actualités, tournois, messages). | Typographie soignée, interlignage `1.6`, espacement propre des paragraphes et listes. |
+| **`.multiline-large-title`** | Titres principaux adaptatifs multi-lignes pour les en-têtes collapsibles Ionic. | Retour à la ligne préservé sans troncature brute dans les barres d'outils. |
 
 ### 2. Tokens de Design SCSS (`pwa/src/theme/core/_base.scss`)
 
 Les variables CSS racine normalisent les espacements et géométries :
 - `--dame-card-radius: 12px;` : Rayon de courbure universel des cartes et panneaux.
 - `--dame-item-radius: 8px;` : Rayon de courbure des items de liste, badges et vignettes.
-- `--dame-card-border: 1px solid var(--ion-color-step-150, #e2e8f0);` : Bordure subtile standard.
+- `--dame-card-border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, #e2e8f0));` : Bordure subtile standard adaptée aux modes clair et sombre.
 - `--dame-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);` : Ombrage doux pour les conteneurs élevés.
 
 ### 3. Exemple d'Utilisation dans un Composant Vue

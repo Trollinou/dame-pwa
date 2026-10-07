@@ -10,7 +10,7 @@
 
   /* Tokens de design DAME (Cartes, Panneaux, Items) */
   --dame-card-radius: 12px;
-  --dame-card-border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  --dame-card-border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, #e2e8f0));
   --dame-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   --dame-item-radius: 8px;
 }
@@ -56,6 +56,15 @@
 
 .dame-text-muted {
   color: var(--ion-color-medium);
+}
+
+.multiline-large-title {
+  white-space: normal !important;
+  word-wrap: break-word;
+  line-height: 1.2;
+  display: block;
+  width: 100%;
+  padding-bottom: 8px;
 }
 
 /* ==========================================================================

@@ -26,7 +26,7 @@
   width: 100%;
   overflow-x: auto;
   border-radius: 8px;
-  border: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(0, 0, 0, 0.08)));
 }
 
 .dame-table {
@@ -34,14 +34,15 @@
   border-collapse: collapse;
   text-align: left;
   font-size: 0.9rem;
-  background: var(--ion-color-step-50, #ffffff);
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+  color: var(--ion-text-color, #1f2937);
 
   th {
-    background: var(--ion-color-step-100, #f4f5f8);
-    color: var(--ion-color-dark);
+    background: var(--ion-background-color-step-100, var(--ion-color-step-100, #f4f5f8));
+    color: var(--ion-text-color, #1f2937);
     font-weight: 600;
     padding: 12px 16px;
-    border-bottom: 2px solid var(--ion-color-step-200, rgba(0, 0, 0, 0.12));
+    border-bottom: 2px solid var(--ion-background-color-step-200, var(--ion-color-step-200, rgba(0, 0, 0, 0.12)));
     user-select: none;
     white-space: nowrap;
 
@@ -49,15 +50,15 @@
       cursor: pointer;
 
       &:hover {
-        background: var(--ion-color-step-150, #e8e9ec);
+        background: var(--ion-background-color-step-150, var(--ion-color-step-150, #e8e9ec));
       }
     }
   }
 
   td {
     padding: 12px 16px;
-    border-bottom: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.06));
-    color: var(--ion-color-dark);
+    border-bottom: 1px solid var(--ion-background-color-step-100, var(--ion-color-step-150, rgba(0, 0, 0, 0.06)));
+    color: var(--ion-text-color, #1f2937);
   }
 }
 
@@ -82,14 +83,14 @@
   transition: background-color 0.15s ease-in-out;
 
   &:nth-child(even) {
-    background: var(--ion-color-step-50, rgba(0, 0, 0, 0.015));
+    background: var(--ion-background-color-step-50, rgba(0, 0, 0, 0.015));
   }
 
   &.clickable {
     cursor: pointer;
 
     &:hover {
-      background: var(--ion-color-step-100, rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.06));
+      background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
     }
   }
 }
@@ -133,7 +134,8 @@
 }
 
 .custom-searchbar {
-  --background: var(--ion-color-step-100, #f4f5f8);
+  --background: var(--ion-item-background, var(--ion-background-color-step-100, #f4f5f8));
+  --color: var(--ion-text-color, #1f2937);
   --border-radius: 8px;
   padding: 0;
 }
@@ -155,9 +157,10 @@
   --padding-start: 8px;
   --padding-end: 8px;
   --min-height: 48px;
-  --background: var(--ion-color-step-50, #ffffff);
+  --background: var(--ion-item-background, var(--ion-background-color-step-50, #ffffff));
+  --color: var(--ion-text-color, #1f2937);
   border-radius: 8px;
-  border: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(0, 0, 0, 0.08)));
 }
 
 .custom-select {
@@ -189,7 +192,7 @@
   gap: 12px;
   padding-top: 12px;
   padding-bottom: 12px;
-  border-top: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.08));
+  border-top: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(0, 0, 0, 0.08)));
   font-size: 0.875rem;
 }
 
@@ -218,7 +221,7 @@
 .page-indicator {
   padding: 0 8px;
   font-weight: 600;
-  color: var(--ion-color-dark);
+  color: var(--ion-text-color, var(--ion-color-dark));
 }
 
 .stacked-icon {

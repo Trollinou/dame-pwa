@@ -45,12 +45,10 @@
             />
 
             <!-- Bannière d'information préinscription existante -->
-            <div v-if="isExistingPreInscription" class="info-banner ion-margin-bottom ion-padding">
-              <ion-text color="primary">
-                <p style="margin: 0; font-size: 0.95em; line-height: 1.4;">
-                  ℹ️ <strong>Préinscription en cours :</strong> Une préinscription a déjà été enregistrée pour cet adhérent. Les champs sont pré-remplis avec ces données. Vous pouvez les modifier et valider à nouveau pour mettre à jour son dossier sans créer de doublon.
-                </p>
-              </ion-text>
+            <div v-if="isExistingPreInscription" class="dame-banner dame-banner--info ion-margin-bottom">
+              <p style="margin: 0; font-size: 0.95em; line-height: 1.4;">
+                ℹ️ <strong>Préinscription en cours :</strong> Une préinscription a déjà été enregistrée pour cet adhérent. Les champs sont pré-remplis avec ces données. Vous pouvez les modifier et valider à nouveau pour mettre à jour son dossier sans créer de doublon.
+              </p>
             </div>
 
             <!-- SECTION 1 : Informations Adhérent -->
@@ -83,10 +81,8 @@
             />
 
             <!-- Message d'erreur -->
-            <div class="error-banner ion-margin-top ion-padding-horizontal" v-if="errorMessage">
-              <ion-text color="danger">
-                <p v-html="errorMessage"></p>
-              </ion-text>
+            <div class="dame-banner dame-banner--danger ion-margin-top" v-if="errorMessage">
+              <p style="margin: 0;" v-html="errorMessage"></p>
             </div>
 
             <!-- Soumission -->

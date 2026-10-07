@@ -1,5 +1,5 @@
 <template>
-  <div class="success-card ion-padding ion-text-center animate-fade-in">
+  <div class="dame-panel ion-padding ion-text-center animate-fade-in">
     <ion-icon :icon="checkmarkCircleOutline" color="success" class="success-icon"></ion-icon>
     <h2>Préinscription Enregistrée !</h2>
     <p class="ion-margin-bottom">{{ successData.message }}</p>

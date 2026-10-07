@@ -38,7 +38,7 @@
           <div v-if="currentTab === 'message'">
             <ion-card class="ion-no-margin">
               <ion-card-content>
-                <div class="description-content" v-safe-html="message.content.rendered"></div>
+                <div class="detail-body" v-safe-html="message.content.rendered"></div>
               </ion-card-content>
             </ion-card>
           </div>
@@ -46,19 +46,19 @@
           <!-- Onglet RAPPORT -->
           <div v-if="currentTab === 'report'">
             <ion-card v-if="message.report" class="ion-no-margin">
-              <ion-card-content class="stats-card">
-                <div class="stat-item main-stat">
-                  <span class="stat-value">{{ message.report.stats.rate }}%</span>
-                  <span class="stat-label">Taux d'ouverture</span>
-                </div>
-                <div class="stats-grid">
-                  <div class="stat-item">
-                    <span class="stat-value">{{ message.report.stats.sent }}</span>
-                    <span class="stat-label">Envoyés</span>
+              <ion-card-content>
+                <div class="dame-stat-grid dame-stat-grid--3col">
+                  <div class="dame-stat-box">
+                    <span class="dame-stat-label">Taux d'ouverture</span>
+                    <span class="dame-stat-value">{{ message.report.stats.rate }}%</span>
                   </div>
-                  <div class="stat-item">
-                    <span class="stat-value">{{ message.report.stats.opened }}</span>
-                    <span class="stat-label">Ouverts</span>
+                  <div class="dame-stat-box">
+                    <span class="dame-stat-label">Envoyés</span>
+                    <span class="dame-stat-value">{{ message.report.stats.sent }}</span>
+                  </div>
+                  <div class="dame-stat-box">
+                    <span class="dame-stat-label">Ouverts</span>
+                    <span class="dame-stat-value">{{ message.report.stats.opened }}</span>
                   </div>
                 </div>
               </ion-card-content>

@@ -343,16 +343,18 @@ Le styling suit une architecture centralisée KISS en 3 piliers métier + fondat
 
 | Classe Canonique | Destination & Rôle |
 | :--- | :--- |
-| **`.dame-panel`** | Panneaux, cartes d'information et conteneurs de contenu (fond blanc, coins arrondis `12px`, bordure et ombre subtile). |
+| **`.dame-panel`** | Panneaux, cartes d'information et conteneurs de contenu (fond dynamique, coins arrondis `12px`, bordure et ombre subtile). |
 | **`.dame-list-item`** | Items de liste interactifs/cliquables (arrondi `8px`, marge basse `4px`, hover doux). |
 | **`.dame-btn-large`** | Boutons d'action pleine largeur et ergonomiques (hauteur minimale `48px`, arrondi `10px`). |
 | **`.dame-empty-state`** | Conteneurs d'état vide, non trouvé ou fin de vote (centrage vertical et aéré). |
 | **`.dame-meta-card`** | En-têtes compacts pour les métadonnées de jeu, match ou analyse. |
 | **`.dame-badge`** | Badges de rôle et d'identité (`--admin`, `--rep`, `--member`). |
-| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences (`--2col`, `--3col`). |
+| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences / rapports (`--2col`, `--3col`). |
 | **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). |
-| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`). |
+| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`, `--info`). |
 | **`.detail-header`** | En-tête canonique des vues de détail (`h1` normalisé et métadonnées). |
+| **`.detail-body`** | Corps de texte enrichi et descriptions HTML (actualités, tournois, messages). |
+| **`.multiline-large-title`** | Titres principaux adaptatifs multi-lignes pour les en-têtes collapsibles Ionic. |
 
 
 ## Développement & Release

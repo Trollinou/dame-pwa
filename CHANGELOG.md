@@ -6,6 +6,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Structuration du Thème Administration, Harmonisation Canonique & Compatibilité Dark Mode (`pwa/src/theme/`, `views/`, `components/`, `README.md`, `USING.md`)** :
+  - **Correction du Contraste en Mode Sombre (`_datatable.scss`)** : Remplacement des variables de repli statiques blanches par les variables dynamiques Ionic (`--ion-card-background`, `--ion-item-background`, `--ion-background-color-step-*`, `--ion-text-color`) pour assurer une lisibilité parfaite des tableaux de données (`DataTable`), de la barre de recherche (`.custom-searchbar`) et des sélecteurs de filtre (`.filter-item`) en mode sombre automatique / nocturne.
+  - **Structuration du Pilier Administration (`theme/admin/`)** :
+    - `_admin-layout.scss` : Menu latéral Ionic `ion-menu` (largeur standard 280px), états actifs des items de navigation (`.menu-item.active`), pied de menu fixe (`.menu-footer`) et section tableau de bord (`.dashboard-section`).
+    - `_admin-components.scss` : Fiches de contact et gestion (`.organization-name`, `.contact-gender`, `.contact-name`, `.role-name`), formulaires de pré-inscription et santé (`.form-container`, `.section-title`, `.health-info-box`, `.radio-group-container`, `.radio-options`, `.consent-item`, `.signature-section`, `.identity-select-card`, `.copy-adh-container`, `.legal-rep-prevention-note`), autocomplétion d'adresses BAN (`.suggestions-outer-container`, `.suggestions-list`) et actions de téléchargement (`.pdf-buttons`, `.success-icon`).
+  - **Rapprochement et Unification avec le Modèle Canonique Core** :
+    - Déplacement de la classe transverse `.multiline-large-title` dans `core/_base.scss` pour un partage universel entre Public, Learning et Admin.
+    - Utilisation des bannières canoniques `.dame-banner` (`--info`, `--danger`) dans `PreInscriptionPage.vue` en lieu et place des styles dupliqués `.info-banner` et `.error-banner`.
+    - Alignement de `MessageDetailPage.vue` sur le corps de texte enrichi `.detail-body` et les grilles de statistiques `.dame-stat-grid` / `.dame-stat-box`.
+    - Uniformisation des cartes de confirmation avec `.dame-panel` dans `PreInscriptionSuccessCard.vue`.
+
 - **Refactorisation de l'Architecture SCSS & Standardisation par Classes Canoniques (`pwa/src/theme/`, `views/`, `components/`, `README.md`, `USING.md`)** :
   - **Reclassement Logique en Piliers Métier** : Transfert de l'ensemble des règles de style du module de jeu (`PlayPage`) et d'analyse interactive (`AnalysisPage`) depuis `theme/public/` vers `theme/learning/` (`_learning-layout.scss`, `_learning-components.scss`).
   - **Système de Design & Classes Canoniques Explicites (`theme/core/`)** :
