@@ -264,6 +264,18 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
    - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).
 
+## Espace Administration & Gestion Club (Adhérents, Bénévolat, Contacts, Messages)
+
+Accessible aux profils administrateurs via le menu latéral, l'espace d'administration permet de piloter les données de l'association :
+
+1. **Gestion des Adhérents (`/admin/members`)** :
+   - **Filtrage par Saison** : Par défaut, la liste affiche les adhérents inscrits pour la dernière saison en cours. Le sélecteur de filtre permet d'isoler une saison spécifique ou de sélectionner **« Toutes les saisons »** pour obtenir une vue globale exhaustive de tous les adhérents enregistrés.
+   - **Recherche & Tri** : Recherche textuelle instantanée insensible aux accents et tri par nom, catégorie d'âge, licence, Elo, téléphone ou e-mail.
+   - **Export CSV** : Bouton d'exportation générant un fichier CSV encodé en UTF-8 BOM (`adherents.csv`) respectant le filtrage actif.
+2. **Appels à Bénévolat (`/admin/benevolat`)** : Suivi des réponses et créneaux avec filtrage par statut (*Tous les appels*, *Appels en cours*, *Appels terminés*).
+3. **Répertoire de Contacts (`/admin/contacts`)** : Annuaire avec filtres combinés par type de contact, région et département.
+4. **Messages & Communications (`/admin/messages`)** : Historique et consultation détaillée des messages reçus.
+
 ## Informations Système, Mises à Jour & Gestion du Cache
 
 En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou non), une section dédiée permet de suivre l'état de l'application et de forcer la mise à niveau :

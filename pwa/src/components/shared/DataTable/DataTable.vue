@@ -269,4 +269,27 @@ const handleRowClick = (row: TData) => {
     props.onRowClick(row);
   }
 };
+
+const initializedFilterIds = ref<Set<string>>(new Set());
+
+watch(
+  () => props.filters,
+  (newFilters) => {
+    if (!newFilters) return;
+    for (const filter of newFilters) {
+      if (
+        !initializedFilterIds.value.has(filter.id) &&
+        filter.defaultValue !== undefined &&
+        filter.defaultValue !== 'all'
+      ) {
+        initializedFilterIds.value.add(filter.id);
+        const col = table.getColumn(filter.id);
+        if (col && col.getFilterValue() === undefined) {
+          col.setFilterValue(filter.defaultValue);
+        }
+      }
+    }
+  },
+  { immediate: true, deep: true }
+);
 </script>

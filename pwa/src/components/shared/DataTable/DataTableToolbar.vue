@@ -26,12 +26,12 @@
             >
               <ion-item lines="none" class="filter-item">
                 <ion-select
-                  :value="getFilterValue(filter.id, filter.defaultValue)"
+                  :value="getFilterValue(filter.id)"
                   interface="action-sheet"
                   :label="filter.label"
                   label-placement="stacked"
                   class="custom-select"
-                  @ionChange="(e) => onFilterChange(filter.id, e.detail.value)"
+                  @ionChange="(e) => onFilterChange(filter, e.detail.value)"
                 >
                   <ion-select-option
                     v-for="opt in filter.options"
@@ -105,20 +105,23 @@ const onSearchInput = (e: CustomEvent) => {
   props.table.setGlobalFilter(val);
 };
 
-const getFilterValue = (filterId: string, defaultValue?: string | number) => {
+const getFilterValue = (filterId: string) => {
   const column = props.table.getColumn(filterId);
-  if (!column) return defaultValue ?? 'all';
+  if (!column) return 'all';
   const val = column.getFilterValue();
-  return val !== undefined ? (val as string | number) : defaultValue ?? 'all';
+  return val !== undefined && val !== null ? (val as string | number) : 'all';
 };
 
-const onFilterChange = (filterId: string, value: unknown) => {
-  const column = props.table.getColumn(filterId);
+const onFilterChange = (filter: DataTableFilterConfig, value: unknown) => {
+  const column = props.table.getColumn(filter.id);
   if (!column) return;
-  if (value === 'all' || value === '' || value === null) {
+  if (value === 'all' || value === '' || value === null || value === undefined) {
     column.setFilterValue(undefined);
   } else {
     column.setFilterValue(value);
+  }
+  if (filter.onChange) {
+    filter.onChange(value);
   }
 };
 

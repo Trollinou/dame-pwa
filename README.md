@@ -326,6 +326,12 @@ Centralise et standardise toutes les opérations sur la notation échiquéenne f
 - **Algorithme de Mélange Aléatoire** :
   - `shuffleArray<T>(array, rng?)` : Mélange de Fisher-Yates immuable préservant le tableau original.
 
+### 11. Composant Tableau de Données `<DataTable>` (`src/components/shared/DataTable/`)
+Composant maître réutilisable pour l'affichage, le tri, la pagination, le filtrage facetté et l'export CSV des listes d'administration (Adhérents, Bénévolat, Contacts, Messages) :
+- **Rendu Responsive Dual-Mode** : Mode tableau sticky triable sur Desktop/Tablette (`>768px`) et liste interactive sur Mobile (`<=768px`) via le slot `#mobile-item`.
+- **Filtres Facettés Déclaratifs (`filters`)** : Prise en charge des listes déroulantes de filtre avec valeur neutre (`all`) et initialisation déclarative de valeur par défaut (`defaultValue`) sans verrouiller les sélections ultérieures.
+- **Export CSV Formaté** : Export immédiat des lignes filtrées actives avec en-têtes personnalisés et encodage UTF-8 BOM (`\uFEFF`) pour Excel.
+
 ## API REST & Hooks Partagés
 
 *   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).

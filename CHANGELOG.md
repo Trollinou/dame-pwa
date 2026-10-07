@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Correction du Filtrage Multi-Saisons dans l'Administration des Adhérents (`DataTable.vue`, `DataTableToolbar.vue`, `types.ts`, `MembersPage.vue`, `ContactsPage.vue`, `DataTable.spec.ts`)** :
+  - **Correction du Fallback de Filtre (`DataTableToolbar.vue`)** : Remplacement du repli systématique sur `defaultValue` par la valeur neutre `'all'` lorsque le filtre de colonne TanStack Table est réinitialisé (`undefined`), résolvant le dysfonctionnement où la sélection de « Toutes les saisons » réappliquait automatiquement la saison active courante.
+  - **Initialisation Déclarative des Filtres (`DataTable.vue`)** : Application unique et isolée de la valeur par défaut (`defaultValue`) lors du montage initial de la table sans écraser les changements de sélection ultérieurs de l'utilisateur.
+  - **Nettoyage & Synchronisation Réactive (`MembersPage.vue`, `ContactsPage.vue`)** : Suppression de l'assignation forcée résiduelle dans le cycle de vue de `MembersPage.vue` et ajout du callback `onChange` sur `DataTableFilterConfig` pour les filtres dépendants.
+  - **Couverture de Tests Unitaires (`DataTable.spec.ts`)** : Ajout d'une suite de tests automatisés vérifiant l'application de la valeur par défaut et le basculement fluide et persistant sur « Toutes les saisons ».
+
 - **Adaptation & Harmonisation du Mode Sombre (Dark Mode) pour les Thèmes Public & Core (`pwa/src/theme/`, `CHANGELOG.md`)** :
   - **Calendrier & Vue Agenda (`_public-components.scss`, `_public-layout.scss`)** :
     - Remplacement des variables de repli statiques blanches (`--ion-color-step-50: #f9f9f9`) dans les cellules avec événements (`.day-cell.has-events:not(.is-selected)`) par des variables adaptatives (`--ion-background-color-step-100`, `--ion-color-step-100`) pour éviter les cellules blanches en mode sombre.

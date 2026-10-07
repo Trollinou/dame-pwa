@@ -194,7 +194,10 @@ const filterConfigs = computed<DataTableFilterConfig[]>(() => [
     options: [
       { label: 'Toutes les régions', value: 'all' },
       ...regions.value.map((r) => ({ label: r.name, value: r.code }))
-    ]
+    ],
+    onChange: (val: unknown) => {
+      selectedRegion.value = (val as string) || 'all';
+    }
   },
   {
     id: 'department',
@@ -203,7 +206,10 @@ const filterConfigs = computed<DataTableFilterConfig[]>(() => [
     options: [
       { label: 'Tous les départements', value: 'all' },
       ...filteredDepartmentsList.value.map((d) => ({ label: d.name, value: d.code }))
-    ]
+    ],
+    onChange: (val: unknown) => {
+      selectedDepartment.value = (val as string) || 'all';
+    }
   }
 ]);
 
