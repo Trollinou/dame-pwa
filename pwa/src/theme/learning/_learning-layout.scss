@@ -10,11 +10,10 @@
    1. Conteneurs de base & Safe Areas
    ========================================================================== */
 
-.safe-area-wrapper {
+.contenu-ion-content .safe-area-wrapper,
+.learning-layout .safe-area-wrapper {
   max-width: 800px;
   margin: 0 auto;
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
 }
 
 .exercise-viewer-layout {
