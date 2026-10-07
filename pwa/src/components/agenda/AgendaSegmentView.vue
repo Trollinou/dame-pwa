@@ -45,9 +45,8 @@
             >
               <!-- Indicateur de couleur de catégorie -->
               <div
-                v-if="event.categories_data && event.categories_data.length > 0"
-                class="list-category-indicator"
-                :style="{ backgroundColor: event.categories_data[0].color }"
+                class="category-color-bar"
+                :style="{ backgroundColor: getEventPrimaryColor(event) }"
               ></div>
 
               <ion-label class="ion-padding-start">
@@ -239,6 +238,13 @@ const formatEventDate = (event: AgendaEvent): string => {
     return `Le ${formatPart(startDate)} de ${startTime} à ${endTime}`;
   }
   return `Le ${formatPart(startDate)} (Toute la journée)`;
+};
+
+const getEventPrimaryColor = (event: AgendaEvent): string => {
+  if (event.categories_data && event.categories_data.length > 0 && event.categories_data[0].color) {
+    return event.categories_data[0].color;
+  }
+  return '#3880ff';
 };
 
 watch(filteredEvents, () => {

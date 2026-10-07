@@ -14,6 +14,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Dédoublonnage & Remplacement par Classes Canoniques Uniques (Option 1)** :
     - Élimination des doublons et règles obsolètes dans `_public-components.scss` (`.badge`, `.badge-admin/rep/member`, `.elo-grid`, `.elo-item`, `.elo-label`, `.elo-val`, `.tournament-info-grid`, `.info-item`, `.info-label`, `.info-value`, `.detail-card`, `.admin-access-card`, `.redirect-banner`, `.success-message`, `.offline-banner`, `.event-main-title`).
     - Mise à jour et alignement direct des templates Vue (`ProfilePage.vue`, `TournamentDetailContent.vue`, `AgendaDetailContent.vue`, `BenevolatDetailContent.vue`, `LoginPage.vue`, `RegisterPage.vue`, `TournamentPage.vue`, `TournoisSegmentView.vue`, `NewsPage.vue`, `MemberDetailPage.vue`, `ChessThemeCustomizer.vue`, `PlayInfoBar.vue`, `AnalysisPage.vue`).
+  - **Correction Affichage Indicateur de Catégorie Agenda (`AgendaSegmentView.vue`, `_public-components.scss`, `_base.scss`)** : Rétablissement de la barre latérale de couleur de catégorie (`.category-color-bar`) et de la position relative sur `.dame-list-item`, ainsi que des styles de statut d'événement (`.past-event`, `.upcoming-title`).
   - **Documentation Vivante** : Mise à jour synchrone du catalogue des classes et conventions de style dans `README.md` et `USING.md`.
 
 ## [1.9.0] - 2026-10-04
