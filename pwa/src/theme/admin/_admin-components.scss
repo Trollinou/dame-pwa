@@ -181,3 +181,27 @@
   line-height: 1.4;
   text-align: center;
 }
+
+/* ==========================================================================
+   3. Événements et Badges de Catégories
+   ========================================================================== */
+
+.admin-event-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.admin-event-category-badge {
+  --background: var(--event-cat-color, var(--ion-color-primary));
+  --color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+

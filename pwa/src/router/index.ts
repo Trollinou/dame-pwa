@@ -12,6 +12,7 @@ const MessagesPage = () => import( '../views/MessagesPage.vue' );
 const AdminLayout = () => import( '../views/AdminLayout.vue' );
 const TournamentPage = () => import( '../views/TournamentPage.vue' );
 const GenericPage = () => import( '../views/GenericPage.vue' );
+const EventsPage = () => import( '../views/EventsPage.vue' );
 
 const routes: Array< RouteRecordRaw > = [
 	{
@@ -84,6 +85,23 @@ const routes: Array< RouteRecordRaw > = [
 				path: 'contact/:id',
 				name: 'ContactDetail',
 				component: () => import( '@/views/ContactDetailPage.vue' ),
+			},
+			{
+				path: 'agenda',
+				component: EventsPage,
+			},
+			{
+				path: 'agenda/:id',
+				name: 'AdminAgendaDetail',
+				component: () => import( '@/views/AdminAgendaDetailPage.vue' ),
+			},
+			{
+				path: 'events',
+				redirect: '/admin/agenda',
+			},
+			{
+				path: 'events/:id',
+				redirect: ( to ) => `/admin/agenda/${ to.params.id }`,
 			},
 			{
 				path: 'message',

@@ -69,6 +69,7 @@ import {
   homeOutline,
   peopleOutline,
   callOutline,
+  calendarOutline,
   handRightOutline,
   chatbubbleOutline,
   eyeOutline
@@ -88,6 +89,7 @@ const adminPages = [
   { title: 'Tableau de bord', url: '/admin/dashboard', icon: homeOutline },
   { title: 'Adhérents', url: '/admin/members', icon: peopleOutline },
   { title: 'Contacts', url: '/admin/contact', icon: callOutline },
+  { title: 'Événements', url: '/admin/agenda', icon: calendarOutline },
   { title: 'Appels à bénévoles', url: '/admin/benevolat', icon: handRightOutline },
   { title: 'Messages', url: '/admin/message', icon: chatbubbleOutline }
 ];

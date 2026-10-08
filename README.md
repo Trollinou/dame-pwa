@@ -21,6 +21,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
   - `src/components/agenda/detail/` : Composants purs de détail (`NewsDetailContent.vue`, `AgendaDetailContent.vue`, `TournamentDetailContent.vue`, `BenevolatDetailContent.vue`).
   - `src/components/common/SignaturePad.vue` : Composant réactif de signature tactile/manuscrite sur Canvas HTML5 (export PNG transparent).
   - `src/views/PreInscriptionPage.vue` : Formulaire de préinscription / réinscription en ligne pour la nouvelle saison avec signature électronique dématérialisée.
+  - `src/views/EventsPage.vue` & `src/views/AdminAgendaDetailPage.vue` : Grille d'administration des événements avec filtre par saison, export Excel/CSV et fiche détaillée.
   - `src/components/preinscription/` : Composants modulaires du formulaire (`PreInscriptionIdentitySelector.vue`, `PreInscriptionMemberSection.vue`, `PreInscriptionLegalRepSection.vue`, `PreInscriptionHealthSection.vue`, `PreInscriptionSuccessCard.vue`).
   - `src/composables/preinscription/` : Logique métier découplée (`usePreInscriptionApi.ts`, `usePreInscriptionForm.ts`, `useAddressAutocomplete.ts`) avec détection et mise à jour transparente des préinscriptions existantes et transmission de la signature.
   - `src/stores/auth/` : Sous-modules spécialisés pour l'authentification (`types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`) pilotés par la façade `useAuthStore` (`auth.ts`).

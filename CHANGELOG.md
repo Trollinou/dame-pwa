@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Ajout du Module d'Administration « Événements » (`EventsPage.vue`, `AdminAgendaDetailPage.vue`, `AdminLayout.vue`, `router/index.ts`, `stores/agenda.ts`, `seasonUtils.ts`, `_admin-components.scss`, `seasonUtils.spec.ts`, `README.md`, `USING.md`)** :
+  - **Menu d'administration & Routage** : Ajout de l'entrée « Événements » dans le menu latéral d'administration entre « Contacts » et « Appels à bénévoles » (`/admin/agenda`), avec routes protégées et vue détaillée (`/admin/agenda/:id`) équivalente à l'affichage public.
+  - **Grille de données réactive (`DataTable`)** : Liste des événements ordonnée par défaut par ordre chronologique croissant (date de début puis heure de début) avec colonnes de date, plage/horaires, titre, badge de catégorie coloré et lieu.
+  - **Filtre par Saison Sportive** : Calcul automatique des saisons (du 1er septembre de l'année X au 31 août de l'année X+1). Le filtre déroulant propose *Toutes les saisons*, la *Saison courante* (sélectionnée par défaut) puis les *Saisons antérieures* par ordre décroissant.
+  - **Export Excel / CSV Enrichi** : Export selon la saison active avec l'intégralité des métadonnées disponibles (ID, titre, dates début/fin, horaires/plage, journée entière, catégories avec codes couleurs, saison, lieu, adresse postale, code postal, ville, type/niveau de compétition et description).
+  - **Utilitaires et Tests Unitaires Dédiés** : Création de `seasonUtils.ts` pour le calcul et formatage des saisons/horaires avec couverture complète de tests unitaires (`seasonUtils.spec.ts`).
+
 - **Correction du Filtrage Multi-Saisons dans l'Administration des Adhérents (`DataTable.vue`, `DataTableToolbar.vue`, `types.ts`, `MembersPage.vue`, `ContactsPage.vue`, `DataTable.spec.ts`)** :
   - **Correction du Fallback de Filtre (`DataTableToolbar.vue`)** : Remplacement du repli systématique sur `defaultValue` par la valeur neutre `'all'` lorsque le filtre de colonne TanStack Table est réinitialisé (`undefined`), résolvant le dysfonctionnement où la sélection de « Toutes les saisons » réappliquait automatiquement la saison active courante.
   - **Initialisation Déclarative des Filtres (`DataTable.vue`)** : Application unique et isolée de la valeur par défaut (`defaultValue`) lors du montage initial de la table sans écraser les changements de sélection ultérieurs de l'utilisateur.

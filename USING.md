@@ -264,7 +264,7 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
    - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).
 
-## Espace Administration & Gestion Club (Adhérents, Bénévolat, Contacts, Messages)
+## Espace Administration & Gestion Club (Adhérents, Contacts, Événements, Bénévolat, Messages)
 
 Accessible aux profils administrateurs via le menu latéral, l'espace d'administration permet de piloter les données de l'association :
 
@@ -272,9 +272,15 @@ Accessible aux profils administrateurs via le menu latéral, l'espace d'administ
    - **Filtrage par Saison** : Par défaut, la liste affiche les adhérents inscrits pour la dernière saison en cours. Le sélecteur de filtre permet d'isoler une saison spécifique ou de sélectionner **« Toutes les saisons »** pour obtenir une vue globale exhaustive de tous les adhérents enregistrés.
    - **Recherche & Tri** : Recherche textuelle instantanée insensible aux accents et tri par nom, catégorie d'âge, licence, Elo, téléphone ou e-mail.
    - **Export CSV** : Bouton d'exportation générant un fichier CSV encodé en UTF-8 BOM (`adherents.csv`) respectant le filtrage actif.
-2. **Appels à Bénévolat (`/admin/benevolat`)** : Suivi des réponses et créneaux avec filtrage par statut (*Tous les appels*, *Appels en cours*, *Appels terminés*).
-3. **Répertoire de Contacts (`/admin/contacts`)** : Annuaire avec filtres combinés par type de contact, région et département.
-4. **Messages & Communications (`/admin/messages`)** : Historique et consultation détaillée des messages reçus.
+2. **Répertoire de Contacts (`/admin/contact`)** : Annuaire avec filtres combinés par type de contact, région et département.
+3. **Gestion des Événements (`/admin/agenda`)** :
+   - **Liste chronologique** : Classement par ordre croissant des événements (date et heure de début).
+   - **Filtre par saison** : Filtrage automatique par saison sportive (du 1er septembre de l'année X au 31 août de l'année X+1). Options disponibles : *Toutes les saisons*, *Saison courante* (sélectionnée par défaut), puis saisons précédentes par ordre décroissant.
+   - **Informations complètes** : Affichage de la date de début, plage horaire / calendaire (heures de début/fin ou dates de début/fin si plusieurs jours), titre, badges de catégories avec code couleur et lieu de l'événement.
+   - **Affichage détaillé** : Le clic sur un événement ouvre la fiche détaillée complète équivalente à l'affichage public (`/admin/agenda/:id`) avec bouton retour vers la liste d'administration.
+   - **Export Excel / CSV** : Export complet des données selon le filtre de saison affiché avec l'ensemble des colonnes disponibles (ID, titre, dates début/fin, plage/horaires, heures, journée entière, catégories avec code couleur, saison, lieu, adresse, code postal, ville, type/niveau de compétition et description).
+4. **Appels à Bénévolat (`/admin/benevolat`)** : Suivi des réponses et créneaux avec filtrage par statut (*Tous les appels*, *Appels en cours*, *Appels terminés*).
+5. **Messages & Communications (`/admin/message`)** : Historique et consultation détaillée des messages reçus.
 
 ## Informations Système, Mises à Jour & Gestion du Cache
 

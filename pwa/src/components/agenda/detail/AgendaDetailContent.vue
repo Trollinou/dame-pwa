@@ -135,12 +135,16 @@ const props = defineProps<{
 const agendaStore = useAgendaStore();
 const { handleInternalLinks } = useInternalLinks();
 
-const isLoading = computed(() => agendaStore.isLoading);
+const isLoading = computed(() => agendaStore.isLoading || agendaStore.isAdminEventsLoading);
 
 const currentEvent = computed(() => {
   if (props.event) return props.event;
   if (props.eventId) {
-    return agendaStore.events.find((e) => e.id === props.eventId) || null;
+    return (
+      agendaStore.events.find((e) => e.id === props.eventId) ||
+      agendaStore.adminEvents.find((e) => e.id === props.eventId) ||
+      null
+    );
   }
   return null;
 });
