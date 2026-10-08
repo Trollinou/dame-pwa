@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import CapOuPasCapViewer from '@/components/shared/CapOuPasCapViewer.vue';
+import CapOuPasCapViewer from '@/components/learning/viewers/CapOuPasCapViewer.vue';
 import type { ExerciseType14Config } from '@/types/roi';
 
 const props = defineProps<{

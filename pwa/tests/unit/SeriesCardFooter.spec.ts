@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { computed, ref, nextTick, provide } from 'vue';
 import { mount } from '@vue/test-utils';
-import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
+import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 
 vi.mock( '@/composables/useCelebration', () => ( {

@@ -101,7 +101,7 @@ import {
   IonCheckbox
 } from '@ionic/vue';
 import type { PreInscriptionFormData } from '@/composables/preinscription/usePreInscriptionForm';
-import SignaturePad from '@/components/common/SignaturePad.vue';
+import SignaturePad from '@/components/shared/SignaturePad.vue';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const siteUrl = apiBaseUrl.replace(/\/wp-json\/?$/, '');

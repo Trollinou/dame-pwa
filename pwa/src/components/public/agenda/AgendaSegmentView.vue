@@ -112,7 +112,7 @@ import type { AgendaEvent } from '@/stores/agenda';
 import { removeAccents } from '@/utils/stringUtils';
 import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
-import AgendaDetailContent from '@/components/agenda/detail/AgendaDetailContent.vue';
+import AgendaDetailContent from '@/components/public/agenda/detail/AgendaDetailContent.vue';
 import AgendaCalendarView from './AgendaCalendarView.vue';
 
 const { isTabletLandscape } = useIsTabletLandscape();

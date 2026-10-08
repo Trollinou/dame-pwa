@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { useApprentissageStore } from '@/stores/apprentissage';
-import JugementFinalViewer from '@/components/shared/JugementFinalViewer.vue';
+import JugementFinalViewer from '@/components/learning/viewers/JugementFinalViewer.vue';
 import type { ExerciseType15Config } from '@/types/roi';
 
 const props = defineProps<{

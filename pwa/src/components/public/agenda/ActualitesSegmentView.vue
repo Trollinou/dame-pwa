@@ -70,7 +70,7 @@ import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
 import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
-import NewsDetailContent from '@/components/agenda/detail/NewsDetailContent.vue';
+import NewsDetailContent from '@/components/public/agenda/detail/NewsDetailContent.vue';
 
 const newsStore = useNewsStore();
 const unreadStore = useUnreadStore();

@@ -213,7 +213,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePwaUpdate } from '@/composables/usePwaUpdate';
 import { useFeedback } from '@/composables/useFeedback';
-import ChessThemeCustomizer from '@/components/profile/ChessThemeCustomizer.vue';
+import ChessThemeCustomizer from '@/components/auth/profile/ChessThemeCustomizer.vue';
 
 const router = useRouter();
 const ionRouter = useIonRouter();

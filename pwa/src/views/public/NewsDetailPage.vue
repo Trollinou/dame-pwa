@@ -33,7 +33,7 @@ import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNewsStore } from '@/stores/news';
 import { useUnreadStore } from '@/stores/unread';
-import NewsDetailContent from '@/components/agenda/detail/NewsDetailContent.vue';
+import NewsDetailContent from '@/components/public/agenda/detail/NewsDetailContent.vue';
 
 const route = useRoute();
 const newsStore = useNewsStore();

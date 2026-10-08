@@ -37,9 +37,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import ParcoursViewer from '@/components/shared/ParcoursViewer.vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import ParcoursViewer from '@/components/learning/viewers/ParcoursViewer.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { getParcoursVariant } from '@/utils/parcoursVariants';
 import type { DrawShape } from 'eg-chessboard';
 import type { ExerciseType9Config } from '@/types/roi';

@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import QuiSuisJeViewer from '@/components/shared/QuiSuisJeViewer.vue';
+import QuiSuisJeViewer from '@/components/learning/viewers/QuiSuisJeViewer.vue';
 import type { ExerciseType12Config } from '@/types/roi';
 
 defineProps<{

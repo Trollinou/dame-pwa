@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { IonButton } from '@ionic/vue';
-import DiagramViewer from '@/components/shared/DiagramViewer.vue';
+import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import { useFeedback } from '@/composables/useFeedback';
 import { shuffleArray } from '@/utils/chessNotation';
 

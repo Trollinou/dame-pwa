@@ -31,7 +31,7 @@ import {
 import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useUnreadStore } from '@/stores/unread';
-import TournamentDetailContent from '@/components/agenda/detail/TournamentDetailContent.vue';
+import TournamentDetailContent from '@/components/public/agenda/detail/TournamentDetailContent.vue';
 
 const route = useRoute();
 const unreadStore = useUnreadStore();

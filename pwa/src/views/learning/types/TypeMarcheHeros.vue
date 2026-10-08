@@ -92,10 +92,10 @@ import { parseFen, makeFen } from 'chessops/fen';
 import { parseSan } from 'chessops/san';
 import { parsePgn } from 'chessops/pgn';
 import { isNormal } from 'chessops/types';
-import DiagramViewer from '@/components/shared/DiagramViewer.vue';
-import PuzzleViewer from '@/components/shared/PuzzleViewer.vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
+import PuzzleViewer from '@/components/learning/viewers/PuzzleViewer.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { shuffleArray } from '@/utils/chessNotation';
 
 import type { Key, DrawShape } from 'eg-chessboard';

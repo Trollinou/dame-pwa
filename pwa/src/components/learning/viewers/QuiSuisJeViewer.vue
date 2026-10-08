@@ -79,8 +79,8 @@ import { IonIcon } from '@ionic/vue';
 import { helpCircleOutline } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { DrawShape } from 'eg-chessboard';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
 const chessPreferences = useChessPreferencesStore();

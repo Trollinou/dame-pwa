@@ -85,7 +85,7 @@ import {
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useFeedback } from '@/composables/useFeedback';
 import { shuffleArray } from '@/utils/chessNotation';
-import PgnViewer from '@/components/shared/PgnViewer.vue';
+import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 
 const { showSuccess, showError } = useFeedback();
 

@@ -57,7 +57,7 @@ import {
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useFeedback } from '@/composables/useFeedback';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
-import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 
 const { showSuccess, showError } = useFeedback();
 

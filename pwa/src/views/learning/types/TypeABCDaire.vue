@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import ABCDaireTactiqueViewer, { type ExerciceABCDaire } from '@/components/shared/ABCDaireTactiqueViewer.vue';
+import ABCDaireTactiqueViewer, { type ExerciceABCDaire } from '@/components/learning/viewers/ABCDaireTactiqueViewer.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import type { ExerciseType3Config } from '@/types/roi';
 

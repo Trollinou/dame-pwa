@@ -57,10 +57,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
-import MatchingViewer from '@/components/shared/MatchingViewer.vue';
-import PgnViewer from '@/components/shared/PgnViewer.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
+import MatchingViewer from '@/components/learning/viewers/MatchingViewer.vue';
+import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 import {
   parseAssociPlanPaires,
   type AssociPlanPaire,

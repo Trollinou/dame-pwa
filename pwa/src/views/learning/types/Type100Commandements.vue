@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import QcmViewer from '@/components/shared/QcmViewer.vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
+import QcmViewer from '@/components/learning/viewers/QcmViewer.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import type { ExerciseType1Config, QcmItem } from '@/types/roi';
 

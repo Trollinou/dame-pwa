@@ -94,9 +94,9 @@ import { useAuthStore } from '@/stores/auth';
 import { useChessStore } from '@/stores/chess';
 import { useBoardOrientation } from '@/composables/play/useBoardOrientation';
 import { usePlayGame } from '@/composables/play/usePlayGame';
-import PlayInfoBar from '@/components/play/PlayInfoBar.vue';
-import PlayActionsPanel from '@/components/play/PlayActionsPanel.vue';
-import PlaySettingsModal from '@/components/play/PlaySettingsModal.vue';
+import PlayInfoBar from '@/components/learning/play/PlayInfoBar.vue';
+import PlayActionsPanel from '@/components/learning/play/PlayActionsPanel.vue';
+import PlaySettingsModal from '@/components/learning/play/PlaySettingsModal.vue';
 
 const authStore = useAuthStore();
 const chessStore = useChessStore();

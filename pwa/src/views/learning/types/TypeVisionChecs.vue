@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import VisionViewer from '@/components/shared/VisionViewer.vue';
+import VisionViewer from '@/components/learning/viewers/VisionViewer.vue';
 import type { ExerciseType8Config } from '@/types/roi';
 
 defineProps<{

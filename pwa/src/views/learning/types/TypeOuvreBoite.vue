@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import OuvreBoiteViewer from '@/components/shared/OuvreBoiteViewer.vue';
+import OuvreBoiteViewer from '@/components/learning/viewers/OuvreBoiteViewer.vue';
 import type { ExerciseType13Config } from '@/types/roi';
 
 const props = defineProps<{

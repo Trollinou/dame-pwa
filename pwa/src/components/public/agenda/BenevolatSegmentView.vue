@@ -129,7 +129,7 @@ import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
 import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
-import BenevolatDetailContent from '@/components/agenda/detail/BenevolatDetailContent.vue';
+import BenevolatDetailContent from '@/components/public/agenda/detail/BenevolatDetailContent.vue';
 
 const benevolatStore = useBenevolatStore();
 const authStore = useAuthStore();

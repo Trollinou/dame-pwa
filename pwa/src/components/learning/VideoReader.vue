@@ -109,8 +109,8 @@ import {
   informationCircleOutline,
   closeOutline
 } from 'ionicons/icons';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
 import { useYouTubePlayer } from '@/composables/useYouTubePlayer';
 
 const props = defineProps<{

@@ -90,7 +90,7 @@ import { Chess } from 'chessops';
 import { parseFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import { parsePgn } from 'chessops/pgn';
-import PgnViewer from '@/components/shared/PgnViewer.vue';
+import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 
 const { showSuccess, showError } = useFeedback();
 

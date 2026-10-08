@@ -84,7 +84,7 @@ import {
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore } from 'eg-chessboard';
-import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
+import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
 
 const props = defineProps<{
   pgnString?: string;

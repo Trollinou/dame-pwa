@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import PlacementViewer, { type DiagrammePopEchecs } from '@/components/shared/PlacementViewer.vue';
+import PlacementViewer, { type DiagrammePopEchecs } from '@/components/learning/viewers/PlacementViewer.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import type { ExerciseType2Config } from '@/types/roi';
 

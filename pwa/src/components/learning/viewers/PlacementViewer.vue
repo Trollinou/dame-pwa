@@ -61,8 +61,8 @@ import {
   filterYellowShapes
 } from '@/utils/fenUtils';
 import { CHAR_TO_ROLE, getPieceDisplayName } from '@/utils/chessNotation';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import SeriesCardFooter, { type CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 
 const chessPreferences = useChessPreferencesStore();
 

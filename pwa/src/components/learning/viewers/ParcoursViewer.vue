@@ -50,7 +50,7 @@ import {
 } from '@/utils/parcoursVariants';
 import { LoopTracker, extractOpponentPieceSquare } from '@/utils/LoopTracker';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
-import type { CardFeedback } from '@/components/shared/SeriesCardFooter.vue';
+import type { CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 
 const chessPreferences = useChessPreferencesStore();
 

@@ -36,10 +36,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick, render, createVNode } from 'vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
-import SeriesCardFooter from '@/components/shared/SeriesCardFooter.vue';
-import DiagramViewer from '@/components/shared/DiagramViewer.vue';
-import PgnViewer from '@/components/shared/PgnViewer.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
+import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
+import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 import type { DrawShape } from 'eg-chessboard';
 
 const props = defineProps<{

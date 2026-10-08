@@ -41,7 +41,7 @@ import {
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAgendaStore } from '@/stores/agenda';
-import AgendaDetailContent from '@/components/agenda/detail/AgendaDetailContent.vue';
+import AgendaDetailContent from '@/components/public/agenda/detail/AgendaDetailContent.vue';
 
 const route = useRoute();
 const agendaStore = useAgendaStore();

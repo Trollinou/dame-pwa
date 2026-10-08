@@ -24,8 +24,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
-import EvalViewer, { type QuestionEval } from '@/components/shared/EvalViewer.vue';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
+import EvalViewer, { type QuestionEval } from '@/components/learning/viewers/EvalViewer.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
 import type { ExerciseType10Config } from '@/types/roi';
 
 const props = defineProps<{

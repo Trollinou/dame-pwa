@@ -33,7 +33,7 @@ import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBenevolatStore } from '@/stores/benevolat';
 import { useUnreadStore } from '@/stores/unread';
-import BenevolatDetailContent from '@/components/agenda/detail/BenevolatDetailContent.vue';
+import BenevolatDetailContent from '@/components/public/agenda/detail/BenevolatDetailContent.vue';
 
 const route = useRoute();
 const benevolatStore = useBenevolatStore();

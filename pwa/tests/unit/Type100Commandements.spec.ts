@@ -6,7 +6,7 @@ import { queryClient } from '@/queryClient';
 import Type100Commandements from '@/views/learning/types/Type100Commandements.vue';
 
 // Mock QcmViewer to easily trigger success emit
-vi.mock( '@/components/shared/QcmViewer.vue', () => ( {
+vi.mock( '@/components/learning/viewers/QcmViewer.vue', () => ( {
 	default: {
 		name: 'QcmViewer',
 		props: [

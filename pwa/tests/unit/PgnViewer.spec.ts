@@ -1,7 +1,7 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { mount, flushPromises, VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import PgnViewer from '@/components/shared/PgnViewer.vue';
+import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 
 describe( 'PgnViewer.vue', () => {
 	beforeEach( () => {

@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import OrderViewer from '@/components/shared/OrderViewer.vue';
+import OrderViewer from '@/components/learning/viewers/OrderViewer.vue';
 import type { DrawShape } from 'eg-chessboard';
 import type { ExerciseType11Config } from '@/types/roi';
 

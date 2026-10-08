@@ -129,11 +129,11 @@ import { useAuthStore } from '@/stores/auth';
 import { usePreInscriptionForm } from '@/composables/preinscription/usePreInscriptionForm';
 import { useAddressAutocomplete } from '@/composables/preinscription/useAddressAutocomplete';
 import { usePreInscriptionApi } from '@/composables/preinscription/usePreInscriptionApi';
-import PreInscriptionSuccessCard from '@/components/preinscription/PreInscriptionSuccessCard.vue';
-import PreInscriptionIdentitySelector from '@/components/preinscription/PreInscriptionIdentitySelector.vue';
-import PreInscriptionMemberSection from '@/components/preinscription/PreInscriptionMemberSection.vue';
-import PreInscriptionLegalRepSection from '@/components/preinscription/PreInscriptionLegalRepSection.vue';
-import PreInscriptionHealthSection from '@/components/preinscription/PreInscriptionHealthSection.vue';
+import PreInscriptionSuccessCard from '@/components/public/preinscription/PreInscriptionSuccessCard.vue';
+import PreInscriptionIdentitySelector from '@/components/public/preinscription/PreInscriptionIdentitySelector.vue';
+import PreInscriptionMemberSection from '@/components/public/preinscription/PreInscriptionMemberSection.vue';
+import PreInscriptionLegalRepSection from '@/components/public/preinscription/PreInscriptionLegalRepSection.vue';
+import PreInscriptionHealthSection from '@/components/public/preinscription/PreInscriptionHealthSection.vue';
 
 const authStore = useAuthStore();
 

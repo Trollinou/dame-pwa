@@ -150,10 +150,10 @@ import { useUnreadStore } from '@/stores/unread';
 import { storeToRefs } from 'pinia';
 import { useAgendaSearch } from '@/composables/agenda/useAgendaSearch';
 
-const ActualitesSegmentView = defineAsyncComponent(() => import('@/components/agenda/ActualitesSegmentView.vue'));
-const AgendaSegmentView = defineAsyncComponent(() => import('@/components/agenda/AgendaSegmentView.vue'));
-const TournoisSegmentView = defineAsyncComponent(() => import('@/components/agenda/TournoisSegmentView.vue'));
-const BenevolatSegmentView = defineAsyncComponent(() => import('@/components/agenda/BenevolatSegmentView.vue'));
+const ActualitesSegmentView = defineAsyncComponent(() => import('@/components/public/agenda/ActualitesSegmentView.vue'));
+const AgendaSegmentView = defineAsyncComponent(() => import('@/components/public/agenda/AgendaSegmentView.vue'));
+const TournoisSegmentView = defineAsyncComponent(() => import('@/components/public/agenda/TournoisSegmentView.vue'));
+const BenevolatSegmentView = defineAsyncComponent(() => import('@/components/public/agenda/BenevolatSegmentView.vue'));
 
 const router = useRouter();
 const route = useRoute();
