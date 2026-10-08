@@ -4,7 +4,7 @@ import VideoReader from '@/components/learning/VideoReader.vue';
 import {
 	useYouTubePlayer,
 	YOUTUBE_DEFAULT_THRESHOLD_PERCENT,
-} from '@/composables/useYouTubePlayer';
+} from '@/composables/learning/useYouTubePlayer';
 
 describe( 'useYouTubePlayer', () => {
 	test( 'le seuil par défaut est bien de 95%', () => {

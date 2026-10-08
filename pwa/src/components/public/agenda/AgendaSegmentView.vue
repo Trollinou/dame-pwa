@@ -110,7 +110,7 @@ import {
 } from '@ionic/vue';
 import type { AgendaEvent } from '@/stores/agenda';
 import { removeAccents } from '@/utils/stringUtils';
-import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
+import { useIsTabletLandscape } from '@/composables/core/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
 import AgendaDetailContent from '@/components/public/agenda/detail/AgendaDetailContent.vue';
 import AgendaCalendarView from './AgendaCalendarView.vue';

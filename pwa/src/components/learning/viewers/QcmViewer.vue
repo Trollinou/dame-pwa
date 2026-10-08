@@ -55,7 +55,7 @@ import {
   IonButton
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import { useFeedback } from '@/composables/useFeedback';
+import { useFeedback } from '@/composables/core/useFeedback';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 

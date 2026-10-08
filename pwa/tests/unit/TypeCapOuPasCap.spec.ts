@@ -6,7 +6,7 @@ import { queryClient } from '@/queryClient';
 import TypeCapOuPasCap from '@/views/learning/types/TypeCapOuPasCap.vue';
 
 const fireCelebrationMock = vi.fn();
-vi.mock( '@/composables/useCelebration', () => ( {
+vi.mock( '@/composables/learning/useCelebration', () => ( {
 	fireExerciseCelebration: () => fireCelebrationMock(),
 } ) );
 

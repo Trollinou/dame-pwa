@@ -111,7 +111,7 @@ import {
 } from 'ionicons/icons';
 import ContentHeader from '@/components/learning/ContentHeader.vue';
 import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
-import { useYouTubePlayer } from '@/composables/useYouTubePlayer';
+import { useYouTubePlayer } from '@/composables/learning/useYouTubePlayer';
 
 const props = defineProps<{
   title: string;

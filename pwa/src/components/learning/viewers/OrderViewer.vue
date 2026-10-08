@@ -75,7 +75,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { IonButton } from '@ionic/vue';
 import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
-import { useFeedback } from '@/composables/useFeedback';
+import { useFeedback } from '@/composables/core/useFeedback';
 import { shuffleArray } from '@/utils/chess/chessNotation';
 
 const { showError } = useFeedback();

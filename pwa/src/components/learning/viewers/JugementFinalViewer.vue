@@ -84,7 +84,7 @@ import {
   IonButton
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import { useFeedback } from '@/composables/useFeedback';
+import { useFeedback } from '@/composables/core/useFeedback';
 import type { BoardCore } from 'eg-chessboard';
 import { Chess } from 'chessops';
 import { parseFen } from 'chessops/fen';

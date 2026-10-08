@@ -119,8 +119,8 @@ import {
   alertCircleOutline,
   listOutline
 } from 'ionicons/icons';
-import { useExerciseNavigation } from '@/composables/useExerciseNavigation';
-import { fireExerciseCelebration } from '@/composables/useCelebration';
+import { useExerciseNavigation } from '@/composables/learning/useExerciseNavigation';
+import { fireExerciseCelebration } from '@/composables/learning/useCelebration';
 
 export interface CardFeedback {
   message: string;

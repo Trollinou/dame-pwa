@@ -211,8 +211,8 @@ import {
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
-import { usePwaUpdate } from '@/composables/usePwaUpdate';
-import { useFeedback } from '@/composables/useFeedback';
+import { usePwaUpdate } from '@/composables/core/usePwaUpdate';
+import { useFeedback } from '@/composables/core/useFeedback';
 import ChessThemeCustomizer from '@/components/auth/profile/ChessThemeCustomizer.vue';
 
 const router = useRouter();

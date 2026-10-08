@@ -198,7 +198,7 @@ import {
   IonSelectOption,
   IonCheckbox
 } from '@ionic/vue';
-import type { PreInscriptionFormData } from '@/composables/preinscription/usePreInscriptionForm';
+import type { PreInscriptionFormData } from '@/composables/public/preinscription/usePreInscriptionForm';
 import type { GeoAddressResult } from '@/utils/geoApi';
 
 const form = inject<PreInscriptionFormData>('preInscriptionForm')!;

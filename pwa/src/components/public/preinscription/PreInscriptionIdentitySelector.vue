@@ -40,7 +40,7 @@ import {
   IonSelect,
   IonSelectOption
 } from '@ionic/vue';
-import type { RegistrationTarget } from '@/composables/preinscription/usePreInscriptionApi';
+import type { RegistrationTarget } from '@/composables/public/preinscription/usePreInscriptionApi';
 
 defineProps<{
   registrationTargets: RegistrationTarget[];

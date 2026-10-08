@@ -125,7 +125,7 @@ import {
   informationCircleOutline
 } from 'ionicons/icons';
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
-import { useInternalLinks } from '@/composables/useInternalLinks';
+import { useInternalLinks } from '@/composables/core/useInternalLinks';
 
 const props = defineProps<{
   event?: AgendaEvent | null;

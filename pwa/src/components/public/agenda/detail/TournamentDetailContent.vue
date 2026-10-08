@@ -39,7 +39,7 @@ import {
 import { cloudOfflineOutline } from 'ionicons/icons';
 import { safeFetch } from '@/utils/safeFetch';
 import { useTournamentStore } from '@/stores/tournament';
-import { useInternalLinks } from '@/composables/useInternalLinks';
+import { useInternalLinks } from '@/composables/core/useInternalLinks';
 import type { WpPage } from '@/types/wp';
 
 const props = defineProps<{

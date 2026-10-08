@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import { useFeedback } from '@/composables/useFeedback';
+import { useFeedback } from '@/composables/core/useFeedback';
 import type { BoardCore, Key, DrawShape, Move } from 'eg-chessboard';
 
 const { showSuccess, showError } = useFeedback();

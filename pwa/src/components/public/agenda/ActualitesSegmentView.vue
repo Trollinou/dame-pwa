@@ -68,7 +68,7 @@ import {
 import { useNewsStore, type Post } from '@/stores/news';
 import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
-import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
+import { useIsTabletLandscape } from '@/composables/core/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
 import NewsDetailContent from '@/components/public/agenda/detail/NewsDetailContent.vue';
 

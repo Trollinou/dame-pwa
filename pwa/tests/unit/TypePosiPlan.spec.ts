@@ -5,10 +5,10 @@ import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypePosiPlan from '@/views/learning/types/TypePosiPlan.vue';
-import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
+import { EXERCISE_NAVIGATION_KEY } from '@/composables/learning/useExerciseNavigation';
 
 const fireCelebrationMock = vi.fn();
-vi.mock( '@/composables/useCelebration', () => ( {
+vi.mock( '@/composables/learning/useCelebration', () => ( {
 	fireExerciseCelebration: () => fireCelebrationMock(),
 } ) );
 

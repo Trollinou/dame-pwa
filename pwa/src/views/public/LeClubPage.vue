@@ -148,7 +148,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useNewsStore } from '@/stores/news';
 import { useUnreadStore } from '@/stores/unread';
 import { storeToRefs } from 'pinia';
-import { useAgendaSearch } from '@/composables/agenda/useAgendaSearch';
+import { useAgendaSearch } from '@/composables/public/agenda/useAgendaSearch';
 
 const ActualitesSegmentView = defineAsyncComponent(() => import('@/components/public/agenda/ActualitesSegmentView.vue'));
 const AgendaSegmentView = defineAsyncComponent(() => import('@/components/public/agenda/AgendaSegmentView.vue'));

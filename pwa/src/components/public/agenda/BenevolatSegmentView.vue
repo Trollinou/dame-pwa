@@ -127,7 +127,7 @@ import { useBenevolatStore, type Benevolat } from '@/stores/benevolat';
 import { useAuthStore } from '@/stores/auth';
 import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
-import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
+import { useIsTabletLandscape } from '@/composables/core/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
 import BenevolatDetailContent from '@/components/public/agenda/detail/BenevolatDetailContent.vue';
 

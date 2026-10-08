@@ -36,7 +36,7 @@ import {
 } from '@ionic/vue';
 import { cloudOfflineOutline } from 'ionicons/icons';
 import { useNewsStore, type Post } from '@/stores/news';
-import { useInternalLinks } from '@/composables/useInternalLinks';
+import { useInternalLinks } from '@/composables/core/useInternalLinks';
 import { safeFetch } from '@/utils/safeFetch';
 
 const props = defineProps<{

@@ -100,7 +100,7 @@ import {
   IonButton,
   IonCheckbox
 } from '@ionic/vue';
-import type { PreInscriptionFormData } from '@/composables/preinscription/usePreInscriptionForm';
+import type { PreInscriptionFormData } from '@/composables/public/preinscription/usePreInscriptionForm';
 import SignaturePad from '@/components/shared/SignaturePad.vue';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;

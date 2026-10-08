@@ -83,7 +83,7 @@ import { trophyOutline, chevronForwardOutline, cloudOfflineOutline } from 'ionic
 import { useTournamentStore, type MenuItem } from '@/stores/tournament';
 import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
-import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
+import { useIsTabletLandscape } from '@/composables/core/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
 import TournamentDetailContent from '@/components/public/agenda/detail/TournamentDetailContent.vue';
 

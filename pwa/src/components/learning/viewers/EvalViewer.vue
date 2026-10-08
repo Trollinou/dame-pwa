@@ -65,7 +65,7 @@
 import { ref, computed } from 'vue';
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import { useFeedback } from '@/composables/useFeedback';
+import { useFeedback } from '@/composables/core/useFeedback';
 import type { DrawShape } from 'eg-chessboard';
 import PuzzleViewer from './PuzzleViewer.vue';
 import PgnViewer from './PgnViewer.vue';

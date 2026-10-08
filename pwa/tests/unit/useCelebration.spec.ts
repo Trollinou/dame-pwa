@@ -3,7 +3,7 @@ import {
 	launchConfetti,
 	triggerSuccessHaptics,
 	fireExerciseCelebration,
-} from '@/composables/useCelebration';
+} from '@/composables/learning/useCelebration';
 import confetti from 'canvas-confetti';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 
