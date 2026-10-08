@@ -194,7 +194,10 @@ const filterConfigs = computed<DataTableFilterConfig[]>(() => [
     options: [
       { label: 'Toutes les régions', value: 'all' },
       ...regions.value.map((r) => ({ label: r.name, value: r.code }))
-    ]
+    ],
+    onChange: (val: unknown) => {
+      selectedRegion.value = (val as string) || 'all';
+    }
   },
   {
     id: 'department',
@@ -203,7 +206,10 @@ const filterConfigs = computed<DataTableFilterConfig[]>(() => [
     options: [
       { label: 'Tous les départements', value: 'all' },
       ...filteredDepartmentsList.value.map((d) => ({ label: d.name, value: d.code }))
-    ]
+    ],
+    onChange: (val: unknown) => {
+      selectedDepartment.value = (val as string) || 'all';
+    }
   }
 ]);
 
@@ -231,10 +237,3 @@ onIonViewWillEnter(async () => {
   referenceDataStore.fetchMapping();
 });
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-</style>

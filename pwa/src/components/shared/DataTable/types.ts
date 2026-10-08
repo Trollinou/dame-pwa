@@ -13,6 +13,7 @@ export interface DataTableFilterConfig {
 	label: string;
 	options: SelectFilterOption[];
 	defaultValue?: string | number;
+	onChange?: ( _value: unknown ) => void;
 }
 
 export interface DataTableExportConfig< TData > {

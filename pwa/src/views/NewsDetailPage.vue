@@ -26,23 +26,29 @@ import {
   IonTitle,
   IonContent,
   IonButtons,
-  IonBackButton
+  IonBackButton,
+  onIonViewWillEnter
 } from '@ionic/vue';
-import { computed } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNewsStore } from '@/stores/news';
+import { useUnreadStore } from '@/stores/unread';
 import NewsDetailContent from '@/components/agenda/detail/NewsDetailContent.vue';
 
 const route = useRoute();
 const newsStore = useNewsStore();
+const unreadStore = useUnreadStore();
 
 const postId = computed(() => Number(route.params.id));
 const post = computed(() => newsStore.getPostById(postId.value));
-</script>
 
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-</style>
+const markAsSeen = () => {
+  if (postId.value) {
+    unreadStore.markNewsAsSeen(postId.value, post.value?.modified);
+  }
+};
+
+onMounted(markAsSeen);
+onIonViewWillEnter(markAsSeen);
+watch(postId, markAsSeen);
+</script>

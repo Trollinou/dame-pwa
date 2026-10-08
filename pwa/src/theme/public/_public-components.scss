@@ -1,0 +1,649 @@
+/**
+ * Composants unifiés et normalisés pour le groupe Public & Vitrine / Joueur.
+ * Architecture KISS & Centralisée.
+ */
+
+/* ==========================================================================
+   1. Vitrine, Accueil & Actualités
+   ========================================================================== */
+
+.home-section {
+  margin: 0;
+  background: transparent;
+}
+
+.pre-inscription-card {
+  border-radius: var(--dame-card-radius, 12px);
+  border: var(--dame-card-border);
+  box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
+  margin-bottom: 16px;
+}
+
+.pre-inscription-btn {
+  --border-radius: var(--dame-item-radius, 8px);
+  font-weight: 600;
+}
+
+.news-card {
+  border-radius: var(--dame-card-radius, 12px);
+  overflow: hidden;
+  box-shadow: var(--dame-card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  border: var(--dame-card-border);
+
+  .featured-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+}
+
+.news-card-header {
+  padding-bottom: 6px;
+}
+
+.news-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.cta-container {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  color: var(--ion-color-primary);
+  font-weight: 600;
+
+  .cta-text {
+    margin-right: 5px;
+  }
+}
+
+/* Détails des actualités */
+.news-detail-content {
+  width: 100%;
+}
+
+/* ==========================================================================
+   2. Agenda, Calendrier & Bénévolat
+   ========================================================================== */
+
+.agenda-items-list {
+  margin-top: 8px;
+  background: transparent;
+}
+
+.finished-item {
+  opacity: 0.75;
+}
+
+.agenda-date-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 4px;
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.15);
+  border-radius: var(--dame-item-radius, 8px);
+  margin-right: 12px;
+
+  .badge-day {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ion-color-primary, #3880ff);
+    line-height: 1;
+  }
+
+  .badge-month {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ion-color-primary-shade, #2f6cdb);
+    line-height: 1;
+    margin-top: 2px;
+  }
+}
+
+/* Cellules du Calendrier Interactif */
+.day-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 42px;
+  padding: 4px 2px;
+  border-radius: var(--dame-item-radius, 8px);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  color: var(--ion-text-color, inherit);
+
+  &.other-month {
+    opacity: 0.35;
+  }
+
+  &.is-today {
+    font-weight: 700;
+
+    .day-number {
+      color: var(--ion-color-primary, #3880ff);
+    }
+  }
+
+  &.is-selected {
+    background: var(--ion-color-primary, #3880ff) !important;
+    color: #ffffff !important;
+
+    .day-number {
+      color: #ffffff !important;
+      font-weight: 700;
+    }
+
+    .event-dot {
+      background: #ffffff !important;
+    }
+  }
+
+  &.has-events:not(.is-selected) {
+    background: var(--ion-background-color-step-100, var(--ion-color-step-100, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.06)));
+  }
+
+  .day-number-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .day-number {
+    font-size: 0.85rem;
+    line-height: 1;
+    color: inherit;
+  }
+}
+
+.event-dots-container {
+  display: flex;
+  gap: 2px;
+  margin-top: 3px;
+  align-items: center;
+  justify-content: center;
+  min-height: 6px;
+}
+
+.event-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ion-color-primary, #3880ff);
+}
+
+.event-count-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  background: var(--ion-background-color-step-100, var(--ion-color-step-100, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.08)));
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.past-event {
+  opacity: 0.75;
+
+  h2 {
+    font-weight: normal;
+  }
+}
+
+.upcoming-title {
+  color: var(--ion-color-primary, #3880ff);
+}
+
+.day-event-item {
+  position: relative;
+  border-radius: var(--dame-item-radius, 8px);
+  margin-bottom: 4px;
+}
+
+.list-category-indicator,
+.category-color-bar {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.event-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 2px 0;
+}
+
+.event-time-location {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+/* Contenu Détaillé Agenda & Bénévolat */
+.agenda-detail-content {
+  width: 100%;
+}
+
+.poll-ended-msg {
+  color: var(--ion-color-medium);
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   3. Tournois
+   ========================================================================== */
+
+.tournament-card {
+  border-radius: var(--dame-card-radius, 12px);
+  overflow: hidden;
+  box-shadow: var(--dame-card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  border: var(--dame-card-border);
+
+  .card-icon-container {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+  }
+}
+
+.tournaments-list {
+  background: transparent;
+}
+
+/* Détail Tournoi */
+.tournament-detail-content {
+  width: 100%;
+}
+
+/* ==========================================================================
+   4. Profil Joueur & Personnalisation (ProfilePage, ChessThemeCustomizer)
+   ========================================================================== */
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0 4px;
+  text-align: center;
+
+  .avatar-container {
+    margin-bottom: 6px;
+  }
+
+  .avatar-icon {
+    font-size: 60px;
+    color: var(--ion-color-medium);
+  }
+
+  h2 {
+    font-weight: 700;
+    margin: 0 0 2px 0;
+    font-size: 20px;
+  }
+
+  .email {
+    color: var(--ion-color-medium);
+    margin: 0 0 6px 0;
+    font-size: 13px;
+  }
+}
+
+.admin-access-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  h3 {
+    margin: 0 0 2px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ion-color-medium);
+  }
+}
+
+.admin-icon {
+  font-size: 28px;
+  color: var(--ion-color-primary);
+  flex-shrink: 0;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 12px;
+
+  ion-icon {
+    font-size: 18px;
+  }
+}
+
+.member-icon {
+  color: var(--ion-color-medium);
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.system-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.system-icon {
+  font-size: 26px;
+  color: var(--ion-color-medium);
+  flex-shrink: 0;
+}
+
+.system-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 2px 0;
+  color: var(--ion-text-color, var(--ion-color-dark, #222));
+}
+
+.system-version {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+.system-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Personnalisateur de Thème d'Échiquier */
+.chess-theme-customizer {
+  background: var(--ion-card-background, var(--ion-item-background, #fff));
+  border-radius: var(--dame-card-radius, 14px);
+  border: var(--dame-card-border);
+  box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.customizer-header {
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ion-text-color, var(--ion-color-dark, #1f1f1f));
+  }
+}
+
+.header-text {
+  flex: 1;
+
+  p {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: var(--ion-color-medium);
+    line-height: 1.35;
+  }
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.header-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.chevron-icon {
+  font-size: 18px;
+  color: var(--ion-color-medium);
+  transition: transform 0.25s ease;
+
+  &.is-rotated {
+    transform: rotate(180deg);
+  }
+}
+
+.summary-text {
+  font-size: 12.5px;
+}
+
+.summary-pill {
+  color: var(--ion-color-primary);
+  font-weight: 600;
+}
+
+.customizer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 4px;
+  animation: customizerFadeIn 0.2s ease-in-out;
+}
+
+@keyframes customizerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Double Rouleau Compact */
+.wheel-picker-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--ion-background-color-step-50, var(--ion-card-background, var(--ion-color-light, #f4f5f8)));
+  border: var(--dame-card-border);
+  border-radius: var(--dame-item-radius, 10px);
+  padding: 8px 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.wheel-headers {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 4px;
+  padding: 0 10px;
+}
+
+.wheel-header-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ion-text-color, #444);
+}
+
+.badge-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.wheel-columns-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 108px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 25%,
+    black 75%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 25%,
+    black 75%,
+    transparent 100%
+  );
+}
+
+.wheel-highlight-lens {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.15);
+  border-radius: var(--dame-item-radius, 8px);
+  border: 1px solid rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.3);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wheel-divider {
+  width: 1px;
+  height: 70%;
+  background: var(--ion-background-color-step-200, var(--ion-color-step-200, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.15)));
+  z-index: 2;
+}
+
+.wheel-scroll-col {
+  flex: 1;
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  z-index: 2;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.wheel-padding-top,
+.wheel-padding-bottom {
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.wheel-item {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+  scroll-snap-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &.is-active {
+    color: var(--ion-color-primary);
+    font-weight: 700;
+    font-size: 14.5px;
+    transform: scale(1.04);
+  }
+}
+
+/* Prévisualisation de l'échiquier dans Customizer */
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.board-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f0d9b5;
+  box-shadow: var(--dame-card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  border-radius: var(--dame-item-radius, 10px);
+  border: var(--dame-card-border);
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+
+  cg-board {
+    border-radius: 0 !important;
+  }
+}
+
+.actions-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.secondary-actions-row {
+  display: flex;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   5. Formulaires & Messages (Login / Register)
+   ========================================================================== */
+
+.input-item {
+  --background: var(--ion-color-light);
+  --border-radius: var(--dame-item-radius, 8px);
+  margin-bottom: 15px;
+  border-radius: var(--dame-item-radius, 8px);
+}
+
+.error-message {
+  text-align: center;
+  font-size: 0.9em;
+  margin-top: 10px;
+}

@@ -585,35 +585,3 @@ const passerEtapeSuivante = () => {
   }
 };
 </script>
-
-<style scoped>
-.exercice-type-partie-heros {
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100%;
-}
-
-.etape-container {
-  width: 100%;
-  max-width: 500px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  gap: 12px;
-}
-
-.stage-pgn-wrapper,
-.stage-qcm-wrapper {
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  gap: 6px;
-}
-</style>
-

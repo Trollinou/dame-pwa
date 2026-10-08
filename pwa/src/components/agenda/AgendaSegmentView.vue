@@ -41,13 +41,12 @@
               :id="'event-' + event.id"
               button
               @click="handleEventClick(event)"
-              :class="['agenda-item', { 'past-event': isPast(event), 'is-active': isTabletLandscape && event.id === selectedEventId }]"
+              :class="['dame-list-item', { 'past-event': isPast(event), 'is-active': isTabletLandscape && event.id === selectedEventId }]"
             >
               <!-- Indicateur de couleur de catégorie -->
               <div
-                v-if="event.categories_data && event.categories_data.length > 0"
-                class="list-category-indicator"
-                :style="{ backgroundColor: event.categories_data[0].color }"
+                class="category-color-bar"
+                :style="{ backgroundColor: getEventPrimaryColor(event) }"
               ></div>
 
               <ion-label class="ion-padding-start">
@@ -241,6 +240,13 @@ const formatEventDate = (event: AgendaEvent): string => {
   return `Le ${formatPart(startDate)} (Toute la journée)`;
 };
 
+const getEventPrimaryColor = (event: AgendaEvent): string => {
+  if (event.categories_data && event.categories_data.length > 0 && event.categories_data[0].color) {
+    return event.categories_data[0].color;
+  }
+  return '#3880ff';
+};
+
 watch(filteredEvents, () => {
   if (isTabletLandscape.value) {
     autoSelectUpcomingOrCurrent();
@@ -257,53 +263,3 @@ onMounted(() => {
   autoSelectUpcomingOrCurrent();
 });
 </script>
-
-<style scoped>
-.agenda-items-list {
-  margin-top: 8px;
-}
-
-.agenda-item {
-  border-radius: 8px;
-  margin-bottom: 4px;
-  --background-hover: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.agenda-item.is-active {
-  --background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.12);
-  border-left: 4px solid var(--ion-color-primary, #3880ff);
-  font-weight: 600;
-}
-
-h2 {
-  font-weight: bold;
-}
-
-p {
-  color: var(--ion-color-medium);
-}
-
-.past-event {
-  opacity: 0.6;
-}
-
-.past-event h2 {
-  font-weight: normal;
-}
-
-.upcoming-title {
-  color: var(--ion-color-primary);
-}
-
-ion-badge {
-  margin-left: 8px;
-}
-
-.list-category-indicator {
-  width: 4px;
-  height: 28px;
-  border-radius: 2px;
-  margin-right: 8px;
-}
-</style>

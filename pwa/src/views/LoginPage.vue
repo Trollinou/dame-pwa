@@ -13,7 +13,7 @@
       <div class="safe-area-wrapper">
         <div class="login-container">
           <!-- Message de redirection contextuel -->
-          <div v-if="redirectMessage" class="redirect-banner">
+          <div v-if="redirectMessage" class="dame-banner dame-banner--primary">
             <ion-icon :icon="informationCircleOutline" color="primary"></ion-icon>
             <p>{{ redirectMessage }}</p>
           </div>
@@ -148,56 +148,3 @@ onIonViewWillLeave(() => {
   }
 });
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.login-container {
-  max-width: 400px;
-  margin: 40px auto;
-}
-
-.redirect-banner {
-  display: flex;
-  align-items: center;
-  background: var(--ion-color-primary-contrast, #f4f5f8);
-  border: 1px solid var(--ion-color-primary);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 24px;
-  gap: 12px;
-}
-
-.redirect-banner ion-icon {
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.redirect-banner p {
-  margin: 0;
-  font-size: 0.9em;
-  color: var(--ion-color-dark);
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.login-header h2 {
-  font-weight: 700;
-  font-size: 24px;
-}
-
-.login-header p {
-  color: var(--ion-color-medium);
-}
-
-ion-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
-}
-</style>

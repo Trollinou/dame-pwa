@@ -12,7 +12,7 @@
     </div>
 
     <div v-else>
-      <div v-if="tournamentError && filteredTournaments.length > 0" class="offline-banner ion-margin-bottom">
+      <div v-if="tournamentError && filteredTournaments.length > 0" class="dame-banner dame-banner--warning ion-margin-bottom">
         <ion-icon :icon="cloudOfflineOutline"></ion-icon>
         <span>Mode hors-ligne : Affichage des données en cache</span>
       </div>
@@ -31,14 +31,19 @@
                 :key="item.id"
                 button
                 @click="handleTournamentClick(item)"
-                :class="['tournament-item', { 'is-active': isTabletLandscape && item.object_id === selectedTournamentId }]"
+                :class="['dame-list-item', { 'is-active': isTabletLandscape && item.object_id === selectedTournamentId }]"
               >
                 <ion-icon slot="start" :icon="trophyOutline" color="primary" class="ion-margin-end"></ion-icon>
                 <ion-label>
                   <h2 v-safe-html="item.title"></h2>
                   <p>Compétition</p>
                 </ion-label>
-                <ion-icon slot="end" :icon="chevronForwardOutline" color="medium" style="opacity: 0.6; font-size: 1.1rem;"></ion-icon>
+                <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+                  <ion-badge v-if="unreadStore.isTournamentUnread(item)" color="danger">
+                    Nouveau
+                  </ion-badge>
+                  <ion-icon :icon="chevronForwardOutline" color="medium" style="opacity: 0.6; font-size: 1.1rem;"></ion-icon>
+                </div>
               </ion-item>
             </ion-list>
           </template>
@@ -71,16 +76,19 @@ import {
   IonCardSubtitle,
   IonCardContent,
   IonIcon,
-  IonButton
+  IonButton,
+  IonBadge
 } from '@ionic/vue';
 import { trophyOutline, chevronForwardOutline, cloudOfflineOutline } from 'ionicons/icons';
 import { useTournamentStore, type MenuItem } from '@/stores/tournament';
+import { useUnreadStore } from '@/stores/unread';
 import { removeAccents } from '@/utils/stringUtils';
 import { useIsTabletLandscape } from '@/composables/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
 import TournamentDetailContent from '@/components/agenda/detail/TournamentDetailContent.vue';
 
 const tournamentStore = useTournamentStore();
+const unreadStore = useUnreadStore();
 const { isTabletLandscape } = useIsTabletLandscape();
 
 const props = defineProps<{
@@ -108,7 +116,11 @@ const autoSelectFirst = () => {
   if (filteredTournaments.value.length > 0) {
     const exists = filteredTournaments.value.some((t) => t.object_id === selectedTournamentId.value);
     if (!exists) {
-      selectedTournamentId.value = filteredTournaments.value[0].object_id;
+      const first = filteredTournaments.value[0];
+      selectedTournamentId.value = first.object_id;
+      if (isTabletLandscape.value) {
+        unreadStore.markTournamentAsSeen(first.object_id, first.modified);
+      }
     }
   } else {
     selectedTournamentId.value = null;
@@ -117,6 +129,7 @@ const autoSelectFirst = () => {
 
 const handleTournamentClick = (item: MenuItem) => {
   selectedTournamentId.value = item.object_id;
+  unreadStore.markTournamentAsSeen(item.object_id, item.modified);
   if (!isTabletLandscape.value) {
     emit('go-to-tournament-detail', item.object_id);
   }
@@ -138,42 +151,3 @@ onMounted(() => {
   autoSelectFirst();
 });
 </script>
-
-<style scoped>
-.tournaments-list {
-  background: transparent;
-}
-
-.tournament-item {
-  border-radius: 8px;
-  margin-bottom: 4px;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.tournament-item.is-active {
-  --background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.12);
-  border-left: 4px solid var(--ion-color-primary, #3880ff);
-  font-weight: 600;
-}
-
-.tournament-item h2 {
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.tournament-item p {
-  color: var(--ion-color-medium);
-  font-size: 0.85rem;
-}
-
-.offline-banner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--ion-color-warning-tint);
-  color: var(--ion-color-warning-shade);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-}
-</style>

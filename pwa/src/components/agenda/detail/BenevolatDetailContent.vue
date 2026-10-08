@@ -7,14 +7,14 @@
 
     <div v-else-if="currentBenevolat" class="benevolat-detail-content__body">
       <!-- En-tête -->
-      <div class="header-section">
+      <div class="detail-header">
         <h1 v-safe-html="currentBenevolat.title.rendered"></h1>
-        <div
-          v-if="currentBenevolat.content?.rendered"
-          class="description-content"
-          v-safe-html="currentBenevolat.content.rendered"
-        ></div>
       </div>
+      <div
+        v-if="currentBenevolat.content?.rendered"
+        class="description-content ion-margin-bottom"
+        v-safe-html="currentBenevolat.content.rendered"
+      ></div>
 
       <!-- VUE ADMIN : Liste des participants par créneau -->
       <div v-if="authStore.adminMode">
@@ -111,7 +111,7 @@
               <ion-spinner v-if="isSubmitting" name="crescent"></ion-spinner>
               <span v-else>{{ hasInitialVote ? 'Mettre à jour ma participation' : 'Confirmer ma participation' }}</span>
             </ion-button>
-            <div v-else class="poll-ended-container">
+            <div v-else class="dame-empty-state">
               <p class="ion-text-center poll-ended-msg">
                 Cet appel est terminé. Vous pouvez consulter vos participations ci-dessus.
               </p>
@@ -122,7 +122,7 @@
     </div>
 
     <!-- Introuvable -->
-    <div v-else class="ion-text-center ion-padding not-found-container">
+    <div v-else class="ion-text-center ion-padding dame-empty-state">
       <p>Appel à bénévoles introuvable.</p>
     </div>
   </div>
@@ -330,51 +330,3 @@ onMounted(() => {
   fetchMyVote();
 });
 </script>
-
-<style scoped>
-.benevolat-detail-content {
-  width: 100%;
-}
-
-.header-section h1 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 0;
-  margin-bottom: 12px;
-}
-
-.description-content :deep(p) {
-  margin-bottom: 12px;
-  line-height: 1.6;
-}
-
-.unauthenticated-box {
-  background: var(--ion-color-light);
-  border-radius: 12px;
-  text-align: center;
-}
-
-.slot-card {
-  border-radius: 8px;
-  margin-bottom: 8px;
-}
-
-.no-participants {
-  margin: 0;
-  font-size: 0.9em;
-  opacity: 0.7;
-  font-style: italic;
-}
-
-.poll-ended-container {
-  padding: 12px;
-  background: var(--ion-color-light);
-  border-radius: 8px;
-}
-
-.poll-ended-msg {
-  margin: 0;
-  color: var(--ion-color-medium);
-  font-size: 0.9em;
-}
-</style>

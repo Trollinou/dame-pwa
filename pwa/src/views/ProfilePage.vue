@@ -18,13 +18,13 @@
             </div>
             <h2>{{ authStore.selectedIdentity?.name || authStore.user?.name }}</h2>
             <p class="email">{{ authStore.user?.email }}</p>
-            <span class="badge" :class="identityBadgeClass">
+            <span class="dame-badge" :class="identityBadgeClass">
               {{ identityTypeText }}
             </span>
           </div>
 
           <!-- Section administration (si admin) -->
-          <div v-if="authStore.isAdmin" class="admin-access-card">
+          <div v-if="authStore.isAdmin" class="dame-panel">
             <div class="admin-access-content">
               <ion-icon :icon="shieldCheckmarkOutline" color="primary" class="admin-icon"></ion-icon>
               <div>
@@ -36,7 +36,8 @@
               expand="block" 
               color="primary" 
               fill="solid" 
-              class="admin-btn"
+              class="dame-btn-large"
+              style="margin-top: 14px;"
               @click="goToAdmin"
             >
               <ion-icon slot="start" :icon="settingsOutline"></ion-icon>
@@ -45,29 +46,29 @@
           </div>
 
           <!-- Informations & ELO (si adhérent) -->
-          <div v-if="authStore.selectedIdentity?.type === 'member'" class="info-card">
+          <div v-if="authStore.selectedIdentity?.type === 'member'" class="dame-panel">
             <h3 class="card-title">
               <ion-icon :icon="trophyOutline" color="primary"></ion-icon>
               Classements ELO
             </h3>
-            <div class="elo-grid">
-              <div class="elo-item">
-                <span class="elo-label">Standard</span>
-                <span class="elo-val">{{ authStore.selectedIdentity?.elo_standard || 'N/A' }}</span>
+            <div class="dame-stat-grid dame-stat-grid--3col">
+              <div class="dame-stat-box">
+                <span class="dame-stat-label">Standard</span>
+                <span class="dame-stat-value">{{ authStore.selectedIdentity?.elo_standard || 'N/A' }}</span>
               </div>
-              <div class="elo-item">
-                <span class="elo-label">Rapide</span>
-                <span class="elo-val">{{ authStore.selectedIdentity?.elo_rapide || 'N/A' }}</span>
+              <div class="dame-stat-box">
+                <span class="dame-stat-label">Rapide</span>
+                <span class="dame-stat-value">{{ authStore.selectedIdentity?.elo_rapide || 'N/A' }}</span>
               </div>
-              <div class="elo-item">
-                <span class="elo-label">Blitz</span>
-                <span class="elo-val">{{ authStore.selectedIdentity?.elo_blitz || 'N/A' }}</span>
+              <div class="dame-stat-box">
+                <span class="dame-stat-label">Blitz</span>
+                <span class="dame-stat-value">{{ authStore.selectedIdentity?.elo_blitz || 'N/A' }}</span>
               </div>
             </div>
           </div>
 
           <!-- Membres Associés / Famille -->
-          <div v-if="hasAssociatedMembers" class="info-card">
+          <div v-if="hasAssociatedMembers" class="dame-panel">
             <h3 class="card-title">
               <ion-icon :icon="peopleOutline" color="primary"></ion-icon>
               Membres associés
@@ -76,7 +77,7 @@
               <ion-item 
                 v-for="member in authStore.selectedIdentity?.associated_members" 
                 :key="member.member_id"
-                class="associated-member-item"
+                class="dame-list-item"
               >
                 <ion-icon slot="start" :icon="personOutline" class="member-icon"></ion-icon>
                 <ion-label>
@@ -96,7 +97,7 @@
               v-if="hasMultipleIdentities" 
               expand="block" 
               fill="outline" 
-              class="identity-btn"
+              class="dame-btn-large"
               @click="changeIdentity"
             >
               <ion-icon slot="start" :icon="swapHorizontalOutline"></ion-icon>
@@ -108,7 +109,7 @@
               expand="block" 
               color="danger" 
               fill="outline"
-              class="logout-btn"
+              class="dame-btn-large"
               @click="handleLogout"
             >
               <ion-icon slot="start" :icon="logOutOutline"></ion-icon>
@@ -138,7 +139,7 @@
         </div>
 
         <!-- Section Système & Mises à jour PWA -->
-        <div class="system-card">
+        <div class="dame-panel" style="margin-top: 24px; margin-bottom: 32px;">
           <div class="system-info">
             <ion-icon :icon="informationCircleOutline" class="system-icon"></ion-icon>
             <div>
@@ -260,9 +261,9 @@ const identityTypeText = computed(() => {
 
 const identityBadgeClass = computed(() => {
   const type = authStore.selectedIdentity?.type;
-  if (type === 'admin') return 'badge-admin';
-  if (type === 'representative') return 'badge-rep';
-  return 'badge-member';
+  if (type === 'admin') return 'dame-badge--admin';
+  if (type === 'representative') return 'dame-badge--rep';
+  return 'dame-badge--member';
 });
 
 const hasAssociatedMembers = computed(() => {
@@ -307,277 +308,3 @@ onIonViewWillLeave(() => {
   }
 });
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.profile-container {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.profile-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 10px 0 4px;
-  text-align: center;
-}
-
-.avatar-container {
-  margin-bottom: 6px;
-}
-
-.avatar-icon {
-  font-size: 60px;
-  color: var(--ion-color-step-350, #8a8a8f);
-}
-
-.profile-header h2 {
-  font-weight: 700;
-  margin: 0 0 2px 0;
-  font-size: 20px;
-}
-
-.profile-header .email {
-  color: var(--ion-color-step-600, #666);
-  margin: 0 0 6px 0;
-  font-size: 13px;
-}
-
-.badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.badge-admin {
-  background-color: var(--ion-color-danger-light, #ffdae0);
-  color: var(--ion-color-danger, #eb445a);
-}
-
-.badge-rep {
-  background-color: var(--ion-color-warning-light, #ffd59a);
-  color: var(--ion-color-warning-shade, #b58000);
-}
-
-.badge-member {
-  background-color: var(--ion-color-primary-light, #d2e3fc);
-  color: var(--ion-color-primary, #3880ff);
-}
-
-.admin-access-card {
-  background: rgba(0, 115, 170, 0.04);
-  border-radius: 14px;
-  padding: 16px;
-  border: 1px solid rgba(0, 115, 170, 0.22);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-
-.admin-access-content {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.admin-access-content h3 {
-  margin: 0 0 2px 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ion-color-primary-shade, #006596);
-}
-
-.admin-access-content p {
-  margin: 0;
-  font-size: 12px;
-  color: var(--ion-color-step-600, #666);
-}
-
-.admin-icon {
-  font-size: 28px;
-  color: var(--ion-color-primary, #0073aa);
-  flex-shrink: 0;
-}
-
-.admin-btn {
-  --min-height: 48px;
-  --border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  margin-top: 14px;
-}
-
-.info-card {
-  background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border-radius: 14px;
-  border: 1px solid var(--ion-color-step-150, #e2e8f0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  padding: 16px;
-}
-
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 12px;
-}
-
-.card-title ion-icon {
-  font-size: 18px;
-}
-
-.elo-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  text-align: center;
-}
-
-.elo-item {
-  display: flex;
-  flex-direction: column;
-  background: var(--ion-color-light, #f4f5f8);
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.elo-label {
-  font-size: 11px;
-  color: var(--ion-color-step-600, #666);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.elo-val {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--ion-color-dark, #000);
-}
-
-.associated-member-item {
-  --background: var(--ion-color-light, #f4f5f8);
-  --border-radius: 8px;
-  margin-bottom: 6px;
-  --min-height: 44px;
-}
-
-.member-icon {
-  color: var(--ion-color-medium);
-}
-
-.actions-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 4px;
-}
-
-.identity-btn {
-  --min-height: 48px;
-  --border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.logout-btn {
-  --min-height: 48px;
-  --border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  --border-width: 1.5px;
-  margin-top: 0;
-}
-
-.login-prompt {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  padding: 40px 20px;
-}
-
-.prompt-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.prompt-icon {
-  font-size: 80px;
-  color: var(--ion-color-primary);
-  margin-bottom: 24px;
-}
-
-.prompt-header h2 {
-  font-weight: 700;
-  margin-bottom: 12px;
-  font-size: 24px;
-}
-
-.prompt-header p {
-  color: var(--ion-color-step-600, #666);
-  line-height: 1.5;
-  max-width: 320px;
-  margin: 0;
-}
-
-.system-card {
-  margin-top: 24px;
-  margin-bottom: 32px;
-  background: var(--ion-card-background, var(--ion-item-background, #fff));
-  border-radius: 14px;
-  border: 1px solid var(--ion-color-step-150, #e2e8f0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.system-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.system-icon {
-  font-size: 26px;
-  color: var(--ion-color-medium, #8a8a8f);
-  flex-shrink: 0;
-}
-
-.system-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 2px 0;
-  color: var(--ion-color-dark, #222);
-}
-
-.system-version {
-  font-size: 12px;
-  color: var(--ion-color-step-600, #666);
-  margin: 0;
-}
-
-.system-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-</style>

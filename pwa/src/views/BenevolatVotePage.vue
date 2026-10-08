@@ -26,23 +26,29 @@ import {
   IonTitle,
   IonContent,
   IonButtons,
-  IonBackButton
+  IonBackButton,
+  onIonViewWillEnter
 } from '@ionic/vue';
-import { computed } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBenevolatStore } from '@/stores/benevolat';
+import { useUnreadStore } from '@/stores/unread';
 import BenevolatDetailContent from '@/components/agenda/detail/BenevolatDetailContent.vue';
 
 const route = useRoute();
 const benevolatStore = useBenevolatStore();
+const unreadStore = useUnreadStore();
 
 const benevolatId = computed(() => parseInt(route.params.id as string));
 const benevolat = computed(() => benevolatStore.benevolats.find((b) => b.id === benevolatId.value));
-</script>
 
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-</style>
+const markAsSeen = () => {
+  if (benevolatId.value) {
+    unreadStore.markBenevolatAsSeen(benevolatId.value, benevolat.value?.modified);
+  }
+};
+
+onMounted(markAsSeen);
+onIonViewWillEnter(markAsSeen);
+watch(benevolatId, markAsSeen);
+</script>

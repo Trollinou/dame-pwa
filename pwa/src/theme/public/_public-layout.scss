@@ -1,0 +1,239 @@
+/**
+ * Styles de mise en page (Layout) unifiés pour le groupe Public & Vitrine / Joueur.
+ * Architecture KISS & Mobile First.
+ */
+
+/* ==========================================================================
+   1. Conteneurs de Page & Safe Areas
+   ========================================================================== */
+
+.safe-area-wrapper {
+  padding-left: var(--ion-safe-area-left, 0);
+  padding-right: var(--ion-safe-area-right, 0);
+  width: 100%;
+}
+
+/* ==========================================================================
+   2. Layout Onglets / Tabs (TabsPage)
+   ========================================================================== */
+
+ion-tab-bar {
+  --border: 0;
+  height: clamp(56px, 6.5vh, 64px);
+
+  ion-tab-button {
+    --padding-start: 0px;
+    --padding-end: 0px;
+    min-width: 0;
+
+    ion-icon {
+      font-size: clamp(24px, 3vh, 28px);
+    }
+
+    ion-label {
+      font-size: clamp(11.5px, 1.4vh, 13px);
+      font-weight: 600;
+      letter-spacing: -0.1px;
+      white-space: nowrap;
+    }
+  }
+}
+
+/* ==========================================================================
+   3. Layout Authentification (Login / Register / SelectPerson)
+   ========================================================================== */
+
+.login-container,
+.register-container {
+  max-width: 420px;
+  margin: 30px auto;
+  width: 100%;
+}
+
+.login-header,
+.register-header {
+  text-align: center;
+  margin-bottom: 24px;
+
+  h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+.form-list {
+  background: transparent;
+}
+
+/* ==========================================================================
+   4. Layout Profil & Utilisateur
+   ========================================================================== */
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 40px 20px;
+}
+
+.prompt-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 32px;
+
+  .prompt-icon {
+    font-size: 72px;
+    color: var(--ion-color-primary);
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    line-height: 1.5;
+    max-width: 340px;
+    margin: 0;
+  }
+}
+
+.prompt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ==========================================================================
+   5. Layout Calendrier & Vue Agenda (AgendaCalendarView)
+   ========================================================================== */
+
+.agenda-calendar-view {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  gap: 14px;
+}
+
+.calendar-month-panel {
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+  border-radius: var(--dame-card-radius, 12px);
+  padding: 10px;
+  border: var(--dame-card-border);
+  box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 8px 0;
+}
+
+.month-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .month-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ion-text-color, var(--ion-color-dark, #222));
+  }
+
+  .today-button {
+    font-size: 0.8rem;
+    font-weight: 600;
+    height: 28px;
+  }
+}
+
+.month-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  ion-button {
+    height: 32px;
+    --padding-start: 4px;
+    --padding-end: 4px;
+  }
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12)));
+  margin-bottom: 6px;
+}
+
+.weekday-cell {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.selected-day-events {
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
+  border-radius: var(--dame-card-radius, 12px);
+  border: var(--dame-card-border);
+  box-shadow: var(--dame-card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
+  padding: 12px 14px;
+}
+
+.selected-day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ion-text-color, var(--ion-color-dark, #222));
+    text-transform: capitalize;
+  }
+}
+
+.day-events-scrollable {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.day-event-list {
+  background: transparent;
+  padding: 0;
+}

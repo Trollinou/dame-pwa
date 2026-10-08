@@ -1,0 +1,464 @@
+/**
+ * Styles des composants transverses partagés (ContentHeader, SplitMasterDetail, SeriesCardFooter, SignaturePad)
+ */
+
+/* ==========================================================================
+   1. ContentHeader
+   ========================================================================== */
+
+.content-unified-header {
+  width: 100%;
+}
+
+.header-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 6px;
+}
+
+.meta-card-content {
+  padding: 6px 10px;
+}
+
+.meta-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ion-text-color, var(--ion-color-dark, #111827));
+  margin-bottom: 2px;
+}
+
+.meta-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-type {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ion-color-primary, #3880ff);
+}
+
+.meta-chapitre-niveau {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ion-color-medium-shade, #666666);
+}
+
+.consigne-card-content {
+  padding: 6px 10px;
+}
+
+.consigne-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.consigne-text {
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ion-text-color, var(--ion-color-dark, #222222));
+  flex: 1;
+}
+
+.step-badge {
+  font-size: 0.78rem;
+  line-height: 1.25;
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  white-space: pre-line;
+  text-align: center;
+}
+
+/* ==========================================================================
+   2. SplitMasterDetail
+   ========================================================================== */
+
+.split-master-detail {
+  display: block;
+  width: 100%;
+}
+
+.split-master-detail__detail {
+  display: none;
+}
+
+@media (min-width: 1024px), ((min-width: 768px) and (min-height: 600px) and (orientation: landscape)) {
+  .split-master-detail {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) 2fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .split-master-detail__master {
+    height: 100%;
+  }
+
+  .split-master-detail__detail {
+    display: block;
+    position: sticky;
+    top: 0;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    background: var(--ion-card-background, var(--ion-background-color, #ffffff));
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.08);
+  }
+
+  .split-master-detail__detail-content {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  .split-master-detail__empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--ion-color-medium);
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ion-text-color);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* ==========================================================================
+   3. SeriesCardFooter
+   ========================================================================== */
+
+.series-card-footer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.feedback-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-sizing: border-box;
+  transition: opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.feedback-empty {
+  visibility: hidden;
+  border: 1px solid transparent;
+}
+
+.feedback-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.feedback-message {
+  flex: 1;
+  line-height: 1.2;
+}
+
+.feedback-success {
+  background: var(--ion-color-success, #2dd36f);
+  color: var(--ion-color-success-contrast, #ffffff);
+  border: 1px solid var(--ion-color-success-shade, #28ba62);
+}
+
+.feedback-danger {
+  background: var(--ion-color-danger, #eb445a);
+  color: var(--ion-color-danger-contrast, #ffffff);
+  border: 1px solid var(--ion-color-danger-shade, #cf3c4f);
+}
+
+.feedback-warning {
+  background: var(--ion-color-warning, #ffc409);
+  color: var(--ion-color-warning-contrast, #000000);
+  border: 1px solid var(--ion-color-warning-shade, #e0ac08);
+}
+
+.feedback-info {
+  background: var(--ion-color-primary, #3880ff);
+  color: var(--ion-color-primary-contrast, #ffffff);
+  border: 1px solid var(--ion-color-primary-shade, #3171e0);
+}
+
+.series-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 4px 12px;
+  background: var(--ion-color-step-50, #f8f9fa);
+  border: 1px solid var(--ion-color-step-200, #e9ecef);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.card-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.action-zone {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  min-width: 0;
+}
+
+.footer-course-btn {
+  --border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  height: 30px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.next-card-btn {
+  --border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  height: 30px;
+  margin: 0;
+
+  &[disabled],
+  &.button-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.success-resolu-badge {
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.3px;
+}
+
+.next-exercise-btn {
+  font-weight: 700;
+  animation: pulseScale 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseScale {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.08);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.pending-hint {
+  font-size: 0.78rem;
+  color: var(--ion-color-medium-shade, #888888);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   4. SignaturePad
+   ========================================================================== */
+
+.signature-pad-container {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.signature-pad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.signature-label {
+  font-size: 0.95em;
+  font-weight: 600;
+  color: var(--ion-text-color, var(--ion-color-dark, #333));
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  background: #ffffff;
+  border: 2px dashed var(--ion-color-step-300, #b0b0b0);
+  border-radius: 8px;
+  overflow: hidden;
+  touch-action: none;
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}
+
+.canvas-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--ion-color-step-400, #888888);
+  font-size: 0.9em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ==========================================================================
+   5. États Réseau & Chargement Transverses
+   ========================================================================== */
+
+.offline-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.spinner-container,
+.error-container,
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  padding: 32px 16px;
+}
+
+/* ==========================================================================
+   6. Rendu WordPress Générique & Vues de Détail
+   ========================================================================== */
+
+.content,
+.detail-body {
+  line-height: 1.65;
+  font-size: 0.95rem;
+
+  p {
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--dame-item-radius, 8px);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12)));
+    padding: 8px;
+    text-align: left;
+  }
+}
+
+.detail-image {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: var(--dame-card-radius, 12px);
+  margin-bottom: 16px;
+}
+
+.detail-header {
+  margin-bottom: 16px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    line-height: 1.25;
+  }
+
+  .detail-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ion-color-medium);
+    font-size: 0.85rem;
+  }
+}
+
+.detail-lead {
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ion-text-color, var(--ion-color-step-800, #333333));
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12)));
+}
+

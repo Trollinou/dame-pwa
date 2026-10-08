@@ -207,32 +207,3 @@ onBeforeUnmount(() => {
   }
 });
 </script>
-
-<style>
-/* Style global pour les blocs de la leçon */
-.roi-bloc-fen, .roi-bloc-pgn {
-  margin: 16px auto;
-  display: block;
-  max-width: 400px;
-  width: 100%;
-}
-.roi-bloc-pgn .board-container {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-</style>
-
-<style scoped>
-.lecon-reader-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.lecon-content-wrapper {
-  line-height: 1.6;
-  font-size: 1rem;
-  color: var(--ion-color-dark, #222);
-  margin-bottom: 24px;
-}
-</style>

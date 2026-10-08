@@ -70,7 +70,6 @@ import {
 const router = useRouter();
 const memberStore = useMemberStore();
 const { members, seasons, isLoading } = storeToRefs(memberStore);
-const selectedSeason = ref<number | 'all'>('all');
 
 const AGE_CATEGORY_ORDER = [
   'U8', 'U8F', 'U10', 'U10F', 'U12', 'U12F', 'U14', 'U14F', 'U16', 'U16F',
@@ -152,7 +151,7 @@ const filterConfigs = computed<DataTableFilterConfig[]>(() => [
   {
     id: 'seasons',
     label: 'Saison',
-    defaultValue: selectedSeason.value,
+    defaultValue: seasons.value.length > 0 ? seasons.value[0].id : undefined,
     options: [
       { label: 'Toutes les saisons', value: 'all' },
       ...seasons.value.map((s) => ({ label: s.name, value: s.id }))
@@ -177,15 +176,6 @@ const exportConfig: DataTableExportConfig<Member> = {
 onIonViewWillEnter(async () => {
   memberStore.fetchMembers();
   await memberStore.fetchSeasons();
-  if (selectedSeason.value === 'all' && seasons.value.length > 0) {
-    selectedSeason.value = seasons.value[0].id;
-  }
 });
 </script>
 
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-</style>

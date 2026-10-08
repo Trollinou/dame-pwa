@@ -1,0 +1,42 @@
+/**
+ * Layouts et structures d'administration DAME PWA.
+ */
+
+/* ==========================================================================
+   1. Structure Menu Latéral & Administration (AdminLayout)
+   ========================================================================== */
+
+ion-menu {
+  --width: 280px;
+}
+
+.menu-item {
+  margin: 8px;
+  --border-radius: 8px;
+  --color: var(--ion-text-color);
+
+  &.active {
+    --background: rgba(var(--ion-color-primary-rgb, 0, 115, 170), 0.15);
+    --color: var(--ion-color-primary);
+    color: var(--ion-color-primary);
+  }
+}
+
+.menu-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: var(--ion-background-color, #fff);
+  border-top: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, rgba(0, 0, 0, 0.08)));
+}
+
+/* ==========================================================================
+   2. Tableau de Bord Admin (HomePage)
+   ========================================================================== */
+
+.dashboard-section {
+  margin-top: 10px;
+  margin-bottom: 24px;
+}

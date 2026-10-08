@@ -176,9 +176,3 @@ const passerParcoursSuivant = () => {
   }
 };
 </script>
-
-<style scoped>
-.exercice-type-parcours {
-  width: 100%;
-}
-</style>

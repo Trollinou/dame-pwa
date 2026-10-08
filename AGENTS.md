@@ -27,7 +27,16 @@
   - `stores/` : État global Pinia persisté.
   - `theme/` : SCSS centralisé (`shared-components.scss`) avec classes canoniques obligatoires.
 
-## 4. Règles Frontend PWA, Échiquier & UX Mobile
+## 4. Règles Frontend PWA, Échiquier, Styling & UX Mobile
+- **RÈGLE D'OR CSS / STYLING PWA (Architecture KISS en 3 groupes)** :
+  - **Interdiction formelle et absolue de balises `<style>` ou `<style scoped>`** dans tous les composants Vue (`.vue`) du projet (vues, viewers et composants).
+  - **Zéro style inline** (sauf valeurs dynamiques calculées par JS comme `--progress-width` ou ratios d'aspect).
+  - **Centralisation exclusive dans `pwa/src/theme/`** organisée en 3 piliers métier simples + fondations communes :
+    1. `theme/public/` (`_public-layout.scss`, `_public-components.scss`) : Vitrine, accueil, club, tournois, actualités, agenda, profil joueur.
+    2. `theme/learning/` (`_learning-layout.scss`, `_learning-components.scss`) : Hub d'apprentissage, cours, leçons, vidéos, viewers et exercices interactifs.
+    3. `theme/admin/` (`_admin-layout.scss`, `_admin-components.scss`) : Shell d'administration, gestion des membres, bénévolat, contacts, messages, pré-inscriptions.
+    4. `theme/core/` (`_base.scss`, `_club-badges.scss`, etc.) : Variables, normalisations globales, badges et composants transverses.
+  - Tous les modules SCSS sont importés dans `pwa/src/theme/shared-components.scss`.
 - **Wrapper Maître `<Chessboard>`** : Tout affichage d'échiquier doit impérativement utiliser le wrapper `src/components/shared/Chessboard/Chessboard.vue` plutôt que d'importer directement `TheChessboard` / `eg-chessboard`.
 - **Grilles de Données (`DataTable.vue`)** :
   - Rendu responsive dual-mode : Desktop (`>768px`) en tableau sticky triable, Mobile (`<=768px`) via le slot `#mobile-item`.

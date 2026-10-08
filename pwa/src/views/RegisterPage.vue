@@ -18,11 +18,11 @@
             <p>Réservé aux adhérents et représentants légaux</p>
           </div>
 
-          <div v-if="successMessage" class="success-message ion-padding ion-text-center">
+          <div v-if="successMessage" class="dame-banner dame-banner--success dame-banner--block ion-margin-bottom">
             <ion-icon :icon="checkmarkCircleOutline" color="success" style="font-size: 3rem;"></ion-icon>
             <h3>Inscription réussie !</h3>
             <p>{{ successMessage }}</p>
-            <ion-button expand="block" router-link="/tabs/login" class="ion-margin-top">
+            <ion-button expand="block" router-link="/tabs/login" class="ion-margin-top" style="width: 100%;">
               Retour à la connexion
             </ion-button>
           </div>
@@ -193,53 +193,3 @@ const handleRegister = async () => {
   }
 };
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.register-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px 10px;
-}
-
-.register-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.register-header h2 {
-  font-weight: 700;
-  font-size: 24px;
-}
-
-.register-header p {
-  color: var(--ion-color-medium);
-}
-
-.form-list {
-  background: transparent;
-}
-
-.input-item {
-  --background: var(--ion-color-light);
-  --border-radius: 8px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-}
-
-.error-message {
-  text-align: center;
-  font-size: 0.9em;
-  margin-top: 10px;
-}
-
-.success-message {
-  background: var(--ion-color-success-tint);
-  border-radius: 12px;
-  padding: 20px;
-}
-</style>

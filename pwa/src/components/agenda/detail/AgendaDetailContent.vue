@@ -5,10 +5,12 @@
     </div>
 
     <div v-else-if="currentEvent" class="agenda-detail-content__body">
-      <h1 class="event-main-title" v-safe-html="currentEvent.title.rendered"></h1>
+      <div class="detail-header">
+        <h1 v-safe-html="currentEvent.title.rendered"></h1>
+      </div>
 
       <!-- Carte Détails -->
-      <ion-card class="ion-no-margin ion-margin-bottom detail-card">
+      <ion-card class="ion-no-margin ion-margin-bottom dame-panel">
         <ion-card-header>
           <ion-card-title>
             <ion-icon :icon="calendarOutline" color="primary"></ion-icon>
@@ -42,7 +44,7 @@
       <!-- Carte Lieu -->
       <ion-card
         v-if="currentEvent.meta._dame_location_name || currentEvent.meta._dame_address"
-        class="ion-no-margin ion-margin-bottom detail-card"
+        class="ion-no-margin ion-margin-bottom dame-panel"
       >
         <ion-card-header>
           <ion-card-title>
@@ -76,7 +78,7 @@
       </ion-card>
 
       <!-- Carte Description -->
-      <ion-card v-if="processedDescription.cleanHtml" class="ion-no-margin ion-margin-bottom detail-card">
+      <ion-card v-if="processedDescription.cleanHtml" class="ion-no-margin ion-margin-bottom dame-panel">
         <ion-card-header>
           <ion-card-title>
             <ion-icon :icon="informationCircleOutline" color="primary"></ion-icon>
@@ -94,7 +96,7 @@
     </div>
 
     <!-- Introuvable -->
-    <div v-else class="ion-text-center ion-padding not-found-container">
+    <div v-else class="ion-text-center ion-padding dame-empty-state">
       <ion-icon :icon="calendarOutline" size="large" color="medium"></ion-icon>
       <h2>Événement introuvable</h2>
       <p>Cet événement n'existe pas ou n'est pas encore disponible.</p>
@@ -133,12 +135,16 @@ const props = defineProps<{
 const agendaStore = useAgendaStore();
 const { handleInternalLinks } = useInternalLinks();
 
-const isLoading = computed(() => agendaStore.isLoading);
+const isLoading = computed(() => agendaStore.isLoading || agendaStore.isAdminEventsLoading);
 
 const currentEvent = computed(() => {
   if (props.event) return props.event;
   if (props.eventId) {
-    return agendaStore.events.find((e) => e.id === props.eventId) || null;
+    return (
+      agendaStore.events.find((e) => e.id === props.eventId) ||
+      agendaStore.adminEvents.find((e) => e.id === props.eventId) ||
+      null
+    );
   }
   return null;
 });
@@ -214,45 +220,3 @@ const formatEventDate = (eventItem: AgendaEvent): string => {
   return `Le ${formatPart(startDate)}`;
 };
 </script>
-
-<style scoped>
-.agenda-detail-content {
-  width: 100%;
-}
-
-.event-main-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 0;
-  margin-bottom: 1.25rem;
-}
-
-.detail-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.not-found-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-}
-
-.not-found-container h2 {
-  font-size: 1.25rem;
-  margin-top: 0.75rem;
-}
-
-.description-content :deep(p) {
-  margin-bottom: 12px;
-  line-height: 1.6;
-}
-
-.description-content :deep(img) {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-</style>

@@ -105,15 +105,3 @@ const gererSucces = () => {
   }
 };
 </script>
-
-<style scoped>
-.exercice-type-100commandements {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-</style>

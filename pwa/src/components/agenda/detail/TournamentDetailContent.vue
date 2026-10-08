@@ -6,7 +6,9 @@
     </div>
 
     <div v-else-if="currentPage" class="tournament-detail-content__body">
-      <h1 v-safe-html="currentPage.title.rendered"></h1>
+      <div class="detail-header">
+        <h1 v-safe-html="currentPage.title.rendered"></h1>
+      </div>
 
       <!-- Contenu de la page avec boutons injectés et interception des liens -->
       <div
@@ -149,48 +151,3 @@ onMounted(() => {
   loadPage();
 });
 </script>
-
-<style scoped>
-.tournament-detail-content {
-  width: 100%;
-}
-
-h1 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-.offline-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 30px;
-}
-
-.content :deep(img) {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-.content :deep(table) {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 16px;
-}
-
-.content :deep(th),
-.content :deep(td) {
-  border: 1px solid var(--ion-color-light);
-  padding: 8px;
-  text-align: left;
-}
-
-.content :deep(p) {
-  margin-bottom: 12px;
-  line-height: 1.6;
-}
-</style>

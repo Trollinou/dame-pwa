@@ -63,6 +63,13 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
    - **Navigation inter-mois intuitive** : Le clic sur un jour appartenant au mois précédent ou suivant déplace automatiquement l'affichage vers ce mois et sélectionne le jour demandé.
    - **Persistance** : Le choix d'affichage (Liste ou Calendrier) est sauvegardé dans le navigateur (`localStorage`) pour être conservé lors des futures sessions.
 
+4. **Badges de Nouveautés & Suivi des Non-Lus 🔴** :
+   - **Badges contextuels** : Affichage d'un badge rouge indiquant le nombre de nouveaux éléments sur les sous-onglets *Actualités*, *Tournois* et *Bénévolat* (aucun badge sur l'Agenda où les nouveautés s'insèrent naturellement dans la chronologie).
+   - **Badge global** : La somme totale des éléments non lus est reportée sur l'onglet principal *Le Club* dans la barre de navigation inférieure.
+   - **Initialisation intelligente (Cold Start)** : Lors de la première installation ou initialisation, l'historique antérieur est considéré comme déjà connu (compteur à zéro au départ), évitant la surcharge de badges.
+   - **Filtre Bénévolat** : Les appels à bénévoles dont la date est passée (*Appels terminés*) sont automatiquement exclus des compteurs.
+   - **Décompte automatique & Action rapide** : Le badge d'un élément s'efface dès sa consultation (vue détail ou sélection split-view). Un bouton d'action rapide dans l'en-tête (✓✓) permet également de tout marquer comme lu en un clic.
+
 ## Module Apprentissage & Jeu
 
 L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
@@ -257,6 +264,24 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
    - Les choix sont immédiatement appliqués sur tous les échiquiers (Partie, Analyse, Diagrammes, Puzzles et Exercices interactifs).
 
+## Espace Administration & Gestion Club (Adhérents, Contacts, Événements, Bénévolat, Messages)
+
+Accessible aux profils administrateurs via le menu latéral, l'espace d'administration permet de piloter les données de l'association :
+
+1. **Gestion des Adhérents (`/admin/members`)** :
+   - **Filtrage par Saison** : Par défaut, la liste affiche les adhérents inscrits pour la dernière saison en cours. Le sélecteur de filtre permet d'isoler une saison spécifique ou de sélectionner **« Toutes les saisons »** pour obtenir une vue globale exhaustive de tous les adhérents enregistrés.
+   - **Recherche & Tri** : Recherche textuelle instantanée insensible aux accents et tri par nom, catégorie d'âge, licence, Elo, téléphone ou e-mail.
+   - **Export CSV** : Bouton d'exportation générant un fichier CSV encodé en UTF-8 BOM (`adherents.csv`) respectant le filtrage actif.
+2. **Répertoire de Contacts (`/admin/contact`)** : Annuaire avec filtres combinés par type de contact, région et département.
+3. **Gestion des Événements (`/admin/agenda`)** :
+   - **Liste chronologique** : Classement par ordre croissant des événements (date et heure de début).
+   - **Filtre par saison** : Filtrage automatique par saison sportive (du 1er septembre de l'année X au 31 août de l'année X+1). Options disponibles : *Toutes les saisons*, *Saison courante* (sélectionnée par défaut), puis saisons précédentes par ordre décroissant.
+   - **Informations complètes** : Affichage de la date de début, plage horaire / calendaire (heures de début/fin ou dates de début/fin si plusieurs jours), titre, badges de catégories avec code couleur et lieu de l'événement.
+   - **Affichage détaillé** : Le clic sur un événement ouvre la fiche détaillée complète équivalente à l'affichage public (`/admin/agenda/:id`) avec bouton retour vers la liste d'administration.
+   - **Export Excel / CSV** : Export complet des données selon le filtre de saison affiché avec l'ensemble des colonnes disponibles (ID, titre, dates début/fin, plage/horaires, heures, journée entière, catégories avec code couleur, saison, lieu, adresse, code postal, ville, type/niveau de compétition et description).
+4. **Appels à Bénévolat (`/admin/benevolat`)** : Suivi des réponses et créneaux avec filtrage par statut (*Tous les appels*, *Appels en cours*, *Appels terminés*).
+5. **Messages & Communications (`/admin/message`)** : Historique et consultation détaillée des messages reçus.
+
 ## Informations Système, Mises à Jour & Gestion du Cache
 
 En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou non), une section dédiée permet de suivre l'état de l'application et de forcer la mise à niveau :
@@ -274,3 +299,57 @@ En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou
    - Permet de forcer un nettoyage complet manuel si nécessaire.
    - Purge le `CacheStorage` d'assets et le cache des requêtes tout en **préservant scrupuleusement la session active** (aucun mot de passe à resaisir).
    - Recharge immédiatement l'application pour afficher la dernière version disponible.
+
+## Système de Design & Classes Canoniques Réutilisables
+
+L'architecture CSS centralisée (`pwa/src/theme/core/`) met à disposition un catalogue de **classes canoniques explicites** et de **tokens de design** à réutiliser obligatoirement sur l'ensemble des vues pour garantir un rendu 100% homogène et éviter la duplication de styles :
+
+### 1. Classes Canoniques de Composants
+
+| Classe Canonique | Usage & Description | Rendu & Propriétés |
+| :--- | :--- | :--- |
+| **`.dame-panel`** | Cartes et panneaux d'information standard (Profil, Tournois, Détails d'événements, Customiseur, Inscription). | Fond adaptatif (clair/sombre), arrondi `12px` (`--dame-card-radius`), bordure subtile `var(--dame-card-border)` et ombre légère `var(--dame-card-shadow)`, padding `16px`. |
+| **`.dame-list-item`** | Items interactifs et cliquables dans les listes (Agenda, Tournois, Bénévolat, Membres associés). | Arrondi `8px` (`--dame-item-radius`), marge basse `4px`, retour hover/tactile doux. |
+| **`.dame-btn-large`** | Grands boutons d'action pleine largeur / tactiles (48px de haut). | Hauteur minimale `48px`, arrondi `10px`, typographie `15px` semi-bold (`600`). |
+| **`.dame-empty-state`** | Zones d'état vide, introuvable ou confirmation de fin. | Centrage vertical/horizontal flex, padding aéré `32px 16px`, texte centré. |
+| **`.dame-meta-card`** | En-têtes compacts de match / partie / revue d'analyse. | Fond adaptatif, arrondi `12px`, padding compact `10px 14px`, bordure fine. |
+| **`.dame-badge`** | Badges de rôle et d'identité (`--admin`, `--rep`, `--member`). | Pilule arrondie `20px`, typographie `12px` uppercase bold, couleurs thématiques. |
+| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences / rapports (`--2col`, `--3col`). | Grille responsive avec gap de `10px` et centrage automatique du texte. |
+| **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). | Fond doux, arrondi `8px`, libellé uppercase et valeur en gras. |
+| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`, `--info`). | Conteneur flexible avec icône et texte, fond et bordures harmonisés. |
+| **`.detail-header`** | En-tête canonique des pages et vues de détail (Actualités, Agenda, Tournois). | Titre `h1` normalisé (`1.5rem`, `700`) et métadonnées associées (`.detail-date`). |
+| **`.detail-body`** | Corps de texte enrichi et descriptions HTML (actualités, tournois, messages). | Typographie soignée, interlignage `1.6`, espacement propre des paragraphes et listes. |
+| **`.multiline-large-title`** | Titres principaux adaptatifs multi-lignes pour les en-têtes collapsibles Ionic. | Retour à la ligne préservé sans troncature brute dans les barres d'outils. |
+
+### 2. Tokens de Design SCSS (`pwa/src/theme/core/_base.scss`)
+
+Les variables CSS racine normalisent les espacements et géométries :
+- `--dame-card-radius: 12px;` : Rayon de courbure universel des cartes et panneaux.
+- `--dame-item-radius: 8px;` : Rayon de courbure des items de liste, badges et vignettes.
+- `--dame-card-border: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-150, #e2e8f0));` : Bordure subtile standard adaptée aux modes clair et sombre.
+- `--dame-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);` : Ombrage doux pour les conteneurs élevés.
+
+### 3. Exemple d'Utilisation dans un Composant Vue
+
+```vue
+<template>
+  <!-- Panneau d'information standard -->
+  <div class="dame-panel">
+    <h3>Titre du panneau</h3>
+    <p>Contenu textuel formaté...</p>
+    
+    <!-- Grand bouton d'action -->
+    <ion-button expand="block" color="primary" class="dame-btn-large">
+      Valider l'action
+    </ion-button>
+  </div>
+
+  <!-- Liste d'items interactifs -->
+  <ion-list lines="none">
+    <ion-item button class="dame-list-item">
+      <ion-label>Élément interactif</ion-label>
+    </ion-item>
+  </ion-list>
+</template>
+```
+

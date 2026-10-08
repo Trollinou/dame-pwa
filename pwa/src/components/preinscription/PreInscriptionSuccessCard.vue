@@ -1,5 +1,5 @@
 <template>
-  <div class="success-card ion-padding ion-text-center animate-fade-in">
+  <div class="dame-panel ion-padding ion-text-center animate-fade-in">
     <ion-icon :icon="checkmarkCircleOutline" color="success" class="success-icon"></ion-icon>
     <h2>Préinscription Enregistrée !</h2>
     <p class="ion-margin-bottom">{{ successData.message }}</p>
@@ -59,31 +59,3 @@ defineEmits<{
   (e: 'reset'): void;
 }>();
 </script>
-
-<style scoped>
-.success-card {
-  background: var(--ion-color-step-0, #fff);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.success-icon {
-  font-size: 4rem;
-  margin-bottom: 15px;
-}
-
-.pdf-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>

@@ -1,12 +1,16 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { safeFetch } from '@/utils/safeFetch';
-import { useQueryClient } from '@tanstack/vue-query';
+import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useAuthStore } from './auth';
+import { fetchWpCollection } from '@/utils/wpApi';
+import { getSeasonFromDate, getCurrentSeason } from '@/utils/seasonUtils';
 
 import type { AgendaEvent, AgendaEventCategory } from 'dame-types';
 export type { AgendaEvent, AgendaEventCategory };
 
 export const useAgendaStore = defineStore( 'agenda', () => {
+	const authStore = useAuthStore();
 	const queryClient = useQueryClient();
 	const events = ref< AgendaEvent[] >( [] );
 	const isLoading = ref( false );
@@ -14,6 +18,58 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 	const hasMorePast = ref( true );
 	let isFetchingUpcoming = false;
 	let isFetchingPast = false;
+
+	// Query des événements en mode admin (tous les événements pour DataTable admin)
+	const {
+		data: rawAdminEvents,
+		isLoading: isAdminEventsLoading,
+		refetch: refetchAdminEvents,
+	} = useQuery< AgendaEvent[] >( {
+		queryKey: [ 'admin', 'agenda', 'list' ],
+		queryFn: async () => {
+			const allEvents = await fetchWpCollection< AgendaEvent >(
+				'/wp/v2/agenda?per_page=100&orderby=meta_value&meta_key=_dame_start_date&order=asc'
+			);
+			return sortEvents( allEvents );
+		},
+		enabled: computed( () => authStore.isAdmin ),
+	} );
+
+	const adminEvents = computed( () => rawAdminEvents.value || [] );
+
+	/**
+	 * Liste des saisons disponibles (ordonnées par ordre décroissant)
+	 * Comprend toujours la saison courante, ainsi que toutes les saisons trouvées dans les événements.
+	 */
+	const availableSeasons = computed( () => {
+		const seasonsSet = new Set< string >();
+		const current = getCurrentSeason();
+		seasonsSet.add( current );
+
+		for ( const ev of adminEvents.value ) {
+			const s = getSeasonFromDate( ev.meta?._dame_start_date );
+			if ( s ) {
+				seasonsSet.add( s );
+			}
+		}
+
+		// Trier par année de départ décroissante
+		return Array.from( seasonsSet ).sort( ( a, b ) => {
+			const startA = parseInt( a.split( '-' )[ 0 ], 10 ) || 0;
+			const startB = parseInt( b.split( '-' )[ 0 ], 10 ) || 0;
+			return startB - startA;
+		} );
+	} );
+
+	const fetchAdminEvents = async ( force = false ) => {
+		if ( force ) {
+			await queryClient.invalidateQueries( {
+				queryKey: [ 'admin', 'agenda' ],
+			} );
+		} else {
+			await refetchAdminEvents();
+		}
+	};
 
 	// Etat de la pagination partagé
 	const upcomingPage = ref( 1 );
@@ -392,7 +448,10 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 
 	return {
 		events,
+		adminEvents,
 		isLoading,
+		isAdminEventsLoading,
+		availableSeasons,
 		hasMoreUpcoming,
 		hasMorePast,
 		upcomingPage,
@@ -400,6 +459,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 		getTodayLocal,
 		fetchBatch,
 		fetchAgenda,
+		fetchAdminEvents,
 		fetchMonthEvents,
 		clearData,
 	};

@@ -62,7 +62,7 @@
         <!-- Liste des articles -->
         <div v-else>
           <!-- Message d'avertissement si on affiche des données en cache alors qu'on est hors-ligne -->
-          <div v-if="error && newsStore.posts.length > 0" class="offline-banner">
+          <div v-if="error && newsStore.posts.length > 0" class="dame-banner dame-banner--warning">
             <ion-icon :icon="cloudOfflineOutline"></ion-icon>
             <span>{{ error }}</span>
           </div>
@@ -324,59 +324,3 @@ onIonViewWillEnter(() => {
   }
 });
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.news-card {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.featured-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-ion-card-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-ion-card-subtitle {
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--ion-color-medium);
-}
-
-ion-item {
-  --background: transparent;
-}
-
-.offline-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 50px;
-}
-
-.offline-banner {
-  background: var(--ion-color-warning);
-  color: var(--ion-color-warning-contrast);
-  padding: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  margin-bottom: 15px;
-}
-</style>

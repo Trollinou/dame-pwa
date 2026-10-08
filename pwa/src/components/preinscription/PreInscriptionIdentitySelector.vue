@@ -52,10 +52,3 @@ defineEmits<{
   (e: 'select-target', memberId: number): void;
 }>();
 </script>
-
-<style scoped>
-.identity-select-card {
-  --background: var(--ion-color-primary-contrast, #f4f5f8);
-  border-left: 4px solid var(--ion-color-primary);
-}
-</style>

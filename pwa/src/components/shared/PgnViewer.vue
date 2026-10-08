@@ -243,9 +243,3 @@ const viewEnd = () => {
   notifyFinishedIfEnd();
 };
 </script>
-
-<style scoped>
-:deep(.main-wrap.viewingHistory) {
-  filter: none !important;
-}
-</style>

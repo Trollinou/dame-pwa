@@ -30,11 +30,3 @@ const props = withDefaults(
   }
 );
 </script>
-
-<style scoped>
-.diagram-viewer-container {
-  width: 100%;
-  max-width: 400px;
-  margin: 16px auto;
-}
-</style>

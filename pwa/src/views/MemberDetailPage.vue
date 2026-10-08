@@ -59,33 +59,33 @@
             <ion-card-content>
               <ion-list lines="none">
                 <!-- Grille Infos Licence -->
-                <div class="license-grid-container">
-                  <div class="license-box" v-if="member.meta?._dame_license_number">
-                    <span class="license-label">Licence FFE</span>
-                    <span class="license-value">
+                <div class="dame-stat-grid dame-stat-grid--2col ion-margin-bottom">
+                  <div class="dame-stat-box" v-if="member.meta?._dame_license_number">
+                    <span class="dame-stat-label">Licence FFE</span>
+                    <span class="dame-stat-value">
                       {{ member.meta._dame_license_number }}
                       <small v-if="member.meta._dame_license_type">({{ member.meta._dame_license_type }})</small>
                     </span>
                   </div>
-                  <div class="license-box" v-if="member.meta?._dame_fide_id">
-                    <span class="license-label">FIDE ID</span>
-                    <span class="license-value">{{ member.meta._dame_fide_id }}</span>
+                  <div class="dame-stat-box" v-if="member.meta?._dame_fide_id">
+                    <span class="dame-stat-label">FIDE ID</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_fide_id }}</span>
                   </div>
                 </div>
                 
                 <!-- Grille Elo -->
-                <div v-if="member.meta?._dame_elo_standard || member.meta?._dame_elo_rapide || member.meta?._dame_elo_blitz" class="elo-grid-container">
-                  <div class="elo-box" v-if="member.meta?._dame_elo_standard">
-                    <span class="elo-label">Standard</span>
-                    <span class="elo-value">{{ member.meta._dame_elo_standard }}</span>
+                <div v-if="member.meta?._dame_elo_standard || member.meta?._dame_elo_rapide || member.meta?._dame_elo_blitz" class="dame-stat-grid dame-stat-grid--3col">
+                  <div class="dame-stat-box" v-if="member.meta?._dame_elo_standard">
+                    <span class="dame-stat-label">Standard</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_elo_standard }}</span>
                   </div>
-                  <div class="elo-box" v-if="member.meta?._dame_elo_rapide">
-                    <span class="elo-label">Rapide</span>
-                    <span class="elo-value">{{ member.meta._dame_elo_rapide }}</span>
+                  <div class="dame-stat-box" v-if="member.meta?._dame_elo_rapide">
+                    <span class="dame-stat-label">Rapide</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_elo_rapide }}</span>
                   </div>
-                  <div class="elo-box" v-if="member.meta?._dame_elo_blitz">
-                    <span class="elo-label">Blitz</span>
-                    <span class="elo-value">{{ member.meta._dame_elo_blitz }}</span>
+                  <div class="dame-stat-box" v-if="member.meta?._dame_elo_blitz">
+                    <span class="dame-stat-label">Blitz</span>
+                    <span class="dame-stat-value">{{ member.meta._dame_elo_blitz }}</span>
                   </div>
                 </div>
               </ion-list>
@@ -300,98 +300,3 @@ const formatGender = (gender?: GenderType | string) => {
   return gender;
 };
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.mt-large {
-  margin-top: 5%;
-}
-
-ion-card {
-  margin-bottom: 20px;
-}
-
-ion-item-divider {
-  margin-top: 10px;
-  --padding-start: 10px;
-}
-
-ion-item-divider ion-label {
-  font-weight: bold;
-  color: var(--ion-color-dark);
-}
-
-p {
-  color: var(--ion-color-medium);
-  font-size: 0.85em;
-  margin-bottom: 2px;
-}
-
-h3 {
-  font-weight: 500;
-  margin-top: 0;
-  margin-bottom: 2px;
-}
-
-.multiline-large-title {
-  white-space: normal !important;
-  word-wrap: break-word;
-  line-height: 1.2;
-  display: block;
-  width: 100%;
-  padding-bottom: 8px;
-}
-
-.elo-grid-container {
-  display: flex;
-  gap: 10px;
-  padding: 10px 16px;
-  justify-content: space-between;
-}
-
-.license-grid-container {
-  display: flex;
-  gap: 10px;
-  padding: 0 16px 10px 16px;
-}
-
-.license-box,
-.elo-box {
-  flex: 1;
-  background: var(--ion-color-light);
-  border-radius: 8px;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-width: 0;
-}
-
-.license-label,
-.elo-label {
-  font-size: 0.75em;
-  color: var(--ion-color-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 2px;
-}
-
-.license-value,
-.elo-value {
-  font-weight: bold;
-  font-size: 1.1em;
-  color: var(--ion-color-dark);
-}
-
-.license-value small {
-  font-weight: normal;
-  font-size: 0.8em;
-  margin-left: 4px;
-}
-</style>

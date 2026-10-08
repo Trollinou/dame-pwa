@@ -9,5 +9,6 @@ pwa/node_modules/
 pwa/dist/
 /pwa/.vscode
 /.antigravitycli
+.antigravityrules
 *.zip
 pwa/src/utils/desktop.ini

@@ -125,36 +125,3 @@ const repondre = async (valeur: string) => {
   }
 };
 </script>
-
-<style scoped>
-.theme-title {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: var(--ion-color-primary);
-}
-
-.question-text {
-  font-size: 1rem;
-  margin-bottom: 16px;
-  line-height: 1.4;
-}
-
-.buttons-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.phase-title {
-  margin-bottom: 12px;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.finish-container {
-  width: 100%;
-  max-width: 500px;
-  margin-top: 16px;
-}
-</style>

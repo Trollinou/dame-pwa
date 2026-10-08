@@ -25,19 +25,26 @@ import {
   IonTitle,
   IonContent,
   IonButtons,
-  IonBackButton
+  IonBackButton,
+  onIonViewWillEnter
 } from '@ionic/vue';
-import { computed } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useUnreadStore } from '@/stores/unread';
 import TournamentDetailContent from '@/components/agenda/detail/TournamentDetailContent.vue';
 
 const route = useRoute();
+const unreadStore = useUnreadStore();
 const pageId = computed(() => route.params.id as string);
-</script>
 
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-</style>
+const markAsSeen = () => {
+  const id = Number(pageId.value);
+  if (id) {
+    unreadStore.markTournamentAsSeen(id);
+  }
+};
+
+onMounted(markAsSeen);
+onIonViewWillEnter(markAsSeen);
+watch(pageId, markAsSeen);
+</script>

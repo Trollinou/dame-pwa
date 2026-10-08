@@ -6,6 +6,55 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Ajout du Module d'Administration « Événements » (`EventsPage.vue`, `AdminAgendaDetailPage.vue`, `AdminLayout.vue`, `router/index.ts`, `stores/agenda.ts`, `seasonUtils.ts`, `_admin-components.scss`, `seasonUtils.spec.ts`, `README.md`, `USING.md`)** :
+  - **Menu d'administration & Routage** : Ajout de l'entrée « Événements » dans le menu latéral d'administration entre « Contacts » et « Appels à bénévoles » (`/admin/agenda`), avec routes protégées et vue détaillée (`/admin/agenda/:id`) équivalente à l'affichage public.
+  - **Grille de données réactive (`DataTable`)** : Liste des événements ordonnée par défaut par ordre chronologique croissant (date de début puis heure de début) avec colonnes de date, plage/horaires, titre, badge de catégorie coloré et lieu.
+  - **Filtre par Saison Sportive** : Calcul automatique des saisons (du 1er septembre de l'année X au 31 août de l'année X+1). Le filtre déroulant propose *Toutes les saisons*, la *Saison courante* (sélectionnée par défaut) puis les *Saisons antérieures* par ordre décroissant.
+  - **Export Excel / CSV Enrichi** : Export selon la saison active avec l'intégralité des métadonnées disponibles (ID, titre, dates début/fin, horaires/plage, journée entière, catégories avec codes couleurs, saison, lieu, adresse postale, code postal, ville, type/niveau de compétition et description).
+  - **Utilitaires et Tests Unitaires Dédiés** : Création de `seasonUtils.ts` pour le calcul et formatage des saisons/horaires avec couverture complète de tests unitaires (`seasonUtils.spec.ts`).
+
+- **Correction du Filtrage Multi-Saisons dans l'Administration des Adhérents (`DataTable.vue`, `DataTableToolbar.vue`, `types.ts`, `MembersPage.vue`, `ContactsPage.vue`, `DataTable.spec.ts`)** :
+  - **Correction du Fallback de Filtre (`DataTableToolbar.vue`)** : Remplacement du repli systématique sur `defaultValue` par la valeur neutre `'all'` lorsque le filtre de colonne TanStack Table est réinitialisé (`undefined`), résolvant le dysfonctionnement où la sélection de « Toutes les saisons » réappliquait automatiquement la saison active courante.
+  - **Initialisation Déclarative des Filtres (`DataTable.vue`)** : Application unique et isolée de la valeur par défaut (`defaultValue`) lors du montage initial de la table sans écraser les changements de sélection ultérieurs de l'utilisateur.
+  - **Nettoyage & Synchronisation Réactive (`MembersPage.vue`, `ContactsPage.vue`)** : Suppression de l'assignation forcée résiduelle dans le cycle de vue de `MembersPage.vue` et ajout du callback `onChange` sur `DataTableFilterConfig` pour les filtres dépendants.
+  - **Couverture de Tests Unitaires (`DataTable.spec.ts`)** : Ajout d'une suite de tests automatisés vérifiant l'application de la valeur par défaut et le basculement fluide et persistant sur « Toutes les saisons ».
+
+- **Adaptation & Harmonisation du Mode Sombre (Dark Mode) pour les Thèmes Public & Core (`pwa/src/theme/`, `CHANGELOG.md`)** :
+  - **Calendrier & Vue Agenda (`_public-components.scss`, `_public-layout.scss`)** :
+    - Remplacement des variables de repli statiques blanches (`--ion-color-step-50: #f9f9f9`) dans les cellules avec événements (`.day-cell.has-events:not(.is-selected)`) par des variables adaptatives (`--ion-background-color-step-100`, `--ion-color-step-100`) pour éviter les cellules blanches en mode sombre.
+    - Application de la couleur de texte adaptative `--ion-text-color` sur les numéros de jours (`.day-number`), les titres de mois (`.month-title`), les en-têtes de jour sélectionné (`.selected-day-header h3`) et les jours de semaine (`.weekday-cell`).
+    - Adaptation du badge de date d'agenda (`.agenda-date-badge`) via le canal RGBA `--ion-color-primary-rgb` avec opacité douce.
+  - **Profil, Personnalisateur d'Échiquier & Éléments Publics (`_public-components.scss`, `_public-layout.scss`)** :
+    - Correction des contrastes du sélecteur de thèmes d'échiquier (`.wheel-picker-wrapper`, `.wheel-header-item`, `.wheel-highlight-lens`, `.wheel-divider`, `.wheel-item`).
+    - Remplacement des couleurs fixes sur `.system-title`, `.system-version`, `.avatar-icon`, `.admin-access-content` et le conteneur d'invitation de connexion (`.prompt-header p`).
+  - **Tokens & Classes Canoniques Core (`_base.scss`, `_club-badges.scss`, `_shared.scss`)** :
+    - Adaptation des bordures universelles `--dame-card-border` avec `--ion-background-color-step-150` et canal alpha textuel pour un fondu subtil en dark mode.
+    - Remplacement des fonds de badges `.dame-badge` (`--admin`, `--rep`, `--member`) par des opacités RGBA s'adaptant automatiquement au thème clair/sombre.
+    - Normalisation des contrastes pour `.dame-stat-box`, `.dame-banner`, `.meta-title`, `.consigne-text`, `.signature-label`, `.detail-lead` et les tableaux `.detail-body table`.
+
+- **Structuration du Thème Administration, Harmonisation Canonique & Compatibilité Dark Mode (`pwa/src/theme/`, `views/`, `components/`, `README.md`, `USING.md`)** :
+  - **Correction du Contraste en Mode Sombre (`_datatable.scss`)** : Remplacement des variables de repli statiques blanches par les variables dynamiques Ionic (`--ion-card-background`, `--ion-item-background`, `--ion-background-color-step-*`, `--ion-text-color`) pour assurer une lisibilité parfaite des tableaux de données (`DataTable`), de la barre de recherche (`.custom-searchbar`) et des sélecteurs de filtre (`.filter-item`) en mode sombre automatique / nocturne.
+  - **Structuration du Pilier Administration (`theme/admin/`)** :
+    - `_admin-layout.scss` : Menu latéral Ionic `ion-menu` (largeur standard 280px), états actifs des items de navigation (`.menu-item.active`), pied de menu fixe (`.menu-footer`) et section tableau de bord (`.dashboard-section`).
+    - `_admin-components.scss` : Fiches de contact et gestion (`.organization-name`, `.contact-gender`, `.contact-name`, `.role-name`), formulaires de pré-inscription et santé (`.form-container`, `.section-title`, `.health-info-box`, `.radio-group-container`, `.radio-options`, `.consent-item`, `.signature-section`, `.identity-select-card`, `.copy-adh-container`, `.legal-rep-prevention-note`), autocomplétion d'adresses BAN (`.suggestions-outer-container`, `.suggestions-list`) et actions de téléchargement (`.pdf-buttons`, `.success-icon`).
+  - **Rapprochement et Unification avec le Modèle Canonique Core** :
+    - Déplacement de la classe transverse `.multiline-large-title` dans `core/_base.scss` pour un partage universel entre Public, Learning et Admin.
+    - Utilisation des bannières canoniques `.dame-banner` (`--info`, `--danger`) dans `PreInscriptionPage.vue` en lieu et place des styles dupliqués `.info-banner` et `.error-banner`.
+    - Alignement de `MessageDetailPage.vue` sur le corps de texte enrichi `.detail-body` et les grilles de statistiques `.dame-stat-grid` / `.dame-stat-box`.
+    - Uniformisation des cartes de confirmation avec `.dame-panel` dans `PreInscriptionSuccessCard.vue`.
+
+- **Refactorisation de l'Architecture SCSS & Standardisation par Classes Canoniques (`pwa/src/theme/`, `views/`, `components/`, `README.md`, `USING.md`)** :
+  - **Reclassement Logique en Piliers Métier** : Transfert de l'ensemble des règles de style du module de jeu (`PlayPage`) et d'analyse interactive (`AnalysisPage`) depuis `theme/public/` vers `theme/learning/` (`_learning-layout.scss`, `_learning-components.scss`).
+  - **Système de Design & Classes Canoniques Explicites (`theme/core/`)** :
+    - Définition des tokens universels (`--dame-card-radius`, `--dame-item-radius`, `--dame-card-border`, `--dame-card-shadow`) dans `_base.scss`.
+    - Création des classes canoniques partagées : `.dame-panel` (cartes/panneaux standard), `.dame-list-item` (items interactifs avec hover doux), `.dame-btn-large` (boutons d'action 48px), `.dame-empty-state` (états vides ou introuvables), `.dame-meta-card` (en-têtes de match/analyse), `.dame-badge` (badges de rôle `--admin`, `--rep`, `--member`), `.dame-stat-grid` / `.dame-stat-box` (grilles de métriques, classements ELO et licences FFE), `.dame-banner` (bannières contextuelles et état hors-ligne), et `.detail-header` (en-tête de vues de détail).
+  - **Dédoublonnage & Remplacement par Classes Canoniques Uniques (Option 1)** :
+    - Élimination des doublons et règles obsolètes dans `_public-components.scss` (`.badge`, `.badge-admin/rep/member`, `.elo-grid`, `.elo-item`, `.elo-label`, `.elo-val`, `.tournament-info-grid`, `.info-item`, `.info-label`, `.info-value`, `.detail-card`, `.admin-access-card`, `.redirect-banner`, `.success-message`, `.offline-banner`, `.event-main-title`).
+    - Mise à jour et alignement direct des templates Vue (`ProfilePage.vue`, `TournamentDetailContent.vue`, `AgendaDetailContent.vue`, `BenevolatDetailContent.vue`, `LoginPage.vue`, `RegisterPage.vue`, `TournamentPage.vue`, `TournoisSegmentView.vue`, `NewsPage.vue`, `MemberDetailPage.vue`, `ChessThemeCustomizer.vue`, `PlayInfoBar.vue`, `AnalysisPage.vue`).
+  - **Correction Affichage Indicateur de Catégorie Agenda (`AgendaSegmentView.vue`, `_public-components.scss`, `_base.scss`)** : Rétablissement de la barre latérale de couleur de catégorie (`.category-color-bar`) et de la position relative sur `.dame-list-item`, ainsi que des styles de statut d'événement (`.past-event`, `.upcoming-title`).
+  - **Correction Largeur SplitMasterDetail Tablette / Ordinateur (`_learning-layout.scss`)** : Isolation de la restriction `max-width: 800px` aux seuls conteneurs d'apprentissage pour permettre aux grilles 1/3 - 2/3 (`SplitMasterDetail`) de la section Club d'occuper harmonieusement toute la largeur disponible sur grand écran.
+  - **Documentation Vivante** : Mise à jour synchrone du catalogue des classes et conventions de style dans `README.md` et `USING.md`.
+
 ## [1.9.0] - 2026-10-04
 
 - **Modernisation WordPress 7.1, Directives Globales & QA Pré-Packaging (`AGENTS.md`, `scripts/package.cjs`, `pwa/src/stores/auth.ts`, `package.json`)** :

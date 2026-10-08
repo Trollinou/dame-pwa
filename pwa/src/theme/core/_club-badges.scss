@@ -1,0 +1,58 @@
+/**
+ * Styles partagés et normalisés pour les badges de notification et segments Club.
+ */
+
+.segment-label-wrapper {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.segment-badge {
+	font-size: 10px;
+	font-weight: 700;
+	padding: 2px 6px;
+	border-radius: 10px;
+	line-height: 1.2;
+}
+
+.news-subtitle-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.news-unread-badge {
+	font-size: 10px;
+	font-weight: 700;
+	padding: 2px 6px;
+	border-radius: 8px;
+}
+
+/* Badges de rôle et d'identité canoniques DAME */
+.dame-badge {
+	display: inline-block;
+	padding: 6px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+
+	&--admin {
+		background-color: rgba(var(--ion-color-danger-rgb, 235, 68, 90), 0.18);
+		color: var(--ion-color-danger, #eb445a);
+	}
+
+	&--rep {
+		background-color: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.2);
+		color: var(--ion-color-warning-shade, #b58000);
+	}
+
+	&--member {
+		background-color: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.18);
+		color: var(--ion-color-primary, #3880ff);
+	}
+}
+

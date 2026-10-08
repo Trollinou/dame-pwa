@@ -45,12 +45,10 @@
             />
 
             <!-- Bannière d'information préinscription existante -->
-            <div v-if="isExistingPreInscription" class="info-banner ion-margin-bottom ion-padding">
-              <ion-text color="primary">
-                <p style="margin: 0; font-size: 0.95em; line-height: 1.4;">
-                  ℹ️ <strong>Préinscription en cours :</strong> Une préinscription a déjà été enregistrée pour cet adhérent. Les champs sont pré-remplis avec ces données. Vous pouvez les modifier et valider à nouveau pour mettre à jour son dossier sans créer de doublon.
-                </p>
-              </ion-text>
+            <div v-if="isExistingPreInscription" class="dame-banner dame-banner--info ion-margin-bottom">
+              <p style="margin: 0; font-size: 0.95em; line-height: 1.4;">
+                ℹ️ <strong>Préinscription en cours :</strong> Une préinscription a déjà été enregistrée pour cet adhérent. Les champs sont pré-remplis avec ces données. Vous pouvez les modifier et valider à nouveau pour mettre à jour son dossier sans créer de doublon.
+              </p>
             </div>
 
             <!-- SECTION 1 : Informations Adhérent -->
@@ -83,10 +81,8 @@
             />
 
             <!-- Message d'erreur -->
-            <div class="error-banner ion-margin-top ion-padding-horizontal" v-if="errorMessage">
-              <ion-text color="danger">
-                <p v-html="errorMessage"></p>
-              </ion-text>
+            <div class="dame-banner dame-banner--danger ion-margin-top" v-if="errorMessage">
+              <p style="margin: 0;" v-html="errorMessage"></p>
             </div>
 
             <!-- Soumission -->
@@ -221,39 +217,3 @@ const onDownloadPdf = (type: 'health' | 'parental') => {
   downloadPdf(type, form);
 };
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.form-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding-bottom: 40px;
-}
-
-.info-banner {
-  background: var(--ion-color-light, #f4f5f8);
-  border-left: 4px solid var(--ion-color-primary, #3880ff);
-  border-radius: 8px;
-}
-
-.error-banner {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-weight: 500;
-}
-
-.privacy-disclaimer {
-  font-size: 0.82em;
-  color: var(--ion-color-medium);
-  margin-top: 12px;
-  line-height: 1.4;
-  text-align: center;
-}
-</style>

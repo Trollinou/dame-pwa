@@ -26,12 +26,12 @@
             >
               <ion-item lines="none" class="filter-item">
                 <ion-select
-                  :value="getFilterValue(filter.id, filter.defaultValue)"
+                  :value="getFilterValue(filter.id)"
                   interface="action-sheet"
                   :label="filter.label"
                   label-placement="stacked"
                   class="custom-select"
-                  @ionChange="(e) => onFilterChange(filter.id, e.detail.value)"
+                  @ionChange="(e) => onFilterChange(filter, e.detail.value)"
                 >
                   <ion-select-option
                     v-for="opt in filter.options"
@@ -105,20 +105,23 @@ const onSearchInput = (e: CustomEvent) => {
   props.table.setGlobalFilter(val);
 };
 
-const getFilterValue = (filterId: string, defaultValue?: string | number) => {
+const getFilterValue = (filterId: string) => {
   const column = props.table.getColumn(filterId);
-  if (!column) return defaultValue ?? 'all';
+  if (!column) return 'all';
   const val = column.getFilterValue();
-  return val !== undefined ? (val as string | number) : defaultValue ?? 'all';
+  return val !== undefined && val !== null ? (val as string | number) : 'all';
 };
 
-const onFilterChange = (filterId: string, value: unknown) => {
-  const column = props.table.getColumn(filterId);
+const onFilterChange = (filter: DataTableFilterConfig, value: unknown) => {
+  const column = props.table.getColumn(filter.id);
   if (!column) return;
-  if (value === 'all' || value === '' || value === null) {
+  if (value === 'all' || value === '' || value === null || value === undefined) {
     column.setFilterValue(undefined);
   } else {
     column.setFilterValue(value);
+  }
+  if (filter.onChange) {
+    filter.onChange(value);
   }
 };
 
@@ -129,61 +132,3 @@ const handleExport = () => {
   exportToCsv(props.exportConfig.filename, props.exportConfig.columns, filteredRows);
 };
 </script>
-
-<style scoped>
-.datatable-toolbar {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.toolbar-search {
-  width: 100%;
-}
-
-.custom-searchbar {
-  --background: var(--ion-color-step-100, #f4f5f8);
-  --border-radius: 8px;
-  padding: 0;
-}
-
-.toolbar-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.toolbar-filters {
-  flex: 1;
-  min-width: 240px;
-}
-
-.filter-item {
-  --padding-start: 8px;
-  --padding-end: 8px;
-  --min-height: 48px;
-  --background: var(--ion-color-step-50, #ffffff);
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-step-150, rgba(0, 0, 0, 0.08));
-}
-
-.custom-select {
-  width: 100%;
-  font-size: 0.875rem;
-}
-
-.toolbar-buttons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.export-btn {
-  --border-radius: 8px;
-  font-weight: 600;
-  margin: 0;
-}
-</style>

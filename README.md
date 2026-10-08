@@ -21,12 +21,14 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
   - `src/components/agenda/detail/` : Composants purs de détail (`NewsDetailContent.vue`, `AgendaDetailContent.vue`, `TournamentDetailContent.vue`, `BenevolatDetailContent.vue`).
   - `src/components/common/SignaturePad.vue` : Composant réactif de signature tactile/manuscrite sur Canvas HTML5 (export PNG transparent).
   - `src/views/PreInscriptionPage.vue` : Formulaire de préinscription / réinscription en ligne pour la nouvelle saison avec signature électronique dématérialisée.
+  - `src/views/EventsPage.vue` & `src/views/AdminAgendaDetailPage.vue` : Grille d'administration des événements avec filtre par saison, export Excel/CSV et fiche détaillée.
   - `src/components/preinscription/` : Composants modulaires du formulaire (`PreInscriptionIdentitySelector.vue`, `PreInscriptionMemberSection.vue`, `PreInscriptionLegalRepSection.vue`, `PreInscriptionHealthSection.vue`, `PreInscriptionSuccessCard.vue`).
   - `src/composables/preinscription/` : Logique métier découplée (`usePreInscriptionApi.ts`, `usePreInscriptionForm.ts`, `useAddressAutocomplete.ts`) avec détection et mise à jour transparente des préinscriptions existantes et transmission de la signature.
   - `src/stores/auth/` : Sous-modules spécialisés pour l'authentification (`types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`) pilotés par la façade `useAuthStore` (`auth.ts`).
-  - `src/stores/` : Stores Pinia harmonisés avec TanStack Query (`news.ts`, `tournament.ts`, `members.ts`, `contacts.ts`, `dashboard.ts`, `benevolat.ts`, `apprentissage.ts`) pour la gestion unifiée du cache serveur et de l'état client.
+  - `src/stores/` : Stores Pinia harmonisés avec TanStack Query (`news.ts`, `tournament.ts`, `members.ts`, `contacts.ts`, `dashboard.ts`, `benevolat.ts`, `apprentissage.ts`, `unread.ts`) pour la gestion unifiée du cache serveur, du suivi des nouveautés et de l'état client.
   - `src/utils/safeFetch.ts` & `src/utils/wpApi.ts` : Couche réseau unifiée avec timeouts de protection, rafraîchissement transparent des jetons JWT en cas de session expirée (retry automatique) et pagination multi-pages WP REST automatique (`fetchWpCollection`).
   - `src/queryClient.ts` : Configuration de TanStack Query avec persistance et invalidation automatique des caches de requêtes lors des montées de version PWA.
+  - `src/theme/` : Architecture SCSS centralisée KISS organisée en 3 piliers métier (`theme/public/`, `theme/learning/`, `theme/admin/`) + fondations communes (`theme/core/`, `variables.css`). Règle d'or CSS stricte : zéro balise `<style>` ou `<style scoped>` dans les composants Vue.
 - **Rendu Visuel Unifié (`mode: 'ios'`) & Adaptation Dynamique en Hauteur (`vh` / `clamp`)** : Initialisation d'Ionic configurée en mode `ios` global associée à une échelle typographique et des variables de mise en page réactives en hauteur (`--app-section-gap`, `--app-item-min-height`, `--app-card-padding`), assurant une occupation à 100 % de l'écran et une lisibilité immédiate sans zoom sur tous les smartphones (iPhone, Samsung One UI, Xiaomi et Pixel 9 sous Android 14/15).
 - **Stratégie de Performance & Découpage de Bundle (`pwa/vite.config.ts`)** :
   - **Manual Chunks** : Découpage ciblé des dépendances lourdes (`chess-vendor` pour `eg-chessboard` et `chessops`, `confetti-vendor` pour `canvas-confetti`, `ionic-vendor`, `tanstack-vendor`, `vue-vendor`) afin de différer le chargement du moteur d'échecs aux seules pages de jeu et d'analyse.
@@ -325,10 +327,42 @@ Centralise et standardise toutes les opérations sur la notation échiquéenne f
 - **Algorithme de Mélange Aléatoire** :
   - `shuffleArray<T>(array, rng?)` : Mélange de Fisher-Yates immuable préservant le tableau original.
 
+### 11. Composant Tableau de Données `<DataTable>` (`src/components/shared/DataTable/`)
+Composant maître réutilisable pour l'affichage, le tri, la pagination, le filtrage facetté et l'export CSV des listes d'administration (Adhérents, Bénévolat, Contacts, Messages) :
+- **Rendu Responsive Dual-Mode** : Mode tableau sticky triable sur Desktop/Tablette (`>768px`) et liste interactive sur Mobile (`<=768px`) via le slot `#mobile-item`.
+- **Filtres Facettés Déclaratifs (`filters`)** : Prise en charge des listes déroulantes de filtre avec valeur neutre (`all`) et initialisation déclarative de valeur par défaut (`defaultValue`) sans verrouiller les sélections ultérieures.
+- **Export CSV Formaté** : Export immédiat des lignes filtrées actives avec en-têtes personnalisés et encodage UTF-8 BOM (`\uFEFF`) pour Excel.
+
 ## API REST & Hooks Partagés
 
 *   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
 *   **Filtre Web Worker Stockfish (`dame_pwa_stockfish_worker_url`) :** Fournit l'URL absolue du Web Worker Stockfish (`pwa/dist/stockfish/stockfish.js`) pour mutualiser le moteur d'échecs avec d'autres extensions (ex: plugin `roi`).
+
+## Architecture SCSS & Classes Canoniques Réutilisables
+
+Le styling suit une architecture centralisée KISS en 3 piliers métier + fondations communes (`pwa/src/theme/`), avec **interdiction absolue de balises `<style>` ou `<style scoped>` dans les composants Vue** :
+1. `theme/core/` (`_base.scss`, `_shared.scss`, `_club-badges.scss`, `_chessboard.scss`, `_datatable.scss`) : Fondations, variables et tokens universels.
+2. `theme/learning/` (`_learning-layout.scss`, `_learning-components.scss`) : Cours, leçons, viewers d'exercices, et modules de **Jeu (`PlayPage`)** et **Analyse (`AnalysisPage`)**.
+3. `theme/public/` (`_public-layout.scss`, `_public-components.scss`) : Vitrine, accueil, actualités, agenda, calendrier, tournois, bénévolat, profil et formulaires.
+4. `theme/admin/` (`_admin-layout.scss`, `_admin-components.scss`) : Shell d'administration club et gestion.
+
+### Catalogue des Classes Canoniques Explicites (`theme/core/`)
+
+| Classe Canonique | Destination & Rôle |
+| :--- | :--- |
+| **`.dame-panel`** | Panneaux, cartes d'information et conteneurs de contenu (fond dynamique, coins arrondis `12px`, bordure et ombre subtile). |
+| **`.dame-list-item`** | Items de liste interactifs/cliquables (arrondi `8px`, marge basse `4px`, hover doux). |
+| **`.dame-btn-large`** | Boutons d'action pleine largeur et ergonomiques (hauteur minimale `48px`, arrondi `10px`). |
+| **`.dame-empty-state`** | Conteneurs d'état vide, non trouvé ou fin de vote (centrage vertical et aéré). |
+| **`.dame-meta-card`** | En-têtes compacts pour les métadonnées de jeu, match ou analyse. |
+| **`.dame-badge`** | Badges de rôle et d'identité (`--admin`, `--rep`, `--member`). |
+| **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences / rapports (`--2col`, `--3col`). |
+| **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). |
+| **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`, `--info`). |
+| **`.detail-header`** | En-tête canonique des vues de détail (`h1` normalisé et métadonnées). |
+| **`.detail-body`** | Corps de texte enrichi et descriptions HTML (actualités, tournois, messages). |
+| **`.multiline-large-title`** | Titres principaux adaptatifs multi-lignes pour les en-têtes collapsibles Ionic. |
+
 
 ## Développement & Release
 

@@ -38,7 +38,7 @@
           <div v-if="currentTab === 'message'">
             <ion-card class="ion-no-margin">
               <ion-card-content>
-                <div class="description-content" v-safe-html="message.content.rendered"></div>
+                <div class="detail-body" v-safe-html="message.content.rendered"></div>
               </ion-card-content>
             </ion-card>
           </div>
@@ -46,19 +46,19 @@
           <!-- Onglet RAPPORT -->
           <div v-if="currentTab === 'report'">
             <ion-card v-if="message.report" class="ion-no-margin">
-              <ion-card-content class="stats-card">
-                <div class="stat-item main-stat">
-                  <span class="stat-value">{{ message.report.stats.rate }}%</span>
-                  <span class="stat-label">Taux d'ouverture</span>
-                </div>
-                <div class="stats-grid">
-                  <div class="stat-item">
-                    <span class="stat-value">{{ message.report.stats.sent }}</span>
-                    <span class="stat-label">Envoyés</span>
+              <ion-card-content>
+                <div class="dame-stat-grid dame-stat-grid--3col">
+                  <div class="dame-stat-box">
+                    <span class="dame-stat-label">Taux d'ouverture</span>
+                    <span class="dame-stat-value">{{ message.report.stats.rate }}%</span>
                   </div>
-                  <div class="stat-item">
-                    <span class="stat-value">{{ message.report.stats.opened }}</span>
-                    <span class="stat-label">Ouverts</span>
+                  <div class="dame-stat-box">
+                    <span class="dame-stat-label">Envoyés</span>
+                    <span class="dame-stat-value">{{ message.report.stats.sent }}</span>
+                  </div>
+                  <div class="dame-stat-box">
+                    <span class="dame-stat-label">Ouverts</span>
+                    <span class="dame-stat-value">{{ message.report.stats.opened }}</span>
                   </div>
                 </div>
               </ion-card-content>
@@ -186,75 +186,3 @@ const getRecipientColor = (recipient: MessageRecipient) => {
   return 'warning';
 };
 </script>
-
-<style scoped>
-.safe-area-wrapper {
-  padding-left: var(--ion-safe-area-left, 0);
-  padding-right: var(--ion-safe-area-right, 0);
-}
-
-.mt-large {
-  margin-top: 5%;
-}
-
-.multiline-large-title {
-  white-space: normal !important;
-  word-wrap: break-word;
-  line-height: 1.2;
-  display: block;
-  width: 100%;
-  padding-bottom: 8px;
-}
-
-.description-content {
-  color: var(--ion-color-dark);
-  line-height: 1.6;
-}
-
-:deep(.description-content p) {
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-
-/* Styles pour le rapport statistique */
-.stats-card {
-  text-align: center;
-  padding: 20px 0;
-}
-
-.main-stat {
-  margin-bottom: 20px;
-}
-
-.main-stat .stat-value {
-  font-size: 3em;
-  font-weight: 800;
-  color: var(--ion-color-primary);
-  display: block;
-}
-
-.stats-grid {
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid var(--ion-color-light);
-  padding-top: 20px;
-}
-
-.stat-item .stat-value {
-  font-size: 1.5em;
-  font-weight: bold;
-  display: block;
-}
-
-.stat-label {
-  font-size: 0.85em;
-  color: var(--ion-color-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-ion-note {
-  font-size: 0.75em;
-  line-height: 1.2;
-}
-</style>
