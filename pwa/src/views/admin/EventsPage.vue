@@ -65,21 +65,21 @@ import {
   onIonViewWillEnter
 } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import { useAgendaStore, type AgendaEvent } from '../stores/agenda';
+import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
 import { storeToRefs } from 'pinia';
 import {
   DataTable,
   type CustomColumnDef,
   type DataTableFilterConfig,
   type DataTableExportConfig
-} from '../components/shared/DataTable';
+} from '@/components/shared/DataTable';
 import {
   getSeasonFromDate,
   getCurrentSeason,
   formatDateFr,
   formatEventSchedule,
   formatEventLocation
-} from '../utils/seasonUtils';
+} from '@/utils/seasonUtils';
 
 const router = useRouter();
 const agendaStore = useAgendaStore();

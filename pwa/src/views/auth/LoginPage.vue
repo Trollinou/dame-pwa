@@ -90,7 +90,7 @@ import {
 import { informationCircleOutline } from 'ionicons/icons';
 import { reactive, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();

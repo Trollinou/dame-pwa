@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import Type100Commandements from '@/views/types/Type100Commandements.vue';
+import Type100Commandements from '@/views/learning/types/Type100Commandements.vue';
 
 // Mock QcmViewer to easily trigger success emit
 vi.mock( '@/components/shared/QcmViewer.vue', () => ( {

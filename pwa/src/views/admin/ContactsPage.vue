@@ -50,15 +50,15 @@ import {
   onIonViewWillEnter
 } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import { useContactStore, type Contact } from '../stores/contacts';
-import { useReferenceDataStore } from '../stores/referenceData';
+import { useContactStore, type Contact } from '@/stores/contacts';
+import { useReferenceDataStore } from '@/stores/referenceData';
 import { storeToRefs } from 'pinia';
 import {
   DataTable,
   type CustomColumnDef,
   type DataTableFilterConfig,
   type DataTableExportConfig
-} from '../components/shared/DataTable';
+} from '@/components/shared/DataTable';
 
 const router = useRouter();
 const contactStore = useContactStore();

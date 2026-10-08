@@ -47,13 +47,13 @@ import {
   onIonViewWillEnter
 } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import { useMessageStore, type Message } from '../stores/messages';
+import { useMessageStore, type Message } from '@/stores/messages';
 import { storeToRefs } from 'pinia';
 import {
   DataTable,
   type CustomColumnDef,
   type DataTableExportConfig
-} from '../components/shared/DataTable';
+} from '@/components/shared/DataTable';
 
 const router = useRouter();
 const messageStore = useMessageStore();

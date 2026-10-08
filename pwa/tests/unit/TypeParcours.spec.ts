@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypeParcours from '@/views/types/TypeParcours.vue';
+import TypeParcours from '@/views/learning/types/TypeParcours.vue';
 import {
 	getParcoursVariant,
 	registerParcoursVariant,

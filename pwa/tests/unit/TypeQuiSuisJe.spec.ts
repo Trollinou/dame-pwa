@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypeQuiSuisJe from '@/views/types/TypeQuiSuisJe.vue';
+import TypeQuiSuisJe from '@/views/learning/types/TypeQuiSuisJe.vue';
 
 const fireCelebrationMock = vi.fn();
 vi.mock( '@/composables/useCelebration', () => ( {

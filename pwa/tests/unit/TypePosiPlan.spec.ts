@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypePosiPlan from '@/views/types/TypePosiPlan.vue';
+import TypePosiPlan from '@/views/learning/types/TypePosiPlan.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
 
 const fireCelebrationMock = vi.fn();

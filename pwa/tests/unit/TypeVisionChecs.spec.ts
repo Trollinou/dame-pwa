@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypeVisionChecs from '@/views/types/TypeVisionChecs.vue';
+import TypeVisionChecs from '@/views/learning/types/TypeVisionChecs.vue';
 import {
 	parseFenPieces,
 	getPieceColumns,

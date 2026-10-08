@@ -65,15 +65,15 @@ import {
   onIonViewWillEnter
 } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import { useBenevolatStore, type Benevolat } from '../stores/benevolat';
-import { useAuthStore } from '../stores/auth';
+import { useBenevolatStore, type Benevolat } from '@/stores/benevolat';
+import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import {
   DataTable,
   type CustomColumnDef,
   type DataTableFilterConfig,
   type DataTableExportConfig
-} from '../components/shared/DataTable';
+} from '@/components/shared/DataTable';
 
 const router = useRouter();
 const benevolatStore = useBenevolatStore();

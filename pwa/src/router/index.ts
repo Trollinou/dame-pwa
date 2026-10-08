@@ -2,17 +2,17 @@ import { createRouter, createWebHashHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
-const TabsPage = () => import( '../views/TabsPage.vue' );
-const LoginPage = () => import( '../views/LoginPage.vue' );
-const MembersPage = () => import( '../views/MembersPage.vue' );
-const ContactsPage = () => import( '../views/ContactsPage.vue' );
-const LeClubPage = () => import( '../views/LeClubPage.vue' );
-const BenevolatPage = () => import( '../views/BenevolatPage.vue' );
-const MessagesPage = () => import( '../views/MessagesPage.vue' );
-const AdminLayout = () => import( '../views/AdminLayout.vue' );
-const TournamentPage = () => import( '../views/TournamentPage.vue' );
-const GenericPage = () => import( '../views/GenericPage.vue' );
-const EventsPage = () => import( '../views/EventsPage.vue' );
+const TabsPage = () => import( '@/views/layout/TabsPage.vue' );
+const LoginPage = () => import( '@/views/auth/LoginPage.vue' );
+const MembersPage = () => import( '@/views/admin/MembersPage.vue' );
+const ContactsPage = () => import( '@/views/admin/ContactsPage.vue' );
+const LeClubPage = () => import( '@/views/public/LeClubPage.vue' );
+const BenevolatPage = () => import( '@/views/public/BenevolatPage.vue' );
+const MessagesPage = () => import( '@/views/admin/MessagesPage.vue' );
+const AdminLayout = () => import( '@/views/layout/AdminLayout.vue' );
+const TournamentPage = () => import( '@/views/public/TournamentPage.vue' );
+const GenericPage = () => import( '@/views/layout/GenericPage.vue' );
+const EventsPage = () => import( '@/views/admin/EventsPage.vue' );
 
 const routes: Array< RouteRecordRaw > = [
 	{
@@ -38,7 +38,7 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'home',
-				component: () => import( '../views/PublicHomePage.vue' ),
+				component: () => import( '@/views/public/PublicHomePage.vue' ),
 			},
 			{
 				path: 'agenda',
@@ -46,11 +46,12 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'apprentissage',
-				component: () => import( '../views/ApprentissageHubPage.vue' ),
+				component: () =>
+					import( '@/views/learning/ApprentissageHubPage.vue' ),
 			},
 			{
 				path: 'profil',
-				component: () => import( '../views/ProfilePage.vue' ),
+				component: () => import( '@/views/auth/ProfilePage.vue' ),
 			},
 		],
 	},
@@ -66,7 +67,7 @@ const routes: Array< RouteRecordRaw > = [
 			},
 			{
 				path: 'dashboard',
-				component: () => import( '../views/HomePage.vue' ),
+				component: () => import( '@/views/admin/HomePage.vue' ),
 			},
 			{
 				path: 'members',
@@ -75,7 +76,7 @@ const routes: Array< RouteRecordRaw > = [
 			{
 				path: 'members/:id',
 				name: 'MemberDetail',
-				component: () => import( '@/views/MemberDetailPage.vue' ),
+				component: () => import( '@/views/admin/MemberDetailPage.vue' ),
 			},
 			{
 				path: 'contact',
@@ -84,7 +85,8 @@ const routes: Array< RouteRecordRaw > = [
 			{
 				path: 'contact/:id',
 				name: 'ContactDetail',
-				component: () => import( '@/views/ContactDetailPage.vue' ),
+				component: () =>
+					import( '@/views/admin/ContactDetailPage.vue' ),
 			},
 			{
 				path: 'agenda',
@@ -93,7 +95,8 @@ const routes: Array< RouteRecordRaw > = [
 			{
 				path: 'agenda/:id',
 				name: 'AdminAgendaDetail',
-				component: () => import( '@/views/AdminAgendaDetailPage.vue' ),
+				component: () =>
+					import( '@/views/admin/AdminAgendaDetailPage.vue' ),
 			},
 			{
 				path: 'events',
@@ -110,7 +113,8 @@ const routes: Array< RouteRecordRaw > = [
 			{
 				path: 'message/:id',
 				name: 'MessageDetail',
-				component: () => import( '@/views/MessageDetailPage.vue' ),
+				component: () =>
+					import( '@/views/admin/MessageDetailPage.vue' ),
 			},
 			{
 				path: 'benevolat',
@@ -119,24 +123,25 @@ const routes: Array< RouteRecordRaw > = [
 			{
 				path: 'benevolat/:id',
 				name: 'BenevolatDetail',
-				component: () => import( '@/views/BenevolatDetailPage.vue' ),
+				component: () =>
+					import( '@/views/admin/BenevolatDetailPage.vue' ),
 			},
 		],
 	},
 	// Routes publiques secondaires hors Tabs
 	{
 		path: '/news',
-		component: () => import( '../views/NewsPage.vue' ),
+		component: () => import( '@/views/public/NewsPage.vue' ),
 	},
 	{
 		path: '/news/:id',
 		name: 'NewsDetail',
-		component: () => import( '../views/NewsDetailPage.vue' ),
+		component: () => import( '@/views/public/NewsDetailPage.vue' ),
 	},
 	{
 		path: '/agenda/:id',
 		name: 'AgendaDetail',
-		component: () => import( '@/views/AgendaDetailPage.vue' ),
+		component: () => import( '@/views/public/AgendaDetailPage.vue' ),
 	},
 	{
 		path: '/tournoi',
@@ -150,7 +155,7 @@ const routes: Array< RouteRecordRaw > = [
 		path: '/benevolat/participation/:id',
 		name: 'BenevolatVote',
 		meta: { requiresAuth: true },
-		component: () => import( '@/views/BenevolatVotePage.vue' ),
+		component: () => import( '@/views/public/BenevolatVotePage.vue' ),
 	},
 	{
 		path: '/page/:id',
@@ -159,41 +164,42 @@ const routes: Array< RouteRecordRaw > = [
 	},
 	{
 		path: '/register',
-		component: () => import( '../views/RegisterPage.vue' ),
+		component: () => import( '@/views/auth/RegisterPage.vue' ),
 	},
 	{
 		path: '/pre-inscription',
-		component: () => import( '../views/PreInscriptionPage.vue' ),
+		component: () => import( '@/views/public/PreInscriptionPage.vue' ),
 	},
 	{
 		path: '/select-person',
-		component: () => import( '../views/SelectPersonPage.vue' ),
+		component: () => import( '@/views/auth/SelectPersonPage.vue' ),
 		meta: { requiresAuth: true },
 	},
 	{
 		path: '/play',
 		name: 'Play',
-		component: () => import( '../views/PlayPage.vue' ),
+		component: () => import( '@/views/learning/PlayPage.vue' ),
 	},
 	{
 		path: '/analysis',
 		name: 'Analysis',
-		component: () => import( '../views/AnalysisPage.vue' ),
+		component: () => import( '@/views/learning/AnalysisPage.vue' ),
 	},
 	{
 		path: '/apprentissage/cours',
 		name: 'ApprentissageCoursList',
-		component: () => import( '../views/ApprentissageCoursListPage.vue' ),
+		component: () =>
+			import( '@/views/learning/ApprentissageCoursListPage.vue' ),
 		meta: { requiresAuth: true, requiresApprentissageAccess: true },
 	},
 	{
 		path: '/contenu/:id',
-		component: () => import( '../views/ContenuPage.vue' ),
+		component: () => import( '@/views/learning/ContenuPage.vue' ),
 		meta: { requiresAuth: true, requiresApprentissageAccess: true },
 	},
 	{
 		path: '/cours/:id',
-		component: () => import( '../views/CoursPage.vue' ),
+		component: () => import( '@/views/learning/CoursPage.vue' ),
 		meta: { requiresAuth: true, requiresApprentissageAccess: true },
 	},
 ];
