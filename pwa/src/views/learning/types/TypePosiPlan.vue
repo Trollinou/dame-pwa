@@ -274,7 +274,7 @@ import {
   type PosiPlanPgnStage,
   type PosiPlanQcmStage,
   type PosiPlanStage,
-} from '@/utils/posiPlanParser';
+} from '@/utils/parsers/posiPlanParser';
 import type { ExerciseType5Config } from '@/types/roi';
 
 const props = defineProps<{

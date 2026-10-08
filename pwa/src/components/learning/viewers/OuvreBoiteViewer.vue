@@ -113,7 +113,7 @@ import {
   parseOuvreBoiteMiniPgn,
   type CarteOuvreBoite,
   type OuvreBoiteChoix
-} from '@/utils/ouvreBoiteParser';
+} from '@/utils/parsers/ouvreBoiteParser';
 import type { BoardCore, Move } from 'eg-chessboard';
 
 export interface ExerciceItem {

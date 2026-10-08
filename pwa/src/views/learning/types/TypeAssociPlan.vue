@@ -64,7 +64,7 @@ import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 import {
   parseAssociPlanPaires,
   type AssociPlanPaire,
-} from '@/utils/associPlanParser';
+} from '@/utils/parsers/associPlanParser';
 import type { ExerciseType6Config } from '@/types/roi';
 
 const props = defineProps<{

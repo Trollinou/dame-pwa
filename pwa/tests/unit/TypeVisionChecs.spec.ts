@@ -8,7 +8,7 @@ import {
 	parseFenPieces,
 	getPieceColumns,
 	getActiveColorFromFen,
-} from '@/utils/fenUtils';
+} from '@/utils/chess/fenUtils';
 
 // Mock eg-chessboard to easily trigger square clicks and test board interactions
 vi.mock( 'eg-chessboard/vue', () => ( {

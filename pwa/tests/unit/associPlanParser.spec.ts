@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
 	parseAssociPlanSinglePgn,
 	parseAssociPlanPaires,
-} from '@/utils/associPlanParser';
+} from '@/utils/parsers/associPlanParser';
 
 describe( 'associPlanParser', () => {
 	const pgnExemple = `[Event "EA_Activité_CavalierAuCentre: EA_Niv1_A_AA-2_Associ'plan"]

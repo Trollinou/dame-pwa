@@ -118,7 +118,7 @@ import {
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { DrawShape } from 'eg-chessboard';
-import { shuffleArray } from '@/utils/chessNotation';
+import { shuffleArray } from '@/utils/chess/chessNotation';
 
 export interface MatchingFeedback {
   type: 'success' | 'danger' | 'warning' | 'info';

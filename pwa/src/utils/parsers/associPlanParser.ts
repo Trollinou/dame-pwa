@@ -1,6 +1,6 @@
 import { parsePgn } from 'chessops/pgn';
 import type { DrawShape } from 'eg-chessboard';
-import { getActiveColorFromFen } from './fenUtils';
+import { getActiveColorFromFen } from '@/utils/chess/fenUtils';
 
 export interface AssociPlanPaire {
 	originalIndex: number;
@@ -11,7 +11,7 @@ export interface AssociPlanPaire {
 	pgn: string;
 }
 
-import { extractShapesAndText } from './chessNotation';
+import { extractShapesAndText } from '@/utils/chess/chessNotation';
 
 /**
  * Parse un PGN unique pour en extraire :

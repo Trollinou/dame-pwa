@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
 	parseOuvreBoiteMiniPgn,
 	formatMoveInFrench,
-} from '@/utils/ouvreBoiteParser';
+} from '@/utils/parsers/ouvreBoiteParser';
 import { Chess } from 'chessops';
 
 describe( 'ouvreBoiteParser', () => {

@@ -1,5 +1,5 @@
 import type { DrawShape, Key } from 'eg-chessboard';
-import { LoopTracker } from './LoopTracker';
+import { LoopTracker } from '@/utils/parsers/LoopTracker';
 
 export interface ParcoursBoardApi {
 	getPieces: () => Array< {
@@ -321,7 +321,7 @@ export function extractPieceTypeFromFen( fen: string ): PieceRole | null {
 	return null;
 }
 
-import { getPieceLabel } from './chessNotation';
+import { getPieceLabel } from '@/utils/chess/chessNotation';
 
 export function getPieceRoleLabel( role: string ): string {
 	return getPieceLabel( role );

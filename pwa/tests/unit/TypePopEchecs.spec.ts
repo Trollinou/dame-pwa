@@ -10,7 +10,7 @@ import {
 	removePieceFromFen,
 	getActiveColorFromFen,
 	filterYellowShapes,
-} from '@/utils/fenUtils';
+} from '@/utils/chess/fenUtils';
 
 export const mockBoardApi = {
 	setPosition: vi.fn(),

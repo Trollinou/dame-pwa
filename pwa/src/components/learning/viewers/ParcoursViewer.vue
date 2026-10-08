@@ -47,8 +47,8 @@ import {
   getPieceRoleLabel,
   removePieceFromSquareInFen,
   type ParcoursBoardApi
-} from '@/utils/parcoursVariants';
-import { LoopTracker, extractOpponentPieceSquare } from '@/utils/LoopTracker';
+} from '@/utils/parsers/parcoursVariants';
+import { LoopTracker, extractOpponentPieceSquare } from '@/utils/parsers/LoopTracker';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import type { CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 

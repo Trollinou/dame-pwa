@@ -9,7 +9,7 @@ import {
 	isChildNode,
 } from 'chessops/pgn';
 import type { DrawShape } from 'eg-chessboard';
-import { getActiveColorFromFen } from './fenUtils';
+import { getActiveColorFromFen } from '@/utils/chess/fenUtils';
 
 export interface PgnMoveStep {
 	san: string;
@@ -50,7 +50,7 @@ import {
 	formatMoveWithFrenchSan,
 	extractShapesAndComment,
 	shuffleArray,
-} from './chessNotation';
+} from '@/utils/chess/chessNotation';
 
 export {
 	toFrenchNotation,

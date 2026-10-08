@@ -9,7 +9,7 @@ import {
 	formatMoveInFrench,
 	extractShapesAndText,
 	shuffleArray,
-} from './chessNotation';
+} from '@/utils/chess/chessNotation';
 
 export interface OuvreBoiteChoix {
 	id: number;

@@ -63,7 +63,7 @@ import { ref, computed, watch } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
-import { parseFenPieces, getActiveColorFromFen } from '@/utils/fenUtils';
+import { parseFenPieces, getActiveColorFromFen } from '@/utils/chess/fenUtils';
 import ContentHeader from '@/components/learning/ContentHeader.vue';
 import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
 

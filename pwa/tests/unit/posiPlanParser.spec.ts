@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { parsePosiPlanPgn } from '@/utils/posiPlanParser';
+import { parsePosiPlanPgn } from '@/utils/parsers/posiPlanParser';
 
 describe( 'posiPlanParser.ts', () => {
 	const examplePgn = `[Event "EA_Activité_CavalierAuCentre: EA_Niv1_A_PA_Posi’plan (Il n’y a pas le feu...)"]

@@ -294,7 +294,7 @@
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
-import { getActiveColorFromFen, parseFenPieces, filterYellowShapes, type PieceInfo } from '@/utils/fenUtils';
+import { getActiveColorFromFen, parseFenPieces, filterYellowShapes, type PieceInfo } from '@/utils/chess/fenUtils';
 import ContentHeader from '@/components/learning/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import LearningFeedbackCallout from '@/components/learning/LearningFeedbackCallout.vue';
@@ -309,7 +309,7 @@ import {
   ROLE_LETTERS_FR,
   CHAR_TO_ROLE,
   extractShapesAndComment,
-} from '@/utils/chessNotation';
+} from '@/utils/chess/chessNotation';
 
 const chessPreferences = useChessPreferencesStore();
 

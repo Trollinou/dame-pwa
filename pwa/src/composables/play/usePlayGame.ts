@@ -5,7 +5,7 @@ import { useChessStore } from '@/stores/chess';
 import {
 	undoMove as apiUndoMove,
 	getGameOverReason,
-} from '@/utils/boardApiWrapper';
+} from '@/utils/chess/boardApiWrapper';
 
 export function usePlayGame() {
 	const chessStore = useChessStore();

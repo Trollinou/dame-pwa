@@ -84,7 +84,7 @@ import {
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useFeedback } from '@/composables/useFeedback';
-import { shuffleArray } from '@/utils/chessNotation';
+import { shuffleArray } from '@/utils/chess/chessNotation';
 import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 
 const { showSuccess, showError } = useFeedback();

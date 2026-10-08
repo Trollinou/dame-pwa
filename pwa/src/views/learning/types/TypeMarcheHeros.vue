@@ -96,7 +96,7 @@ import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import PuzzleViewer from '@/components/learning/viewers/PuzzleViewer.vue';
 import ContentHeader from '@/components/learning/ContentHeader.vue';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
-import { shuffleArray } from '@/utils/chessNotation';
+import { shuffleArray } from '@/utils/chess/chessNotation';
 
 import type { Key, DrawShape } from 'eg-chessboard';
 import type { ExerciseType7Config } from '@/types/roi';

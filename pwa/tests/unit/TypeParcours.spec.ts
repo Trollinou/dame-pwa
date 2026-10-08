@@ -11,12 +11,12 @@ import {
 	getPieceRoleLabel,
 	removePieceFromSquareInFen,
 	type ParcoursBoardApi,
-} from '@/utils/parcoursVariants';
+} from '@/utils/parsers/parcoursVariants';
 import {
 	LoopTracker,
 	extractOpponentPieceSquare,
 	squareToCoords,
-} from '@/utils/LoopTracker';
+} from '@/utils/parsers/LoopTracker';
 import type { Key } from 'eg-chessboard';
 
 // Mock eg-chessboard

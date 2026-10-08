@@ -147,7 +147,7 @@ import {
   type PartieHerosStage,
   type PgnStage,
   type QcmStage,
-} from '@/utils/partieHerosParser';
+} from '@/utils/parsers/partieHerosParser';
 import type { ExerciseType4Config } from '@/types/roi';
 
 const props = defineProps<{

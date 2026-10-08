@@ -9,13 +9,13 @@ import {
 	isChildNode,
 } from 'chessops/pgn';
 import type { DrawShape } from 'eg-chessboard';
-import { getActiveColorFromFen } from './fenUtils';
+import { getActiveColorFromFen } from '@/utils/chess/fenUtils';
 import {
 	toFrenchNotation,
 	formatMoveWithFrenchSan,
 	extractShapesAndComment,
 	shuffleArray,
-} from './chessNotation';
+} from '@/utils/chess/chessNotation';
 
 export interface PosiPlanMoveStep {
 	san: string;
