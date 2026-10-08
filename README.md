@@ -13,17 +13,19 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 
 - `includes/` : Classes PHP du plugin WordPress (`DAME_PWA`).
 - `pwa/` : Application Ionic 9 + Vue 3 + Pinia + TanStack Query.
-  - `src/views/ApprentissageHubPage.vue` : Hub d'accueil à 2 panneaux (Cours théoriques / Espace de Jeu).
-  - `src/views/ApprentissageCoursListPage.vue` : Liste des parcours et chapitres réservés aux adhérents.
-  - `src/views/PlayPage.vue` : Échiquier interactif 1J (vs Stockfish 18) et 2J (Pass & Play) basé sur `eg-chessboard`.
-  - `src/views/AnalysisPage.vue` : Revue et analyse coup par coup de la dernière partie jouée.
-  - `src/components/agenda/` : Composants de la vue Le Club / Agenda (`ActualitesSegmentView.vue`, `AgendaSegmentView.vue`, `TournoisSegmentView.vue`, `BenevolatSegmentView.vue`, `AgendaCalendarView.vue`).
-  - `src/components/agenda/detail/` : Composants purs de détail (`NewsDetailContent.vue`, `AgendaDetailContent.vue`, `TournamentDetailContent.vue`, `BenevolatDetailContent.vue`).
-  - `src/components/common/SignaturePad.vue` : Composant réactif de signature tactile/manuscrite sur Canvas HTML5 (export PNG transparent).
-  - `src/views/PreInscriptionPage.vue` : Formulaire de préinscription / réinscription en ligne pour la nouvelle saison avec signature électronique dématérialisée.
-  - `src/views/EventsPage.vue` & `src/views/AdminAgendaDetailPage.vue` : Grille d'administration des événements avec filtre par saison, export Excel/CSV et fiche détaillée.
-  - `src/components/preinscription/` : Composants modulaires du formulaire (`PreInscriptionIdentitySelector.vue`, `PreInscriptionMemberSection.vue`, `PreInscriptionLegalRepSection.vue`, `PreInscriptionHealthSection.vue`, `PreInscriptionSuccessCard.vue`).
-  - `src/composables/preinscription/` : Logique métier découplée (`usePreInscriptionApi.ts`, `usePreInscriptionForm.ts`, `useAddressAutocomplete.ts`) avec détection et mise à jour transparente des préinscriptions existantes et transmission de la signature.
+  - `src/views/` : Vues organisées par domaines métier :
+    - `src/views/learning/` : `ApprentissageHubPage.vue`, `ApprentissageCoursListPage.vue`, `CoursPage.vue`, `ContenuPage.vue`, `PlayPage.vue`, `AnalysisPage.vue` et `types/` (16 wrappers de leçons/exercices).
+    - `src/views/public/` : `PublicHomePage.vue`, `LeClubPage.vue`, `NewsPage.vue`, `NewsDetailPage.vue`, `AgendaDetailPage.vue`, `TournamentPage.vue`, `BenevolatPage.vue`, `BenevolatVotePage.vue`, `PreInscriptionPage.vue`.
+    - `src/views/admin/` : `HomePage.vue` (Dashboard), `MembersPage.vue`, `MemberDetailPage.vue`, `ContactsPage.vue`, `ContactDetailPage.vue`, `EventsPage.vue`, `AdminAgendaDetailPage.vue`, `MessagesPage.vue`, `MessageDetailPage.vue`, `BenevolatDetailPage.vue`.
+    - `src/views/auth/` : `LoginPage.vue`, `RegisterPage.vue`, `SelectPersonPage.vue`, `ProfilePage.vue`.
+    - `src/views/layout/` : `TabsPage.vue`, `AdminLayout.vue`, `GenericPage.vue`.
+  - `src/components/` : Composants modulaires organisés par piliers :
+    - `src/components/learning/` : `LeconReader.vue`, `VideoReader.vue`, `ContentHeader.vue`, `ExerciseHeader.vue`, `LearningFeedbackCallout.vue`, `SeriesCardFooter.vue`, sous-dossier `play/` et sous-dossier `viewers/` (les 17 viewers d'exercices interactifs).
+    - `src/components/public/` : Composants de la vitrine club (`agenda/`, `preinscription/`).
+    - `src/components/auth/` : Personnalisation et profil (`profile/ChessThemeCustomizer.vue`).
+    - `src/components/shared/` : Briques UI génériques pures (`Chessboard/`, `DataTable/`, `SplitMasterDetail.vue`, `SignaturePad.vue`).
+  - `src/composables/` : Logique réutilisable découplée (`learning/`, `public/`, `core/`).
+  - `src/utils/` : Utilitaires système (`safeFetch.ts`, `wpApi.ts`), parseurs d'exercices (`parsers/`) et moteurs d'échecs (`chess/`).
   - `src/stores/auth/` : Sous-modules spécialisés pour l'authentification (`types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`) pilotés par la façade `useAuthStore` (`auth.ts`).
   - `src/stores/` : Stores Pinia harmonisés avec TanStack Query (`news.ts`, `tournament.ts`, `members.ts`, `contacts.ts`, `dashboard.ts`, `benevolat.ts`, `apprentissage.ts`, `unread.ts`) pour la gestion unifiée du cache serveur, du suivi des nouveautés et de l'état client.
   - `src/utils/safeFetch.ts` & `src/utils/wpApi.ts` : Couche réseau unifiée avec timeouts de protection, rafraîchissement transparent des jetons JWT en cas de session expirée (retry automatique) et pagination multi-pages WP REST automatique (`fetchWpCollection`).
