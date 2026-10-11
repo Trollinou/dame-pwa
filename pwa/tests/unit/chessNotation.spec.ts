@@ -11,7 +11,7 @@ import {
 	formatMoveWithFrenchSan,
 	extractShapesAndComment,
 	shuffleArray,
-} from '@/utils/chessNotation';
+} from '@/utils/chess/chessNotation';
 
 describe( 'chessNotation.ts', () => {
 	test( 'getPieceLabel retourne le bon nom français', () => {

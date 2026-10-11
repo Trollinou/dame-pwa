@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypeParcours from '@/views/types/TypeParcours.vue';
+import TypeParcours from '@/views/learning/types/TypeParcours.vue';
 import {
 	getParcoursVariant,
 	registerParcoursVariant,
@@ -11,12 +11,12 @@ import {
 	getPieceRoleLabel,
 	removePieceFromSquareInFen,
 	type ParcoursBoardApi,
-} from '@/utils/parcoursVariants';
+} from '@/utils/parsers/parcoursVariants';
 import {
 	LoopTracker,
 	extractOpponentPieceSquare,
 	squareToCoords,
-} from '@/utils/LoopTracker';
+} from '@/utils/parsers/LoopTracker';
 import type { Key } from 'eg-chessboard';
 
 // Mock eg-chessboard

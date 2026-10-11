@@ -1,10 +1,10 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import VideoReader from '@/components/apprentissage/VideoReader.vue';
+import VideoReader from '@/components/learning/VideoReader.vue';
 import {
 	useYouTubePlayer,
 	YOUTUBE_DEFAULT_THRESHOLD_PERCENT,
-} from '@/composables/useYouTubePlayer';
+} from '@/composables/learning/useYouTubePlayer';
 
 describe( 'useYouTubePlayer', () => {
 	test( 'le seuil par défaut est bien de 95%', () => {

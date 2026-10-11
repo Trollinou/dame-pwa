@@ -6,6 +6,48 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Intégration Native de la Visionneuse Photos `eg-media` dans la PWA (`EgMediaViewer.vue`, `WpContentRenderer.vue`, `wpContentParser.ts`, `egMedia.ts`, `_public-components.scss`, `EgMediaViewer.spec.ts`, `wpContentParser.spec.ts`, `README.md`, `USING.md`)** :
+  - **Prise en charge Multi-Sources & Décodage Déclaratif (`wpContentParser.ts`)** :
+    - Détection automatique des blocs WordPress `wp-block-eg-media-viewer` et `.eg-viewer` insérés dans les actualités, tournois et événements d'agenda.
+    - Double compatibilité transparente : support du format moderne Interactivity API (`data-wp-context`) et du format local/classique (`data-images-json`, `data-layout`, `data-tempo`, `data-limit`, `data-slideshow`).
+    - Prise en charge native des galeries hébergées localement sur WordPress ainsi que des serveurs distants Piwigo (`photos.echiquier-ledonien.fr`).
+  - **Grille Justifiée Responsive & Performance Web Vitals (`EgMediaViewer.vue`)** :
+    - Calcul dynamique des ratios d'aspect et bases flex (`flex-grow`, `flex-basis`) pour composer une mosaïque fluide de photos.
+    - Affichage exhaustif direct de l'ensemble des photos (sans seuil de pagination limitatif) couplé aux attributs natifs `loading="lazy"` et `decoding="async"` pour garantir des performances optimales et une consommation réseau minimale.
+  - **Visionneuse Plein Écran (Lightbox) Multi-Appareils** :
+    - **Téléportation DOM** : Conteneur de plein écran téléporté sur le `body` (`<Teleport to="body">`) pour s'affranchir des débordements et contraintes de scroll des conteneurs parents.
+    - **Interactions Mobiles & Tactiles** : Navigation par gestes de balayage swipe tactile (`@touchstart`, `@touchend`) avec détection de seuil fluide (45px).
+    - **Interactions Ordinateur & Clavier** : Navigation au clavier par touches Flèche Gauche, Flèche Droite et fermeture via Échap (`Escape`), complétée par des boutons de navigation flottants.
+    - **Bandeau de Défilement Inférieur Intelligent** : Bande de miniatures synchronisée défilant automatiquement (`scrollIntoView({ inline: 'center' })`) pour toujours maintenir la vignette active centrée à l'écran.
+  - **Composant Partagé Réutilisable `<WpContentRenderer>`** :
+    - Analyse et rendu hybride des contenus WordPress alternant blocs HTML sécurisés (`v-safe-html`) et blocs interactifs `eg-media`.
+    - Déploiement homogène dans `NewsDetailContent.vue`, `TournamentDetailContent.vue` et `AgendaDetailContent.vue`.
+  - **Charte Graphique Centralisée & Conformité AGENTS.md** :
+    - Zéro style inline statique et zéro balise `<style>` dans les composants Vue.
+    - Centralisation exclusive dans `pwa/src/theme/public/_public-components.scss` (`.eg-viewer`, `.eg-viewer__justified-grid`, `.eg-lightbox`).
+    - Aucune utilisation de `backdrop-filter: blur` pour préserver la fluidité Safari iOS.
+  - **Couverture de Tests Unitaires Complète** : Tests unitaires dédiés pour le parseur (`wpContentParser.spec.ts`) et le composant visionneuse (`EgMediaViewer.spec.ts`).
+
+- **Revue, Optimisation des Styles & Durcissement Thèmes Clair/Sombre (3 Thèmes + CORE) (`_base.scss`, `_chessboard.scss`, `_learning-components.scss`, `_learning-layout.scss`, `_public-components.scss`, `_public-layout.scss`, `PublicHomePage.vue`, `BenevolatPage.vue`, `PreInscriptionPage.vue`, `OrderViewer.vue`, `QuiSuisJeViewer.vue`, etc.)** :
+  - **Éradication Complète des Styles Inline Statiques** : Suppression de plus de 50 occurrences de `style="..."` résiduelles dans les composants et vues (`PublicHomePage`, `BenevolatPage`, `PreInscriptionPage`, sous-sections de pré-inscription, viewers d'apprentissage `OrderViewer`, `QuiSuisJeViewer`, `TypeMarcheHeros`, pages d'authentification et administration). Seules les liaisons dynamiques JS calculées (couleurs de catégories et appariements d'exercices) sont désormais conservées.
+  - **Classes Canoniques Transverses Enrichies (`theme/core/_base.scss`)** : Ajout de `.dame-brand-header` (en-tête de marque standardisé avec logo et nom du club), `.dame-badge-group` (cluster d'alignement flex pour badges d'état et actions), `.dame-list-chevron` (chevron d'item de liste normalisé), `.badge--dimmed`, `.icon--dimmed` et `.full-width`.
+  - **Mutualisation par Domaine Métier dans `theme/`** :
+    - *Public* (`_public-components.scss`, `_public-layout.scss`) : Classes dédiées pour les formulaires de pré-inscription (`.pre-inscription-title`, `.identity-select-card`, `.optin-item`, `.optin-checkbox`, `.optin-text`, `.postal-code-input`, `.consent-checkbox`, `.foyer-up-to-date`), l'agenda (`.slot-time-block`, `.slot-count`, `.survey-action-container`) et l'authentification (`.auth-logo`, `.banner-huge-icon`, `.header-large-icon`, `.system-panel`).
+    - *Learning* (`_learning-components.scss`, `_learning-layout.scss`) : Normalisation des conteneurs de résolution et d'interaction (`.learning-full-width`, `.learning-step-resolution`, `.exercise-action-wrapper`, `.empty-placeholder`, `.empty-icon`, `.learning-interaction-column`, `.learning-interaction-instruction`).
+  - **Sécurisation de la Lisibilité Thème Clair / Sombre (Journée / Soir)** :
+    - Correction du champ de saisie de notation (`.notation-input`) qui forçait un fond blanc pur `#ffffff` combiné à `--ion-color-step-900` (rendant le texte blanc invisible sur fond blanc en mode sombre). Remplacement par les variables adaptatives Ionic (`--ion-item-background`, `--ion-card-background`, `--ion-text-color`).
+    - Adaptation du conteneur d'historique de coups (`.move-history-container`) avec fond et bordure adaptatifs.
+    - Contraste renforcé des bannières d'alerte (`.dame-banner--success`, `.dame-banner--danger`) via media query `prefers-color-scheme: dark` appliquant les nuances tint pour fond sombre.
+    - Adaptation des indicateurs de variantes (`.variant-indicator-bar`) avec fond translucide RGBA et texte adaptatif.
+    - Harmonisation systématique des couleurs de libellés et titres sur `--ion-text-color`.
+  - **Conformité Stricte AGENTS.md** : Suppression des filtres `backdrop-filter: blur(8px)` sur `.floating-exit-fullscreen-btn` pour garantir des performances optimales et l'absence d'artefacts graphiques sur WebKit / Safari iOS.
+
+- **Prise en charge et Transcription Robuste des Widgets et Liens HelloAsso (`helloAsso.ts`, `TournamentDetailContent.vue`, `AgendaDetailContent.vue`, `NewsDetailContent.vue`, `helloAsso.spec.ts`, `README.md`, `USING.md`)** :
+  - **Interception des Widgets Iframe HelloAsso (`helloAsso.ts`)** : Détection et transcription automatique des balises `<iframe>` injectées côté serveur par l'extension WordPress HelloAsso (`type="widget-bouton"` / `widget-vignette`) avant leur suppression par DOMPurify. Extraction sécurisée de la source (`src`) et nettoyage du suffixe technique (`/widget-bouton`, `/widget-vignette`, `/widget`) pour rediriger directement vers la page complète de l'événement.
+  - **Tolérance Étendue des Shortcodes HelloAsso** : Prise en charge des shortcodes textuels `[helloasso ...]` incluant les entités HTML (`&quot;`), les guillemets typographiques (`“`, `”`, `«`, `»`), et la flexibilité sur les noms d'attributs (`campaign=`, `url=`, `link=`, ou URL directe).
+  - **Bouton d'Action Natif Ionic** : Conversion standardisée de tout appel HelloAsso en composant d'action `<ion-button expand="block" ...>` avec libellé clair *« S'inscrire à l'événement »* ouvrant le formulaire sécurisé dans le navigateur.
+  - **Harmonisation Multi-Composants & Tests Unitaires** : Remplacement des expressions régulières locales dans `TournamentDetailContent.vue`, `AgendaDetailContent.vue` et `NewsDetailContent.vue` par l'utilitaire centralisé et validation par une suite complète de tests unitaires (`helloAsso.spec.ts`).
+
 - **Ajout du Module d'Administration « Événements » (`EventsPage.vue`, `AdminAgendaDetailPage.vue`, `AdminLayout.vue`, `router/index.ts`, `stores/agenda.ts`, `seasonUtils.ts`, `_admin-components.scss`, `seasonUtils.spec.ts`, `README.md`, `USING.md`)** :
   - **Menu d'administration & Routage** : Ajout de l'entrée « Événements » dans le menu latéral d'administration entre « Contacts » et « Appels à bénévoles » (`/admin/agenda`), avec routes protégées et vue détaillée (`/admin/agenda/:id`) équivalente à l'affichage public.
   - **Grille de données réactive (`DataTable`)** : Liste des événements ordonnée par défaut par ordre chronologique croissant (date de début puis heure de début) avec colonnes de date, plage/horaires, titre, badge de catégorie coloré et lieu.

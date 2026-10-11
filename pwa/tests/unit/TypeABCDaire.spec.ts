@@ -4,11 +4,11 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypeABCDaire from '@/views/types/TypeABCDaire.vue';
-import { EXERCISE_NAVIGATION_KEY } from '@/composables/useExerciseNavigation';
+import TypeABCDaire from '@/views/learning/types/TypeABCDaire.vue';
+import { EXERCISE_NAVIGATION_KEY } from '@/composables/learning/useExerciseNavigation';
 
 const fireCelebrationMock = vi.fn();
-vi.mock( '@/composables/useCelebration', () => ( {
+vi.mock( '@/composables/learning/useCelebration', () => ( {
 	fireExerciseCelebration: () => fireCelebrationMock(),
 } ) );
 

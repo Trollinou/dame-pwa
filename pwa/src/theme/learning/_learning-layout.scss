@@ -549,10 +549,10 @@
   flex: 1 !important;
   min-height: 0;
   overflow-y: auto;
-  background: #fff;
+  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
   border-radius: var(--dame-item-radius, 8px);
   padding: 5px;
-  border: 1px solid var(--ion-color-light-shade);
+  border: var(--dame-card-border);
   margin-top: 5px;
 }
 

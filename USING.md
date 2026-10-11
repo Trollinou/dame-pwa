@@ -46,9 +46,10 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
 1. **Affichage Split-View (1/3 - 2/3) sur Tablette Paysage et Ordinateur** :
    - **Disposition 1/3 (Gauche)** : Liste fluide des éléments avec carte active mise en valeur lors de la sélection.
    - **Disposition 2/3 (Droite)** : Panneau latéral dédié affichant le contenu complet et les actions associées.
-   - **Actualités** : Sélection automatique du premier article.
-   - **Agenda (Mode Liste ☰)** : Sélection intelligente par défaut de l'événement courant ou du plus proche à venir.
-   - **Tournois** : Consultation instantanée des modalités, règlements et formulaires HelloAsso.
+   - **Actualités** : Sélection automatique du premier article. Rendu interactif des galeries photos `eg-media` avec grille justifiée et lightbox plein écran.
+   - **Agenda (Mode Liste ☰)** : Sélection intelligente par défaut de l'événement courant ou du plus proche à venir. Prise en charge des galeries photos dans le descriptif de l'événement.
+   - **Tournois** : Consultation instantanée des modalités, règlements, galeries photos (`eg-media` ou Piwigo) et formulaires HelloAsso. Les widgets intégrés (`<iframe>`) ou shortcodes (`[helloasso campaign="..."]`) insérés sur WordPress sont automatiquement convertis en boutons d'action natifs (`<ion-button>`) sécurisés et redirigent vers le formulaire HelloAsso complet sans être bloqués par le nettoyeur HTML.
+   - **Visionneuse Photos & Galeries Découplées (`eg-media`)** : Les articles et pages intégrant le bloc WordPress `eg-media` (galeries de club, photos d'événements, y compris serveurs distants Piwigo) sont restitués sous forme de mosaïque justifiée fluide. Le clic sur une photo ouvre instantanément une lightbox plein écran haute résolution avec défilement tactile (swipe), touches directionnelles clavier (gauche/droite/échap) et bandeau de miniatures dynamique centré sur la photo active.
    - **Bénévolat** : Sélection des créneaux horaires, formulaire d'inscription direct pour les adhérents ou vue administration des inscrits.
    - **Double défilement indépendant** : Le scroll de la liste de gauche ne déplace pas le panneau de détail de droite, et inversement.
 
@@ -317,6 +318,9 @@ L'architecture CSS centralisée (`pwa/src/theme/core/`) met à disposition un ca
 | **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences / rapports (`--2col`, `--3col`). | Grille responsive avec gap de `10px` et centrage automatique du texte. |
 | **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). | Fond doux, arrondi `8px`, libellé uppercase et valeur en gras. |
 | **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`, `--info`). | Conteneur flexible avec icône et texte, fond et bordures harmonisés. |
+| **`.dame-brand-header`** | En-tête de marque standardisé avec logo (`.brand-logo`) et nom du club (`.brand-name`). | Alignement flex centré, espacement gauche `12px`, texte gras adaptatif clair/sombre. |
+| **`.dame-badge-group`** | Cluster horizontal pour regrouper les badges de statut et les icônes de liste. | Conteneur flex en ligne avec gap de `8px`. |
+| **`.dame-list-chevron`** | Chevron de navigation standardisé pour éléments de liste interactifs. | Opacité douce `0.6` et taille `1.1rem`. |
 | **`.detail-header`** | En-tête canonique des pages et vues de détail (Actualités, Agenda, Tournois). | Titre `h1` normalisé (`1.5rem`, `700`) et métadonnées associées (`.detail-date`). |
 | **`.detail-body`** | Corps de texte enrichi et descriptions HTML (actualités, tournois, messages). | Typographie soignée, interlignage `1.6`, espacement propre des paragraphes et listes. |
 | **`.multiline-large-title`** | Titres principaux adaptatifs multi-lignes pour les en-têtes collapsibles Ionic. | Retour à la ligne préservé sans troncature brute dans les barres d'outils. |

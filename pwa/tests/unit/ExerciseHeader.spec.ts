@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
-import ExerciseHeader from '@/components/shared/ExerciseHeader.vue';
+import ExerciseHeader from '@/components/learning/ExerciseHeader.vue';
 
 describe( 'ExerciseHeader.vue', () => {
 	test( 'renders unified 2-panel header correctly', () => {

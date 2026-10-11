@@ -423,6 +423,142 @@
     padding: 8px;
     text-align: left;
   }
+
+  /* Blocs Stackable & Grilles WordPress */
+  .wp-block-stackable-feature-grid,
+  .stk-block-feature-grid,
+  .stk-block-columns,
+  .wp-block-stackable-columns {
+    border-radius: var(--dame-card-radius, 12px);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+
+  .stk-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--stk-columns-spacing, 4px);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .wp-block-stackable-column,
+  .stk-block-column,
+  .stk-column {
+    flex: 1 1 280px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+
+    @media (max-width: 689px) {
+      // Masque les colonnes strictement vides sur écran mobile
+      &:not(:has(p, h1, h2, h3, h4, h5, h6, img, a, iframe, ion-button, button)) {
+        display: none;
+      }
+    }
+  }
+
+  .stk-column-wrapper,
+  .stk-container {
+    background-color: var(--ion-card-background, var(--ion-item-background, #ffffff));
+    color: var(--ion-text-color, #1e1e1e);
+    padding: var(--stk-container-padding, 20px);
+    border-radius: var(--stk-container-border-radius, 8px);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .stk-block-content,
+  .stk-inner-blocks {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .stk-block-heading {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top: 0;
+    }
+  }
+
+  .wp-block-stackable-button-group,
+  .stk-block-button-group,
+  .stk-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+    justify-content: center;
+  }
+
+  .wp-block-stackable-button,
+  .stk-block-button {
+    display: inline-block;
+
+    .stk-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      background-color: var(--ion-color-primary, #3880ff);
+      color: var(--ion-color-primary-contrast, #ffffff);
+      border-radius: var(--dame-item-radius, 8px);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  .wp-block-brad-border-box {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    width: 100%;
+
+    ion-button {
+      width: 100%;
+      max-width: 320px;
+    }
+  }
+
+  /* Blocs Colonnes Gutenberg Natifs */
+  .wp-block-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    @media (min-width: 782px) {
+      flex-wrap: nowrap;
+    }
+
+    .wp-block-column {
+      flex: 1 1 0;
+      min-width: 0;
+
+      @media (max-width: 781px) {
+        flex-basis: 100%;
+      }
+    }
+  }
 }
 
 .detail-image {

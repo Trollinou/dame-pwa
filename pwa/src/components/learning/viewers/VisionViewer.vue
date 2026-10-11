@@ -1,0 +1,272 @@
+<template>
+  <div class="vision-viewer-wrapper">
+    <!-- En-tête Unifié 2 Panels -->
+    <ContentHeader
+      :title="headerMeta.title"
+      :typeLabel="headerMeta.typeLabel"
+      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
+      :consigne="consigneTexte"
+      :stepBadgeText="`Carte ${indexCourant + 1} / ${diagrammesListe.length}`"
+    />
+
+    <!-- Main Dual Panel Layout -->
+    <div class="vision-main-layout">
+      <!-- Description Panel: Pièces & Positions (4 colonnes sur mobile) -->
+      <div class="description-panel">
+        <div class="panel-header">
+          <span class="panel-title">Pièces sur l'échiquier</span>
+        </div>
+
+        <div :class="['pieces-container', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
+          <div
+            v-for="(item, idx) in piecesExtraites"
+            :key="`${idx}-${item.square}`"
+            class="piece-row"
+          >
+            <cg-board class="piece-icon-box">
+              <piece :class="[item.role, item.color]"></piece>
+            </cg-board>
+            <span class="piece-square">{{ item.square }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chessboard Panel -->
+      <div class="board-panel">
+        <div class="chessboard-container">
+          <Chessboard
+            :fen="fenActuelle"
+            :shapes="shapesActuelles"
+            :orientation="couleurJoueur"
+            :player-color="couleurJoueur"
+            :view-only="true"
+            @board-created="onBoardCreated"
+            @square-click="gererClicCase"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer de Navigation par Carte avec Feedback Fixe -->
+    <SeriesCardFooter
+      :currentCard="indexCourant + 1"
+      :totalCards="diagrammesListe.length"
+      :isSolved="etapeJeu === 'revelation'"
+      :feedback="feedback"
+      @next="passerCarteSuivante"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import { Chessboard } from '@/components/shared/Chessboard';
+import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
+import { useChessPreferencesStore } from '@/stores/chessPreferences';
+import { parseFenPieces, getActiveColorFromFen } from '@/utils/chess/fenUtils';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
+
+const chessPreferences = useChessPreferencesStore();
+
+export interface DiagrammeConfig {
+  fen: string;
+  couleur_joueur?: 'white' | 'black';
+  shapes?: DrawShape[];
+}
+
+const props = defineProps<{
+  consigne?: string;
+  diagrammes?: DiagrammeConfig[];
+  metaTitre?: string;
+  metaTypeLabel?: string;
+  metaChapitreNiveauLabel?: string;
+  // Props de rétrocompatibilité pour ancien format
+  fenDepart?: string;
+  legacyCouleurJoueur?: 'white' | 'black';
+  caseDepart?: string;
+  caseArrivee?: string;
+  solutionSan?: string;
+  legacyConfig?: {
+    description?: string;
+    fen_depart?: string;
+    couleur_joueur?: 'white' | 'black';
+    case_depart?: string;
+    case_arrivee?: string;
+    solution_san?: string;
+    metaTitre?: string;
+    metaTypeLabel?: string;
+    metaChapitreNiveauLabel?: string;
+  };
+}>();
+
+const emit = defineEmits<{
+  (e: 'success'): void;
+}>();
+
+const headerMeta = computed(() => {
+  return {
+    title: props.metaTitre || props.legacyConfig?.metaTitre || "T8 - Vision'checs",
+    typeLabel: props.metaTypeLabel || props.legacyConfig?.metaTypeLabel || "Vision'checs",
+    chapitreNiveauLabel: props.metaChapitreNiveauLabel || props.legacyConfig?.metaChapitreNiveauLabel || '',
+  };
+});
+
+const indexCourant = ref<number>(0);
+const etapeJeu = ref<'reflexion' | 'revelation'>('reflexion');
+const caseSelectionnee = ref<string | null>(null);
+const shapesActuelles = ref<DrawShape[]>([]);
+const boardApi = ref<BoardCore | null>(null);
+const feedback = ref<{ message: string; type: 'success' | 'danger' } | null>(null);
+
+const onBoardCreated = (api: BoardCore) => {
+  boardApi.value = api;
+};
+
+// Normalisation de la liste des 4 diagrammes
+const diagrammesListe = computed<DiagrammeConfig[]>(() => {
+  if (props.diagrammes && Array.isArray(props.diagrammes) && props.diagrammes.length > 0) {
+    return props.diagrammes;
+  }
+  // Rétrocompatibilité legacy
+  const fenLegacy = props.fenDepart || props.legacyConfig?.fen_depart || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const colorLegacy = props.legacyCouleurJoueur || props.legacyConfig?.couleur_joueur || getActiveColorFromFen(fenLegacy);
+  const caseDep = props.caseDepart || props.legacyConfig?.case_depart || '';
+  const caseArr = props.caseArrivee || props.legacyConfig?.case_arrivee || '';
+
+  const shapesLegacy: DrawShape[] = [];
+  if (caseDep && caseArr) {
+    shapesLegacy.push({ orig: caseDep as Key, dest: caseArr as Key, brush: 'blue' });
+  }
+
+  return [
+    {
+      fen: fenLegacy,
+      couleur_joueur: colorLegacy,
+      shapes: shapesLegacy,
+    }
+  ];
+});
+
+const consigneTexte = computed<string>(() => {
+  return props.consigne || props.legacyConfig?.description || 'Observez les 4 diagrammes ci-dessous.';
+});
+
+const diagrammeCourant = computed<DiagrammeConfig>(() => {
+  return diagrammesListe.value[indexCourant.value] || diagrammesListe.value[0];
+});
+
+const couleurJoueur = computed<'white' | 'black'>(() => {
+  return getActiveColorFromFen(diagrammeCourant.value.fen);
+});
+
+const solutionMove = computed<{ orig: string; dest: string }>(() => {
+  const shapes = diagrammeCourant.value.shapes || [];
+  const blueArrow = shapes.find(
+    (s) => {
+      const shapeObj = s as DrawShape & { color?: string };
+      return (
+        (shapeObj.brush === 'blue' || shapeObj.color === 'blue') &&
+        Boolean(s.orig) &&
+        Boolean(s.dest) &&
+        s.orig !== s.dest
+      );
+    }
+  );
+
+  if (blueArrow && blueArrow.orig && blueArrow.dest) {
+    return {
+      orig: blueArrow.orig.toLowerCase(),
+      dest: blueArrow.dest.toLowerCase(),
+    };
+  }
+
+  // Fallback legacy
+  const caseDep = (props.caseDepart || props.legacyConfig?.case_depart || '').toLowerCase();
+  const caseArr = (props.caseArrivee || props.legacyConfig?.case_arrivee || '').toLowerCase();
+  return { orig: caseDep, dest: caseArr };
+});
+
+const piecesExtraites = computed(() => {
+  return parseFenPieces(diagrammeCourant.value.fen);
+});
+
+const fenActuelle = computed<string>(() => {
+  if (etapeJeu.value === 'revelation') {
+    return diagrammeCourant.value.fen;
+  }
+  return couleurJoueur.value === 'black'
+    ? '8/8/8/8/8/8/8/8 b - - 0 1'
+    : '8/8/8/8/8/8/8/8 w - - 0 1';
+});
+
+// Réinitialisation lors du changement de diagramme
+watch(indexCourant, () => {
+  etapeJeu.value = 'reflexion';
+  caseSelectionnee.value = null;
+  shapesActuelles.value = [];
+  feedback.value = null;
+});
+
+const gererClicCase = async (square: string) => {
+  if (etapeJeu.value !== 'reflexion') {
+    return;
+  }
+
+  const squareLower = square.toLowerCase();
+
+  // 1er clic (case de départ)
+  if (!caseSelectionnee.value) {
+    caseSelectionnee.value = squareLower;
+    shapesActuelles.value = [{ orig: squareLower as Key, brush: 'blue' }];
+    return;
+  }
+
+  // 2ème clic (case d'arrivée)
+  const dep = caseSelectionnee.value;
+  const arr = squareLower;
+
+  if (dep === solutionMove.value.orig && arr === solutionMove.value.dest) {
+    // Succès sur ce diagramme !
+    etapeJeu.value = 'revelation';
+    shapesActuelles.value = diagrammeCourant.value.shapes && diagrammeCourant.value.shapes.length > 0
+      ? diagrammeCourant.value.shapes
+      : [{ orig: dep as Key, dest: arr as Key, brush: 'blue' }];
+
+    feedback.value = {
+      type: 'success',
+      message: 'Bravo ! Bon coup trouvé.'
+    };
+
+    // Animation du coup après 400ms en conservant les shapes
+    setTimeout(() => {
+      if (boardApi.value) {
+        boardApi.value.move({ from: dep, to: arr });
+      }
+    }, 400);
+  } else {
+    // Erreur !
+    feedback.value = {
+      type: 'danger',
+      message: "Ce n'est pas le bon coup ! Réessayez."
+    };
+    caseSelectionnee.value = null;
+    shapesActuelles.value = [];
+
+    setTimeout(() => {
+      if (feedback.value?.type === 'danger') {
+        feedback.value = null;
+      }
+    }, 2000);
+  }
+};
+
+const passerCarteSuivante = () => {
+  feedback.value = null;
+  if (indexCourant.value < diagrammesListe.value.length - 1) {
+    indexCourant.value += 1;
+  } else {
+    emit('success');
+  }
+};
+</script>

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
-import ContentHeader from '@/components/shared/ContentHeader.vue';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
 
 describe( 'ContentHeader.vue', () => {
 	test( 'renders unified 2-panel header correctly for exercise', () => {

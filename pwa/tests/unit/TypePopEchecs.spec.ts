@@ -3,14 +3,14 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypePopEchecs from '@/views/types/TypePopEchecs.vue';
+import TypePopEchecs from '@/views/learning/types/TypePopEchecs.vue';
 import {
 	findBlueCircledSquare,
 	findPieceOnSquare,
 	removePieceFromFen,
 	getActiveColorFromFen,
 	filterYellowShapes,
-} from '@/utils/fenUtils';
+} from '@/utils/chess/fenUtils';
 
 export const mockBoardApi = {
 	setPosition: vi.fn(),

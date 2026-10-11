@@ -214,12 +214,20 @@
     background: rgba(var(--ion-color-success-rgb, 0, 163, 42), 0.15);
     border: 1px solid var(--ion-color-success);
     color: var(--ion-color-success-shade, var(--ion-color-success));
+
+    @media (prefers-color-scheme: dark) {
+      color: var(--ion-color-success-tint, #1aac3f);
+    }
   }
 
   &--danger {
     background: rgba(var(--ion-color-danger-rgb, 214, 54, 56), 0.15);
     border: 1px solid var(--ion-color-danger);
     color: var(--ion-color-danger-shade, var(--ion-color-danger));
+
+    @media (prefers-color-scheme: dark) {
+      color: var(--ion-color-danger-tint, #da4a4c);
+    }
   }
 
   &--block {
@@ -228,6 +236,49 @@
     text-align: center;
     padding: 20px;
   }
+}
+
+/* En-tête de marque standardisé */
+.dame-brand-header {
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+
+  .brand-logo {
+    height: 22px;
+    margin-right: 8px;
+    display: block;
+  }
+
+  .brand-name {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--ion-text-color, var(--ion-color-dark));
+  }
+}
+
+/* Groupe de badges / icônes d'action alignés */
+.dame-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Chevron d'élément de liste standardisé */
+.dame-list-chevron {
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+
+/* États atténués / inactifs */
+.badge--dimmed,
+.icon--dimmed {
+  opacity: 0.7;
+}
+
+/* Pleine largeur */
+.full-width {
+  width: 100%;
 }
 
 

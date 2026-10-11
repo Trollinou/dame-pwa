@@ -40,7 +40,7 @@ import '@ionic/vue/css/palettes/dark.system.css';
 /* Theme variables & Shared Components */
 import './theme/variables.css';
 import './theme/shared-components.scss';
-import { usePwaUpdate } from './composables/usePwaUpdate';
+import { usePwaUpdate } from '@/composables/core/usePwaUpdate';
 
 const pinia = createPinia();
 pinia.use( piniaPluginPersistedstate );

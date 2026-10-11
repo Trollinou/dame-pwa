@@ -22,8 +22,10 @@
   - Encapsuler l'enregistrement REST dans `rest_api_init`.
   - Isoler les services d'administration sous `if ( is_admin() )`.
 - **Frontend PWA (`pwa/src/`)** :
-  - `components/shared/` : Composants maîtres réutilisables (`DataTable/`, `Chessboard/`, Viewers d'exercices).
-  - `composables/` : Logique réutilisable (`useFeedback`, `useCardNavigation`, etc.).
+  - `views/` : Vues classées par domaines (`views/admin/`, `views/auth/`, `views/layout/`, `views/learning/`, `views/public/`).
+  - `components/` : Composants organisés par piliers (`learning/viewers/`, `learning/`, `public/`, `auth/`, `shared/` pour `Chessboard/`, `DataTable/`, `SplitMasterDetail.vue`, `SignaturePad.vue`).
+  - `composables/` : Logique réutilisable découplée par domaine (`composables/learning/`, `composables/public/`, `composables/core/`).
+  - `utils/` : Utilitaires système (`safeFetch.ts`, `wpApi.ts`), parseurs (`parsers/`) et moteurs d'échecs (`chess/`).
   - `stores/` : État global Pinia persisté.
   - `theme/` : SCSS centralisé (`shared-components.scss`) avec classes canoniques obligatoires.
 

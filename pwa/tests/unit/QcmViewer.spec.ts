@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import QcmViewer from '@/components/shared/QcmViewer.vue';
+import QcmViewer from '@/components/learning/viewers/QcmViewer.vue';
 
 // Mock eg-chessboard
 vi.mock( 'eg-chessboard/vue', () => ( {

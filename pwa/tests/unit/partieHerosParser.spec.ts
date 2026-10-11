@@ -4,7 +4,7 @@ import {
 	shuffleChoices,
 	toFrenchNotation,
 	type QcmChoice,
-} from '@/utils/partieHerosParser';
+} from '@/utils/parsers/partieHerosParser';
 
 describe( 'partieHerosParser.ts', () => {
 	test( 'toFrenchNotation convertit la notation anglaise en notation française', () => {

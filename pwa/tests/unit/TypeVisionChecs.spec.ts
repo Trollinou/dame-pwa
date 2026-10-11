@@ -3,12 +3,12 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
-import TypeVisionChecs from '@/views/types/TypeVisionChecs.vue';
+import TypeVisionChecs from '@/views/learning/types/TypeVisionChecs.vue';
 import {
 	parseFenPieces,
 	getPieceColumns,
 	getActiveColorFromFen,
-} from '@/utils/fenUtils';
+} from '@/utils/chess/fenUtils';
 
 // Mock eg-chessboard to easily trigger square clicks and test board interactions
 vi.mock( 'eg-chessboard/vue', () => ( {
