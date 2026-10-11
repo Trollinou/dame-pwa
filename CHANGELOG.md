@@ -28,8 +28,6 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Aucune utilisation de `backdrop-filter: blur` pour préserver la fluidité Safari iOS.
   - **Couverture de Tests Unitaires Complète** : Tests unitaires dédiés pour le parseur (`wpContentParser.spec.ts`) et le composant visionneuse (`EgMediaViewer.spec.ts`).
 
-## [1.9.1] - 2026-10-11
-
 - **Revue, Optimisation des Styles & Durcissement Thèmes Clair/Sombre (3 Thèmes + CORE) (`_base.scss`, `_chessboard.scss`, `_learning-components.scss`, `_learning-layout.scss`, `_public-components.scss`, `_public-layout.scss`, `PublicHomePage.vue`, `BenevolatPage.vue`, `PreInscriptionPage.vue`, `OrderViewer.vue`, `QuiSuisJeViewer.vue`, etc.)** :
   - **Éradication Complète des Styles Inline Statiques** : Suppression de plus de 50 occurrences de `style="..."` résiduelles dans les composants et vues (`PublicHomePage`, `BenevolatPage`, `PreInscriptionPage`, sous-sections de pré-inscription, viewers d'apprentissage `OrderViewer`, `QuiSuisJeViewer`, `TypeMarcheHeros`, pages d'authentification et administration). Seules les liaisons dynamiques JS calculées (couleurs de catégories et appariements d'exercices) sont désormais conservées.
   - **Classes Canoniques Transverses Enrichies (`theme/core/_base.scss`)** : Ajout de `.dame-brand-header` (en-tête de marque standardisé avec logo et nom du club), `.dame-badge-group` (cluster d'alignement flex pour badges d'état et actions), `.dame-list-chevron` (chevron d'item de liste normalisé), `.badge--dimmed`, `.icon--dimmed` et `.full-width`.
