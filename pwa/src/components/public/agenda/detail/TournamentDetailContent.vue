@@ -11,11 +11,11 @@
       </div>
 
       <!-- Contenu de la page avec boutons injectés et interception des liens -->
-      <div
+      <WpContentRenderer
+        v-if="currentPage?.content?.rendered"
+        :content="currentPage.content.rendered"
         class="content"
-        v-safe-html="processedContent.cleanHtml"
-        @click="handleInternalLinks"
-      ></div>
+      />
     </div>
 
     <div v-else class="ion-text-center ion-padding offline-container">
@@ -39,9 +39,8 @@ import {
 import { cloudOfflineOutline } from 'ionicons/icons';
 import { safeFetch } from '@/utils/safeFetch';
 import { useTournamentStore } from '@/stores/tournament';
-import { useInternalLinks } from '@/composables/core/useInternalLinks';
-import { transformHelloAssoContent } from '@/utils/helloAsso';
 import type { WpPage } from '@/types/wp';
+import WpContentRenderer from '@/components/shared/WpContent/WpContentRenderer.vue';
 
 const props = defineProps<{
   page?: WpPage | null;
@@ -49,7 +48,6 @@ const props = defineProps<{
 }>();
 
 const tournamentStore = useTournamentStore();
-const { handleInternalLinks } = useInternalLinks();
 
 const localPage = ref<WpPage | null>(null);
 const isLoading = ref(false);
@@ -58,13 +56,6 @@ const error = ref<string | null>(null);
 const currentPage = computed(() => {
   if (props.page) return props.page;
   return localPage.value;
-});
-
-const processedContent = computed(() => {
-  const rawHtml = currentPage.value?.content?.rendered || '';
-  const cleanHtml = transformHelloAssoContent(rawHtml);
-
-  return { cleanHtml };
 });
 
 const loadPage = async () => {

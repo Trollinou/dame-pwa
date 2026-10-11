@@ -9,11 +9,11 @@
       <h1 v-safe-html="currentPost.title.rendered"></h1>
       <p class="date">{{ formatDate(currentPost.date) }}</p>
 
-      <div
+      <WpContentRenderer
+        v-if="currentPost?.content?.rendered"
+        :content="currentPost.content.rendered"
         class="content"
-        v-safe-html="processedContent.cleanHtml"
-        @click="handleInternalLinks"
-      ></div>
+      />
     </div>
 
     <div v-else class="ion-text-center ion-padding offline-container">
@@ -36,9 +36,8 @@ import {
 } from '@ionic/vue';
 import { cloudOfflineOutline } from 'ionicons/icons';
 import { useNewsStore, type Post } from '@/stores/news';
-import { useInternalLinks } from '@/composables/core/useInternalLinks';
 import { safeFetch } from '@/utils/safeFetch';
-import { transformHelloAssoContent } from '@/utils/helloAsso';
+import WpContentRenderer from '@/components/shared/WpContent/WpContentRenderer.vue';
 
 const props = defineProps<{
   post?: Post | null;
@@ -46,7 +45,6 @@ const props = defineProps<{
 }>();
 
 const newsStore = useNewsStore();
-const { handleInternalLinks } = useInternalLinks();
 
 const localPost = ref<Post | null>(null);
 const isLoading = ref(false);
@@ -59,25 +57,6 @@ const currentPost = computed(() => {
 
 const featuredImage = computed(() => {
   return currentPost.value?._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-});
-
-const processedContent = computed(() => {
-  let cleanHtml = transformHelloAssoContent(currentPost.value?.content?.rendered || '');
-
-  const surveyRegex = /<form[^>]+id="dame-benevolat-form-(\d+)"[^>]*>[\s\S]*?<\/form>/gi;
-  cleanHtml = cleanHtml.replace(surveyRegex, (match: string, surveyId: string) => {
-    return `
-      <div class="survey-action-container ion-padding ion-margin-vertical">
-        <h3 class="survey-action-title">Bénévolat disponible</h3>
-        <p class="survey-action-desc">Proposez votre aide directement depuis l'application.</p>
-        <ion-button expand="block" color="secondary" class="internal-benevolat-btn" data-path="/tabs/benevolat/participation/${surveyId}">
-          Proposer mon aide
-        </ion-button>
-      </div>
-    `;
-  });
-
-  return { cleanHtml };
 });
 
 const formatDate = (dateString: string): string => {

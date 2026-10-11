@@ -46,9 +46,10 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
 1. **Affichage Split-View (1/3 - 2/3) sur Tablette Paysage et Ordinateur** :
    - **Disposition 1/3 (Gauche)** : Liste fluide des éléments avec carte active mise en valeur lors de la sélection.
    - **Disposition 2/3 (Droite)** : Panneau latéral dédié affichant le contenu complet et les actions associées.
-   - **Actualités** : Sélection automatique du premier article.
-   - **Agenda (Mode Liste ☰)** : Sélection intelligente par défaut de l'événement courant ou du plus proche à venir.
-   - **Tournois** : Consultation instantanée des modalités, règlements et formulaires HelloAsso. Les widgets intégrés (`<iframe>`) ou shortcodes (`[helloasso campaign="..."]`) insérés sur WordPress sont automatiquement convertis en boutons d'action natifs (`<ion-button>`) sécurisés et redirigent vers le formulaire HelloAsso complet sans être bloqués par le nettoyeur HTML.
+   - **Actualités** : Sélection automatique du premier article. Rendu interactif des galeries photos `eg-media` avec grille justifiée et lightbox plein écran.
+   - **Agenda (Mode Liste ☰)** : Sélection intelligente par défaut de l'événement courant ou du plus proche à venir. Prise en charge des galeries photos dans le descriptif de l'événement.
+   - **Tournois** : Consultation instantanée des modalités, règlements, galeries photos (`eg-media` ou Piwigo) et formulaires HelloAsso. Les widgets intégrés (`<iframe>`) ou shortcodes (`[helloasso campaign="..."]`) insérés sur WordPress sont automatiquement convertis en boutons d'action natifs (`<ion-button>`) sécurisés et redirigent vers le formulaire HelloAsso complet sans être bloqués par le nettoyeur HTML.
+   - **Visionneuse Photos & Galeries Découplées (`eg-media`)** : Les articles et pages intégrant le bloc WordPress `eg-media` (galeries de club, photos d'événements, y compris serveurs distants Piwigo) sont restitués sous forme de mosaïque justifiée fluide. Le clic sur une photo ouvre instantanément une lightbox plein écran haute résolution avec défilement tactile (swipe), touches directionnelles clavier (gauche/droite/échap) et bandeau de miniatures dynamique centré sur la photo active.
    - **Bénévolat** : Sélection des créneaux horaires, formulaire d'inscription direct pour les adhérents ou vue administration des inscrits.
    - **Double défilement indépendant** : Le scroll de la liste de gauche ne déplace pas le panneau de détail de droite, et inversement.
 

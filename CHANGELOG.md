@@ -6,6 +6,30 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Intégration Native de la Visionneuse Photos `eg-media` dans la PWA (`EgMediaViewer.vue`, `WpContentRenderer.vue`, `wpContentParser.ts`, `egMedia.ts`, `_public-components.scss`, `EgMediaViewer.spec.ts`, `wpContentParser.spec.ts`, `README.md`, `USING.md`)** :
+  - **Prise en charge Multi-Sources & Décodage Déclaratif (`wpContentParser.ts`)** :
+    - Détection automatique des blocs WordPress `wp-block-eg-media-viewer` et `.eg-viewer` insérés dans les actualités, tournois et événements d'agenda.
+    - Double compatibilité transparente : support du format moderne Interactivity API (`data-wp-context`) et du format local/classique (`data-images-json`, `data-layout`, `data-tempo`, `data-limit`, `data-slideshow`).
+    - Prise en charge native des galeries hébergées localement sur WordPress ainsi que des serveurs distants Piwigo (`photos.echiquier-ledonien.fr`).
+  - **Grille Justifiée Responsive & Performance Web Vitals (`EgMediaViewer.vue`)** :
+    - Calcul dynamique des ratios d'aspect et bases flex (`flex-grow`, `flex-basis`) pour composer une mosaïque fluide de photos.
+    - Affichage exhaustif direct de l'ensemble des photos (sans seuil de pagination limitatif) couplé aux attributs natifs `loading="lazy"` et `decoding="async"` pour garantir des performances optimales et une consommation réseau minimale.
+  - **Visionneuse Plein Écran (Lightbox) Multi-Appareils** :
+    - **Téléportation DOM** : Conteneur de plein écran téléporté sur le `body` (`<Teleport to="body">`) pour s'affranchir des débordements et contraintes de scroll des conteneurs parents.
+    - **Interactions Mobiles & Tactiles** : Navigation par gestes de balayage swipe tactile (`@touchstart`, `@touchend`) avec détection de seuil fluide (45px).
+    - **Interactions Ordinateur & Clavier** : Navigation au clavier par touches Flèche Gauche, Flèche Droite et fermeture via Échap (`Escape`), complétée par des boutons de navigation flottants.
+    - **Bandeau de Défilement Inférieur Intelligent** : Bande de miniatures synchronisée défilant automatiquement (`scrollIntoView({ inline: 'center' })`) pour toujours maintenir la vignette active centrée à l'écran.
+  - **Composant Partagé Réutilisable `<WpContentRenderer>`** :
+    - Analyse et rendu hybride des contenus WordPress alternant blocs HTML sécurisés (`v-safe-html`) et blocs interactifs `eg-media`.
+    - Déploiement homogène dans `NewsDetailContent.vue`, `TournamentDetailContent.vue` et `AgendaDetailContent.vue`.
+  - **Charte Graphique Centralisée & Conformité AGENTS.md** :
+    - Zéro style inline statique et zéro balise `<style>` dans les composants Vue.
+    - Centralisation exclusive dans `pwa/src/theme/public/_public-components.scss` (`.eg-viewer`, `.eg-viewer__justified-grid`, `.eg-lightbox`).
+    - Aucune utilisation de `backdrop-filter: blur` pour préserver la fluidité Safari iOS.
+  - **Couverture de Tests Unitaires Complète** : Tests unitaires dédiés pour le parseur (`wpContentParser.spec.ts`) et le composant visionneuse (`EgMediaViewer.spec.ts`).
+
+## [1.9.1] - 2026-10-11
+
 - **Revue, Optimisation des Styles & Durcissement Thèmes Clair/Sombre (3 Thèmes + CORE) (`_base.scss`, `_chessboard.scss`, `_learning-components.scss`, `_learning-layout.scss`, `_public-components.scss`, `_public-layout.scss`, `PublicHomePage.vue`, `BenevolatPage.vue`, `PreInscriptionPage.vue`, `OrderViewer.vue`, `QuiSuisJeViewer.vue`, etc.)** :
   - **Éradication Complète des Styles Inline Statiques** : Suppression de plus de 50 occurrences de `style="..."` résiduelles dans les composants et vues (`PublicHomePage`, `BenevolatPage`, `PreInscriptionPage`, sous-sections de pré-inscription, viewers d'apprentissage `OrderViewer`, `QuiSuisJeViewer`, `TypeMarcheHeros`, pages d'authentification et administration). Seules les liaisons dynamiques JS calculées (couleurs de catégories et appariements d'exercices) sont désormais conservées.
   - **Classes Canoniques Transverses Enrichies (`theme/core/_base.scss`)** : Ajout de `.dame-brand-header` (en-tête de marque standardisé avec logo et nom du club), `.dame-badge-group` (cluster d'alignement flex pour badges d'état et actions), `.dame-list-chevron` (chevron d'item de liste normalisé), `.badge--dimmed`, `.icon--dimmed` et `.full-width`.

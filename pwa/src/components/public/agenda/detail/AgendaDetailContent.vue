@@ -78,7 +78,7 @@
       </ion-card>
 
       <!-- Carte Description -->
-      <ion-card v-if="processedDescription.cleanHtml" class="ion-no-margin ion-margin-bottom dame-panel">
+      <ion-card v-if="descriptionHtml" class="ion-no-margin ion-margin-bottom dame-panel">
         <ion-card-header>
           <ion-card-title>
             <ion-icon :icon="informationCircleOutline" color="primary"></ion-icon>
@@ -86,11 +86,10 @@
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <div
+          <WpContentRenderer
+            :content="descriptionHtml"
             class="description-content"
-            v-safe-html="processedDescription.cleanHtml"
-            @click="handleInternalLinks"
-          ></div>
+          />
         </ion-card-content>
       </ion-card>
     </div>
@@ -125,8 +124,7 @@ import {
   informationCircleOutline
 } from 'ionicons/icons';
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
-import { useInternalLinks } from '@/composables/core/useInternalLinks';
-import { transformHelloAssoContent } from '@/utils/helloAsso';
+import WpContentRenderer from '@/components/shared/WpContent/WpContentRenderer.vue';
 
 const props = defineProps<{
   event?: AgendaEvent | null;
@@ -134,7 +132,6 @@ const props = defineProps<{
 }>();
 
 const agendaStore = useAgendaStore();
-const { handleInternalLinks } = useInternalLinks();
 
 const isLoading = computed(() => agendaStore.isLoading || agendaStore.isAdminEventsLoading);
 
@@ -175,15 +172,12 @@ const openMap = () => {
   }
 };
 
-const processedDescription = computed(() => {
-  const rawHtml =
+const descriptionHtml = computed(() => {
+  return (
     currentEvent.value?._dame_agenda_description_html ||
-    currentEvent.value?.meta._dame_agenda_description ||
-    '';
-
-  const cleanHtml = transformHelloAssoContent(rawHtml);
-
-  return { cleanHtml };
+    currentEvent.value?.meta?._dame_agenda_description ||
+    ''
+  );
 });
 
 const formatPart = (dateString: string): string => {
