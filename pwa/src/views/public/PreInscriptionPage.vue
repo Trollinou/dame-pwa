@@ -23,12 +23,11 @@
           <!-- Écran Foyer à Jour -->
           <div
             v-else-if="authStore.isAuthenticated && hasLoadedIdentities && registrationTargets.length === 0"
-            class="ion-text-center ion-padding"
-            style="margin-top: 40px;"
+            class="foyer-up-to-date dame-empty-state"
           >
-            <ion-icon :icon="checkmarkCircleOutline" color="success" style="font-size: 5rem;"></ion-icon>
-            <h2 style="font-weight: 600; margin-top: 15px;">Foyer à jour !</h2>
-            <p style="color: var(--ion-color-step-600); line-height: 1.5; margin: 15px 0;">
+            <ion-icon :icon="checkmarkCircleOutline" color="success" class="foyer-success-icon"></ion-icon>
+            <h2 class="foyer-title">Foyer à jour !</h2>
+            <p class="foyer-desc">
               Tous les membres associés à votre adresse e-mail sont déjà inscrits pour la saison en cours. Aucune réinscription n'est nécessaire.
             </p>
           </div>
@@ -46,7 +45,7 @@
 
             <!-- Bannière d'information préinscription existante -->
             <div v-if="isExistingPreInscription" class="dame-banner dame-banner--info ion-margin-bottom">
-              <p style="margin: 0; font-size: 0.95em; line-height: 1.4;">
+              <p>
                 ℹ️ <strong>Préinscription en cours :</strong> Une préinscription a déjà été enregistrée pour cet adhérent. Les champs sont pré-remplis avec ces données. Vous pouvez les modifier et valider à nouveau pour mettre à jour son dossier sans créer de doublon.
               </p>
             </div>
@@ -82,7 +81,7 @@
 
             <!-- Message d'erreur -->
             <div class="dame-banner dame-banner--danger ion-margin-top" v-if="errorMessage">
-              <p style="margin: 0;" v-html="errorMessage"></p>
+              <p v-html="errorMessage"></p>
             </div>
 
             <!-- Soumission -->

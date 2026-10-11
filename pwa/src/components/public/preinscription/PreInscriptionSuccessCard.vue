@@ -6,7 +6,7 @@
 
     <ion-card class="pdf-card ion-no-margin ion-margin-bottom">
       <ion-card-header>
-        <ion-card-title style="font-size: 1.1em;">Documents à télécharger</ion-card-title>
+        <ion-card-title class="pdf-card-title">Documents à télécharger</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <div class="pdf-buttons">

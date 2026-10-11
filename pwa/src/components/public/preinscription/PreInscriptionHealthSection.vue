@@ -30,12 +30,11 @@
         <!-- 1. Attestation de santé sur l'honneur -->
         <ion-item class="ion-text-wrap consent-item">
           <ion-checkbox
-            class="ion-text-wrap"
+            class="consent-checkbox ion-text-wrap"
             v-model="form.health_honor_consent"
             required
             justify="start"
             label-placement="end"
-            style="--size: 20px;"
           >
             <span class="consent-text">
               <strong v-if="!isMinor">Attestation sur l'honneur (Majeur) :</strong>
@@ -49,14 +48,13 @@
         </ion-item>
 
         <!-- 2. Autorisation parentale (si mineur) -->
-        <ion-item v-if="isMinor" class="ion-text-wrap consent-item" style="margin-top: 10px;">
+        <ion-item v-if="isMinor" class="ion-text-wrap consent-item consent-item--spacing">
           <ion-checkbox
-            class="ion-text-wrap"
+            class="consent-checkbox ion-text-wrap"
             v-model="form.parental_consent"
             required
             justify="start"
             label-placement="end"
-            style="--size: 20px;"
           >
             <span class="consent-text">
               <strong>Autorisation parentale :</strong>
@@ -73,17 +71,16 @@
       </div>
 
       <!-- Règlement intérieur -->
-      <ion-item style="margin-top: 15px;" class="ion-text-wrap">
+      <ion-item class="consent-item--rules ion-text-wrap">
         <ion-checkbox
-          class="ion-text-wrap"
+          class="consent-checkbox ion-text-wrap"
           :model-value="consentCheckbox"
           @update:model-value="$emit('update:consentCheckbox', $event)"
           required
           justify="start"
           label-placement="end"
-          style="--size: 20px;"
         >
-          <span class="consent-text" style="white-space: normal; display: block;">
+          <span class="consent-text">
             En cochant cette case, je reconnais avoir pris connaissance du règlement intérieur de l’Association Échiquier Lédonien et m’engage à le respecter. *
           </span>
         </ion-checkbox>

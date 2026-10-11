@@ -5,9 +5,9 @@
       <ion-toolbar>
         <!-- Logo à gauche -->
         <ion-buttons slot="start">
-          <div style="display: flex; align-items: center; padding-left: 12px;">
-            <img src="/assets/icon/logo.png" style="height: 20px; margin-right: 8px;" alt="Logo" />
-            <span style="font-weight: 800; letter-spacing: 0.5px; color: var(--ion-color-dark);">Echiquier Lédonien</span>
+          <div class="dame-brand-header">
+            <img src="/assets/icon/logo.png" class="brand-logo" alt="Logo" />
+            <span class="brand-name">Echiquier Lédonien</span>
           </div>
         </ion-buttons>
       </ion-toolbar>
@@ -31,7 +31,7 @@
         <!-- Carte Préinscription Saison -->
         <ion-card v-if="!authStore.isAuthenticated || hasUnregisteredTargets" class="pre-inscription-card ion-no-margin">
           <ion-card-header>
-            <ion-card-title style="display: flex; align-items: center; gap: 8px; font-size: 1.15em; font-weight: bold; color: var(--ion-color-primary);">
+            <ion-card-title class="pre-inscription-title">
               ✍️ Préinscription {{ authStore.currentSeason ? authStore.currentSeason : 'Saison' }}
             </ion-card-title>
           </ion-card-header>
@@ -64,7 +64,7 @@
         </ion-card>
 
         <!-- Section Dernières Nouvelles -->
-        <ion-list lines="full" class="home-section" style="margin: 0;">
+        <ion-list lines="full" class="home-section">
           <ion-list-header>
             <ion-label color="primary">Dernières Nouvelles</ion-label>
             <ion-button fill="clear" router-link="/tabs/agenda?tab=actualites">Actualités</ion-button>
@@ -91,7 +91,7 @@
         </ion-list>
 
         <!-- Section Prochains Événements -->
-        <ion-list lines="full" class="home-section" style="margin: 0;">
+        <ion-list lines="full" class="home-section">
           <ion-list-header>
             <ion-label color="primary">Prochains Événements</ion-label>
             <ion-button fill="clear" router-link="/tabs/agenda?tab=agenda">Agenda</ion-button>
@@ -116,7 +116,7 @@
         </ion-list>
 
         <!-- Section Appel à bénévoles -->
-        <ion-list lines="full" class="home-section" style="margin: 0;">
+        <ion-list lines="full" class="home-section">
           <ion-list-header>
             <ion-label color="primary">Appel à bénévoles</ion-label>
             <ion-button fill="clear" router-link="/tabs/agenda?tab=benevolat">Bénévolat</ion-button>
@@ -132,7 +132,7 @@
               <h3 v-safe-html="benevolat.title?.rendered || benevolat.title?.raw || 'Appel en cours'" class="ion-text-wrap"></h3>
               <p>{{ formatBenevolatDates(benevolat) }}</p>
             </ion-label>
-            <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+            <div slot="end" class="dame-badge-group">
               <ion-badge v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode" color="success">Inscrit</ion-badge>
               <ion-badge v-if="isBenevolatExpired(benevolat)" color="danger">Terminé</ion-badge>
             </div>

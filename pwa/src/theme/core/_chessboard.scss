@@ -54,11 +54,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 18px;
-  background: var(--ion-color-step-100, #f4f5f8);
+  background: var(--ion-background-color-step-100, var(--ion-color-step-100, #f4f5f8));
   font-weight: 600;
   font-size: 1rem;
-  color: var(--ion-color-dark, #222222);
-  border-bottom: 1px solid var(--ion-color-step-200, #e0e0e0);
+  color: var(--ion-text-color, var(--ion-color-dark));
+  border-bottom: 1px solid var(--ion-background-color-step-150, var(--ion-color-step-200, #e0e0e0));
 }
 
 .dame-zoom-close-btn {
@@ -72,7 +72,7 @@
   transition: color 0.15s ease;
 
   &:hover {
-    color: var(--ion-color-dark, #111111);
+    color: var(--ion-text-color, var(--ion-color-dark));
   }
 }
 

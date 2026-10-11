@@ -6,8 +6,8 @@
           label="Pour qui souhaitez-vous faire la préinscription ?"
           label-placement="stacked"
           placeholder="Sélectionner..."
+          class="full-width-select"
           @ionChange="$emit('select-target', $event.detail.value)"
-          style="width: 100%;"
           :value="selectedTargetId"
         >
           <ion-select-option :value="0">-- Nouvelle préinscription (vierge) --</ion-select-option>

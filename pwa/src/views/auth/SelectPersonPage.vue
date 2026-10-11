@@ -13,7 +13,7 @@
       <div class="safe-area-wrapper">
         <div class="selection-container">
           <div class="selection-header">
-            <ion-icon :icon="peopleOutline" color="primary" style="font-size: 3rem;"></ion-icon>
+            <ion-icon :icon="peopleOutline" color="primary" class="header-large-icon"></ion-icon>
             <h2>Plusieurs profils trouvés</h2>
             <p>Cet email est lié à plusieurs membres. Veuillez sélectionner la personne qui souhaite agir ou voter.</p>
           </div>

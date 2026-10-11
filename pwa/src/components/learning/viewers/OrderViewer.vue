@@ -24,7 +24,7 @@
           </div>
 
           <div v-if="bank.length === 0" class="learning-callout learning-callout--success ion-text-center">
-            <span class="empty-icon" style="font-size: 1.5rem; display: block; margin-bottom: 4px;">✓</span>
+            <span class="empty-icon">✓</span>
             <p><strong>Tout est placé</strong></p>
           </div>
         </div>
@@ -53,7 +53,7 @@
                 <DiagramViewer :fen="slot.fen" :orientation="slot.orientation" />
               </div>
             </template>
-            <div v-else class="empty-placeholder" style="aspect-ratio: 1; width: 100%; display: flex; align-items: center; justify-content: center; color: var(--ion-color-step-400);">
+            <div v-else class="empty-placeholder">
               <span>Libre</span>
             </div>
           </div>
@@ -62,7 +62,7 @@
     </div>
 
     <!-- Bouton d'action 44px -->
-    <div style="width: 100%; max-width: 320px; margin-top: 12px;">
+    <div class="exercise-action-wrapper">
       <ion-button expand="block" class="choice-btn" @click="validerOrdre" :disabled="bank.length > 0">
         Valider l'ordre
       </ion-button>

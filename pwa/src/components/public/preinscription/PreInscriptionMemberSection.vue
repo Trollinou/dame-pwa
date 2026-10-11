@@ -93,13 +93,12 @@
         ></ion-input>
       </ion-item>
 
-      <ion-item lines="none" class="optin-item ion-text-wrap" style="--background: transparent; margin-top: -5px; margin-bottom: 5px;">
+      <ion-item lines="none" class="optin-item ion-text-wrap">
         <ion-checkbox
-          class="ion-text-wrap"
+          class="optin-checkbox ion-text-wrap"
           v-model="form.dame_refuses_comms"
-          style="--size: 18px; font-size: 0.85em; --border-radius: 4px;"
         >
-          <span style="white-space: normal; line-height: 1.3; display: block; color: var(--ion-color-medium); font-size: 0.9em; margin-left: 8px;">
+          <span class="optin-text">
             Je m'oppose à la réception des e-mails d'information de l'association.
           </span>
         </ion-checkbox>
@@ -148,7 +147,7 @@
           v-model="form.dame_postal_code"
           label="Code Postal"
           label-placement="stacked"
-          style="max-width: 120px;"
+          class="postal-code-input"
         ></ion-input>
       </ion-item>
 

@@ -27,11 +27,11 @@
               <h2 v-safe-html="row.title.rendered"></h2>
               <p>{{ formatBenevolatDates(row) }}</p>
             </ion-label>
-            <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+            <div slot="end" class="dame-badge-group">
               <ion-badge
                 v-if="hasUserVoted(row.id) && !authStore.adminMode"
                 color="success"
-                :style="isBenevolatExpired(row) ? { opacity: '0.7' } : {}"
+                :class="{ 'badge--dimmed': isBenevolatExpired(row) }"
               >
                 Inscrit
               </ion-badge>

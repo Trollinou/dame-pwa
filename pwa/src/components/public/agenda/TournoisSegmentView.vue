@@ -38,11 +38,11 @@
                   <h2 v-safe-html="item.title"></h2>
                   <p>Compétition</p>
                 </ion-label>
-                <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+                <div slot="end" class="dame-badge-group">
                   <ion-badge v-if="unreadStore.isTournamentUnread(item)" color="danger">
                     Nouveau
                   </ion-badge>
-                  <ion-icon :icon="chevronForwardOutline" color="medium" style="opacity: 0.6; font-size: 1.1rem;"></ion-icon>
+                  <ion-icon :icon="chevronForwardOutline" color="medium" class="dame-list-chevron"></ion-icon>
                 </div>
               </ion-item>
             </ion-list>

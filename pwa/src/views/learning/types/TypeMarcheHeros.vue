@@ -30,7 +30,7 @@
     </div>
 
     <!-- SOUS-ÉTAPE 2 : Ordonnancement chronologique en grille 2 colonnes (Tap & Swap) -->
-    <div v-else-if="sousEtape === 'ordonnancement'" class="animate-fade-in" style="width: 100%;">
+    <div v-else-if="sousEtape === 'ordonnancement'" class="animate-fade-in learning-full-width">
       <div class="learning-callout learning-callout--info ion-text-center">
         <span>Touchez deux cartes pour permuter leur position chronologique.</span>
       </div>
@@ -55,8 +55,8 @@
     </div>
 
     <!-- SOUS-ÉTAPE 3 : Résolution du coup suivant -->
-    <div v-else-if="sousEtape === 'resolution'" class="animate-fade-in" style="width: 100%; display: flex; justify-content: center;">
-      <div v-if="solutionCourante" style="width: 100%;">
+    <div v-else-if="sousEtape === 'resolution'" class="animate-fade-in learning-step-resolution">
+      <div v-if="solutionCourante" class="learning-full-width">
         <PuzzleViewer
           :key="`puzzle-${serieCouranteIndex}`"
           :fen="solutionCourante.fenDepart"

@@ -55,6 +55,11 @@ ion-tab-bar {
   text-align: center;
   margin-bottom: 24px;
 
+  .auth-logo {
+    height: 60px;
+    margin-bottom: 10px;
+  }
+
   h2 {
     font-weight: 700;
     font-size: 1.5rem;
@@ -64,6 +69,25 @@ ion-tab-bar {
   p {
     color: var(--ion-color-medium);
     margin: 0;
+  }
+}
+
+.banner-huge-icon {
+  font-size: 3rem;
+}
+
+.selection-container {
+  max-width: 480px;
+  margin: 20px auto;
+  width: 100%;
+}
+
+.selection-header {
+  text-align: center;
+  margin-bottom: 24px;
+
+  .header-large-icon {
+    font-size: 3rem;
   }
 }
 
@@ -81,6 +105,11 @@ ion-tab-bar {
   align-items: stretch;
   gap: 16px;
   margin-bottom: 24px;
+}
+
+.system-panel {
+  margin-top: 24px;
+  margin-bottom: 32px;
 }
 
 .login-prompt {

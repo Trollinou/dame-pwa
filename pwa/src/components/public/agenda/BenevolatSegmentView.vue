@@ -32,7 +32,7 @@
                   <h2 v-safe-html="benevolat.title.rendered"></h2>
                   <p>{{ formatBenevolatDates(benevolat) }}</p>
                 </ion-label>
-                <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+                <div slot="end" class="dame-badge-group">
                   <ion-badge
                     v-if="unreadStore.isBenevolatUnread(benevolat)"
                     color="danger"
@@ -68,16 +68,16 @@
                 @click="handleBenevolatClick(benevolat)"
                 :class="['dame-list-item', 'finished-item', { 'is-active': isTabletLandscape && benevolat.id === selectedBenevolatId }]"
               >
-                <ion-icon slot="start" :icon="handRightOutline" color="medium" class="ion-margin-end" style="opacity: 0.6;"></ion-icon>
+                <ion-icon slot="start" :icon="handRightOutline" color="medium" class="ion-margin-end icon--dimmed"></ion-icon>
                 <ion-label>
                   <h2 v-safe-html="benevolat.title.rendered"></h2>
                   <p>{{ formatBenevolatDates(benevolat) }}</p>
                 </ion-label>
-                <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+                <div slot="end" class="dame-badge-group">
                   <ion-badge
                     v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode"
                     color="success"
-                    style="opacity: 0.7;"
+                    class="badge--dimmed"
                   >
                     Inscrit
                   </ion-badge>

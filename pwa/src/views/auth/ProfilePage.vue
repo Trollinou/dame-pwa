@@ -36,8 +36,7 @@
               expand="block" 
               color="primary" 
               fill="solid" 
-              class="dame-btn-large"
-              style="margin-top: 14px;"
+              class="dame-btn-large ion-margin-top"
               @click="goToAdmin"
             >
               <ion-icon slot="start" :icon="settingsOutline"></ion-icon>
@@ -139,7 +138,7 @@
         </div>
 
         <!-- Section Système & Mises à jour PWA -->
-        <div class="dame-panel" style="margin-top: 24px; margin-bottom: 32px;">
+        <div class="dame-panel system-panel">
           <div class="system-info">
             <ion-icon :icon="informationCircleOutline" class="system-icon"></ion-icon>
             <div>

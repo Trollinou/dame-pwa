@@ -68,8 +68,8 @@ const processedContent = computed(() => {
   cleanHtml = cleanHtml.replace(surveyRegex, (match: string, surveyId: string) => {
     return `
       <div class="survey-action-container ion-padding ion-margin-vertical">
-        <h3 style="margin-top: 0;">Bénévolat disponible</h3>
-        <p style="font-size: 0.9em; opacity: 0.8;">Proposez votre aide directement depuis l'application.</p>
+        <h3 class="survey-action-title">Bénévolat disponible</h3>
+        <p class="survey-action-desc">Proposez votre aide directement depuis l'application.</p>
         <ion-button expand="block" color="secondary" class="internal-benevolat-btn" data-path="/tabs/benevolat/participation/${surveyId}">
           Proposer mon aide
         </ion-button>

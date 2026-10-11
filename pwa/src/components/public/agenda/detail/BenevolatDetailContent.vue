@@ -90,9 +90,9 @@
                   label-placement="start"
                   justify="space-between"
                 >
-                  <div style="display: flex; flex-direction: column;">
+                  <div class="slot-time-block">
                     <span>{{ slot.start }} - {{ slot.end }}</span>
-                    <span style="font-size: 0.8em; opacity: 0.7;">
+                    <span class="slot-count">
                       {{ getSlotParticipantCount(dIndex, tIndex) }} inscrit(s)
                     </span>
                   </div>

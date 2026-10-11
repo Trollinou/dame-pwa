@@ -361,6 +361,9 @@ Le styling suit une architecture centralisée KISS en 3 piliers métier + fondat
 | **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences / rapports (`--2col`, `--3col`). |
 | **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). |
 | **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`, `--info`). |
+| **`.dame-brand-header`** | En-tête de marque standardisé avec logo (`.brand-logo`) et nom (`.brand-name`). |
+| **`.dame-badge-group`** | Cluster horizontal d'alignement flex pour les badges d'état et icônes d'action. |
+| **`.dame-list-chevron`** | Chevron de navigation standardisé pour éléments de liste. |
 | **`.detail-header`** | En-tête canonique des vues de détail (`h1` normalisé et métadonnées). |
 | **`.detail-body`** | Corps de texte enrichi et descriptions HTML (actualités, tournois, messages). |
 | **`.multiline-large-title`** | Titres principaux adaptatifs multi-lignes pour les en-têtes collapsibles Ionic. |

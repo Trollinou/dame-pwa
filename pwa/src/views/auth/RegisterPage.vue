@@ -13,16 +13,16 @@
       <div class="safe-area-wrapper">
         <div class="register-container">
           <div class="register-header">
-            <img src="/assets/icon/logo.png" alt="Logo Echiquier Lédonien" style="height: 60px; margin-bottom: 10px;" />
+            <img src="/assets/icon/logo.png" alt="Logo Echiquier Lédonien" class="auth-logo" />
             <h2>Créer un compte</h2>
             <p>Réservé aux adhérents et représentants légaux</p>
           </div>
 
           <div v-if="successMessage" class="dame-banner dame-banner--success dame-banner--block ion-margin-bottom">
-            <ion-icon :icon="checkmarkCircleOutline" color="success" style="font-size: 3rem;"></ion-icon>
+            <ion-icon :icon="checkmarkCircleOutline" color="success" class="banner-huge-icon"></ion-icon>
             <h3>Inscription réussie !</h3>
             <p>{{ successMessage }}</p>
-            <ion-button expand="block" router-link="/tabs/login" class="ion-margin-top" style="width: 100%;">
+            <ion-button expand="block" router-link="/tabs/login" class="ion-margin-top full-width">
               Retour à la connexion
             </ion-button>
           </div>

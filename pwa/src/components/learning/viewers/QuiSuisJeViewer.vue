@@ -10,7 +10,7 @@
     />
 
     <!-- Zone des Indices (Multiligne) -->
-    <div class="animate-fade-in" style="width: 100%;">
+    <div class="animate-fade-in learning-full-width">
       <div class="learning-callout learning-callout--info">
         <div class="learning-callout__title">
           <ion-icon :icon="helpCircleOutline" />
@@ -21,10 +21,10 @@
     </div>
 
     <!-- Zone d'Interaction selon la Variante -->
-    <div class="animate-fade-in" style="width: 100%;">
+    <div class="animate-fade-in learning-full-width">
       <!-- Variante 1 : Pièces (Palette des 6 pièces blanches) -->
-      <div v-if="resolvedVariante === 'pieces'" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-        <p class="ion-text-center" style="margin: 4px 0; font-size: 0.9rem; font-weight: 600;">Sélectionnez la pièce blanche mystère :</p>
+      <div v-if="resolvedVariante === 'pieces'" class="learning-interaction-column">
+        <p class="learning-interaction-instruction ion-text-center">Sélectionnez la pièce blanche mystère :</p>
         <div :class="['learning-piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
           <button
             v-for="item in whitePieces"
@@ -42,8 +42,8 @@
       </div>
 
       <!-- Variante 2 : Cases (Échiquier vide interactif avec révélation cercle vert) -->
-      <div v-else-if="resolvedVariante === 'cases'" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-        <p class="ion-text-center" style="margin: 4px 0; font-size: 0.9rem; font-weight: 600;">Cliquez sur la case mystère sur l'échiquier :</p>
+      <div v-else-if="resolvedVariante === 'cases'" class="learning-interaction-column">
+        <p class="learning-interaction-instruction ion-text-center">Cliquez sur la case mystère sur l'échiquier :</p>
         <div class="chessboard-container" @contextmenu.prevent>
           <Chessboard
             :key="`t12-board-${indexCourant}`"

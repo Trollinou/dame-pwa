@@ -317,6 +317,9 @@ L'architecture CSS centralisée (`pwa/src/theme/core/`) met à disposition un ca
 | **`.dame-stat-grid`** | Grilles de statistiques / métriques ELO / licences / rapports (`--2col`, `--3col`). | Grille responsive avec gap de `10px` et centrage automatique du texte. |
 | **`.dame-stat-box`** | Boîte de métrique individuelle dans `.dame-stat-grid` (avec `.dame-stat-label` et `.dame-stat-value`). | Fond doux, arrondi `8px`, libellé uppercase et valeur en gras. |
 | **`.dame-banner`** | Bannières d'alerte contextuelles ou état hors-ligne (`--primary`, `--warning`, `--success`, `--danger`, `--block`, `--info`). | Conteneur flexible avec icône et texte, fond et bordures harmonisés. |
+| **`.dame-brand-header`** | En-tête de marque standardisé avec logo (`.brand-logo`) et nom du club (`.brand-name`). | Alignement flex centré, espacement gauche `12px`, texte gras adaptatif clair/sombre. |
+| **`.dame-badge-group`** | Cluster horizontal pour regrouper les badges de statut et les icônes de liste. | Conteneur flex en ligne avec gap de `8px`. |
+| **`.dame-list-chevron`** | Chevron de navigation standardisé pour éléments de liste interactifs. | Opacité douce `0.6` et taille `1.1rem`. |
 | **`.detail-header`** | En-tête canonique des pages et vues de détail (Actualités, Agenda, Tournois). | Titre `h1` normalisé (`1.5rem`, `700`) et métadonnées associées (`.detail-date`). |
 | **`.detail-body`** | Corps de texte enrichi et descriptions HTML (actualités, tournois, messages). | Typographie soignée, interlignage `1.6`, espacement propre des paragraphes et listes. |
 | **`.multiline-large-title`** | Titres principaux adaptatifs multi-lignes pour les en-têtes collapsibles Ionic. | Retour à la ligne préservé sans troncature brute dans les barres d'outils. |

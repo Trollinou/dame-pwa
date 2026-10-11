@@ -6,9 +6,9 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-title>
-          <div style="display: flex; align-items: center;">
-            <img src="/assets/icon/logo.png" style="height: 24px; margin-right: 10px;" alt="Logo Echiquier Lédonien" />
-            Echiquier Lédonien
+          <div class="dame-brand-header">
+            <img src="/assets/icon/logo.png" class="brand-logo" alt="Logo Echiquier Lédonien" />
+            <span class="brand-name">Echiquier Lédonien</span>
           </div>
         </ion-title>
         <ion-buttons slot="end">

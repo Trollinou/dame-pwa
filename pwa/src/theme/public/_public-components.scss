@@ -19,6 +19,15 @@
   margin-bottom: 16px;
 }
 
+.pre-inscription-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.15em;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+}
+
 .pre-inscription-btn {
   --border-radius: var(--dame-item-radius, 8px);
   font-weight: 600;
@@ -62,6 +71,17 @@
 /* Détails des actualités */
 .news-detail-content {
   width: 100%;
+}
+
+.survey-action-container {
+  .survey-action-title {
+    margin-top: 0;
+  }
+
+  .survey-action-desc {
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
 }
 
 /* ==========================================================================
@@ -646,4 +666,86 @@
   text-align: center;
   font-size: 0.9em;
   margin-top: 10px;
+}
+
+/* ==========================================================================
+   6. Composants Formulaires & Vues Pré-inscription
+   ========================================================================== */
+
+.identity-select-card {
+  ion-select,
+  .full-width-select {
+    width: 100%;
+  }
+}
+
+.pdf-card-title {
+  font-size: 1.1em;
+}
+
+.optin-item {
+  --background: transparent;
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+
+.optin-checkbox {
+  --size: 18px;
+  --border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.optin-text {
+  white-space: normal;
+  line-height: 1.3;
+  display: block;
+  color: var(--ion-color-medium);
+  font-size: 0.9em;
+  margin-left: 8px;
+}
+
+.postal-code-input {
+  max-width: 120px;
+}
+
+.consent-checkbox {
+  --size: 20px;
+}
+
+.consent-item--spacing {
+  margin-top: 10px;
+}
+
+.consent-item--rules {
+  margin-top: 15px;
+}
+
+.foyer-up-to-date {
+  margin-top: 40px;
+
+  .foyer-success-icon {
+    font-size: 5rem;
+  }
+
+  .foyer-title {
+    font-weight: 600;
+    margin-top: 15px;
+  }
+
+  .foyer-desc {
+    color: var(--ion-color-step-600);
+    line-height: 1.5;
+    margin: 15px 0;
+  }
+}
+
+/* Détails Bénévolat */
+.slot-time-block {
+  display: flex;
+  flex-direction: column;
+
+  .slot-count {
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
 }

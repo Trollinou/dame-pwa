@@ -459,7 +459,7 @@
   margin: 4px 0 2px 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--ion-color-dark, #222);
+  color: var(--ion-text-color, var(--ion-color-dark));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -498,7 +498,7 @@
   .piece-chip-label {
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--ion-color-dark, #222222);
+    color: var(--ion-text-color, var(--ion-color-dark));
   }
 }
 
@@ -1244,7 +1244,7 @@ cg-board.piece-icon-box {
 .lecon-content-wrapper {
   line-height: 1.6;
   font-size: 1rem;
-  color: var(--ion-color-dark, #222);
+  color: var(--ion-text-color, var(--ion-color-dark));
   margin-bottom: 24px;
 }
 
@@ -1315,11 +1315,9 @@ cg-board.piece-icon-box {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.82);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 13px;
@@ -1682,8 +1680,8 @@ cg-board.piece-icon-box {
   font-size: 0.95rem;
   font-weight: 700;
   font-family: inherit;
-  color: var(--ion-color-step-900, #111827);
-  background: #ffffff;
+  color: var(--ion-text-color, var(--ion-color-dark));
+  background: var(--ion-item-background, var(--ion-card-background, #ffffff));
   text-align: center;
   outline: none;
   box-sizing: border-box;
@@ -1691,12 +1689,12 @@ cg-board.piece-icon-box {
 
   &:focus {
     border-color: var(--ion-color-primary, #3880ff);
-    box-shadow: 0 0 0 2px rgba(56, 128, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.2);
   }
 
   &:disabled {
-    background: var(--ion-color-step-100, #f3f4f6);
-    color: var(--ion-color-step-700, #374151);
+    background: var(--ion-background-color-step-100, var(--ion-color-step-100, #f3f4f6));
+    color: var(--ion-color-medium, #888888);
     cursor: default;
   }
 }
@@ -1710,18 +1708,18 @@ cg-board.piece-icon-box {
 }
 
 .success-icon {
-  color: #198754;
+  color: var(--ion-color-success, #00a32a);
 }
 
 .error-icon {
-  color: #dc3545;
+  color: var(--ion-color-danger, #d63638);
 }
 
 .piece-square {
   font-size: 0.95rem;
   font-weight: 700;
   font-family: monospace, Courier, monospace;
-  color: var(--ion-color-dark, #222222);
+  color: var(--ion-text-color, var(--ion-color-dark));
 }
 
 /* ==========================================================================
@@ -1773,7 +1771,7 @@ cg-board.piece-icon-box {
 .column-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--ion-color-dark);
+  color: var(--ion-text-color, var(--ion-color-dark));
   margin: 0 0 2px 0;
 }
 
@@ -1801,12 +1799,12 @@ cg-board.piece-icon-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--ion-color-warning-tint, #fff3cd);
-  border: 1px solid var(--ion-color-warning, #ffc409);
+  background: rgba(var(--ion-color-warning-rgb, 217, 79, 0), 0.15);
+  border: 1px solid var(--ion-color-warning, #d94f00);
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 0.88rem;
-  color: var(--ion-color-warning-shade, #856404);
+  color: var(--ion-text-color, var(--ion-color-dark));
 }
 
 .variant-title {
@@ -2122,5 +2120,50 @@ cg-board.piece-icon-box {
   border-radius: var(--dame-item-radius, 8px);
   line-height: 1.6;
   font-size: 1.1rem;
+}
+
+.learning-full-width {
+  width: 100%;
+}
+
+.learning-step-resolution {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.exercise-action-wrapper {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 12px;
+}
+
+.empty-placeholder {
+  aspect-ratio: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ion-color-step-400);
+}
+
+.empty-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.learning-interaction-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.learning-interaction-instruction {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
