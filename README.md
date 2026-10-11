@@ -25,7 +25,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
     - `src/components/auth/` : Personnalisation et profil (`profile/ChessThemeCustomizer.vue`).
     - `src/components/shared/` : Briques UI génériques pures (`Chessboard/`, `DataTable/`, `SplitMasterDetail.vue`, `SignaturePad.vue`).
   - `src/composables/` : Logique réutilisable découplée (`learning/`, `public/`, `core/`).
-  - `src/utils/` : Utilitaires système (`safeFetch.ts`, `wpApi.ts`), parseurs d'exercices (`parsers/`) et moteurs d'échecs (`chess/`).
+  - `src/utils/` : Utilitaires système (`safeFetch.ts`, `wpApi.ts`, `helloAsso.ts`), parseurs d'exercices (`parsers/`) et moteurs d'échecs (`chess/`).
   - `src/stores/auth/` : Sous-modules spécialisés pour l'authentification (`types.ts`, `jwtService.ts`, `appConfig.ts`, `identitiesService.ts`) pilotés par la façade `useAuthStore` (`auth.ts`).
   - `src/stores/` : Stores Pinia harmonisés avec TanStack Query (`news.ts`, `tournament.ts`, `members.ts`, `contacts.ts`, `dashboard.ts`, `benevolat.ts`, `apprentissage.ts`, `unread.ts`) pour la gestion unifiée du cache serveur, du suivi des nouveautés et de l'état client.
   - `src/utils/safeFetch.ts` & `src/utils/wpApi.ts` : Couche réseau unifiée avec timeouts de protection, rafraîchissement transparent des jetons JWT en cas de session expirée (retry automatique) et pagination multi-pages WP REST automatique (`fetchWpCollection`).

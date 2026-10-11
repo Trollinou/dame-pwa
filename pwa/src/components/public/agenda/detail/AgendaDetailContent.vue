@@ -126,6 +126,7 @@ import {
 } from 'ionicons/icons';
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
 import { useInternalLinks } from '@/composables/core/useInternalLinks';
+import { transformHelloAssoContent } from '@/utils/helloAsso';
 
 const props = defineProps<{
   event?: AgendaEvent | null;
@@ -180,11 +181,7 @@ const processedDescription = computed(() => {
     currentEvent.value?.meta._dame_agenda_description ||
     '';
 
-  const regex = /\[helloasso\s+campaign=(?:&nbsp;|\s)*[»"']*(https?:\/\/[^&"'\s»\]]+)(?:&nbsp;|\s)*[»"']*[^\]]*\]/gi;
-
-  const cleanHtml = rawHtml.replace(regex, (match: string, url: string) => {
-    return `<ion-button expand="block" class="ion-margin-top ion-margin-bottom" href="${url}" target="_blank">S'inscrire à l'événement</ion-button>`;
-  });
+  const cleanHtml = transformHelloAssoContent(rawHtml);
 
   return { cleanHtml };
 });

@@ -38,6 +38,7 @@ import { cloudOfflineOutline } from 'ionicons/icons';
 import { useNewsStore, type Post } from '@/stores/news';
 import { useInternalLinks } from '@/composables/core/useInternalLinks';
 import { safeFetch } from '@/utils/safeFetch';
+import { transformHelloAssoContent } from '@/utils/helloAsso';
 
 const props = defineProps<{
   post?: Post | null;
@@ -61,12 +62,7 @@ const featuredImage = computed(() => {
 });
 
 const processedContent = computed(() => {
-  let cleanHtml = currentPost.value?.content?.rendered || '';
-
-  const helloAssoRegex = /\[helloasso\s+campaign=(?:&nbsp;|\s)*[»"']*(https?:\/\/[^&"'\s»\]]+)(?:&nbsp;|\s)*[»"']*[^\]]*\]/gi;
-  cleanHtml = cleanHtml.replace(helloAssoRegex, (match: string, url: string) => {
-    return `<ion-button expand="block" class="ion-margin-top ion-margin-bottom" href="${url}" target="_blank">S'inscrire à l'événement</ion-button>`;
-  });
+  let cleanHtml = transformHelloAssoContent(currentPost.value?.content?.rendered || '');
 
   const surveyRegex = /<form[^>]+id="dame-benevolat-form-(\d+)"[^>]*>[\s\S]*?<\/form>/gi;
   cleanHtml = cleanHtml.replace(surveyRegex, (match: string, surveyId: string) => {

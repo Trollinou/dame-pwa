@@ -40,6 +40,7 @@ import { cloudOfflineOutline } from 'ionicons/icons';
 import { safeFetch } from '@/utils/safeFetch';
 import { useTournamentStore } from '@/stores/tournament';
 import { useInternalLinks } from '@/composables/core/useInternalLinks';
+import { transformHelloAssoContent } from '@/utils/helloAsso';
 import type { WpPage } from '@/types/wp';
 
 const props = defineProps<{
@@ -61,12 +62,7 @@ const currentPage = computed(() => {
 
 const processedContent = computed(() => {
   const rawHtml = currentPage.value?.content?.rendered || '';
-
-  const regex = /\[helloasso\s+campaign=(?:&nbsp;|\s)*[»"']*(https?:\/\/[^&"'\s»\]]+)(?:&nbsp;|\s)*[»"']*[^\]]*\]/gi;
-
-  const cleanHtml = rawHtml.replace(regex, (match: string, url: string) => {
-    return `<ion-button expand="block" class="ion-margin-top ion-margin-bottom" href="${url}" target="_blank">S'inscrire à l'événement</ion-button>`;
-  });
+  const cleanHtml = transformHelloAssoContent(rawHtml);
 
   return { cleanHtml };
 });

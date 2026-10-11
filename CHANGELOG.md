@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Prise en charge et Transcription Robuste des Widgets et Liens HelloAsso (`helloAsso.ts`, `TournamentDetailContent.vue`, `AgendaDetailContent.vue`, `NewsDetailContent.vue`, `helloAsso.spec.ts`, `README.md`, `USING.md`)** :
+  - **Interception des Widgets Iframe HelloAsso (`helloAsso.ts`)** : Détection et transcription automatique des balises `<iframe>` injectées côté serveur par l'extension WordPress HelloAsso (`type="widget-bouton"` / `widget-vignette`) avant leur suppression par DOMPurify. Extraction sécurisée de la source (`src`) et nettoyage du suffixe technique (`/widget-bouton`, `/widget-vignette`, `/widget`) pour rediriger directement vers la page complète de l'événement.
+  - **Tolérance Étendue des Shortcodes HelloAsso** : Prise en charge des shortcodes textuels `[helloasso ...]` incluant les entités HTML (`&quot;`), les guillemets typographiques (`“`, `”`, `«`, `»`), et la flexibilité sur les noms d'attributs (`campaign=`, `url=`, `link=`, ou URL directe).
+  - **Bouton d'Action Natif Ionic** : Conversion standardisée de tout appel HelloAsso en composant d'action `<ion-button expand="block" ...>` avec libellé clair *« S'inscrire à l'événement »* ouvrant le formulaire sécurisé dans le navigateur.
+  - **Harmonisation Multi-Composants & Tests Unitaires** : Remplacement des expressions régulières locales dans `TournamentDetailContent.vue`, `AgendaDetailContent.vue` et `NewsDetailContent.vue` par l'utilitaire centralisé et validation par une suite complète de tests unitaires (`helloAsso.spec.ts`).
+
 - **Ajout du Module d'Administration « Événements » (`EventsPage.vue`, `AdminAgendaDetailPage.vue`, `AdminLayout.vue`, `router/index.ts`, `stores/agenda.ts`, `seasonUtils.ts`, `_admin-components.scss`, `seasonUtils.spec.ts`, `README.md`, `USING.md`)** :
   - **Menu d'administration & Routage** : Ajout de l'entrée « Événements » dans le menu latéral d'administration entre « Contacts » et « Appels à bénévoles » (`/admin/agenda`), avec routes protégées et vue détaillée (`/admin/agenda/:id`) équivalente à l'affichage public.
   - **Grille de données réactive (`DataTable`)** : Liste des événements ordonnée par défaut par ordre chronologique croissant (date de début puis heure de début) avec colonnes de date, plage/horaires, titre, badge de catégorie coloré et lieu.

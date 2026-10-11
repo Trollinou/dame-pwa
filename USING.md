@@ -48,7 +48,7 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
    - **Disposition 2/3 (Droite)** : Panneau latéral dédié affichant le contenu complet et les actions associées.
    - **Actualités** : Sélection automatique du premier article.
    - **Agenda (Mode Liste ☰)** : Sélection intelligente par défaut de l'événement courant ou du plus proche à venir.
-   - **Tournois** : Consultation instantanée des modalités, règlements et formulaires HelloAsso.
+   - **Tournois** : Consultation instantanée des modalités, règlements et formulaires HelloAsso. Les widgets intégrés (`<iframe>`) ou shortcodes (`[helloasso campaign="..."]`) insérés sur WordPress sont automatiquement convertis en boutons d'action natifs (`<ion-button>`) sécurisés et redirigent vers le formulaire HelloAsso complet sans être bloqués par le nettoyeur HTML.
    - **Bénévolat** : Sélection des créneaux horaires, formulaire d'inscription direct pour les adhérents ou vue administration des inscrits.
    - **Double défilement indépendant** : Le scroll de la liste de gauche ne déplace pas le panneau de détail de droite, et inversement.
 
