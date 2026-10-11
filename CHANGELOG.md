@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-11
+
 - **Intégration Native de la Visionneuse Photos `eg-media` dans la PWA (`EgMediaViewer.vue`, `WpContentRenderer.vue`, `wpContentParser.ts`, `egMedia.ts`, `_public-components.scss`, `EgMediaViewer.spec.ts`, `wpContentParser.spec.ts`, `README.md`, `USING.md`)** :
   - **Prise en charge Multi-Sources & Décodage Déclaratif (`wpContentParser.ts`)** :
     - Détection automatique des blocs WordPress `wp-block-eg-media-viewer` et `.eg-viewer` insérés dans les actualités, tournois et événements d'agenda.
