@@ -151,6 +151,7 @@ import {
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { PieceSet, BoardTheme } from 'eg-chessboard';
+import { preloadAllPieceSets } from '@/composables/core/useChessThemeLoader';
 import { 
   useChessPreferencesStore, 
   AVAILABLE_PIECE_SET_OPTIONS, 
@@ -174,6 +175,7 @@ const currentThemeLabel = computed(() => {
 const toggleExpand = () => {
   isExpanded.value = !isExpanded.value;
   if (isExpanded.value) {
+    preloadAllPieceSets();
     nextTick(() => {
       const pieceIdx = pieceOptions.findIndex(p => p.id === stagedPieceSet.value);
       if (pieceIdx !== -1) scrollToPieceIndex(pieceIdx, false);

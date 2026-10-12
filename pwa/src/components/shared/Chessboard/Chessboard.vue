@@ -74,11 +74,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { default as TheChessboard } from 'eg-chessboard/vue';
-// Styles globaux eg-chessboard (Structure de base + tous les jeux de pièces)
-import 'eg-chessboard/style.css';
+// Structure de base et plateaux uniquement (13 Ko au lieu de 374 Ko avec toutes les pièces)
+import 'eg-chessboard/base.css';
 
 import type { BoardCore, StockfishConfig, Move, DrawShape } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
+import { loadPieceSetStyle } from '@/composables/core/useChessThemeLoader';
 import type { ChessboardProps, ChessboardEmits, ChessboardConfig } from './types';
 
 const chessPreferences = useChessPreferencesStore();
@@ -123,6 +124,18 @@ watch(
     }
   },
   { deep: true }
+);
+
+const effectivePieceSet = computed(() => props.pieceSet || chessPreferences.pieceSet || 'cburnett');
+
+watch(
+  effectivePieceSet,
+  (newSet) => {
+    if (newSet) {
+      loadPieceSetStyle(newSet);
+    }
+  },
+  { immediate: true }
 );
 
 const normalizedDiagram = computed(() => {

@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Optimisation Granulaire des Styles d'Échiquier `eg-chessboard` & Découpage CSS Dynamique (`Chessboard.vue`, `useChessThemeLoader.ts`, `chessPreferences.ts`, `ChessThemeCustomizer.vue`)** :
+  - **Élagage Massif du CSS Global de l'Échiquier** : Remplacement de l'import statique de `eg-chessboard/style.css` (374 Ko avec l'ensemble des 10 jeux de pièces vectoriels SVG encodés) par `eg-chessboard/base.css` (13.1 Ko), générant un gain de plus de **96.5%** sur la feuille de style centrale de l'échiquier.
+  - **Nouveau Composable `useChessThemeLoader` (`useChessThemeLoader.ts`)** : Chargement paresseux dynamique du style CSS correspondant exclusivement au jeu de pièces sélectionné par l'utilisateur (ex. `cburnett.css` : 11.9 Ko), avec mémorisation des styles déjà chargés pour éviter toute requête redondante.
+  - **Synchronisation Réactive du Store (`chessPreferences.ts`)** : Injection automatique du style de pièces actif lors de l'initialisation, de la mise à jour des préférences ou du rétablissement des valeurs par défaut.
+  - **Préchargement Intelligent dans le Profil (`ChessThemeCustomizer.vue`)** : Déclenchement de `preloadAllPieceSets()` uniquement lorsque l'utilisateur déplie l'accordéon de personnalisation, garantissant un défilement 100% fluide sans micro-coupure sur les deux rouleaux (pièces et fond).
+
 - **Optimisation des Performances Frontend PWA & Réduction Drastique du Bundle Initial (`ContenuPage.vue`, `PlayPage.vue`, `router/index.ts`, `main.ts`, `vite.config.ts`, `AGENTS.md`)** :
   - **Éclatement du Chunk d'Exercices (`ContenuPage.vue`)** :
     - Remplacement de l'import statique des 16 types d'exercices et des lecteurs (`LeconReader`, `VideoReader`) par `defineAsyncComponent(() => import(...))`.

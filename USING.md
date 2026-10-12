@@ -266,8 +266,9 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
    - Rouleau rotatif présentant les 10 styles vectoriels disponibles : *CBurnett* (défaut), *Mérida*, *Alpha*, *Cardinal*, *Dubrovny*, *Fantasy*, *Firi*, *Maestro*, *Tatiana*, *Staunty*.
 3. **Sélecteur de Fond d'Échiquier (Rouleau Wheel-Picker)** :
    - Rouleau rotatif présentant les 9 nuances et textures d'arrière-plan : *Brown (Bois)* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Bois Veiné HD*, *Érable Doré*.
-4. **Prévisualisation en Temps Réel** :
+4. **Prévisualisation en Temps Réel & Préchargement Fluide** :
    - Échiquier complet en position initiale actualisé instantanément selon la combinaison sélectionnée.
+   - À l'ouverture de l'accordéon, l'application précharge de manière transparente les 10 feuilles de style vectorielles pour que le défilement des rouleaux reste instantané sans aucun temps de chargement visible. Sur le reste des écrans (jeu, exercices, analyse), seul le jeu de pièces réellement sélectionné est chargé en mémoire (économie de 96.5% de CSS).
 5. **Validation & Persistance** :
    - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
