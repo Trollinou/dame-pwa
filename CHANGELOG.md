@@ -6,7 +6,24 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-- **Optimisation & Découplage du Chargement des Assets WordPress (`includes/Assets/FrontendAssets.php`, `README.md`, `USING.md`)** :
+- **Optimisation des Performances Frontend PWA & Réduction Drastique du Bundle Initial (`ContenuPage.vue`, `PlayPage.vue`, `router/index.ts`, `main.ts`, `vite.config.ts`, `AGENTS.md`)** :
+  - **Éclatement du Chunk d'Exercices (`ContenuPage.vue`)** :
+    - Remplacement de l'import statique des 16 types d'exercices et des lecteurs (`LeconReader`, `VideoReader`) par `defineAsyncComponent(() => import(...))`.
+    - Réduction de la taille du chunk de `159.73 kB` (42.98 kB gzip) à **`9.87 kB`** (3.56 kB gzip), soit une **baisse de 93.8%** du JavaScript évalué au chargement d'une page de contenu.
+    - Chaque type d'exercice est désormais isolé dans un micro-chunk indépendant chargé exclusivement à la demande.
+  - **Chargement Asynchrone des Modales (`PlayPage.vue`)** :
+    - Conversion de `PlaySettingsModal` en `defineAsyncComponent(() => import(...))`, allégeant le chargement initial de la vue de jeu d'échecs (passage de `13.28 kB` à `11.03 kB`).
+  - **Découpage Dynamique Strict de Vue Router (`router/index.ts`)** :
+    - Unification de toutes les routes sous le pattern déclaratif direct `component: () => import(...)`, éliminant les imports statiques intermédiaires et renforçant l'étanchéité des graphes de dépendances Rollup/Vite.
+  - **Élagage des Feuilles de Styles Globales Ionic (`main.ts`)** :
+    - Suppression des 4 feuilles de style utilitaires inutilisées (`float-elements.css`, `text-transformation.css`, `flex-utils.css`, `display.css`).
+    - Élimination des avertissements de minification émis par LightningCSS concernant la pseudo-classe non reconnue `host-context`.
+    - Conservation exclusive des utilitaires réellement employés dans les templates (`padding.css`, `text-alignment.css`).
+  - **Intégration d'un Visualiseur de Bundle (`vite.config.ts`, `package.json`)** :
+    - Intégration de `rollup-plugin-visualizer` générant une cartographie interactive HTML (`pwa/dist/stats.html`) lors de chaque compilation de production.
+  - **Consolidation des Directives Projet (`AGENTS.md`)** :
+    - Inscription de l'obligation d'opérer sur une branche git dédiée pour tout chantier de refactorisation ou d'optimisation transverse.
+    - Inscription des règles impératives de code-splitting et de limitation des styles utilitaires Ionic.
   - **Séparation Stricte Enregistrement vs Mise en File (Register vs Enqueue)** : Les styles et scripts de la bannière d'installation PWA (`dame-pwa-public-installer`) sont désormais enregistrés de façon précoce sur `wp_enqueue_scripts` à priorité `5` via `wp_register_style()` et `wp_register_script()`, puis mis en file contextuellement à priorité `10`.
   - **Stratégie de Chargement Différé WP 6.3+ (`defer`)** : Utilisation du tableau d'arguments `array( 'strategy' => 'defer', 'in_footer' => true )` pour éliminer le blocage du rendu DOM et optimiser le First Contentful Paint (FCP) et les scores PageSpeed / Site Kit.
   - **Conditionnement Contextuel & Exclusion des Requêtes Sans Interface** : Neutralisation automatique du chargement lors des flux RSS (`is_feed()`), aperçus (`is_preview()`), embeds (`is_embed()`) et requêtes REST/AJAX (`wp_is_json_request()`).
