@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Optimisation & Découplage du Chargement des Assets WordPress (`includes/Assets/FrontendAssets.php`, `README.md`, `USING.md`)** :
+  - **Séparation Stricte Enregistrement vs Mise en File (Register vs Enqueue)** : Les styles et scripts de la bannière d'installation PWA (`dame-pwa-public-installer`) sont désormais enregistrés de façon précoce sur `wp_enqueue_scripts` à priorité `5` via `wp_register_style()` et `wp_register_script()`, puis mis en file contextuellement à priorité `10`.
+  - **Stratégie de Chargement Différé WP 6.3+ (`defer`)** : Utilisation du tableau d'arguments `array( 'strategy' => 'defer', 'in_footer' => true )` pour éliminer le blocage du rendu DOM et optimiser le First Contentful Paint (FCP) et les scores PageSpeed / Site Kit.
+  - **Conditionnement Contextuel & Exclusion des Requêtes Sans Interface** : Neutralisation automatique du chargement lors des flux RSS (`is_feed()`), aperçus (`is_preview()`), embeds (`is_embed()`) et requêtes REST/AJAX (`wp_is_json_request()`).
+  - **Filtre de Contrôle Déclaratif** : Ajout du filtre `apply_filters( 'dame_pwa_should_enqueue_installer', true )` permettant aux thèmes ou plugins tiers de restreindre ou désactiver l'affichage de la bannière d'installation.
+  - **Shortcode à la Demande (`[dame_pwa_installer]`)** : Ajout d'un shortcode pour déclencher le chargement des scripts/styles et injecter le conteneur d'installation PWA exclusivement sur les pages ciblées ou blocs Gutenberg.
+  - **Couverture de Code (DevTools Coverage)** : Élimination de 100% du CSS et JS inutilisé sur les vues non ciblées ou désactivées par filtre.
+
 ## [1.10.0] - 2026-10-11
 
 - **Intégration Native de la Visionneuse Photos `eg-media` dans la PWA (`EgMediaViewer.vue`, `WpContentRenderer.vue`, `wpContentParser.ts`, `egMedia.ts`, `_public-components.scss`, `EgMediaViewer.spec.ts`, `wpContentParser.spec.ts`, `README.md`, `USING.md`)** :

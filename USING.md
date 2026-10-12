@@ -71,6 +71,14 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
    - **Filtre Bénévolat** : Les appels à bénévoles dont la date est passée (*Appels terminés*) sont automatiquement exclus des compteurs.
    - **Décompte automatique & Action rapide** : Le badge d'un élément s'efface dès sa consultation (vue détail ou sélection split-view). Un bouton d'action rapide dans l'en-tête (✓✓) permet également de tout marquer comme lu en un clic.
 
+
+## Intégration WordPress & Bannière d'Installation PWA
+
+Pour optimiser les performances PageSpeed et la couverture de code (DevTools Coverage) sur le site public WordPress :
+- **Séparation Register / Enqueue** : Les assets de la bannière (`dame-pwa-public-installer` CSS et JS) sont pré-enregistrés de manière autonome avec une stratégie de chargement différé (`strategy => defer`).
+- **Contrôle Contextuel & Filtre** : Par défaut, les assets sont exclus des requêtes d'administration, flux RSS, aperçus et requêtes REST/JSON. Le filtre `add_filter( 'dame_pwa_should_enqueue_installer', '__return_false' );` permet de désactiver globalement l'injection automatique.
+- **Shortcode à la Demande `[dame_pwa_installer]`** : Permet de placer un conteneur et d'enclencher le chargement des scripts/styles de la PWA exclusivement sur les pages de présentation de l'application ou dans les blocs Gutenberg spécifiques.
+
 ## Module Apprentissage & Jeu
 
 L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :

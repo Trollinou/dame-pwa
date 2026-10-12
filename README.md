@@ -339,6 +339,12 @@ Composant maître réutilisable pour l'affichage, le tri, la pagination, le filt
 
 *   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
 *   **Filtre Web Worker Stockfish (`dame_pwa_stockfish_worker_url`) :** Fournit l'URL absolue du Web Worker Stockfish (`pwa/dist/stockfish/stockfish.js`) pour mutualiser le moteur d'échecs avec d'autres extensions (ex: plugin `roi`).
+*   **Optimisation & Enregistrement des Assets WordPress (PageSpeed / DevTools Coverage) :**
+    *   Séparation stricte entre `wp_register_style()` / `wp_register_script()` (priorité 5) et `wp_enqueue_*()` (priorité 10).
+    *   Stratégie de chargement différé moderne (`strategy => defer`, `in_footer => true`, WP 6.3+).
+    *   Exclusion automatique des contextes inéligibles (`is_admin()`, `is_feed()`, `is_embed()`, `is_preview()`, requêtes REST/JSON).
+    *   Filtre de contrôle contextuel : `apply_filters( 'dame_pwa_should_enqueue_installer', bool $should_enqueue )`.
+    *   Shortcode à la demande : `[dame_pwa_installer]` pour charger et insérer le déclencheur d'installation uniquement sur les pages ciblées.
 
 ## Architecture SCSS & Classes Canoniques Réutilisables
 
