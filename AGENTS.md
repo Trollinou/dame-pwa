@@ -3,6 +3,7 @@
 ## 1. Outillage & MCP
 - Interdiction d'utiliser `get_repository_content` sur la racine. Utiliser uniquement `search_code` ou `get_file_content` ciblés.
 - Ne JAMAIS réécrire un fichier complet pour une modification. Fournir des diffs ou des fonctions isolées. Pas de disclaimers ni commentaires verbeux.
+- **Branches Dédiées pour Refactorisations** : Tout chantier transverse de refactorisation, audit ou optimisation de performances doit obligatoirement être réalisé sur une branche git dédiée (ex. `perf/...` ou `refactor/...`).
 - **RESTRICTION MODULE `eg-chessboard`** : Interdiction STRICTE de modifier le code du dépôt `eg-chessboard`. En cas de bug, produire exclusivement un rapport de bug détaillé.
 - **Consolidation des scripts** : Tous les scripts d'outillage Node.js / packaging / synchronisation résident obligatoirement dans `scripts/`.
 - **Contrôle Qualité Pré-Packaging** : Le script de release (`scripts/package.cjs`) doit obligatoirement valider l'intégrité de la suite QA complète (`npm run type-check`, `npm run lint`, `npm run test:unit`, `phpstan`) avant de générer l'archive de production.
@@ -51,6 +52,10 @@
   - `content-visibility: auto` sur les listes d'items répétées.
   - Interdiction formelle de `backdrop-filter: blur(...)` sur les calques d'interaction.
   - Formulaires : `autocorrect="off"` et `autocomplete="off"` sur les champs d'identification pour éviter les blocages XPC macOS/iOS.
+- **Optimisation Bundling & Code-Splitting PWA** :
+  - **Routeur (`router/index.ts`)** : Toutes les vues de route sont obligatoirement déclarées en lazy-loading dynamique inliné `component: () => import(...)`.
+  - **Composants d'exercices & Modales lourdes** : Chargement obligatoire via `defineAsyncComponent(() => import(...))` dans les hubs de contenu (ex. `ContenuPage.vue`) et pour les fenêtres modales/tiroirs non visibles initialement.
+  - **CSS Ionic (`main.ts`)** : N'importer que les feuilles strictement utiles (`core.css`, `normalize.css`, `structure.css`, `typography.css`, `padding.css`, `text-alignment.css`). Proscrire `float-elements.css` (incompatible LightningCSS), `text-transformation.css`, `flex-utils.css` et `display.css`.
 
 ## 5. API, Réseau & Caching Offline
 - **Appels HTTP** : Interdiction du `fetch` natif. Utiliser `safeFetch` (`src/utils/safeFetch.ts`) ou `fetchWpCollection` (`src/utils/wpApi.ts`).

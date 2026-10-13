@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { PieceSet, BoardTheme } from 'eg-chessboard';
+import { loadPieceSetStyle } from '@/composables/core/useChessThemeLoader';
 
 export interface PieceSetOption {
 	id: PieceSet;
@@ -132,8 +133,22 @@ export const useChessPreferencesStore = defineStore(
 		const pieceSet = ref< PieceSet >( 'cburnett' );
 		const boardTheme = ref< BoardTheme >( 'brown' );
 
+		// Précharger le set de pièces configuré au démarrage
+		loadPieceSetStyle( pieceSet.value );
+
+		watch(
+			pieceSet,
+			( newSet ) => {
+				if ( newSet ) {
+					loadPieceSetStyle( newSet );
+				}
+			},
+			{ immediate: true }
+		);
+
 		const setPieceSet = ( newSet: PieceSet ) => {
 			pieceSet.value = newSet;
+			loadPieceSetStyle( newSet );
 		};
 
 		const setBoardTheme = ( newTheme: BoardTheme ) => {
@@ -143,11 +158,13 @@ export const useChessPreferencesStore = defineStore(
 		const savePreferences = ( newSet: PieceSet, newTheme: BoardTheme ) => {
 			pieceSet.value = newSet;
 			boardTheme.value = newTheme;
+			loadPieceSetStyle( newSet );
 		};
 
 		const resetDefaults = () => {
 			pieceSet.value = 'cburnett';
 			boardTheme.value = 'brown';
+			loadPieceSetStyle( 'cburnett' );
 		};
 
 		return {

@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, provide } from 'vue';
+import { computed, onMounted, provide, defineAsyncComponent } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -96,7 +96,8 @@ import { useBoardOrientation } from '@/composables/learning/play/useBoardOrienta
 import { usePlayGame } from '@/composables/learning/play/usePlayGame';
 import PlayInfoBar from '@/components/learning/play/PlayInfoBar.vue';
 import PlayActionsPanel from '@/components/learning/play/PlayActionsPanel.vue';
-import PlaySettingsModal from '@/components/learning/play/PlaySettingsModal.vue';
+
+const PlaySettingsModal = defineAsyncComponent(() => import('@/components/learning/play/PlaySettingsModal.vue'));
 
 const authStore = useAuthStore();
 const chessStore = useChessStore();

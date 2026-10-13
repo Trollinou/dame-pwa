@@ -2,7 +2,7 @@ import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-
+import { visualizer } from 'rollup-plugin-visualizer';
 import fs from 'node:fs';
 
 const packageJson = JSON.parse(
@@ -38,6 +38,7 @@ export default defineConfig( {
 		__APP_VERSION__: JSON.stringify( packageJson.version ),
 	},
 	base: './', // Chemins relatifs pour les assets (indispensable pour WordPress)
+	cacheDir: '../node_modules/.vite', // Centralise le cache de pré-compilation à la racine
 	esbuild: {
 		drop:
 			process.env.NODE_ENV === 'production'
@@ -116,6 +117,13 @@ export default defineConfig( {
 					},
 				],
 			},
+		} ),
+		visualizer( {
+			filename: 'pwa/dist/stats.html',
+			title: 'Dame PWA Bundle Analysis',
+			gzipSize: true,
+			brotliSize: true,
+			open: false,
 		} ),
 	],
 	resolve: {
