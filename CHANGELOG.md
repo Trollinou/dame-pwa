@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.10.1] - 2026-10-13
+
 - **Optimisation Granulaire des Styles d'Échiquier `eg-chessboard` & Découpage CSS Dynamique (`Chessboard.vue`, `useChessThemeLoader.ts`, `chessPreferences.ts`, `ChessThemeCustomizer.vue`)** :
   - **Élagage Massif du CSS Global de l'Échiquier** : Remplacement de l'import statique de `eg-chessboard/style.css` (374 Ko avec l'ensemble des 10 jeux de pièces vectoriels SVG encodés) par `eg-chessboard/base.css` (13.1 Ko), générant un gain de plus de **96.5%** sur la feuille de style centrale de l'échiquier.
   - **Nouveau Composable `useChessThemeLoader` (`useChessThemeLoader.ts`)** : Chargement paresseux dynamique du style CSS correspondant exclusivement au jeu de pièces sélectionné par l'utilisateur (ex. `cburnett.css` : 11.9 Ko), avec mémorisation des styles déjà chargés pour éviter toute requête redondante.
