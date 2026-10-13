@@ -1,14 +1,43 @@
+# Fichiers système & IDE
 .DS_Store
+Thumbs.db
+[Dd]esktop.ini
+pwa/src/utils/desktop.ini
+.idea/
+.vscode/
+/pwa/.vscode/
+*~
+*.swp
+
+# Assistants IA & configurations locales
 .gemini/
-.github/
-/.sync.ffs_db
-/vendor/
-gha-creds-*.json
+.antigravitycli
+.antigravityrules
+
+# Dépendances & packages
 node_modules/
 pwa/node_modules/
+/vendor/
+
+# Builds, archives & caches
 pwa/dist/
-/pwa/.vscode
-/.antigravitycli
-.antigravityrules
+dist-temp/
 *.zip
-pwa/src/utils/desktop.ini
+.sass-cache/
+
+# Tests & Logs
+coverage/
+pwa/coverage/
+*.log
+npm-debug.log*
+
+# Capacitor / Ionic mobile artefacts
+pwa/.ionic/
+pwa/platforms/
+pwa/plugins/
+pwa/www/
+
+# Sync & identifiants CI
+/.sync.ffs_db
+.github/
+gha-creds-*.json

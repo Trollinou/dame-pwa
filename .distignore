@@ -1,43 +1,134 @@
-.distignore
-.DS_Store
-.editorconfig
-.eslintrc.json
-.gemini
-.geminirc
-.antigravitycli
+# ==============================================================================
+# .distignore — Fichiers et dossiers exclus du package de production (DAME-PWA)
+# Utilisé par scripts/package.cjs et les outils de déploiement WordPress.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Gestion de versions (Git) & métadonnées du dépôt
+# ------------------------------------------------------------------------------
 .git
 .github/
 .gitignore
+.gitattributes
+.distignore
 .sync.ffs_db
-*.py
-*.zip
-*/.DS_Store
+
+# ------------------------------------------------------------------------------
+# 2. Assistants IA, contextes & consignes de dev
+# ------------------------------------------------------------------------------
+.antigravity/
+.antigravitycli
+.antigravityrules
+.gemini/
+.gemini
+.geminirc
 /AGENTS.md
+/GEMINI.md
+/CLAUDE.md
+/.cursor/
+/.cursorrules
+/jules-scratch/
+
+# ------------------------------------------------------------------------------
+# 3. Fichiers système & éditeurs / IDE
+# ------------------------------------------------------------------------------
+.DS_Store
+*/.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+Desktop.ini
+.editorconfig
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+
+# ------------------------------------------------------------------------------
+# 4. Logs, traces, rapports de couverture & variables d'environnement
+# ------------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.*
+.env.local
+gha-creds-*.json
+/coverage/
+
+# ------------------------------------------------------------------------------
+# 5. Outillage QA & Tests PHP (Composer, PHPStan, PHPCS, PHPUnit)
+# ------------------------------------------------------------------------------
 /composer.json
 /composer.lock
-/dist-temp
-/docker-compose.yml
-/eslint.config.js
-/GEMINI.md
-/jules-scratch
-/minify-js.js
-/node_modules
-/package-lock.json
-/package.json
-/script
-/scripts
+/vendor/
+/vendor
 /phpstan.neon
-/src
-/tests
+/phpcs.xml
+/phpcs.xml.dist
+/phpunit.xml
+/phpunit.xml.dist
+/tests/
+
+# ------------------------------------------------------------------------------
+# 6. Outillage Node.js / Bundlers (Racine)
+# ------------------------------------------------------------------------------
+/node_modules/
+/package.json
+/package-lock.json
+/yarn.lock
+/pnpm-lock.yaml
+/bun.lockb
+.eslintrc*
+/eslint.config.js
 /webpack.config.js
-# --- Exclusions PWA (On ne garde que le dossier pwa/dist/ pour la prod) ---
+/minify-js.js
+/docker-compose.yml
+*.py
+*.sh
+*.zip
+
+# ------------------------------------------------------------------------------
+# 7. Sources brutes & scripts de release (Racine)
+# ------------------------------------------------------------------------------
+/src/
+/script/
+/scripts/
+/dist-temp/
+
+# ------------------------------------------------------------------------------
+# 8. Documentation interne & suivi de projet
+# (Inutiles dans l'archive du plugin WordPress ; la doc publique est dans readme.txt)
+# ------------------------------------------------------------------------------
+/README.md
+/CHANGELOG.md
+/TODO.md
+/USING.md
+/RELEASE.md
+
+# ------------------------------------------------------------------------------
+# 9. PWA (Ionic / Vue 3 / Vite)
+# Règle d'or : Seul le dossier compilé pwa/dist/ doit être packagé en production.
+# Tout le code source, tests et configurations de build sont exclus ci-dessous.
+# ------------------------------------------------------------------------------
 pwa/node_modules/
 pwa/src/
 pwa/public/
 pwa/tests/
 pwa/cypress/
+pwa/coverage/
+pwa/.*
 pwa/*.ts
 pwa/*.js
 pwa/*.cjs
+pwa/*.mjs
 pwa/*.json
-pwa/.*
+pwa/*.html
+pwa/*.md
+pwa/*.yml
+pwa/*.yaml
+pwa/*.lock
+pwa/*.map

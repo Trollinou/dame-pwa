@@ -38,6 +38,7 @@ export default defineConfig( {
 		__APP_VERSION__: JSON.stringify( packageJson.version ),
 	},
 	base: './', // Chemins relatifs pour les assets (indispensable pour WordPress)
+	cacheDir: '../node_modules/.vite', // Centralise le cache de pré-compilation à la racine
 	esbuild: {
 		drop:
 			process.env.NODE_ENV === 'production'
