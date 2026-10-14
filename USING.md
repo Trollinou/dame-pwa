@@ -252,14 +252,15 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - Choix du niveau Elo de 1320 à 3190 (mémorisé pour les prochaines parties).
      - Temps de réflexion et limitation fine en nœuds déterministes selon l'Elo (`getNodesForElo`).
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
-     - Demande de conseil dynamique en cours de partie (`core.requestHint()`).
+     - Demande de conseil dynamique en cours de partie à pleine puissance 3500+ Elo même en mode 2 joueurs (`core.requestHint({ multiPv: 2, movetime: 1500 })`).
+     - Réinitialisation propre de la partie et purge UCI (`core.newGame()`) sans détruire le Web Worker.
      - Pour les membres connectés : enregistrement et envoi automatique de la partie PGN vers le plugin ROI.
    - **Mode 2 Joueurs (Pass & Play)** :
      - Jeu local sur le même écran pour deux joueurs humains, moteur d'analyse IA désactivé.
    - **Analyse & Revue de Partie (Stockfish 19)** :
-     - Évaluation en temps réel avec barre d'évaluation dynamique (`computeEvalBarPercentage`) et affichage du score (pions ou mat).
+     - Évaluation en temps réel avec barre d'évaluation dynamique réagissant instantanément à la navigation dans l'historique (`core.viewHistory()`, `viewPrevious()`, `viewNext()`), reflétant immédiatement la position visualisée à l'écran.
      - Variante principale (PV) et conseil du meilleur coup calculé à la demande (`core.requestHint()`).
-     - Revue de partie complète (`core.reviewGame()`) avec score de précision global (Blancs & Noirs) et classification de chaque coup dans l'historique (`brilliant`, `best`, `excellent`, `good`, `inaccuracy`, `mistake`, `blunder`, `missed_win`).
+     - Revue de partie complète (`core.reviewGame()`) accélérée par chaînage d'évaluations, avec support d'annulation fluide (`core.cancelReview()` / `AbortSignal`), score de précision global (Blancs & Noirs) et classification affinée de chaque coup dans l'historique (`brilliant`, `best`, `excellent`, `good`, `inaccuracy`, `mistake`, `blunder`, `missed_win`).
 
 ## Module Profil & Personnalisation de l'Échiquier
 

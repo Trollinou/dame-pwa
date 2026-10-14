@@ -286,6 +286,9 @@ const gameReviewReport = ref<GameReviewReport | null>(null);
 const evalBarPercent = computed(() => {
   if (!currentEvaluation.value) return 50;
   const ev = currentEvaluation.value;
+  if (typeof ev.winChancePercentage === 'number') {
+    return ev.winChancePercentage;
+  }
   const turn = boardApi ? boardApi.getTurnColor() : 'white';
   return computeEvalBarPercentage(turn, ev.scoreType, ev.scoreValue, ev.wdl);
 });
@@ -413,6 +416,7 @@ const refreshDisplay = () => {
 };
 
 const viewPly = (ply: number) => {
+  boardApi?.hideMoves();
   boardApi?.viewHistory(ply);
   currentPly.value = ply;
 };
@@ -433,25 +437,29 @@ const handleMove = () => {
 };
 
 const viewFirst = () => { 
-  boardApi?.viewHistory(0); 
+  boardApi?.hideMoves();
+  boardApi?.viewStart(); 
   currentPly.value = 0; 
 };
 
 const viewPrev = () => { 
+  boardApi?.hideMoves();
   boardApi?.viewPrevious(); 
   if (currentPly.value > 0) currentPly.value--; 
 };
 
 const viewNext = () => { 
+  boardApi?.hideMoves();
   boardApi?.viewNext(); 
-  if (boardApi && currentPly.value < boardApi.getCurrentPlyNumber()) {
+  if (boardApi && currentPly.value < totalPlyCount.value) {
     currentPly.value++;
   }
 };
 
 const viewLast = () => { 
+  boardApi?.hideMoves();
   boardApi?.stopViewingHistory(); 
-  if (boardApi) currentPly.value = boardApi.getCurrentPlyNumber(); 
+  if (boardApi) currentPly.value = totalPlyCount.value; 
 };
 
 const toggleLiveAnalysis = () => {
@@ -461,17 +469,18 @@ const toggleLiveAnalysis = () => {
     boardApi.startLiveAnalysis();
   } else {
     boardApi.stopLiveAnalysis();
+    boardApi.hideMoves();
     currentEvaluation.value = null;
   }
 };
 
 const requestHint = () => {
   if (!boardApi) return;
-  boardApi.requestHint();
+  boardApi.requestHint({ multiPv: 2, movetime: 1500 });
 };
 
 const handleStockfishHint = (bestMove: string) => {
-  if (boardApi && bestMove) {
+  if (boardApi && bestMove && bestMove.length >= 4) {
     const from = bestMove.substring(0, 2);
     const to = bestMove.substring(2, 4);
     boardApi.drawMove(from, to, 'green');
@@ -480,16 +489,32 @@ const handleStockfishHint = (bestMove: string) => {
 
 const handleEvaluation = (evaluation: StockfishEvaluation) => {
   currentEvaluation.value = evaluation;
+  // Lors de l'analyse en continu, afficher le meilleur coup calculé pour la position visualisée
+  if (isLiveAnalysis.value && boardApi && evaluation.bestMove && evaluation.bestMove.length >= 4) {
+    const from = evaluation.bestMove.substring(0, 2);
+    const to = evaluation.bestMove.substring(2, 4);
+    boardApi.drawMove(from, to, 'green');
+  }
 };
 
 const handleEngineStatus = (status: EngineStatus) => {
   engineStatus.value = status;
 };
 
+let reviewAbortController: AbortController | null = null;
+
+const cancelReview = () => {
+  if (reviewAbortController) {
+    reviewAbortController.abort();
+    reviewAbortController = null;
+  }
+  boardApi?.cancelReview();
+  isReviewing.value = false;
+};
+
 const toggleReview = async () => {
   if (isReviewing.value) {
-    boardApi?.cancelReview();
-    isReviewing.value = false;
+    cancelReview();
     return;
   }
   await startReview();
@@ -499,9 +524,12 @@ const startReview = async () => {
   if (!boardApi || isReviewing.value) return;
   isReviewing.value = true;
   reviewProgress.value = 0;
+  reviewAbortController = new AbortController();
+
   try {
     const report = await boardApi.reviewGame({
-      depth: 10,
+      depth: 12,
+      signal: reviewAbortController.signal,
       onProgress: (percent) => {
         reviewProgress.value = percent;
       }
@@ -509,12 +537,16 @@ const startReview = async () => {
     if (isReviewing.value) {
       gameReviewReport.value = report;
     }
-  } catch (err) {
+  } catch (err: unknown) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      return;
+    }
     if (isReviewing.value) {
       console.error('Erreur lors de la revue de partie:', err);
     }
   } finally {
     isReviewing.value = false;
+    reviewAbortController = null;
   }
 };
 
@@ -526,7 +558,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (boardApi) {
     if (isReviewing.value) {
-      boardApi.cancelReview();
+      cancelReview();
     }
     if (isLiveAnalysis.value) {
       boardApi.stopLiveAnalysis();
@@ -538,8 +570,7 @@ onUnmounted(() => {
 onIonViewWillLeave(() => {
   if (boardApi) {
     if (isReviewing.value) {
-      boardApi.cancelReview();
-      isReviewing.value = false;
+      cancelReview();
     }
     if (isLiveAnalysis.value) {
       boardApi.stopLiveAnalysis();

@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, provide, defineAsyncComponent } from 'vue';
+import { computed, onMounted, onUnmounted, provide, defineAsyncComponent } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -92,7 +92,7 @@ import {
   onIonViewWillLeave
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import type { StockfishConfig, BoardCore, Move } from 'eg-chessboard';
+import type { StockfishConfig, BoardCore } from 'eg-chessboard';
 import { useAuthStore } from '@/stores/auth';
 import { useChessStore } from '@/stores/chess';
 import { useBoardOrientation } from '@/composables/learning/play/useBoardOrientation';
@@ -123,6 +123,8 @@ const {
   gameStatus,
   gameSettings,
   boardConfig,
+  requestHintForPlayer,
+  resetHelpState,
   toggleHint,
   handleStockfishHint,
   handleEngineStatus,
@@ -172,18 +174,14 @@ const handleBoardCreated = (api: BoardCore) => {
   setBoardApi(api);
 };
 
-const handleMove = (moveInfo?: Move) => {
+const handleMove = () => {
   const api = getBoardApi();
   if (!api) return;
 
   refreshDisplay();
 
-  if (moveInfo && lastSuggestedMove.value && isHintEnabled.value) {
-    const playedMove = moveInfo.from + moveInfo.to;
-    if (playedMove === lastSuggestedMove.value) {
-      helpCount.value++;
-    }
-  }
+  lastSuggestedMove.value = '';
+  api.hideMoves();
 
   chessStore.saveGame(
     api.getPgn(),
@@ -193,12 +191,15 @@ const handleMove = (moveInfo?: Move) => {
     oupsCount.value
   );
 
-  lastSuggestedMove.value = '';
-  api.hideMoves();
-
   if (gameStatus.color === 'warning') {
     gameStatus.message = '';
     gameStatus.color = 'medium';
+  }
+
+  // Dès qu'un coup est joué, si l'aide est active comme commutateur permanent
+  // et que c'est au tour du joueur humain, on calcule le conseil pour le nouveau coup
+  if (isHintEnabled.value) {
+    requestHintForPlayer();
   }
 };
 
@@ -220,7 +221,7 @@ const startNewGame = () => {
 
   oupsCount.value = 0;
   helpCount.value = 0;
-  lastSuggestedMove.value = '';
+  resetHelpState();
 
   chessStore.clearGame();
 
@@ -242,6 +243,12 @@ const startNewGame = () => {
     localStorage.setItem('dame_pwa_play_elo', String(gameSettings.level));
   }
   renderKey.value++;
+
+  if (isHintEnabled.value) {
+    setTimeout(() => {
+      requestHintForPlayer();
+    }, 100);
+  }
 };
 
 onMounted(() => {
@@ -260,6 +267,14 @@ onMounted(() => {
     gameSettings.level = 1320;
   }
   engineLoaded.value = true;
+});
+
+onUnmounted(() => {
+  const api = getBoardApi();
+  if (api) {
+    api.cancelReview();
+    api.stopLiveAnalysis();
+  }
 });
 
 onIonViewWillLeave(() => {
