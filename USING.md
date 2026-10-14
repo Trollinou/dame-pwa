@@ -247,13 +247,19 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
 2. **Partie d'Échecs & Échiquier ♟️** :
    - Accessible librement à tous les visiteurs et adhérents.
    - **Disposition responsive Paysage (iPad & Tablettes)** : L'échiquier et les panneaux de commandes / historique se placent automatiquement côte à côte sur toute la largeur disponible avec un centrage vertical optimal.
-   - **Mode 1 Joueur (vs Stockfish)** :
+   - **Mode 1 Joueur (vs Stockfish 19)** :
      - Choix de la couleur (Blancs, Noirs ou Aléatoire).
-     - Choix du niveau Elo (mémorisé pour les prochaines parties).
-     - Temps de réflexion dynamique du moteur Stockfish (`Elo * 1.4 ms`).
+     - Choix du niveau Elo de 1320 à 3190 (mémorisé pour les prochaines parties).
+     - Temps de réflexion et limitation fine en nœuds déterministes selon l'Elo (`getNodesForElo`).
+     - Indicateur dynamique de réflexion de l'ordinateur en direct.
+     - Demande de conseil dynamique en cours de partie (`core.requestHint()`).
      - Pour les membres connectés : enregistrement et envoi automatique de la partie PGN vers le plugin ROI.
    - **Mode 2 Joueurs (Pass & Play)** :
      - Jeu local sur le même écran pour deux joueurs humains, moteur d'analyse IA désactivé.
+   - **Analyse & Revue de Partie (Stockfish 19)** :
+     - Évaluation en temps réel avec barre d'évaluation dynamique (`computeEvalBarPercentage`) et affichage du score (pions ou mat).
+     - Variante principale (PV) et conseil du meilleur coup calculé à la demande (`core.requestHint()`).
+     - Revue de partie complète (`core.reviewGame()`) avec score de précision global (Blancs & Noirs) et classification de chaque coup dans l'historique (`brilliant`, `best`, `excellent`, `good`, `inaccuracy`, `mistake`, `blunder`, `missed_win`).
 
 ## Module Profil & Personnalisation de l'Échiquier
 

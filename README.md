@@ -85,10 +85,11 @@ Pour garantir la cohérence technique, l'application s'appuie sur un socle de co
 ### 1. Composant Wrapper `<Chessboard>` (`src/components/shared/Chessboard/`)
 Encapsule la bibliothèque `eg-chessboard` et centralise la configuration globale de l'échiquier :
 - **Injection automatique des préférences & Chargement CSS dynamique** : Applique de manière réactive le style de pièces (`pieceSet`) et le thème du plateau (`boardTheme`) issus de `useChessPreferencesStore`. Ne charge en base que la feuille structurelle `eg-chessboard/base.css` (13 Ko), tandis que la feuille de style vectorielle du jeu de pièces choisi (ex. `cburnett.css` : 11.9 Ko) est importée de façon paresseuse via le composable `useChessThemeLoader`.
+- **Intégration Stockfish 19 & Architecture Mono-Moteur** : Moteur WASM ultra-léger (1.84 Mo, sans en-tête COOP/COEP) gérant en mono-worker préemptif le jeu bot par niveau Elo (1320 à 3190 avec nœuds déterministes via `getNodesForElo`), le calcul de conseils (`core.requestHint()`), l'évaluation temps réel (`core.startLiveAnalysis()`) et la revue post-mortem complète (`core.reviewGame()`).
 - **Nettoyage automatique du cycle de vie** : Détruit proprement l'instance principale (`boardApi.destroy()`) et l'instance de zoom modal (`zoomBoardApi.destroy()`) à la destruction du composant (`onUnmounted`) pour prévenir toute fuite de mémoire ou persistance des Web Workers Stockfish.
 - **Props principales** : `fen`, `shapes`, `viewOnly` (défaut: `true`), `orientation`, `playerColor`, `coordinates`, `autoCastling`, `highlightLastMove`, `lastMove`, `stockfishEnabled`, `stockfishConfig`, `zoomable` (défaut: `false` sur `Chessboard`, `true` sur `DiagramViewer`), `fitContainer` (défaut: `false`).
 - **Zoom plein écran universel intégré** : Lorsqu'activé (`zoomable="true"`), l'échiquier prend en charge l'appui prolongé (touch 500ms) et le clic droit pour ouvrir une modale plein écran haute résolution téléportée (`<Teleport to="body">`) avec neutralisation des clics parasites au relâchement.
-- **Événements supportés** : `@board-created`, `@move`, `@turn-change`, `@check`, `@checkmate`, `@stalemate`, `@draw`, `@stockfish-hint`, `@square-click`, `@shapes-change`, `@promotion`.
+- **Événements supportés** : `@board-created`, `@move`, `@turn-change`, `@check`, `@checkmate`, `@stalemate`, `@draw`, `@stockfish-hint`, `@evaluation`, `@engine-status`, `@game-review-progress`, `@square-click`, `@shapes-change`, `@promotion`.
 - **Adoption unifiée** : Utilisé de façon homogène et exclusive par l'intégralité de l'application (pages `PlayPage.vue`, `AnalysisPage.vue`, `ChessThemeCustomizer.vue`, `TypePartieHeros.vue` et tous les viewers d'apprentissage : `ABCDaireTactiqueViewer`, `PuzzleViewer`, `QcmViewer`, `ParcoursViewer`, `VisionViewer`, `CapOuPasCapViewer`, `InteractiveQcmViewer`, `MatchingViewer`, `EvalViewer`, `JugementFinalViewer`, `DiagramViewer`, `PgnViewer`, `PlacementViewer`, `QuiSuisJeViewer`, `OuvreBoiteViewer`, `TextOrderViewer`, `OrderViewer`).
 
 ```vue
@@ -387,10 +388,13 @@ npm run lint
 # Tests unitaires Vitest
 npm run test:unit
 
+# Synchronisation des binaires Stockfish depuis eg-chessboard
+npm run sync:stockfish
+
 # 1. Synchronisation et montée de version SemVer (met à jour package.json, PHP, CHANGELOG, etc.)
 npm run version-sync -- 1.3.0
 
-# 2. Compilation de la PWA (injecte la nouvelle version __APP_VERSION__ depuis package.json)
+# 2. Compilation de la PWA (synchronise Stockfish et injecte __APP_VERSION__ depuis package.json)
 npm run build
 
 # 3. Création de l'archive de déploiement ZIP (lance automatiquement le build PWA si nécessaire)

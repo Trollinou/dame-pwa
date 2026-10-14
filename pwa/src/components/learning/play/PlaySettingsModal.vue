@@ -40,7 +40,7 @@
           <ion-range
             v-model="gameSettings.level"
             :min="1320"
-            :max="2800"
+            :max="3190"
             :step="10"
             snaps
             ticks

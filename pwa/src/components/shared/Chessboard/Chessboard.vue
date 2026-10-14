@@ -30,6 +30,9 @@
       @stalemate="() => emit('stalemate')"
       @draw="() => emit('draw')"
       @stockfish-hint="(move: string) => emit('stockfish-hint', move)"
+      @evaluation="(evaluation: StockfishEvaluation) => emit('evaluation', evaluation)"
+      @engine-status="(status: EngineStatus) => emit('engine-status', status)"
+      @game-review-progress="(percent: number) => emit('game-review-progress', percent)"
       @square-click="(square: string) => emit('square-click', square)"
       @shapes-change="(shapes: DrawShape[]) => emit('shapes-change', shapes)"
       @promotion="(detail: { from: string; to: string; promotedTo: string }) => emit('promotion', detail)"
@@ -77,9 +80,17 @@ import { default as TheChessboard } from 'eg-chessboard/vue';
 // Structure de base et plateaux uniquement (13 Ko au lieu de 374 Ko avec toutes les pièces)
 import 'eg-chessboard/base.css';
 
-import type { BoardCore, StockfishConfig, Move, DrawShape } from 'eg-chessboard';
+import type {
+  BoardCore,
+  StockfishConfig,
+  StockfishEvaluation,
+  EngineStatus,
+  Move,
+  DrawShape
+} from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { loadPieceSetStyle } from '@/composables/core/useChessThemeLoader';
+import { getStockfishUrls } from '@/utils/chess/stockfish';
 import type { ChessboardProps, ChessboardEmits, ChessboardConfig } from './types';
 
 const chessPreferences = useChessPreferencesStore();
@@ -199,16 +210,25 @@ const resolvedPlayerColor = computed(() => {
 });
 
 const resolvedStockfishConfig = computed<StockfishConfig>(() => {
+  const urls = getStockfishUrls();
   if (props.stockfishConfig) {
-    return props.stockfishConfig;
+    return {
+      workerUrl: urls.workerUrl,
+      wasmUrl: urls.wasmUrl,
+      ...props.stockfishConfig
+    };
   }
   if (props.stockfishEnabled) {
     return {
+      workerUrl: urls.workerUrl,
+      wasmUrl: urls.wasmUrl,
       whiteMode: 'elo',
       blackMode: 'elo'
     };
   }
   return {
+    workerUrl: urls.workerUrl,
+    wasmUrl: urls.wasmUrl,
     whiteMode: 'disabled',
     blackMode: 'disabled'
   };

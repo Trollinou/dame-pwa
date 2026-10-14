@@ -1,6 +1,10 @@
 import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import type { BoardCore } from 'eg-chessboard';
+import type {
+	BoardCore,
+	EngineStatus,
+	StockfishEvaluation,
+} from 'eg-chessboard';
 import { useChessStore } from '@/stores/chess';
 import {
 	undoMove as apiUndoMove,
@@ -13,6 +17,8 @@ export function usePlayGame() {
 
 	let boardApi: BoardCore | null = null;
 	const engineLoaded = ref( false );
+	const engineStatus = ref< EngineStatus >( 'uninitialized' );
+	const currentEvaluation = ref< StockfishEvaluation | null >( null );
 	const showSettings = ref( false );
 	const isHintEnabled = ref( false );
 	const currentPly = ref( 0 );
@@ -65,9 +71,13 @@ export function usePlayGame() {
 					const to = lastSuggestedMove.value.substring( 2, 4 );
 					if ( isValidSquare( from ) && isValidSquare( to ) ) {
 						boardApi.drawMove( from, to, 'green' );
+						return;
 					}
+				}
+				// Déclenche le calcul Stockfish avec requestHint
+				if ( typeof boardApi.requestHint === 'function' ) {
+					boardApi.requestHint();
 				} else {
-					// Déclenche le calcul Stockfish si non démarré (ex: 1er coup)
 					boardApi.updateStockfishConfig( {} );
 				}
 			}
@@ -194,10 +204,23 @@ export function usePlayGame() {
 		}
 	};
 
+	const handleEngineStatus = ( status: EngineStatus ) => {
+		engineStatus.value = status;
+		if ( status === 'ready' || status === 'searching' ) {
+			engineLoaded.value = true;
+		}
+	};
+
+	const handleEvaluation = ( evaluation: StockfishEvaluation ) => {
+		currentEvaluation.value = evaluation;
+	};
+
 	return {
 		getBoardApi: () => boardApi,
 		setBoardApi,
 		engineLoaded,
+		engineStatus,
+		currentEvaluation,
 		showSettings,
 		isHintEnabled,
 		currentPly,
@@ -212,6 +235,8 @@ export function usePlayGame() {
 		opponentColor,
 		toggleHint,
 		handleStockfishHint,
+		handleEngineStatus,
+		handleEvaluation,
 		handleShapesChange,
 		goToAnalysis,
 		refreshDisplay,

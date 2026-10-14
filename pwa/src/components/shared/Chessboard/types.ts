@@ -1,12 +1,39 @@
 import type {
 	BoardCore,
 	StockfishConfig,
+	StockfishMode,
+	StockfishEvaluation,
+	EngineStatus,
+	GameReviewReport,
+	MoveAnalysisReport,
+	MoveJudgement,
 	Move,
 	BoardMode,
 	PieceSet,
 	BoardTheme,
 	DrawShape,
 	Key,
+} from 'eg-chessboard';
+export type {
+	BoardCore,
+	StockfishConfig,
+	StockfishMode,
+	StockfishEvaluation,
+	EngineStatus,
+	GameReviewReport,
+	MoveAnalysisReport,
+	MoveJudgement,
+	Move,
+	BoardMode,
+	PieceSet,
+	BoardTheme,
+	DrawShape,
+	Key,
+};
+export {
+	computeEvalBarPercentage,
+	getNodesForElo,
+	validateFen,
 } from 'eg-chessboard';
 
 export interface ChessboardConfig {
@@ -125,6 +152,9 @@ export type ChessboardEmits = {
 	( _e: 'stalemate' ): void;
 	( _e: 'draw' ): void;
 	( _e: 'stockfish-hint', _move: string ): void;
+	( _e: 'evaluation', _evaluation: StockfishEvaluation ): void;
+	( _e: 'engine-status', _status: EngineStatus ): void;
+	( _e: 'game-review-progress', _percent: number ): void;
 	( _e: 'square-click', _square: string ): void;
 	( _e: 'shapes-change', _shapes: DrawShape[] ): void;
 	(

@@ -28,6 +28,8 @@ console.log(`ℹ️  Version détectée : ${version}`);
 // Contrôle Qualité Pré-Packaging
 console.log('🔍 Exécution des contrôles qualité pré-packaging...');
 try {
+    console.log('  → Synchronisation Stockfish...');
+    execSync('node scripts/sync-stockfish.cjs', { cwd: rootDir, stdio: 'inherit' });
     console.log('  → TypeCheck (Vue / TypeScript)...');
     execSync('npm run type-check', { cwd: rootDir, stdio: 'inherit' });
     console.log('  → ESLint...');
