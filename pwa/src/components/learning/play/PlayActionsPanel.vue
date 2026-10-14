@@ -25,7 +25,7 @@
               expand="block"
               fill="outline"
               color="primary"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('reset-game')"
             >
               <ion-icon slot="start" :icon="optionsOutline"></ion-icon>
@@ -39,7 +39,7 @@
               expand="block"
               :fill="isHintEnabled ? 'solid' : 'outline'"
               :color="isHintEnabled ? 'success' : 'medium'"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('toggle-hint')"
             >
               <ion-icon slot="start" :icon="bulbOutline"></ion-icon>
@@ -55,7 +55,7 @@
               fill="outline"
               color="warning"
               :disabled="viewOnly"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('undo-move')"
             >
               <ion-icon slot="start" :icon="arrowUndoOutline"></ion-icon>
@@ -70,7 +70,7 @@
               expand="block"
               fill="outline"
               color="tertiary"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('go-to-analysis')"
             >
               <ion-icon slot="start" :icon="analyticsOutline"></ion-icon>
