@@ -153,9 +153,9 @@ const stockfishConfig = computed<StockfishConfig>(() => {
   const moveTime = Math.round(gameSettings.level * 1.2);
 
   return {
-    whiteMode: playerCol === 'white' ? 'hint' : 'elo',
+    whiteMode: playerCol === 'white' ? 'disabled' : 'elo',
     whiteElo: playerCol === 'black' ? gameSettings.level : undefined,
-    blackMode: playerCol === 'black' ? 'hint' : 'elo',
+    blackMode: playerCol === 'black' ? 'disabled' : 'elo',
     blackElo: playerCol === 'white' ? gameSettings.level : undefined,
     stockfishMoveTime: moveTime,
     showWdl: true,
@@ -207,6 +207,12 @@ const resetGame = () => {
 };
 
 const startNewGame = () => {
+  const api = getBoardApi();
+  if (api) {
+    api.cancelReview();
+    api.newGame();
+  }
+
   showSettings.value = false;
   gameStatus.message = '';
   gameStatus.color = 'medium';
@@ -257,6 +263,11 @@ onMounted(() => {
 });
 
 onIonViewWillLeave(() => {
+  const api = getBoardApi();
+  if (api) {
+    api.cancelReview();
+    api.stopLiveAnalysis();
+  }
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }

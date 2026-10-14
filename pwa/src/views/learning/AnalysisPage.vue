@@ -97,13 +97,13 @@
 
                 <ion-button
                   expand="block"
-                  fill="outline"
-                  color="tertiary"
-                  :disabled="isReviewing || historyMoves.length === 0"
-                  @click="startReview"
+                  :fill="isReviewing ? 'solid' : 'outline'"
+                  :color="isReviewing ? 'warning' : 'tertiary'"
+                  :disabled="!isReviewing && historyMoves.length === 0"
+                  @click="toggleReview"
                 >
                   <ion-icon slot="start" :icon="ribbonOutline"></ion-icon>
-                  <span>Bilan</span>
+                  <span>{{ isReviewing ? 'Annuler' : 'Bilan' }}</span>
                 </ion-button>
               </div>
 
@@ -486,6 +486,15 @@ const handleEngineStatus = (status: EngineStatus) => {
   engineStatus.value = status;
 };
 
+const toggleReview = async () => {
+  if (isReviewing.value) {
+    boardApi?.cancelReview();
+    isReviewing.value = false;
+    return;
+  }
+  await startReview();
+};
+
 const startReview = async () => {
   if (!boardApi || isReviewing.value) return;
   isReviewing.value = true;
@@ -497,9 +506,13 @@ const startReview = async () => {
         reviewProgress.value = percent;
       }
     });
-    gameReviewReport.value = report;
+    if (isReviewing.value) {
+      gameReviewReport.value = report;
+    }
   } catch (err) {
-    console.error('Erreur lors de la revue de partie:', err);
+    if (isReviewing.value) {
+      console.error('Erreur lors de la revue de partie:', err);
+    }
   } finally {
     isReviewing.value = false;
   }
@@ -511,13 +524,29 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (boardApi && isLiveAnalysis.value) {
-    boardApi.stopLiveAnalysis();
+  if (boardApi) {
+    if (isReviewing.value) {
+      boardApi.cancelReview();
+    }
+    if (isLiveAnalysis.value) {
+      boardApi.stopLiveAnalysis();
+    }
   }
   window.removeEventListener('resize', updateOrientation);
 });
 
 onIonViewWillLeave(() => {
+  if (boardApi) {
+    if (isReviewing.value) {
+      boardApi.cancelReview();
+      isReviewing.value = false;
+    }
+    if (isLiveAnalysis.value) {
+      boardApi.stopLiveAnalysis();
+      isLiveAnalysis.value = false;
+      currentEvaluation.value = null;
+    }
+  }
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }
