@@ -5,6 +5,10 @@
       <div v-if="gameStatusMessage" :class="['status-banner', gameStatusColor]">
         {{ gameStatusMessage }}
       </div>
+      <div v-else-if="engineStatus === 'searching' && gameMode === '1player'" class="status-placeholder status-thinking">
+        <ion-spinner name="dots" class="thinking-spinner"></ion-spinner>
+        <span>L'ordinateur réfléchit...</span>
+      </div>
       <div v-else class="status-placeholder">
         <span class="turn-dot" :class="turnColor"></span>
         C'est au tour des {{ turnColor === 'white' ? 'Blancs' : 'Noirs' }}
@@ -21,7 +25,7 @@
               expand="block"
               fill="outline"
               color="primary"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('reset-game')"
             >
               <ion-icon slot="start" :icon="optionsOutline"></ion-icon>
@@ -35,7 +39,7 @@
               expand="block"
               :fill="isHintEnabled ? 'solid' : 'outline'"
               :color="isHintEnabled ? 'success' : 'medium'"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('toggle-hint')"
             >
               <ion-icon slot="start" :icon="bulbOutline"></ion-icon>
@@ -51,7 +55,7 @@
               fill="outline"
               color="warning"
               :disabled="viewOnly"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('undo-move')"
             >
               <ion-icon slot="start" :icon="arrowUndoOutline"></ion-icon>
@@ -66,7 +70,7 @@
               expand="block"
               fill="outline"
               color="tertiary"
-              class="action-btn"
+              class="game-action-btn"
               @click="$emit('go-to-analysis')"
             >
               <ion-icon slot="start" :icon="analyticsOutline"></ion-icon>
@@ -80,7 +84,16 @@
 </template>
 
 <script setup lang="ts">
-import { IonGrid, IonRow, IonCol, IonButton, IonIcon, IonBadge } from '@ionic/vue';
+import {
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonButton,
+  IonIcon,
+  IonBadge,
+  IonSpinner
+} from '@ionic/vue';
+import type { EngineStatus } from 'eg-chessboard';
 import {
   optionsOutline,
   bulbOutline,
@@ -99,9 +112,11 @@ withDefaults(
     oupsCount: number;
     viewOnly: boolean;
     gameMode?: '1player' | '2players';
+    engineStatus?: EngineStatus;
   }>(),
   {
-    gameMode: '1player'
+    gameMode: '1player',
+    engineStatus: 'uninitialized'
   }
 );
 

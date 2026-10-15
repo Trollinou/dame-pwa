@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite pwa",
-    "build": "npx vite build pwa",
+    "sync:stockfish": "node scripts/sync-stockfish.cjs",
+    "build": "node scripts/sync-stockfish.cjs && npx vite build pwa",
     "type-check": "vue-tsc --project pwa/tsconfig.json",
     "preview": "vite preview pwa",
     "test:unit": "vitest run --config pwa/vite.config.ts",

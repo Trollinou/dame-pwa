@@ -1,6 +1,10 @@
 import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import type { BoardCore } from 'eg-chessboard';
+import type {
+	BoardCore,
+	EngineStatus,
+	StockfishEvaluation,
+} from 'eg-chessboard';
 import { useChessStore } from '@/stores/chess';
 import {
 	undoMove as apiUndoMove,
@@ -13,6 +17,8 @@ export function usePlayGame() {
 
 	let boardApi: BoardCore | null = null;
 	const engineLoaded = ref( false );
+	const engineStatus = ref< EngineStatus >( 'uninitialized' );
+	const currentEvaluation = ref< StockfishEvaluation | null >( null );
 	const showSettings = ref( false );
 	const isHintEnabled = ref( false );
 	const currentPly = ref( 0 );
@@ -55,30 +61,48 @@ export function usePlayGame() {
 
 	const isValidSquare = ( sq: string ) => /^[a-h][1-8]$/.test( sq );
 
+	let lastHelpPly: number | null = null;
+
+	const isHumanTurn = (): boolean => {
+		if ( ! boardApi || boardConfig.viewOnly ) {
+			return false;
+		}
+		if ( gameSettings.gameMode === '2players' ) {
+			return true;
+		}
+		return boardApi.getTurnColor() === boardConfig.playerColor;
+	};
+
+	const requestHintForPlayer = () => {
+		if ( ! boardApi || ! isHintEnabled.value || ! isHumanTurn() ) {
+			return;
+		}
+		const ply = boardApi.getCurrentPlyNumber();
+		if ( lastHelpPly !== ply ) {
+			lastHelpPly = ply;
+			helpCount.value++;
+		}
+		if ( typeof boardApi.requestHint === 'function' ) {
+			boardApi.requestHint( { multiPv: 2, movetime: 1500 } );
+		}
+	};
+
 	const toggleHint = () => {
 		isHintEnabled.value = ! isHintEnabled.value;
 		if ( isHintEnabled.value ) {
-			helpCount.value++;
-			if ( boardApi ) {
-				if ( lastSuggestedMove.value ) {
-					const from = lastSuggestedMove.value.substring( 0, 2 );
-					const to = lastSuggestedMove.value.substring( 2, 4 );
-					if ( isValidSquare( from ) && isValidSquare( to ) ) {
-						boardApi.drawMove( from, to, 'green' );
-					}
-				} else {
-					// Déclenche le calcul Stockfish si non démarré (ex: 1er coup)
-					boardApi.updateStockfishConfig( {} );
-				}
-			}
+			requestHintForPlayer();
 		} else if ( boardApi ) {
 			boardApi.hideMoves();
+			lastSuggestedMove.value = '';
 		}
 	};
 
 	const handleStockfishHint = ( bestMove: string ) => {
+		if ( ! isHintEnabled.value || ! isHumanTurn() ) {
+			return;
+		}
 		lastSuggestedMove.value = bestMove;
-		if ( isHintEnabled.value && boardApi ) {
+		if ( boardApi ) {
 			const from = bestMove.substring( 0, 2 );
 			const to = bestMove.substring( 2, 4 );
 			if ( isValidSquare( from ) && isValidSquare( to ) ) {
@@ -88,7 +112,12 @@ export function usePlayGame() {
 	};
 
 	const handleShapesChange = () => {
-		if ( isHintEnabled.value && boardApi && lastSuggestedMove.value ) {
+		if (
+			isHintEnabled.value &&
+			isHumanTurn() &&
+			boardApi &&
+			lastSuggestedMove.value
+		) {
 			const shapes = boardApi.getShapes();
 			if ( ! shapes || shapes.length === 0 ) {
 				const from = lastSuggestedMove.value.substring( 0, 2 );
@@ -120,6 +149,7 @@ export function usePlayGame() {
 
 	const setBoardApi = ( api: BoardCore ) => {
 		boardApi = api;
+		lastHelpPly = null;
 		if ( chessStore.currentPgn ) {
 			boardApi.loadPgn( chessStore.currentPgn );
 			boardConfig.orientation = chessStore.orientation;
@@ -130,8 +160,18 @@ export function usePlayGame() {
 
 			helpCount.value = chessStore.helpCount || 0;
 			oupsCount.value = chessStore.oupsCount || 0;
+		} else {
+			api.newGame();
 		}
 		refreshDisplay();
+		if ( isHintEnabled.value ) {
+			requestHintForPlayer();
+		}
+	};
+
+	const resetHelpState = () => {
+		lastHelpPly = null;
+		lastSuggestedMove.value = '';
 	};
 
 	const undoMove = () => {
@@ -144,6 +184,8 @@ export function usePlayGame() {
 
 		oupsCount.value++;
 		boardApi.hideMoves();
+		lastSuggestedMove.value = '';
+		lastHelpPly = null;
 
 		apiUndoMove( boardApi, true );
 		boardConfig.viewOnly = false;
@@ -168,6 +210,10 @@ export function usePlayGame() {
 			helpCount.value,
 			oupsCount.value
 		);
+
+		if ( isHintEnabled.value ) {
+			requestHintForPlayer();
+		}
 	};
 
 	const handleCheck = ( color: string ) => {
@@ -194,10 +240,23 @@ export function usePlayGame() {
 		}
 	};
 
+	const handleEngineStatus = ( status: EngineStatus ) => {
+		engineStatus.value = status;
+		if ( status === 'ready' || status === 'searching' ) {
+			engineLoaded.value = true;
+		}
+	};
+
+	const handleEvaluation = ( evaluation: StockfishEvaluation ) => {
+		currentEvaluation.value = evaluation;
+	};
+
 	return {
 		getBoardApi: () => boardApi,
 		setBoardApi,
 		engineLoaded,
+		engineStatus,
+		currentEvaluation,
 		showSettings,
 		isHintEnabled,
 		currentPly,
@@ -210,8 +269,13 @@ export function usePlayGame() {
 		boardConfig,
 		playerColor,
 		opponentColor,
+		isHumanTurn,
+		requestHintForPlayer,
+		resetHelpState,
 		toggleHint,
 		handleStockfishHint,
+		handleEngineStatus,
+		handleEvaluation,
 		handleShapesChange,
 		goToAnalysis,
 		refreshDisplay,

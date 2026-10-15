@@ -45,6 +45,7 @@ const getLevelDescription = (elo: number) => {
   if (elo <= 1700) return 'Intermédiaire';
   if (elo <= 2000) return 'Avancé';
   if (elo <= 2300) return 'Club / Expert';
-  return 'Maître';
+  if (elo <= 2700) return 'Maître';
+  return 'Grand Maître';
 };
 </script>

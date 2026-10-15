@@ -17,12 +17,24 @@
             <div class="meta-left">
               <h2 class="player-title">Revue de partie</h2>
               <p class="game-type-subtitle">
-                Historique coup par coup // {{ historyMoves.length }} tours joués
+                <template v-if="gameReviewReport">
+                  Précision : Blancs {{ gameReviewReport.accuracy.white }}% • Noirs {{ gameReviewReport.accuracy.black }}%
+                </template>
+                <template v-else>
+                  Historique coup par coup // {{ historyMoves.length }} tours joués
+                </template>
               </p>
             </div>
             <div class="meta-right">
               <span class="ply-badge">
                 Coup {{ currentPly }} / {{ totalPlyCount }}
+              </span>
+              <span
+                v-if="isLiveAnalysis && currentEvaluation"
+                class="eval-badge"
+                :class="{ 'is-white': (currentEvaluation.whiteScoreValue ?? 0) >= 0, 'is-black': (currentEvaluation.whiteScoreValue ?? 0) < 0 }"
+              >
+                {{ formatEvaluationScore(currentEvaluation) }}
               </span>
             </div>
           </div>
@@ -30,21 +42,88 @@
 
         <div class="main-container" :class="{ 'landscape-mode': isLandscape }">
           <div class="board-section">
-            <div class="board-container">
-              <!-- Échiquier (Mode Lecture Seule) -->
-              <Chessboard 
-                v-if="isReady"
-                :key="`board-${isLandscape ? 'l' : 'p'}-${renderKey}`"
-                :board-config="boardConfig"
-                @board-created="handleBoardCreated"
-                @move="handleMove"
-              />
+            <div class="board-wrapper-with-eval">
+              <!-- Barre d'évaluation Stockfish 19 -->
+              <div v-if="isLiveAnalysis && currentEvaluation" class="analysis-eval-bar-container">
+                <div class="analysis-eval-bar">
+                  <div class="analysis-eval-fill" :style="{ '--eval-percent': `${evalBarPercent}%` }"></div>
+                </div>
+                <div class="analysis-eval-label">
+                  {{ formatEvaluationScore(currentEvaluation) }}
+                </div>
+              </div>
+
+              <div class="board-container">
+                <!-- Échiquier (Mode Lecture Seule) -->
+                <Chessboard 
+                  v-if="isReady"
+                  :key="`board-${isLandscape ? 'l' : 'p'}-${renderKey}`"
+                  :board-config="boardConfig"
+                  :stockfish-config="analysisStockfishConfig"
+                  @board-created="handleBoardCreated"
+                  @move="handleMove"
+                  @evaluation="handleEvaluation"
+                  @engine-status="handleEngineStatus"
+                  @stockfish-hint="handleStockfishHint"
+                />
+              </div>
             </div>
           </div>
 
           <!-- Section Historique et Navigation -->
           <div class="side-section" v-if="isReady">
             <div class="analysis-controls">
+              <!-- Actions d'analyse Stockfish 19 -->
+              <div class="analysis-actions-toolbar">
+                <ion-button
+                  expand="block"
+                  :fill="isLiveAnalysis ? 'solid' : 'outline'"
+                  :color="isLiveAnalysis ? 'success' : 'primary'"
+                  @click="toggleLiveAnalysis"
+                >
+                  <ion-icon slot="start" :icon="isLiveAnalysis ? pauseOutline : playOutline"></ion-icon>
+                  <span>{{ isLiveAnalysis ? 'Stop' : 'Éval direct' }}</span>
+                </ion-button>
+
+                <ion-button
+                  expand="block"
+                  fill="outline"
+                  color="secondary"
+                  @click="requestHint"
+                >
+                  <ion-icon slot="start" :icon="bulbOutline"></ion-icon>
+                  <span>Conseil</span>
+                </ion-button>
+
+                <ion-button
+                  expand="block"
+                  :fill="isReviewing ? 'solid' : 'outline'"
+                  :color="isReviewing ? 'warning' : 'tertiary'"
+                  :disabled="!isReviewing && historyMoves.length === 0"
+                  @click="toggleReview"
+                >
+                  <ion-icon slot="start" :icon="ribbonOutline"></ion-icon>
+                  <span>{{ isReviewing ? 'Annuler' : 'Bilan' }}</span>
+                </ion-button>
+              </div>
+
+              <!-- Progression de la revue post-mortem -->
+              <div v-if="isReviewing" class="analysis-review-progress">
+                <div class="review-progress-text">
+                  <span>Revue en cours...</span>
+                  <span>{{ reviewProgress }}%</span>
+                </div>
+                <ion-progress-bar :value="reviewProgress / 100"></ion-progress-bar>
+              </div>
+
+              <!-- Variante PV -->
+              <div
+                v-if="isLiveAnalysis && currentEvaluation && currentEvaluation.pv && currentEvaluation.pv.length > 0"
+                class="analysis-pv-info"
+              >
+                <strong>Meilleure suite :</strong> {{ currentEvaluation.pv.slice(0, 5).join(' ') }}
+              </div>
+
               <div class="history-controls">
                 <!-- Navigation toolbar -->
                 <ion-grid class="ion-no-padding">
@@ -81,14 +160,24 @@
                         <span 
                           :class="['move-san', { 'active-move': move.white.ply === currentPly }]"
                           @click="viewPly(move.white.ply)"
-                          v-safe-html="formatSan(move.white.san)"
-                        ></span>
+                        >
+                          <span v-safe-html="formatSan(move.white.san)"></span>
+                          <span
+                            v-if="judgementsMap.get(move.white.ply)"
+                            :class="['judgement-badge', judgementConfig[judgementsMap.get(move.white.ply)!].class]"
+                          >{{ judgementConfig[judgementsMap.get(move.white.ply)!].symbol }}</span>
+                        </span>
                         <span 
                           v-if="move.black"
                           :class="['move-san', { 'active-move': move.black.ply === currentPly }]"
                           @click="viewPly(move.black.ply)"
-                          v-safe-html="formatSan(move.black.san)"
-                        ></span>
+                        >
+                          <span v-safe-html="formatSan(move.black.san)"></span>
+                          <span
+                            v-if="judgementsMap.get(move.black.ply)"
+                            :class="['judgement-badge', judgementConfig[judgementsMap.get(move.black.ply)!].class]"
+                          >{{ judgementConfig[judgementsMap.get(move.black.ply)!].symbol }}</span>
+                        </span>
                         <span v-else class="move-san empty"></span>
                       </div>
                       <!-- Cellules fantômes pour garder l'alignement sur la dernière ligne -->
@@ -126,17 +215,34 @@ import {
   IonCol,
   IonButton,
   IonIcon,
+  IonProgressBar,
   onIonViewWillLeave
 } from '@ionic/vue';
 import { 
   playBackOutline, 
   chevronBackOutline, 
   chevronForwardOutline, 
-  playForwardOutline 
+  playForwardOutline,
+  playOutline,
+  pauseOutline,
+  bulbOutline,
+  ribbonOutline
 } from 'ionicons/icons';
 import { ref, onMounted, onUnmounted, reactive, watch, computed } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
-import type { BoardCore } from 'eg-chessboard';
+import type {
+  BoardCore,
+  StockfishConfig,
+  StockfishEvaluation,
+  EngineStatus,
+  GameReviewReport,
+  MoveJudgement
+} from 'eg-chessboard';
+import {
+  getStockfishUrls,
+  formatEvaluationScore,
+  computeEvalBarPercentage
+} from '@/utils/chess/stockfish';
 import { useChessStore } from '@/stores/chess';
 
 export interface HistoryMoveItem {
@@ -169,6 +275,56 @@ const boardConfig = reactive({
   orientation: chessStore.orientation,
   viewOnly: true,
 });
+
+const isLiveAnalysis = ref(false);
+const currentEvaluation = ref<StockfishEvaluation | null>(null);
+const engineStatus = ref<EngineStatus>('uninitialized');
+const isReviewing = ref(false);
+const reviewProgress = ref(0);
+const gameReviewReport = ref<GameReviewReport | null>(null);
+
+const evalBarPercent = computed(() => {
+  if (!currentEvaluation.value) return 50;
+  const ev = currentEvaluation.value;
+  if (typeof ev.winChancePercentage === 'number') {
+    return ev.winChancePercentage;
+  }
+  const turn = boardApi ? boardApi.getTurnColor() : 'white';
+  return computeEvalBarPercentage(turn, ev.scoreType, ev.scoreValue, ev.wdl);
+});
+
+const analysisStockfishConfig = computed<StockfishConfig>(() => {
+  const urls = getStockfishUrls();
+  return {
+    whiteMode: 'disabled',
+    blackMode: 'disabled',
+    multiPv: 1,
+    showWdl: true,
+    workerUrl: urls.workerUrl,
+    wasmUrl: urls.wasmUrl,
+  };
+});
+
+const judgementsMap = computed(() => {
+  const map = new Map<number, MoveJudgement>();
+  if (gameReviewReport.value?.moves) {
+    for (const m of gameReviewReport.value.moves) {
+      map.set(m.ply, m.judgement);
+    }
+  }
+  return map;
+});
+
+const judgementConfig: Record<MoveJudgement, { symbol: string; class: string }> = {
+  brilliant: { symbol: '!!', class: 'judgement-brilliant' },
+  best: { symbol: '★', class: 'judgement-best' },
+  excellent: { symbol: '✓', class: 'judgement-excellent' },
+  good: { symbol: '•', class: 'judgement-good' },
+  inaccuracy: { symbol: '?!', class: 'judgement-inaccuracy' },
+  mistake: { symbol: '?', class: 'judgement-mistake' },
+  blunder: { symbol: '??', class: 'judgement-blunder' },
+  missed_win: { symbol: '✗', class: 'judgement-missed-win' },
+};
 
 /**
  * Formate un coup SAN avec symbole de pièce agrandi
@@ -260,6 +416,7 @@ const refreshDisplay = () => {
 };
 
 const viewPly = (ply: number) => {
+  boardApi?.hideMoves();
   boardApi?.viewHistory(ply);
   currentPly.value = ply;
 };
@@ -280,25 +437,117 @@ const handleMove = () => {
 };
 
 const viewFirst = () => { 
-  boardApi?.viewHistory(0); 
+  boardApi?.hideMoves();
+  boardApi?.viewStart(); 
   currentPly.value = 0; 
 };
 
 const viewPrev = () => { 
+  boardApi?.hideMoves();
   boardApi?.viewPrevious(); 
   if (currentPly.value > 0) currentPly.value--; 
 };
 
 const viewNext = () => { 
+  boardApi?.hideMoves();
   boardApi?.viewNext(); 
-  if (boardApi && currentPly.value < boardApi.getCurrentPlyNumber()) {
+  if (boardApi && currentPly.value < totalPlyCount.value) {
     currentPly.value++;
   }
 };
 
 const viewLast = () => { 
+  boardApi?.hideMoves();
   boardApi?.stopViewingHistory(); 
-  if (boardApi) currentPly.value = boardApi.getCurrentPlyNumber(); 
+  if (boardApi) currentPly.value = totalPlyCount.value; 
+};
+
+const toggleLiveAnalysis = () => {
+  if (!boardApi) return;
+  isLiveAnalysis.value = !isLiveAnalysis.value;
+  if (isLiveAnalysis.value) {
+    boardApi.startLiveAnalysis();
+  } else {
+    boardApi.stopLiveAnalysis();
+    boardApi.hideMoves();
+    currentEvaluation.value = null;
+  }
+};
+
+const requestHint = () => {
+  if (!boardApi) return;
+  boardApi.requestHint({ multiPv: 2, movetime: 1500 });
+};
+
+const handleStockfishHint = (bestMove: string) => {
+  if (boardApi && bestMove && bestMove.length >= 4) {
+    const from = bestMove.substring(0, 2);
+    const to = bestMove.substring(2, 4);
+    boardApi.drawMove(from, to, 'green');
+  }
+};
+
+const handleEvaluation = (evaluation: StockfishEvaluation) => {
+  currentEvaluation.value = evaluation;
+  // Lors de l'analyse en continu, afficher le meilleur coup calculé pour la position visualisée
+  if (isLiveAnalysis.value && boardApi && evaluation.bestMove && evaluation.bestMove.length >= 4) {
+    const from = evaluation.bestMove.substring(0, 2);
+    const to = evaluation.bestMove.substring(2, 4);
+    boardApi.drawMove(from, to, 'green');
+  }
+};
+
+const handleEngineStatus = (status: EngineStatus) => {
+  engineStatus.value = status;
+};
+
+let reviewAbortController: AbortController | null = null;
+
+const cancelReview = () => {
+  if (reviewAbortController) {
+    reviewAbortController.abort();
+    reviewAbortController = null;
+  }
+  boardApi?.cancelReview();
+  isReviewing.value = false;
+};
+
+const toggleReview = async () => {
+  if (isReviewing.value) {
+    cancelReview();
+    return;
+  }
+  await startReview();
+};
+
+const startReview = async () => {
+  if (!boardApi || isReviewing.value) return;
+  isReviewing.value = true;
+  reviewProgress.value = 0;
+  reviewAbortController = new AbortController();
+
+  try {
+    const report = await boardApi.reviewGame({
+      depth: 12,
+      signal: reviewAbortController.signal,
+      onProgress: (percent) => {
+        reviewProgress.value = percent;
+      }
+    });
+    if (isReviewing.value) {
+      gameReviewReport.value = report;
+    }
+  } catch (err: unknown) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      return;
+    }
+    if (isReviewing.value) {
+      console.error('Erreur lors de la revue de partie:', err);
+    }
+  } finally {
+    isReviewing.value = false;
+    reviewAbortController = null;
+  }
 };
 
 onMounted(() => {
@@ -307,10 +556,28 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  if (boardApi) {
+    if (isReviewing.value) {
+      cancelReview();
+    }
+    if (isLiveAnalysis.value) {
+      boardApi.stopLiveAnalysis();
+    }
+  }
   window.removeEventListener('resize', updateOrientation);
 });
 
 onIonViewWillLeave(() => {
+  if (boardApi) {
+    if (isReviewing.value) {
+      cancelReview();
+    }
+    if (isLiveAnalysis.value) {
+      boardApi.stopLiveAnalysis();
+      isLiveAnalysis.value = false;
+      currentEvaluation.value = null;
+    }
+  }
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }
