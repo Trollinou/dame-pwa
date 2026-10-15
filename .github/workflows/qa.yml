@@ -1,0 +1,151 @@
+name: QA & CI
+
+on:
+  push:
+    branches: [ main, develop, 'feat/**', 'fix/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa-php:
+    name: PHP QA (PHP 8.4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, curl, libxml, mbstring, zip, gd, :imagick
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: PHPStan Static Analysis
+        run: vendor/bin/phpstan analyze --memory-limit=1G
+
+      - name: PHP CodeSniffer (WPCS)
+        run: vendor/bin/phpcs
+
+      - name: PHPUnit Tests
+        run: vendor/bin/phpunit
+
+  qa-front:
+    name: Frontend QA (Node 24 LTS)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout dame-pwa
+        uses: actions/checkout@v4
+        with:
+          path: dame-pwa
+          fetch-depth: 1
+
+      - name: Checkout dame (shared types)
+        uses: actions/checkout@v4
+        with:
+          repository: Trollinou/dame
+          path: dame
+          fetch-depth: 1
+
+      - name: Checkout roi (shared types)
+        uses: actions/checkout@v4
+        with:
+          repository: Trollinou/roi
+          path: roi
+          fetch-depth: 1
+
+      - name: Checkout js-sdk
+        uses: actions/checkout@v4
+        with:
+          repository: Trollinou/js-sdk
+          path: js-sdk
+          fetch-depth: 1
+
+      - name: Checkout eg-chessboard
+        uses: actions/checkout@v4
+        with:
+          repository: Trollinou/eg-chessboard
+          path: eg-chessboard
+          fetch-depth: 1
+
+      - name: Setup Node.js 24 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: dame-pwa/package-lock.json
+
+      - name: Cache eg-chessboard build
+        id: cache-eg-chessboard
+        uses: actions/cache@v4
+        with:
+          path: eg-chessboard/dist
+          key: ${{ runner.os }}-eg-chessboard-dist-${{ hashFiles('eg-chessboard/package.json', 'eg-chessboard/src/**', 'eg-chessboard/vite.config.ts') }}
+
+      - name: Build eg-chessboard if needed
+        if: steps.cache-eg-chessboard.outputs.cache-hit != 'true'
+        working-directory: eg-chessboard
+        run: |
+          npm install --prefer-offline --no-audit
+          npm run build
+
+      - name: Cache js-sdk build
+        id: cache-js-sdk
+        uses: actions/cache@v4
+        with:
+          path: js-sdk/dist
+          key: ${{ runner.os }}-js-sdk-dist-${{ hashFiles('js-sdk/package.json', 'js-sdk/src/**', 'js-sdk/index.ts') }}
+
+      - name: Build js-sdk if needed
+        if: steps.cache-js-sdk.outputs.cache-hit != 'true'
+        working-directory: js-sdk
+        run: |
+          npm install --prefer-offline --no-audit
+          npm run build
+
+      - name: Install PWA dependencies
+        working-directory: dame-pwa
+        run: npm install --prefer-offline --no-audit
+
+      - name: TypeScript & Vue Type Check
+        working-directory: dame-pwa
+        run: npm run type-check
+
+      - name: ESLint
+        working-directory: dame-pwa
+        run: npm run lint
+
+      - name: Unit Tests (Vitest)
+        working-directory: dame-pwa
+        run: npm run test:unit
+
+      - name: Production Build
+        working-directory: dame-pwa
+        run: npm run build

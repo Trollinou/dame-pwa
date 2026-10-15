@@ -7,7 +7,9 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
 - **WordPress :** 7.1 ou supérieur
 - **PHP :** 8.4 avec typage strict (`declare(strict_types=1);` sur 100% des fichiers)
 - **Analyse Statique :** PHPStan Niveau 7 (0 erreur) et WPCS/PHPCS conforme (0 erreur)
-- **Frontend :** Node.js 20+, TypeScript strict, Vitest (tests unitaires 100% passants)
+- **Tests PHP :** PHPUnit 11 (`composer test`)
+- **Frontend :** Node.js 24 LTS, TypeScript strict, Vitest (tests unitaires 100% passants)
+- **Intégration Continue (CI) :** GitHub Actions automatisée sur `main` et `develop` (`.github/workflows/qa.yml`) avec jobs parallèles PHP 8.4 et Node 24.
 
 ## Architecture
 
@@ -379,6 +381,15 @@ Le styling suit une architecture centralisée KISS en 3 piliers métier + fondat
 ## Développement & Release
 
 ```bash
+# Tests PHPUnit
+composer test
+
+# Analyse PHPStan
+composer run lint:php
+
+# Linting PHPCS
+composer run lint
+
 # Vérification des types TypeScript
 npm run type-check
 
@@ -400,4 +411,11 @@ npm run build
 # 3. Création de l'archive de déploiement ZIP (lance automatiquement le build PWA si nécessaire)
 npm run package
 ```
+
+### Intégration Continue (GitHub Actions)
+
+Le workflow `.github/workflows/qa.yml` s'exécute automatiquement à chaque `push` et `pull_request` sur `main` et `develop` :
+- **Job `qa-php` (PHP 8.4)** : Cache Composer, extensions PHP minimales (`dom, curl, libxml, mbstring, zip, gd` sans `imagick`), exécution de PHPStan, PHPCS et PHPUnit.
+- **Job `qa-front` (Node 24 LTS)** : Cache npm, checkout multi-dépôts des contrats et bibliothèques partagées (`dame`, `roi`, `js-sdk`, `eg-chessboard`), cache des builds intermédiaires, `type-check`, `eslint`, `vitest` et `vite build`.
+- **Objectif de performance** : Moins de 60 secondes d'exécution grâce au parallélisme des jobs et aux caches multi-niveaux.
 

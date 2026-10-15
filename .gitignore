@@ -39,5 +39,4 @@ pwa/www/
 
 # Sync & identifiants CI
 /.sync.ffs_db
-.github/
 gha-creds-*.json
