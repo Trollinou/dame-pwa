@@ -373,3 +373,21 @@ Les variables CSS racine normalisent les espacements et géométries :
 </template>
 ```
 
+## Assurance Qualité & Intégration Continue (CI)
+
+Le projet dispose d'une suite de contrôles automatisée exécutée localement et sur GitHub Actions (`.github/workflows/qa.yml`) :
+
+### 1. Contrôles Qualité Backend (PHP 8.4)
+- **PHPStan** : Analyse statique au niveau 7 (`composer run lint:php`).
+- **PHP CodeSniffer** : Validation des standards de code WordPress (`composer run lint`).
+- **PHPUnit** : Tests unitaires du plugin WordPress (`composer test`).
+
+### 2. Contrôles Qualité Frontend (Vue 3 / TypeScript)
+- **Type-Check** : Vérification des types TypeScript et templates Vue (`npm run type-check`).
+- **ESLint** : Validation du style de code JavaScript/TypeScript (`npm run lint`).
+- **Vitest** : Suite de tests unitaires PWA (`npm run test:unit`).
+- **Build Production** : Compilation Vite et génération du Service Worker PWA (`npm run build`).
+
+### 3. Pipeline GitHub Actions
+Déclenché à chaque `push` ou `pull_request` sur les branches `main` et `develop`, le workflow parallélise les jobs PHP 8.4 et Node 24 avec mise en cache optimisée (Composer, cache npm global et artefacts partagés) pour une exécution ultra-rapide sous les 60 secondes.
+
