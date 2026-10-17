@@ -9,7 +9,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true" :scroll-y="false" class="ion-padding">
+    <ion-content :fullscreen="true" :scroll-y="true" class="ion-padding">
       <div class="analysis-layout safe-area-wrapper" :class="{ 'landscape-wrapper': isLandscape }">
         <!-- Carte d'information méta -->
         <div class="dame-meta-card" v-if="isReady">
@@ -57,7 +57,7 @@
                 <!-- Échiquier (Mode Lecture Seule) -->
                 <Chessboard 
                   v-if="isReady"
-                  :key="`board-${isLandscape ? 'l' : 'p'}-${renderKey}`"
+                  key="board-analysis-view"
                   :board-config="boardConfig"
                   :stockfish-config="analysisStockfishConfig"
                   @board-created="handleBoardCreated"
@@ -107,6 +107,12 @@
                 </ion-button>
               </div>
 
+              <!-- Message informatif de conseil / statut -->
+              <div v-if="hintFeedbackMessage" class="analysis-hint-message">
+                <ion-icon :icon="informationCircleOutline"></ion-icon>
+                <span>{{ hintFeedbackMessage }}</span>
+              </div>
+
               <!-- Progression de la revue post-mortem -->
               <div v-if="isReviewing" class="analysis-review-progress">
                 <div class="review-progress-text">
@@ -114,6 +120,52 @@
                   <span>{{ reviewProgress }}%</span>
                 </div>
                 <ion-progress-bar :value="reviewProgress / 100"></ion-progress-bar>
+              </div>
+
+              <!-- Carte Bilan post-mortem -->
+              <div v-if="gameReviewReport && !isReviewing" class="analysis-review-card">
+                <div class="review-header">
+                  <h3>Bilan de la partie</h3>
+                  <ion-button fill="clear" size="small" @click="gameReviewReport = null">
+                    <ion-icon slot="icon-only" :icon="closeOutline"></ion-icon>
+                  </ion-button>
+                </div>
+                <div class="accuracy-grid">
+                  <div class="accuracy-box white-box">
+                    <span class="acc-title">Précision Blancs</span>
+                    <span class="acc-value">{{ gameReviewReport.accuracy.white }}%</span>
+                  </div>
+                  <div class="accuracy-box black-box">
+                    <span class="acc-title">Précision Noirs</span>
+                    <span class="acc-value">{{ gameReviewReport.accuracy.black }}%</span>
+                  </div>
+                </div>
+                <div class="judgement-summary-grid">
+                  <span v-if="reviewSummaryCounts.brilliant > 0" class="judgement-pill judgement-brilliant">
+                    !! {{ reviewSummaryCounts.brilliant }}
+                  </span>
+                  <span v-if="reviewSummaryCounts.best > 0" class="judgement-pill judgement-best">
+                    ★ {{ reviewSummaryCounts.best }}
+                  </span>
+                  <span v-if="reviewSummaryCounts.excellent > 0" class="judgement-pill judgement-excellent">
+                    ✓ {{ reviewSummaryCounts.excellent }}
+                  </span>
+                  <span v-if="reviewSummaryCounts.good > 0" class="judgement-pill judgement-good">
+                    • {{ reviewSummaryCounts.good }}
+                  </span>
+                  <span v-if="reviewSummaryCounts.inaccuracy > 0" class="judgement-pill judgement-inaccuracy">
+                    ?! {{ reviewSummaryCounts.inaccuracy }}
+                  </span>
+                  <span v-if="reviewSummaryCounts.mistake > 0" class="judgement-pill judgement-mistake">
+                    ? {{ reviewSummaryCounts.mistake }}
+                  </span>
+                  <span v-if="reviewSummaryCounts.blunder > 0" class="judgement-pill judgement-blunder">
+                    ?? {{ reviewSummaryCounts.blunder }}
+                  </span>
+                  <span v-if="reviewSummaryCounts.missed_win > 0" class="judgement-pill judgement-missed-win">
+                    ✗ {{ reviewSummaryCounts.missed_win }}
+                  </span>
+                </div>
               </div>
 
               <!-- Variante PV -->
@@ -226,9 +278,11 @@ import {
   playOutline,
   pauseOutline,
   bulbOutline,
-  ribbonOutline
+  ribbonOutline,
+  informationCircleOutline,
+  closeOutline
 } from 'ionicons/icons';
-import { ref, onMounted, onUnmounted, reactive, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, reactive, watch, computed, nextTick } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type {
   BoardCore,
@@ -255,19 +309,21 @@ const chessStore = useChessStore();
 let boardApi: BoardCore | null = null;
 const isReady = ref(false);
 const currentPly = ref(0);
+const totalPlyCount = ref(0);
 const historyMoves = ref<HistoryMoveItem[]>([]);
 const historyScrollContainer = ref<HTMLElement | null>(null);
 
 const isLandscape = ref(window.innerWidth > window.innerHeight);
-const renderKey = ref(0);
+const isDesktop = ref(window.innerWidth >= 768);
 let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const updateOrientation = () => {
   if (resizeTimeout) clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     isLandscape.value = window.innerWidth > window.innerHeight;
-    renderKey.value++;
-  }, 200);
+    isDesktop.value = window.innerWidth >= 768;
+    boardApi?.redraw(true);
+  }, 150);
 };
 
 const boardConfig = reactive({
@@ -282,6 +338,9 @@ const engineStatus = ref<EngineStatus>('uninitialized');
 const isReviewing = ref(false);
 const reviewProgress = ref(0);
 const gameReviewReport = ref<GameReviewReport | null>(null);
+
+const hintFeedbackMessage = ref<string | null>(null);
+let hintFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
 const evalBarPercent = computed(() => {
   if (!currentEvaluation.value) return 50;
@@ -313,6 +372,26 @@ const judgementsMap = computed(() => {
     }
   }
   return map;
+});
+
+const reviewSummaryCounts = computed(() => {
+  const counts: Record<MoveJudgement, number> = {
+    brilliant: 0,
+    best: 0,
+    excellent: 0,
+    good: 0,
+    inaccuracy: 0,
+    mistake: 0,
+    blunder: 0,
+    missed_win: 0,
+  };
+  if (gameReviewReport.value?.summary) {
+    const { white, black } = gameReviewReport.value.summary;
+    for (const key of Object.keys(counts) as MoveJudgement[]) {
+      counts[key] = (white[key] || 0) + (black[key] || 0);
+    }
+  }
+  return counts;
 });
 
 const judgementConfig: Record<MoveJudgement, { symbol: string; class: string }> = {
@@ -357,16 +436,10 @@ const updateMoveHistory = () => {
   historyMoves.value = moves;
 };
 
-const totalPlyCount = computed(() => {
-  if (!boardApi) return 0;
-  const rawHistory = boardApi.getHistory();
-  return rawHistory ? rawHistory.length : 0;
-});
-
 /**
  * Nombre de colonnes (tours) par ligne
  */
-const movesPerRow = computed(() => isLandscape.value ? 2 : 3);
+const movesPerRow = computed(() => (isLandscape.value || isDesktop.value) ? 2 : 3);
 
 /**
  * Groupe les coups pour l'affichage en tableau (économise de l'espace vertical)
@@ -388,17 +461,10 @@ watch(currentPly, () => {
       const activeEl = historyScrollContainer.value.querySelector('.active-move') as HTMLElement;
       if (activeEl) {
         const container = historyScrollContainer.value;
-        
-        // Calcul plus robuste utilisant getBoundingClientRect
         const containerRect = container.getBoundingClientRect();
         const activeRect = activeEl.getBoundingClientRect();
-        
-        // Calcule la position relative de l'élément par rapport au conteneur
         const relativeTop = activeRect.top - containerRect.top + container.scrollTop;
-        
-        // Centre l'élément dans le conteneur
         const topPos = relativeTop - (container.clientHeight / 2) + (activeRect.height / 2);
-        
         container.scrollTo({ top: topPos, behavior: 'smooth' });
       }
     }
@@ -411,11 +477,14 @@ watch(currentPly, () => {
 const refreshDisplay = () => {
   if (boardApi) {
     currentPly.value = boardApi.getCurrentPlyNumber();
+    const rawHistory = boardApi.getHistory();
+    totalPlyCount.value = rawHistory ? rawHistory.length : 0;
     updateMoveHistory();
   }
 };
 
 const viewPly = (ply: number) => {
+  hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewHistory(ply);
   currentPly.value = ply;
@@ -437,18 +506,21 @@ const handleMove = () => {
 };
 
 const viewFirst = () => { 
+  hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewStart(); 
   currentPly.value = 0; 
 };
 
 const viewPrev = () => { 
+  hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewPrevious(); 
   if (currentPly.value > 0) currentPly.value--; 
 };
 
 const viewNext = () => { 
+  hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewNext(); 
   if (boardApi && currentPly.value < totalPlyCount.value) {
@@ -457,6 +529,7 @@ const viewNext = () => {
 };
 
 const viewLast = () => { 
+  hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.stopViewingHistory(); 
   if (boardApi) currentPly.value = totalPlyCount.value; 
@@ -472,23 +545,53 @@ const toggleLiveAnalysis = () => {
     boardApi.hideMoves();
     currentEvaluation.value = null;
   }
+  nextTick(() => {
+    boardApi?.redraw(true);
+    window.dispatchEvent(new Event('resize'));
+  });
 };
 
 const requestHint = () => {
   if (!boardApi) return;
+  if (currentPly.value === totalPlyCount.value && totalPlyCount.value > 0) {
+    hintFeedbackMessage.value = 'Partie terminée sur cette position. Revenez en arrière pour demander un conseil.';
+    if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
+    hintFeedbackTimer = setTimeout(() => {
+      hintFeedbackMessage.value = null;
+    }, 4000);
+    return;
+  }
+  hintFeedbackMessage.value = 'Recherche du meilleur coup en cours...';
   boardApi.requestHint({ multiPv: 2, movetime: 1500 });
 };
 
 const handleStockfishHint = (bestMove: string) => {
+  if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
   if (boardApi && bestMove && bestMove.length >= 4) {
     const from = bestMove.substring(0, 2);
     const to = bestMove.substring(2, 4);
     boardApi.drawMove(from, to, 'green');
+    hintFeedbackMessage.value = `Conseil Stockfish : ${from.toUpperCase()} ➔ ${to.toUpperCase()}`;
+    hintFeedbackTimer = setTimeout(() => {
+      hintFeedbackMessage.value = null;
+    }, 5000);
+  } else {
+    hintFeedbackMessage.value = 'Aucun coup évident trouvé sur cette position.';
+    hintFeedbackTimer = setTimeout(() => {
+      hintFeedbackMessage.value = null;
+    }, 3000);
   }
 };
 
 const handleEvaluation = (evaluation: StockfishEvaluation) => {
+  const isFirstEval = !currentEvaluation.value;
   currentEvaluation.value = evaluation;
+  if (isFirstEval) {
+    nextTick(() => {
+      boardApi?.redraw(true);
+      window.dispatchEvent(new Event('resize'));
+    });
+  }
   // Lors de l'analyse en continu, afficher le meilleur coup calculé pour la position visualisée
   if (isLiveAnalysis.value && boardApi && evaluation.bestMove && evaluation.bestMove.length >= 4) {
     const from = evaluation.bestMove.substring(0, 2);
@@ -528,7 +631,7 @@ const startReview = async () => {
 
   try {
     const report = await boardApi.reviewGame({
-      depth: 12,
+      depth: 10,
       signal: reviewAbortController.signal,
       onProgress: (percent) => {
         reviewProgress.value = percent;
@@ -556,6 +659,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  if (hintFeedbackTimer) {
+    clearTimeout(hintFeedbackTimer);
+  }
   if (boardApi) {
     if (isReviewing.value) {
       cancelReview();
@@ -568,6 +674,9 @@ onUnmounted(() => {
 });
 
 onIonViewWillLeave(() => {
+  if (hintFeedbackTimer) {
+    clearTimeout(hintFeedbackTimer);
+  }
   if (boardApi) {
     if (isReviewing.value) {
       cancelReview();

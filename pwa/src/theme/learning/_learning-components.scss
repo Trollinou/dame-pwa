@@ -2408,3 +2408,103 @@ cg-board.piece-icon-box {
   }
 }
 
+.analysis-hint-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ion-color-secondary-shade);
+  background: rgba(var(--ion-color-secondary-rgb, 56, 128, 255), 0.12);
+  border: 1px solid var(--ion-color-secondary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+
+  ion-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+}
+
+.analysis-review-card {
+  background: var(--ion-card-background, #ffffff);
+  border: 1px solid var(--ion-color-step-150, #e2e8f0);
+  border-radius: var(--dame-card-radius, 12px);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    h3 {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--ion-text-color, #1a202c);
+    }
+  }
+
+  .accuracy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .accuracy-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 8px;
+
+      &.white-box {
+        background: var(--ion-color-step-50, #f8f9fa);
+        border: 1px solid var(--ion-color-step-200, #cbd5e1);
+        color: var(--ion-text-color, #111827);
+      }
+
+      &.black-box {
+        background: #1e293b;
+        color: #ffffff;
+        border: 1px solid #0f172a;
+      }
+
+      .acc-title {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        opacity: 0.85;
+      }
+
+      .acc-value {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .judgement-summary-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+
+    .judgement-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+  }
+}
+

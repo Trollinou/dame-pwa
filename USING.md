@@ -257,10 +257,13 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - Pour les membres connectés : enregistrement et envoi automatique de la partie PGN vers le plugin ROI.
    - **Mode 2 Joueurs (Pass & Play)** :
      - Jeu local sur le même écran pour deux joueurs humains, moteur d'analyse IA désactivé.
-   - **Analyse & Revue de Partie (Stockfish 19)** :
-     - Évaluation en temps réel avec barre d'évaluation dynamique réagissant instantanément à la navigation dans l'historique (`core.viewHistory()`, `viewPrevious()`, `viewNext()`), reflétant immédiatement la position visualisée à l'écran.
-     - Variante principale (PV) et conseil du meilleur coup calculé à la demande (`core.requestHint()`).
-     - Revue de partie complète (`core.reviewGame()`) accélérée par chaînage d'évaluations, avec support d'annulation fluide (`core.cancelReview()` / `AbortSignal`), score de précision global (Blancs & Noirs) et classification affinée de chaque coup dans l'historique (`brilliant`, `best`, `excellent`, `good`, `inaccuracy`, `mistake`, `blunder`, `missed_win`).
+   - **Analyse & Revue de Partie (Stockfish 19 - `AnalysisPage.vue`)** :
+     - **Affichage Responsive Dual-Mode** :
+       - *Sur Mobile (mode portrait, `< 768px`)* : Échiquier avec barre d'évaluation en tête, corps de page scrollable verticalement pour faire défiler naturellement les actions, la carte de bilan et l'historique des coups.
+       - *Sur Tablette / Ordinateur (ou paysage, `≥ 768px`)* : Affichage ergonomique en 2 colonnes côte-à-côte (échiquier carré 1:1 et barre d'évaluation à gauche, commandes, carte de bilan et liste des coups à droite).
+     - **Éval direct (Évaluation continue)** : Calcul continu Stockfish (`infinite: true`) avec barre d'évaluation verticale dynamique, score numérique (+1.2, -0.8, #M2), variante principale calculée (PV) et flèche verte du meilleur coup sur l'échiquier, avec synchronisation immédiate sans nécessiter de redimensionnement de fenêtre.
+     - **Conseil (Hint ponctuel)** : Demande ponctuelle du meilleur coup calculé à pleine puissance (`core.requestHint({ multiPv: 2, movetime: 1500 })`) avec flèche verte tracée sur l'échiquier et retour textuel d'assistance clair (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*). Gestion explicite de la fin de partie invitant à reculer sur un coup antérieur si la partie est terminée sur la position affichée.
+     - **Bilan (Revue de partie autonome optimisée)** : Calcul autonome rapide à `depth: 10` (~15 à 20s au lieu de 5 min) avec barre de progression, support d'annulation fluide (`core.cancelReview()`), score de précision globale (Blancs & Noirs), carte récapitulative visuelle de synthèse des coups (`!!` brillant, `★` meilleur, `✓` excellent, `•` bon, `?!` imprécision, `?` erreur, `??` gaffe, `✗` victoire manquée) et annotation symbolique coup par coup dans le tableau d'historique.
 
 ## Module Profil & Personnalisation de l'Échiquier
 
