@@ -38,6 +38,8 @@ try {
     execSync('npm run test:unit', { cwd: rootDir, stdio: 'inherit' });
     console.log('  → PHPStan...');
     execSync('vendor/bin/phpstan analyze --debug --memory-limit=2G', { cwd: rootDir, stdio: 'inherit' });
+    console.log('  → PHPCS (WPCS)...');
+    execSync('vendor/bin/phpcs', { cwd: rootDir, stdio: 'inherit' });
     console.log('✅ Suite QA validée avec succès.\n');
 } catch (qaErr) {
     console.error('❌ Erreur : La suite QA a échoué. Packaging interrompu.');

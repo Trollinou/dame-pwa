@@ -99,6 +99,8 @@
 /* Item de liste interactif standard (hover doux, rayon 8px) */
 .dame-list-item {
   position: relative;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
   border-radius: var(--dame-item-radius, 8px);
   margin-bottom: 4px;
   transition: background-color 0.15s ease;

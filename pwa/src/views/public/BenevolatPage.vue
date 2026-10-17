@@ -74,6 +74,7 @@ import {
   type DataTableFilterConfig,
   type DataTableExportConfig
 } from '@/components/shared/DataTable';
+import { decodeHtmlEntities } from '@/utils/stringUtils';
 
 const router = useRouter();
 const benevolatStore = useBenevolatStore();
@@ -118,10 +119,10 @@ const viewBenevolat = (benevolat: Benevolat) => {
     router.push('/admin/benevolat/' + benevolat.id);
   } else {
     if (authStore.isAuthenticated) {
-      router.push('/tabs/benevolat/participation/' + benevolat.id);
+      router.push('/benevolat/participation/' + benevolat.id);
     } else {
       router.push({
-        path: '/tabs/login',
+        path: '/login',
         query: { message: 'Identification requise pour proposer votre aide.' }
       });
     }
@@ -129,18 +130,7 @@ const viewBenevolat = (benevolat: Benevolat) => {
 };
 
 const viewResults = (benevolat: Benevolat) => {
-  if (authStore.adminMode) {
-    router.push('/admin/benevolat/' + benevolat.id);
-  } else {
-    if (authStore.isAuthenticated) {
-      router.push('/tabs/benevolat/participation/' + benevolat.id);
-    } else {
-      router.push({
-        path: '/tabs/login',
-        query: { message: 'Identification requise pour proposer votre aide.' }
-      });
-    }
-  }
+  viewBenevolat(benevolat);
 };
 
 // Configuration des colonnes TanStack Table pour Bénévolat
@@ -148,8 +138,8 @@ const columns: CustomColumnDef<Benevolat>[] = [
   {
     id: 'title',
     header: 'Appel / Titre',
-    accessorFn: (row) => row.title?.raw || row.title?.rendered || '',
-    cell: ({ row }) => h('span', { innerHTML: row.original.title.rendered }),
+    accessorFn: (row) => decodeHtmlEntities(row.title?.raw || row.title?.rendered || ''),
+    cell: ({ row }) => decodeHtmlEntities(row.original.title?.rendered || row.original.title?.raw || ''),
     enableSorting: true
   },
   {

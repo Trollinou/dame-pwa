@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -59,6 +59,7 @@ import {
   type DataTableFilterConfig,
   type DataTableExportConfig
 } from '@/components/shared/DataTable';
+import { decodeHtmlEntities } from '@/utils/stringUtils';
 
 const router = useRouter();
 const contactStore = useContactStore();
@@ -114,8 +115,8 @@ const columns: CustomColumnDef<Contact>[] = [
   {
     id: 'name',
     header: 'Nom',
-    accessorFn: (row) => row.title?.raw || row.title?.rendered || '',
-    cell: ({ row }) => h('span', { innerHTML: row.original.title.rendered }),
+    accessorFn: (row) => decodeHtmlEntities(row.title?.raw || row.title?.rendered || ''),
+    cell: ({ row }) => decodeHtmlEntities(row.original.title?.rendered || row.original.title?.raw || ''),
     enableSorting: true
   },
   {

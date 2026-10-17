@@ -101,8 +101,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 		}
 
 		try {
-			const token = localStorage.getItem( 'dame_jwt_token' );
-			const isAuth = !! token;
+			const isAuth = authStore.isAuthenticated;
 
 			return await queryClient.fetchQuery( {
 				queryKey: [
@@ -142,9 +141,6 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 					const headers: Record< string, string > = {
 						'Content-Type': 'application/json',
 					};
-					if ( token ) {
-						headers.Authorization = `Bearer ${ token }`;
-					}
 
 					let response = await safeFetch(
 						`${ baseUrl }?${ queryParams }`,
@@ -157,7 +153,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 						( response.status === 401 ||
 							response.status === 403 ||
 							response.status === 400 ) &&
-						token
+						isAuth
 					) {
 						console.warn(
 							`Accès agenda authentifié refusé (${ response.status }), tentative de chargement public...`
@@ -168,7 +164,8 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 								method: 'GET',
 								headers: { 'Content-Type': 'application/json' },
 							},
-							8000
+							8000,
+							true
 						);
 					}
 
@@ -218,8 +215,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 			const isOffline =
 				error instanceof Error && error.message === 'Offline';
 			if ( isOffline ) {
-				const token = localStorage.getItem( 'dame_jwt_token' );
-				const isAuth = !! token;
+				const isAuth = authStore.isAuthenticated;
 				const cached = queryClient.getQueryData< AgendaEvent[] >( [
 					'agenda',
 					direction,
@@ -350,8 +346,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 
 		isLoading.value = true;
 		try {
-			const token = localStorage.getItem( 'dame_jwt_token' );
-			const isAuth = !! token;
+			const isAuth = authStore.isAuthenticated;
 
 			return await queryClient.fetchQuery( {
 				queryKey: [
@@ -382,9 +377,6 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 					const headers: Record< string, string > = {
 						'Content-Type': 'application/json',
 					};
-					if ( token ) {
-						headers.Authorization = `Bearer ${ token }`;
-					}
 
 					let response = await safeFetch(
 						`${ baseUrl }?${ queryParams }`,
@@ -396,7 +388,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 						( response.status === 401 ||
 							response.status === 403 ||
 							response.status === 400 ) &&
-						token
+						isAuth
 					) {
 						response = await safeFetch(
 							`${ baseUrl }?${ queryParams }`,
@@ -404,7 +396,8 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 								method: 'GET',
 								headers: { 'Content-Type': 'application/json' },
 							},
-							8000
+							8000,
+							true
 						);
 					}
 

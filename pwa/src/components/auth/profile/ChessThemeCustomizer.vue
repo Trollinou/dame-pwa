@@ -84,7 +84,7 @@
       </div>
 
       <!-- ÉCHIQUIER DE PRÉVISUALISATION DIRECTEMENT DESSOUS -->
-      <div class="preview-container">
+      <div v-if="isExpanded" class="preview-container">
         <div class="board-wrapper">
           <Chessboard
             :key="`${stagedPieceSet}-${stagedBoardTheme}`"
@@ -137,7 +137,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick, defineAsyncComponent } from 'vue';
 import { 
   IonButton, 
   IonIcon, 
@@ -149,9 +149,10 @@ import {
   refreshOutline,
   chevronDownOutline
 } from 'ionicons/icons';
-import { Chessboard } from '@/components/shared/Chessboard';
 import type { PieceSet, BoardTheme } from 'eg-chessboard';
 import { preloadAllPieceSets } from '@/composables/core/useChessThemeLoader';
+
+const Chessboard = defineAsyncComponent(() => import('@/components/shared/Chessboard/Chessboard.vue'));
 import { 
   useChessPreferencesStore, 
   AVAILABLE_PIECE_SET_OPTIONS, 

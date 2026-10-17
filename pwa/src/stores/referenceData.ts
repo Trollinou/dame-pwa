@@ -9,16 +9,9 @@ export interface ReferenceItem {
 }
 
 export const useReferenceDataStore = defineStore( 'referenceData', () => {
-	const getHeaders = () => {
-		const token = localStorage.getItem( 'dame_jwt_token' );
-		const headers: Record< string, string > = {
-			'Content-Type': 'application/json',
-		};
-		if ( token ) {
-			headers.Authorization = `Bearer ${ token }`;
-		}
-		return headers;
-	};
+	const getHeaders = (): Record< string, string > => ( {
+		'Content-Type': 'application/json',
+	} );
 
 	// 1. Regions Query
 	const { data: rawRegions, isLoading: isRegionsLoading } = useQuery<

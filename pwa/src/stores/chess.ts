@@ -70,18 +70,13 @@ export const useChessStore = defineStore(
 
 			// Sinon tenter l'envoi direct
 			try {
-				const token = authStore.token;
-				const response = await safeFetch(
-					`${ import.meta.env.VITE_API_BASE_URL }/roi/v1/games`,
-					{
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							Authorization: `Bearer ${ token }`,
-						},
-						body: JSON.stringify( gameData ),
-					}
-				);
+				const response = await safeFetch( '/roi/v1/games', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify( gameData ),
+				} );
 
 				if ( ! response.ok ) {
 					throw new Error( 'Erreur de sauvegarde serveur' );
@@ -127,7 +122,7 @@ export const useChessStore = defineStore(
 			}
 
 			const authStore = useAuthStore();
-			if ( ! authStore.token ) {
+			if ( ! authStore.isAuthenticated ) {
 				return;
 			}
 
@@ -136,17 +131,13 @@ export const useChessStore = defineStore(
 
 			for ( const game of pending ) {
 				try {
-					const response = await safeFetch(
-						`${ import.meta.env.VITE_API_BASE_URL }/roi/v1/games`,
-						{
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json',
-								Authorization: `Bearer ${ authStore.token }`,
-							},
-							body: JSON.stringify( game ),
-						}
-					);
+					const response = await safeFetch( '/roi/v1/games', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify( game ),
+					} );
 
 					if ( ! response.ok ) {
 						remaining.push( game );

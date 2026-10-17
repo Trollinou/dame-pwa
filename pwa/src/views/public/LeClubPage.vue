@@ -385,18 +385,20 @@ onIonViewWillEnter(async () => {
   if (route.query.tab) {
     selectedSegment.value = route.query.tab as string;
   }
-  loadTabContent();
 
-  if (events.value.length > 0) {
-    scrollToCurrentEvent();
-  }
-
-  try {
-    await agendaStore.fetchAgenda();
-  } catch (err) {
-    console.error('Erreur chargement agenda:', err);
-  } finally {
-    scrollToCurrentEvent();
+  if (selectedSegment.value === 'agenda') {
+    if (events.value.length > 0) {
+      scrollToCurrentEvent();
+    }
+    try {
+      await agendaStore.fetchAgenda();
+    } catch (err) {
+      console.error('Erreur chargement agenda:', err);
+    } finally {
+      scrollToCurrentEvent();
+    }
+  } else {
+    loadTabContent();
   }
 });
 </script>

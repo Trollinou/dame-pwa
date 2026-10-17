@@ -9,7 +9,7 @@
     />
 
     <!-- Contenu HTML de la Leçon hydratant FEN & PGN -->
-    <div ref="contentRef" class="lecon-content-wrapper ion-padding-top" v-html="contenuHtml"></div>
+    <div ref="contentRef" class="lecon-content-wrapper ion-padding-top" v-safe-html="contenuHtml"></div>
 
     <!-- Footer Fixe Unifié SeriesCardFooter (Carte 1/1) -->
     <SeriesCardFooter

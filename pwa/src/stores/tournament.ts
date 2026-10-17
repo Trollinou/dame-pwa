@@ -42,11 +42,24 @@ export const useTournamentStore = defineStore( 'tournament', () => {
 
 			const newData: MenuItem[] = await response.json();
 
-			// PRÉ-CHARGEMENT PROACTIF : On charge le contenu de chaque page de tournoi
-			// pour qu'ils soient disponibles hors-ligne sans même avoir à cliquer dessus.
+			// PRÉ-CHARGEMENT PROACTIF DIFFÉRENTIEL : On ne charge le contenu d'une page de tournoi
+			// que si elle n'est pas déjà en cache ou si sa date 'modified' a changé.
 			if ( navigator.onLine ) {
 				newData.forEach( ( item ) => {
 					if ( item.object_id ) {
+						const cached = queryClient.getQueryData< CachedPage >( [
+							'tournament',
+							'page',
+							item.object_id,
+						] );
+						if (
+							cached &&
+							item.modified &&
+							cached.modified &&
+							cached.modified === item.modified
+						) {
+							return;
+						}
 						fetchPage( item.object_id );
 					}
 				} );

@@ -274,8 +274,8 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
 3. **Sélecteur de Fond d'Échiquier (Rouleau Wheel-Picker)** :
    - Rouleau rotatif présentant les 9 nuances et textures d'arrière-plan : *Brown (Bois)* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Bois Veiné HD*, *Érable Doré*.
 4. **Prévisualisation en Temps Réel & Préchargement Fluide** :
-   - Échiquier complet en position initiale actualisé instantanément selon la combinaison sélectionnée.
-   - À l'ouverture de l'accordéon, l'application précharge de manière transparente les 10 feuilles de style vectorielles pour que le défilement des rouleaux reste instantané sans aucun temps de chargement visible. Sur le reste des écrans (jeu, exercices, analyse), seul le jeu de pièces réellement sélectionné est chargé en mémoire (économie de 96.5% de CSS).
+   - Échiquier complet en position initiale monté à la demande (`v-if="isExpanded"`, `defineAsyncComponent`) et actualisé instantanément selon la combinaison sélectionnée, évitant de charger le moteur d'échiquier (`chess-vendor`) tant que l'accordéon reste replié.
+   - À l'ouverture de l'accordéon, l'application précharge de manière transparente les 10 feuilles de style vectorielles (mises en cache via Workbox `pwa-chess-pieces-cache`) pour que le défilement des rouleaux reste instantané sans aucun temps de chargement visible. Sur le reste des écrans (jeu, exercices, analyse), seul le jeu de pièces réellement sélectionné est chargé en mémoire (économie de 96.5% de CSS).
 5. **Validation & Persistance** :
    - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
@@ -316,6 +316,11 @@ En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou
    - Permet de forcer un nettoyage complet manuel si nécessaire.
    - Purge le `CacheStorage` d'assets et le cache des requêtes tout en **préservant scrupuleusement la session active** (aucun mot de passe à resaisir).
    - Recharge immédiatement l'application pour afficher la dernière version disponible.
+5. **Résilience de Session Hors-Ligne (`simple-jwt-login`)** :
+   - Persistance des jetons JWT et `refresh_token` via `LocalStorageTokenStorage` avec initialisation instantanée de l'état connecté au démarrage (`sdk.isAuthenticated()`).
+   - Les requêtes authentifiées utilisent `sdk.fetchWithAuth()` (via `safeFetch`) pour injecter automatiquement le jeton Bearer et rejouer de manière transparente toute requête recevant un statut `401`.
+   - En cas de coupure réseau (mode hors-ligne, tunnel, perte 4G/Wi-Fi) ou d'erreur serveur `5xx` lors d'un rafraîchissement, la session reste active localement sans déconnecter l'utilisateur. Seul un rejet explicite du `refresh_token` par le serveur (`400`/`401`/`403`) déclenche `onSessionExpired` et redirige vers la page de connexion.
+   - La déconnexion (`await sdk.logout()`) nettoie immédiatement le stockage local et révoque le jeton côté serveur sans erreur même hors-ligne.
 
 ## Système de Design & Classes Canoniques Réutilisables
 

@@ -24,6 +24,10 @@ const DEFAULT_CONFIG = {
 		'name',
 		'fill',
 		'data-path',
+		'data-fen',
+		'data-pgn',
+		'data-orientation',
+		'data-shapes',
 		'style', // data-path est utilisé pour useInternalLinks
 	],
 };

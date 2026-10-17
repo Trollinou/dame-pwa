@@ -30,15 +30,11 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	const contenuActuelId = ref< number | null >( null );
 	const isCustomLoading = ref( false );
 
-	// Headers de sécurité
+	// Headers de sécurité (Authorization injecté nativement par safeFetch / sdk.fetchWithAuth)
 	const getAuthHeaders = (): Record< string, string > => {
-		const token = localStorage.getItem( 'dame_jwt_token' );
 		const headers: Record< string, string > = {
 			'Content-Type': 'application/json',
 		};
-		if ( token ) {
-			headers.Authorization = `Bearer ${ token }`;
-		}
 		if ( authStore.selectedIdentity?.id ) {
 			headers[ 'X-Selected-Identity' ] = authStore.selectedIdentity.id;
 		}

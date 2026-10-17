@@ -80,6 +80,8 @@
 }
 
 .table-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 48px;
   transition: background-color 0.15s ease-in-out;
 
   &:nth-child(even) {
@@ -93,6 +95,11 @@
       background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
     }
   }
+}
+
+.mobile-list-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
 }
 
 /* Responsive Dual-Mode DataTable */

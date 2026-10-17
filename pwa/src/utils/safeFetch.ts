@@ -1,9 +1,39 @@
 import { useAuthStore } from '@/stores/auth';
 
+const resolveWpJsonUrl = ( url: string ): string => {
+	if ( url.startsWith( 'http://' ) || url.startsWith( 'https://' ) ) {
+		return url;
+	}
+	const normalized = url.startsWith( '/' ) ? url : `/${ url }`;
+	if ( normalized.startsWith( '/wp-json/' ) ) {
+		return normalized;
+	}
+	return `/wp-json${ normalized }`;
+};
+
+const extractHeaderRecord = (
+	headers?: HeadersInit
+): Record< string, string > => {
+	if ( ! headers ) {
+		return {};
+	}
+	if ( headers instanceof Headers ) {
+		const record: Record< string, string > = {};
+		headers.forEach( ( value, key ) => {
+			record[ key ] = value;
+		} );
+		return record;
+	}
+	if ( Array.isArray( headers ) ) {
+		return Object.fromEntries( headers );
+	}
+	return { ...( headers as Record< string, string > ) };
+};
+
 /**
  * Utilitaire de fetch avec timeout pour éviter de bloquer l'interface,
- * gestion transparente du rafraîchissement des jetons JWT en cas de statut 401
- * et retry automatique de la requête.
+ * délégation native à `sdk.fetchWithAuth` pour l'injection du header Bearer
+ * et le rafraîchissement transparent des jetons JWT en cas de statut 401/400.
  *
  * @param url
  * @param options
@@ -20,42 +50,79 @@ export const safeFetch = async (
 	const id = setTimeout( () => controller.abort(), timeout );
 
 	try {
-		const response = await fetch( url, {
-			...options,
-			signal: controller.signal,
-		} );
-		clearTimeout( id );
-
-		// En cas d'erreur 401 (Unauthorized) ou 400 avec jeton d'authentification (rejet Simple-JWT-Login)
-		const headersRecord = ( options.headers || {} ) as Record<
-			string,
-			string
-		>;
-		const hasAuthHeader = Boolean(
+		const resolvedUrl = resolveWpJsonUrl( url );
+		const headersRecord = extractHeaderRecord( options.headers );
+		const hasExplicitAuthHeader = Boolean(
 			headersRecord.Authorization || headersRecord.authorization
 		);
+
+		let authStore: ReturnType< typeof useAuthStore > | null = null;
+		try {
+			authStore = useAuthStore();
+		} catch {
+			authStore = null;
+		}
+
+		const legacyToken =
+			typeof localStorage !== 'undefined'
+				? localStorage.getItem( 'dame_jwt_token' )
+				: null;
+		if (
+			authStore &&
+			legacyToken &&
+			! authStore.jwtSdk.getJwt() &&
+			legacyToken !== 'null' &&
+			legacyToken !== 'undefined'
+		) {
+			authStore.jwtSdk.setTokens( legacyToken );
+		}
+
+		const shouldUseAuth = Boolean(
+			hasExplicitAuthHeader ||
+				authStore?.isAuthenticated ||
+				authStore?.jwtSdk.isAuthenticated() ||
+				legacyToken
+		);
+
+		const fetchOptions: RequestInit = {
+			...options,
+			headers: headersRecord,
+			signal: controller.signal,
+		};
+
+		let response: Response;
+		if ( shouldUseAuth && authStore?.jwtSdk && ! isRetry ) {
+			response = await authStore.jwtSdk.fetchWithAuth(
+				resolvedUrl,
+				fetchOptions
+			);
+		} else {
+			const finalUrl =
+				resolvedUrl.startsWith( '/' ) &&
+				typeof window !== 'undefined' &&
+				window.location?.origin
+					? `${ window.location.origin }${ resolvedUrl }`
+					: resolvedUrl;
+			response = await fetch( finalUrl, fetchOptions );
+		}
+
+		clearTimeout( id );
+
+		// Repli de compatibilité : en cas de 401 (si non déjà rejoué) ou de 400 avec jeton d'authentification (rejet Simple-JWT-Login)
 		const isAuthError =
 			response.status === 401 ||
-			( response.status === 400 && hasAuthHeader );
+			( response.status === 400 && shouldUseAuth );
 
-		if (
-			isAuthError &&
-			! isRetry &&
-			typeof localStorage !== 'undefined' &&
-			localStorage.getItem( 'dame_jwt_token' )
-		) {
+		if ( isAuthError && ! isRetry && authStore && shouldUseAuth ) {
 			try {
-				const authStore = useAuthStore();
-				const newToken = await authStore.tryRefreshToken();
+				const newToken = await authStore.tryRefreshToken( true );
 				if ( newToken ) {
-					// Mettre à jour le header Authorization avec le nouveau token
 					const newHeaders: Record< string, string > = {
 						...headersRecord,
 						Authorization: `Bearer ${ newToken }`,
 					};
-					// Re-jouer la requête de manière transparente avec le nouveau jeton
 					return await safeFetch(
-						url,
+						resolvedUrl,
 						{ ...options, headers: newHeaders },
 						timeout,
 						true

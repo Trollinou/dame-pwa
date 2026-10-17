@@ -43,24 +43,19 @@ export const useBenevolatStore = defineStore( 'benevolat', () => {
 	const { data: rawReponses, isLoading: isReponsesLoading } = useQuery<
 		BenevolatReponse[]
 	>( {
-		queryKey: [
+		queryKey: computed( () => [
 			'benevolat',
 			'user-vote',
 			authStore.selectedIdentity?.member_id || 'anonymous',
-		],
+		] ),
 		queryFn: async () => {
-			const token = localStorage.getItem( 'dame_jwt_token' );
-			const apiUrl = import.meta.env.VITE_API_BASE_URL;
-			const headers: Record< string, string > = {
-				'Content-Type': 'application/json',
-			};
-			if ( token ) {
-				headers.Authorization = `Bearer ${ token }`;
-			}
-
 			const response = await safeFetch(
-				`${ apiUrl }/wp/v2/benevolat-reponses?context=view&per_page=100`,
-				{ headers },
+				'/wp/v2/benevolat-reponses?context=view&per_page=100',
+				{
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				},
 				4000
 			);
 

@@ -80,6 +80,7 @@ import {
   formatEventSchedule,
   formatEventLocation
 } from '@/utils/seasonUtils';
+import { decodeHtmlEntities } from '@/utils/stringUtils';
 
 const router = useRouter();
 const agendaStore = useAgendaStore();
@@ -119,8 +120,8 @@ const columns: CustomColumnDef<AgendaEvent>[] = [
   {
     id: 'title',
     header: 'Titre',
-    accessorFn: (row) => row.title?.raw || row.title?.rendered || '',
-    cell: ({ row }) => h('span', { innerHTML: row.original.title.rendered }),
+    accessorFn: (row) => decodeHtmlEntities(row.title?.raw || row.title?.rendered || ''),
+    cell: ({ row }) => decodeHtmlEntities(row.original.title?.rendered || row.original.title?.raw || ''),
     enableSorting: true
   },
   {

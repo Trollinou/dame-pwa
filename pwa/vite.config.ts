@@ -85,9 +85,13 @@ export default defineConfig( {
 			workbox: {
 				skipWaiting: true,
 				clientsClaim: true,
-				// Assets essentiels mis en cache (sans wasm pour alléger le pré-cache initial)
+				// Assets essentiels mis en cache (sans wasm ni jeux de pièces secondaires pour alléger le pré-cache initial)
 				globPatterns: [ '**/*.{js,css,html,ico,png,svg}' ],
-				globIgnores: [ '**/version.json' ],
+				globIgnores: [
+					'**/version.json',
+					'**/stats.html',
+					'**/assets/{alpha,cardinal,dubrovny,fantasy,firi,maestro,merida,staunty,tatiana}-*.css',
+				],
 				maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 				runtimeCaching: [
 					{
@@ -97,6 +101,21 @@ export default defineConfig( {
 							cacheName: 'pwa-stockfish-cache',
 							expiration: {
 								maxEntries: 2,
+								maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
+							},
+							cacheableResponse: {
+								statuses: [ 0, 200 ],
+							},
+						},
+					},
+					{
+						urlPattern:
+							/.*\/assets\/(?:alpha|cardinal|cburnett|dubrovny|fantasy|firi|maestro|merida|staunty|tatiana)-.*\.css$/,
+						handler: 'CacheFirst',
+						options: {
+							cacheName: 'pwa-chess-pieces-cache',
+							expiration: {
+								maxEntries: 15,
 								maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
 							},
 							cacheableResponse: {
@@ -139,6 +158,12 @@ export default defineConfig( {
 		rollupOptions: {
 			output: {
 				manualChunks( id ) {
+					if (
+						id.includes( '/eg-chessboard/' ) ||
+						id.includes( 'node_modules/chessops/' )
+					) {
+						return 'chess-vendor';
+					}
 					if ( id.includes( 'node_modules' ) ) {
 						if (
 							id.includes( 'node_modules/vue/' ) ||
@@ -154,14 +179,14 @@ export default defineConfig( {
 						) {
 							return 'ionic-vendor';
 						}
+						if (
+							id.includes( 'node_modules/@tanstack/vue-table' ) ||
+							id.includes( 'node_modules/@tanstack/table-core' )
+						) {
+							return 'table-vendor';
+						}
 						if ( id.includes( 'node_modules/@tanstack/' ) ) {
 							return 'tanstack-vendor';
-						}
-						if (
-							id.includes( 'node_modules/eg-chessboard/' ) ||
-							id.includes( 'node_modules/chessops/' )
-						) {
-							return 'chess-vendor';
 						}
 						if ( id.includes( 'node_modules/canvas-confetti/' ) ) {
 							return 'confetti-vendor';
