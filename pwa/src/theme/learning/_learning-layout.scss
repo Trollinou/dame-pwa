@@ -626,14 +626,10 @@
 
 /* Stabilité Landscape Jeu & Analyse */
 .landscape-mode {
-  .main-wrap,
-  .main-board {
+  .main-wrap {
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
-  }
-
-  .main-wrap {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -650,7 +646,7 @@
   }
 
   .board-container {
-    width: min(75vh, 50vw) !important;
+    width: min(72vh, 48vw) !important;
     height: auto !important;
     aspect-ratio: 1 / 1 !important;
     max-width: 100%;
@@ -688,8 +684,9 @@
   }
 
   .landscape-mode .board-container {
-    width: 75vh !important;
-    height: 75vh !important;
+    width: min(75vh, 48vw) !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
   }
 
   .side-section {

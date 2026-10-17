@@ -27,14 +27,17 @@
             </div>
             <div class="meta-right">
               <span class="ply-badge">
-                Coup {{ currentPly }} / {{ totalPlyCount }}
+                Coup {{ currentPly }} / {{ totalPlyCount }} {{ currentPly === 0 ? '(Début)' : '' }}
               </span>
               <span
-                v-if="isLiveAnalysis && currentEvaluation"
+                v-if="isLiveAnalysis"
                 class="eval-badge"
-                :class="{ 'is-white': (currentEvaluation.whiteScoreValue ?? 0) >= 0, 'is-black': (currentEvaluation.whiteScoreValue ?? 0) < 0 }"
+                :class="{
+                  'is-white': currentEvaluation ? (currentEvaluation.whiteScoreValue ?? 0) >= 0 : true,
+                  'is-black': currentEvaluation ? (currentEvaluation.whiteScoreValue ?? 0) < 0 : false
+                }"
               >
-                {{ formatEvaluationScore(currentEvaluation) }}
+                {{ currentEvaluation ? formatEvaluationScore(currentEvaluation) : '...' }}
               </span>
             </div>
           </div>
@@ -44,12 +47,12 @@
           <div class="board-section">
             <div class="board-wrapper-with-eval">
               <!-- Barre d'évaluation Stockfish 19 -->
-              <div v-if="isLiveAnalysis && currentEvaluation" class="analysis-eval-bar-container">
+              <div v-if="isLiveAnalysis" class="analysis-eval-bar-container">
                 <div class="analysis-eval-bar">
                   <div class="analysis-eval-fill" :style="{ '--eval-percent': `${evalBarPercent}%` }"></div>
                 </div>
                 <div class="analysis-eval-label">
-                  {{ formatEvaluationScore(currentEvaluation) }}
+                  {{ currentEvaluation ? formatEvaluationScore(currentEvaluation) : '...' }}
                 </div>
               </div>
 
@@ -205,6 +208,16 @@
 
                 <!-- Historique structuré en tableau -->
                 <div class="move-history-container" ref="historyScrollContainer">
+                  <div class="move-start-row" v-if="historyMoves.length > 0">
+                    <button 
+                      type="button"
+                      :class="['start-position-btn', { 'active-move': currentPly === 0 }]"
+                      @click="viewFirst"
+                    >
+                      <ion-icon :icon="playBackOutline"></ion-icon>
+                      <span>Position initiale</span>
+                    </button>
+                  </div>
                   <div class="move-table">
                     <div v-for="(row, rIdx) in groupedHistory" :key="rIdx" class="move-table-row">
                       <div v-for="move in row" :key="move.number" class="move-group">
@@ -476,9 +489,12 @@ watch(currentPly, () => {
  */
 const refreshDisplay = () => {
   if (boardApi) {
-    currentPly.value = boardApi.getCurrentPlyNumber();
     const rawHistory = boardApi.getHistory();
     totalPlyCount.value = rawHistory ? rawHistory.length : 0;
+    const historyState = boardApi.getHistoryViewerState();
+    currentPly.value = (historyState && historyState.isEnabled && historyState.plyViewing !== undefined)
+      ? historyState.plyViewing
+      : totalPlyCount.value;
     updateMoveHistory();
   }
 };
@@ -487,7 +503,7 @@ const viewPly = (ply: number) => {
   hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewHistory(ply);
-  currentPly.value = ply;
+  refreshDisplay();
 };
 
 const handleBoardCreated = (api: BoardCore) => {
@@ -509,30 +525,28 @@ const viewFirst = () => {
   hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewStart(); 
-  currentPly.value = 0; 
+  refreshDisplay();
 };
 
 const viewPrev = () => { 
   hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewPrevious(); 
-  if (currentPly.value > 0) currentPly.value--; 
+  refreshDisplay();
 };
 
 const viewNext = () => { 
   hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
   boardApi?.viewNext(); 
-  if (boardApi && currentPly.value < totalPlyCount.value) {
-    currentPly.value++;
-  }
+  refreshDisplay();
 };
 
 const viewLast = () => { 
   hintFeedbackMessage.value = null;
   boardApi?.hideMoves();
-  boardApi?.stopViewingHistory(); 
-  if (boardApi) currentPly.value = totalPlyCount.value; 
+  boardApi?.viewHistory(totalPlyCount.value); 
+  refreshDisplay();
 };
 
 const toggleLiveAnalysis = () => {
@@ -547,13 +561,16 @@ const toggleLiveAnalysis = () => {
   }
   nextTick(() => {
     boardApi?.redraw(true);
-    window.dispatchEvent(new Event('resize'));
+    setTimeout(() => {
+      boardApi?.redraw(true);
+      window.dispatchEvent(new Event('resize'));
+    }, 50);
   });
 };
 
 const requestHint = () => {
   if (!boardApi) return;
-  if (currentPly.value === totalPlyCount.value && totalPlyCount.value > 0) {
+  if (currentPly.value === totalPlyCount.value && totalPlyCount.value > 0 && boardApi.getIsGameOver()) {
     hintFeedbackMessage.value = 'Partie terminée sur cette position. Revenez en arrière pour demander un conseil.';
     if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
     hintFeedbackTimer = setTimeout(() => {
@@ -584,14 +601,7 @@ const handleStockfishHint = (bestMove: string) => {
 };
 
 const handleEvaluation = (evaluation: StockfishEvaluation) => {
-  const isFirstEval = !currentEvaluation.value;
   currentEvaluation.value = evaluation;
-  if (isFirstEval) {
-    nextTick(() => {
-      boardApi?.redraw(true);
-      window.dispatchEvent(new Event('resize'));
-    });
-  }
   // Lors de l'analyse en continu, afficher le meilleur coup calculé pour la position visualisée
   if (isLiveAnalysis.value && boardApi && evaluation.bestMove && evaluation.bestMove.length >= 4) {
     const from = evaluation.bestMove.substring(0, 2);

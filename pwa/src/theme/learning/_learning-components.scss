@@ -2232,14 +2232,27 @@ cg-board.piece-icon-box {
 .board-wrapper-with-eval {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
-  width: 100%;
-  height: 100%;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
 
   .board-container {
-    flex: 1;
-    min-width: 0;
+    flex: 0 1 auto;
+    width: min(72vh, 100%);
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .analysis-eval-bar-container + .board-container {
+    max-width: calc(100% - 36px);
   }
 }
 
@@ -2249,11 +2262,52 @@ cg-board.piece-icon-box {
   align-items: center;
   justify-content: space-between;
   width: 28px;
+  align-self: stretch;
   background: var(--ion-color-step-100, #222);
   border-radius: 6px;
   overflow: hidden;
   padding: 4px 2px;
   border: 1px solid var(--ion-color-step-200, #333);
+}
+
+.move-start-row {
+  margin-bottom: 6px;
+  display: flex;
+}
+
+.start-position-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ion-color-step-600, #666);
+  background: var(--ion-color-step-50, #f8f9fa);
+  border: 1px solid var(--ion-color-step-150, #e9ecef);
+  border-radius: var(--dame-button-radius, 6px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  ion-icon {
+    font-size: 0.95rem;
+  }
+
+  &:hover {
+    background: var(--ion-color-step-100, #e9ecef);
+    color: var(--ion-text-color, #212529);
+  }
+
+  &.active-move {
+    background: var(--ion-color-primary, #3880ff);
+    color: #ffffff;
+    border-color: var(--ion-color-primary, #3880ff);
+
+    ion-icon {
+      color: #ffffff;
+    }
+  }
 }
 
 .analysis-eval-bar {

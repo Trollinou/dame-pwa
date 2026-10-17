@@ -11,15 +11,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Sur mobile portrait (`< 768px`) : Agencement en colonne unique avec échiquier en tête et corps de page scrollable (`:scroll-y="true"`), permettant de faire défiler naturellement les actions, la carte de bilan et l'historique complet des coups.
     - Sur tablette et ordinateur (`≥ 768px` ou paysage) : Disposition ergonomique en 2 colonnes côte-à-côte (échiquier carré `1:1` et barre d'évaluation à gauche, commandes, carte de bilan et historique des coups à droite).
   - **Correction de la Géométrie et de la Stabilité de l'Échiquier** :
-    - Verrouillage du ratio d'aspect carré (`aspect-ratio: 1 / 1`) éliminant définitivement la distorsion et l'écrasement vertical des pièces.
-    - Suppression de `renderKey++` au redimensionnement, évitant la destruction et le re-montage intempestifs du composant `<Chessboard>`.
-    - Synchronisation et rafraîchissement immédiat du canvas SVG lors de l'activation de l'évaluation ou de la suggestion de coup, garantissant l'affichage instantané de la barre d'évaluation et de la flèche verte sans devoir redimensionner la fenêtre.
+    - Suppression de la règle intrusive `.main-board { height: 100% !important; }` en mode paysage et assouplissement de l'alignement (`align-items: center`) dans `.board-wrapper-with-eval`, rétablissant le calcul intrinsèque 1:1 de `eg-chessboard` (`padding-bottom: 100%`) et éliminant définitivement l'étirement des cases en rectangles verticaux sur écran large ou lors du redimensionnement.
+    - Synchronisation rigoureuse de l'état de visualisation (`getHistoryViewerState()`) : résout la discordance où le dernier coup était surligné dans l'historique alors que l'échiquier affichait la position initiale.
+    - Ajout d'un bouton d'accès rapide « Position initiale » en tête de la table d'historique, actif dès l'arrivée sur l'écran d'analyse et permettant de naviguer instantanément à la position de départ.
+    - Persistance du conteneur de la barre d'évaluation dès l'activation du mode direct, évitant tout décalage d'agencement (layout shift) et assurant le tracé immédiat et exact des flèches vectorielles de conseil.
     - Correction de la réactivité de `totalPlyCount` (passage en `ref` réactive synchronisée dans `refreshDisplay()`) résolvant l'anomalie d'affichage `Coup 35 / 0`.
   - **Accélération et Restitution Visuelle du Bilan de Partie (Stockfish 19)** :
     - Réduction de la profondeur de calcul de `depth: 12` à `depth: 10`, ramenant le temps d'exécution d'une revue complète de ~5 minutes à ~15-20 secondes.
     - Ajout d'une carte de bilan détaillée post-mortem affichant les pourcentages de précision globale (Blancs et Noirs) ainsi que la grille récapitulative des jugements de coups (`!!` brillant, `★` meilleur, `✓` excellent, `•` bon, `?!` imprécision, `?` erreur, `??` gaffe, `✗` victoire manquée).
   - **Amélioration du Retour Utilisateur sur le Conseil & Fin de Partie** :
-    - Gestion explicite de la fin de partie affichant un message d'assistance lorsque l'utilisateur sollicite un conseil sur une position finale terminée (mat/pat).
+    - Gestion explicite de la fin de partie via `boardApi.getIsGameOver()` affichant un message d'assistance lorsque l'utilisateur sollicite un conseil sur une position finale terminée (mat/pat).
     - Ajout d'un bandeau textuel informatif accompagnant le tracé de la flèche verte lors de la suggestion de coup (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*).
 
 ## [1.10.1] - 2026-10-13
