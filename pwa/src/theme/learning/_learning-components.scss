@@ -2438,6 +2438,15 @@ cg-board.piece-icon-box {
       background: #aaa;
     }
   }
+
+  &.is-clickable {
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+  }
 }
 
 @keyframes status-pulse-danger {

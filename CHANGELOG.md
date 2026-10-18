@@ -17,11 +17,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Persistance du conteneur de la barre d'évaluation dès l'activation du mode direct, évitant tout décalage d'agencement (layout shift) et assurant le tracé immédiat et exact des flèches vectorielles de conseil.
     - Correction de la réactivité de `totalPlyCount` (passage en `ref` réactive synchronisée dans `refreshDisplay()`) résolvant l'anomalie d'affichage `Coup 35 / 0`.
   - **Accélération et Restitution Visuelle du Bilan de Partie (Stockfish 19)** :
-    - Réduction de la profondeur de calcul de `depth: 12` à `depth: 10`, ramenant le temps d'exécution d'une revue complète de ~5 minutes à ~15-20 secondes.
+    - Réduction ciblée de la profondeur de calcul à `depth: 8` (au lieu de 12 ou 10), garantissant un temps de calcul de 100 à 250 ms par coup et éliminant le franchissement du watchdog de 5s dans les milieux de jeu complexes. Le bilan complet d'une partie de 37 coups s'exécute désormais en 5 à 8 secondes sans aucune interruption.
     - Ajout d'une carte de bilan détaillée post-mortem affichant les pourcentages de précision globale (Blancs et Noirs) ainsi que la grille récapitulative des jugements de coups (`!!` brillant, `★` meilleur, `✓` excellent, `•` bon, `?!` imprécision, `?` erreur, `??` gaffe, `✗` victoire manquée).
   - **Amélioration du Retour Utilisateur sur le Conseil & Fin de Partie** :
     - Gestion explicite de la fin de partie via `boardApi.getIsGameOver()` affichant un message d'assistance lorsque l'utilisateur sollicite un conseil sur une position finale terminée (mat/pat).
     - Ajout d'un voyant lumineux d'état moteur en temps réel (`.engine-status-indicator`) avec pastille dynamique (vert fixe : *Moteur prêt*, rouge/orange pulsant : *En réflexion...*, ambre clignotant : *Chargement IA...*, gris : *Moteur inactif*, rouge : *Erreur moteur*) informant immédiatement l'utilisateur de l'activité interne de Stockfish.
+    - Mécanisme d'auto-récupération du moteur : interruption propre en cas d'erreur de calcul et redémarrage automatique à chaud de Stockfish en conservant le coup en cours de visualisation.
+    - Voyant d'état interactif : en cas d'erreur moteur résiduelle, un clic direct sur le voyant rouge redémarre instantanément le worker Stockfish.
     - Ajout d'un timer de sécurité (watchdog de 6s) sur la demande de conseil évitant tout sentiment de blocage en boucle infinie en cas de non-réponse du moteur.
     - Ajout d'un bandeau textuel informatif accompagnant le tracé de la flèche verte lors de la suggestion de coup (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*).
 

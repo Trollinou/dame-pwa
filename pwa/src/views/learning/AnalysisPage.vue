@@ -29,8 +29,9 @@
               <!-- Voyant d'état moteur Stockfish -->
               <span
                 class="engine-status-indicator"
-                :class="`engine-status-${engineStatus}`"
-                :title="`État du moteur IA : ${engineStatusLabel}`"
+                :class="[`engine-status-${engineStatus}`, { 'is-clickable': engineStatus === 'error' }]"
+                :title="engineStatus === 'error' ? 'Erreur moteur — Cliquer pour redémarrer Stockfish' : `État du moteur IA : ${engineStatusLabel}`"
+                @click="engineStatus === 'error' ? recoverEngine() : undefined"
               >
                 <span class="status-dot"></span>
                 <span class="status-label">{{ engineStatusLabel }}</span>
@@ -70,7 +71,7 @@
                 <!-- Échiquier (Mode Lecture Seule) -->
                 <Chessboard 
                   v-if="isReady"
-                  key="board-analysis-view"
+                  :key="`board-analysis-${boardKey}`"
                   :board-config="boardConfig"
                   :stockfish-config="analysisStockfishConfig"
                   @board-created="handleBoardCreated"
@@ -332,6 +333,7 @@ export interface HistoryMoveItem {
 const chessStore = useChessStore();
 let boardApi: BoardCore | null = null;
 const isReady = ref(false);
+const boardKey = ref(0);
 const currentPly = ref(0);
 const totalPlyCount = ref(0);
 const historyMoves = ref<HistoryMoveItem[]>([]);
@@ -540,6 +542,9 @@ const handleBoardCreated = (api: BoardCore) => {
   if (chessStore.currentPgn) {
     boardApi.loadPgn(chessStore.currentPgn);
   }
+  if (currentPly.value > 0) {
+    boardApi.viewHistory(currentPly.value);
+  }
   refreshDisplay();
 };
 
@@ -648,8 +653,24 @@ const handleEvaluation = (evaluation: StockfishEvaluation) => {
   }
 };
 
+const recoverEngine = () => {
+  if (isReviewing.value) {
+    cancelReview();
+  }
+  boardKey.value++;
+};
+
 const handleEngineStatus = (status: EngineStatus) => {
   engineStatus.value = status;
+  if (status === 'error') {
+    if (isReviewing.value) {
+      hintFeedbackMessage.value = 'Le moteur Stockfish a été interrompu pendant le bilan. Réinitialisation en cours...';
+      cancelReview();
+      setTimeout(() => {
+        recoverEngine();
+      }, 1000);
+    }
+  }
 };
 
 let reviewAbortController: AbortController | null = null;
@@ -679,7 +700,7 @@ const startReview = async () => {
 
   try {
     const report = await boardApi.reviewGame({
-      depth: 10,
+      depth: 8,
       signal: reviewAbortController.signal,
       onProgress: (percent) => {
         reviewProgress.value = percent;
