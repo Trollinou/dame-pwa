@@ -708,7 +708,7 @@ const startReview = async () => {
 
   try {
     const report = await boardApi.reviewGame({
-      depth: 8,
+      depth: 12,
       signal: reviewAbortController.signal,
       onProgress: (percent) => {
         reviewProgress.value = percent;
