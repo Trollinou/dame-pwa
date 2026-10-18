@@ -38,7 +38,7 @@
               </span>
 
               <span class="ply-badge">
-                Coup {{ currentPly }} / {{ totalPlyCount }} {{ currentPly === 0 ? '(Début)' : '' }}
+                Coup {{ activePly }} / {{ totalPlyCount }} {{ activePly === 0 ? '(Début)' : '' }}
               </span>
               <span
                 v-if="isLiveAnalysis"
@@ -141,7 +141,7 @@
               <div v-if="gameReviewReport && !isReviewing" class="analysis-review-card">
                 <div class="review-header">
                   <h3>Bilan de la partie</h3>
-                  <ion-button fill="clear" size="small" @click="gameReviewReport = null">
+                  <ion-button fill="clear" size="small" @click="closeReviewReport">
                     <ion-icon slot="icon-only" :icon="closeOutline"></ion-icon>
                   </ion-button>
                 </div>
@@ -180,6 +180,76 @@
                   <span v-if="reviewSummaryCounts.missed_win > 0" class="judgement-pill judgement-missed-win">
                     ✗ {{ reviewSummaryCounts.missed_win }}
                   </span>
+                </div>
+              </div>
+
+              <!-- Fiche didactique du coup analysé en mode Bilan -->
+              <div v-if="gameReviewReport && !isReviewing && selectedMoveAnalysis" class="analysis-move-card">
+                <div class="move-card-header">
+                  <div class="move-title-group">
+                    <span class="move-label">{{ selectedMoveLabel }}</span>
+                    <span :class="['judgement-pill', judgementConfig[selectedMoveAnalysis.judgement].class]">
+                      {{ judgementConfig[selectedMoveAnalysis.judgement].symbol }} {{ judgementConfig[selectedMoveAnalysis.judgement].label }}
+                    </span>
+                  </div>
+                  <div class="move-nav-mini">
+                    <button
+                      type="button"
+                      class="mini-nav-btn"
+                      :disabled="activePly <= 1"
+                      title="Coup précédent"
+                      @click="viewPrev"
+                    >
+                      <ion-icon :icon="chevronBackOutline"></ion-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="mini-nav-btn"
+                      :disabled="activePly >= totalPlyCount"
+                      title="Coup suivant"
+                      @click="viewNext"
+                    >
+                      <ion-icon :icon="chevronForwardOutline"></ion-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="move-details-grid">
+                  <div class="move-detail-row played-row">
+                    <span class="detail-label">Coup joué :</span>
+                    <span class="detail-move played-move">
+                      <span class="arrow-indicator" :class="`arrow-${judgementConfig[selectedMoveAnalysis.judgement].brush}`">➔</span>
+                      <span v-safe-html="formatSan(selectedMoveAnalysis.san)"></span>
+                    </span>
+                  </div>
+                  <div v-if="selectedMoveAnalysis.bestMoveSan && selectedMoveAnalysis.bestMoveUci !== selectedMoveAnalysis.uci" class="move-detail-row best-row">
+                    <span class="detail-label">Meilleur coup :</span>
+                    <span class="detail-move best-move">
+                      <span class="arrow-indicator arrow-green">➔</span>
+                      <span v-safe-html="formatSan(selectedMoveAnalysis.bestMoveSan)"></span>
+                    </span>
+                  </div>
+                </div>
+
+                <div v-if="selectedMoveAnalysis.comment" class="move-comment">
+                  {{ selectedMoveAnalysis.comment }}
+                </div>
+
+                <div class="move-toggle-actions">
+                  <button
+                    type="button"
+                    :class="['step-toggle-btn', { 'is-active': isViewingBeforeMove }]"
+                    @click="toggleBeforeAfter(true)"
+                  >
+                    Avant le coup
+                  </button>
+                  <button
+                    type="button"
+                    :class="['step-toggle-btn', { 'is-active': !isViewingBeforeMove }]"
+                    @click="toggleBeforeAfter(false)"
+                  >
+                    Après le coup
+                  </button>
                 </div>
               </div>
 
@@ -223,7 +293,7 @@
                   <div class="move-start-row" v-if="historyMoves.length > 0">
                     <button 
                       type="button"
-                      :class="['start-position-btn', { 'active-move': currentPly === 0 }]"
+                      :class="['start-position-btn', { 'active-move': activePly === 0 }]"
                       @click="viewFirst"
                     >
                       <ion-icon :icon="playBackOutline"></ion-icon>
@@ -235,7 +305,7 @@
                       <div v-for="move in row" :key="move.number" class="move-group">
                         <span class="move-num">{{ move.number }}.</span>
                         <span 
-                          :class="['move-san', { 'active-move': move.white.ply === currentPly }]"
+                          :class="['move-san', { 'active-move': move.white.ply === activePly }]"
                           @click="viewPly(move.white.ply)"
                         >
                           <span v-safe-html="formatSan(move.white.san)"></span>
@@ -246,7 +316,7 @@
                         </span>
                         <span 
                           v-if="move.black"
-                          :class="['move-san', { 'active-move': move.black.ply === currentPly }]"
+                          :class="['move-san', { 'active-move': move.black.ply === activePly }]"
                           @click="viewPly(move.black.ply)"
                         >
                           <span v-safe-html="formatSan(move.black.san)"></span>
@@ -315,7 +385,9 @@ import type {
   StockfishEvaluation,
   EngineStatus,
   GameReviewReport,
-  MoveJudgement
+  MoveJudgement,
+  MoveAnalysisReport,
+  DrawShape
 } from 'eg-chessboard';
 import {
   getStockfishUrls,
@@ -336,9 +408,18 @@ let boardApi: BoardCore | null = null;
 const isReady = ref(false);
 const boardKey = ref(0);
 const currentPly = ref(0);
+const selectedReviewPly = ref<number | null>(null);
+const isViewingBeforeMove = ref(true);
 const totalPlyCount = ref(0);
 const historyMoves = ref<HistoryMoveItem[]>([]);
 const historyScrollContainer = ref<HTMLElement | null>(null);
+
+const activePly = computed(() => {
+  if (selectedReviewPly.value !== null) {
+    return selectedReviewPly.value;
+  }
+  return currentPly.value;
+});
 
 const isLandscape = ref(window.innerWidth > window.innerHeight);
 const isDesktop = ref(window.innerWidth >= 768);
@@ -439,16 +520,31 @@ const reviewSummaryCounts = computed(() => {
   return counts;
 });
 
-const judgementConfig: Record<MoveJudgement, { symbol: string; class: string }> = {
-  brilliant: { symbol: '!!', class: 'judgement-brilliant' },
-  best: { symbol: '★', class: 'judgement-best' },
-  excellent: { symbol: '✓', class: 'judgement-excellent' },
-  good: { symbol: '•', class: 'judgement-good' },
-  inaccuracy: { symbol: '?!', class: 'judgement-inaccuracy' },
-  mistake: { symbol: '?', class: 'judgement-mistake' },
-  blunder: { symbol: '??', class: 'judgement-blunder' },
-  missed_win: { symbol: '✗', class: 'judgement-missed-win' },
+const judgementConfig: Record<MoveJudgement, { symbol: string; class: string; label: string; brush: string }> = {
+  brilliant: { symbol: '!!', class: 'judgement-brilliant', label: 'Brillant', brush: 'blue' },
+  best: { symbol: '★', class: 'judgement-best', label: 'Meilleur coup', brush: 'green' },
+  excellent: { symbol: '✓', class: 'judgement-excellent', label: 'Excellent', brush: 'green' },
+  good: { symbol: '•', class: 'judgement-good', label: 'Bon coup', brush: 'blue' },
+  inaccuracy: { symbol: '?!', class: 'judgement-inaccuracy', label: 'Imprécision', brush: 'yellow' },
+  mistake: { symbol: '?', class: 'judgement-mistake', label: 'Erreur', brush: 'yellow' },
+  blunder: { symbol: '??', class: 'judgement-blunder', label: 'Gaffe', brush: 'red' },
+  missed_win: { symbol: '✗', class: 'judgement-missed-win', label: 'Gain manqué', brush: 'red' },
 };
+
+const selectedMoveAnalysis = computed<MoveAnalysisReport | null>(() => {
+  if (!gameReviewReport.value?.moves || selectedReviewPly.value === null || selectedReviewPly.value === 0) {
+    return null;
+  }
+  return gameReviewReport.value.moves.find(m => m.ply === selectedReviewPly.value) || null;
+});
+
+const selectedMoveLabel = computed(() => {
+  if (!selectedMoveAnalysis.value) return '';
+  const m = selectedMoveAnalysis.value;
+  const moveNumber = Math.ceil(m.ply / 2);
+  const isWhite = m.ply % 2 === 1;
+  return isWhite ? `${moveNumber}. ${m.san}` : `${moveNumber}... ${m.san}`;
+});
 
 /**
  * Formate un coup SAN avec symbole de pièce agrandi
@@ -500,7 +596,7 @@ const groupedHistory = computed(() => {
 /**
  * Scroll automatique du conteneur d'historique lors du changement de coup
  */
-watch(currentPly, () => {
+watch(activePly, () => {
   setTimeout(() => {
     if (historyScrollContainer.value) {
       const activeEl = historyScrollContainer.value.querySelector('.active-move') as HTMLElement;
@@ -531,11 +627,97 @@ const refreshDisplay = () => {
   }
 };
 
+/**
+ * Met à jour l'affichage de l'échiquier et les flèches en mode Bilan
+ */
+const updateReviewBoardDisplay = () => {
+  if (!boardApi || selectedReviewPly.value === null || !gameReviewReport.value) return;
+  const ply = selectedReviewPly.value;
+  if (ply === 0) {
+    boardApi.hideMoves();
+    boardApi.viewStart();
+    refreshDisplay();
+    return;
+  }
+
+  const analysis = selectedMoveAnalysis.value;
+  if (isViewingBeforeMove.value) {
+    if (ply === 1) {
+      boardApi.viewStart();
+    } else {
+      boardApi.viewHistory(ply - 1);
+    }
+
+    if (analysis && analysis.uci && analysis.uci.length >= 4) {
+      const playedBrush = judgementConfig[analysis.judgement]?.brush || 'yellow';
+      const playedFrom = analysis.uci.substring(0, 2);
+      const playedTo = analysis.uci.substring(2, 4);
+      const shapes: DrawShape[] = [];
+
+      const bestUci = analysis.bestMoveUci;
+      if (bestUci && bestUci.length >= 4 && bestUci !== analysis.uci) {
+        // Flèche du coup joué avec la couleur de son jugement
+        shapes.push({
+          orig: playedFrom,
+          dest: playedTo,
+          brush: playedBrush,
+        } as DrawShape);
+        // Flèche du meilleur coup en vert
+        shapes.push({
+          orig: bestUci.substring(0, 2),
+          dest: bestUci.substring(2, 4),
+          brush: 'green',
+        } as DrawShape);
+      } else {
+        // Coup parfait ou meilleur coup
+        shapes.push({
+          orig: playedFrom,
+          dest: playedTo,
+          brush: 'green',
+        } as DrawShape);
+      }
+      boardApi.setShapes(shapes);
+    } else {
+      boardApi.hideMoves();
+    }
+  } else {
+    // Affichage après coup : voir la position résultante
+    boardApi.hideMoves();
+    boardApi.viewHistory(ply);
+  }
+  refreshDisplay();
+};
+
+const selectPlyForReview = (ply: number) => {
+  selectedReviewPly.value = ply;
+  isViewingBeforeMove.value = true;
+  hintFeedbackMessage.value = null;
+  updateReviewBoardDisplay();
+};
+
+const toggleBeforeAfter = (before: boolean) => {
+  if (isViewingBeforeMove.value === before) return;
+  isViewingBeforeMove.value = before;
+  updateReviewBoardDisplay();
+};
+
+const closeReviewReport = () => {
+  gameReviewReport.value = null;
+  selectedReviewPly.value = null;
+  boardApi?.hideMoves();
+  refreshDisplay();
+};
+
 const viewPly = (ply: number) => {
   hintFeedbackMessage.value = null;
-  boardApi?.hideMoves();
-  boardApi?.viewHistory(ply);
-  refreshDisplay();
+  if (gameReviewReport.value && !isReviewing.value) {
+    selectPlyForReview(ply);
+  } else {
+    selectedReviewPly.value = null;
+    boardApi?.hideMoves();
+    boardApi?.viewHistory(ply);
+    refreshDisplay();
+  }
 };
 
 const handleBoardCreated = (api: BoardCore) => {
@@ -562,30 +744,56 @@ const handleMove = () => {
 
 const viewFirst = () => { 
   hintFeedbackMessage.value = null;
-  boardApi?.hideMoves();
-  boardApi?.viewStart(); 
-  refreshDisplay();
+  if (gameReviewReport.value && !isReviewing.value) {
+    selectPlyForReview(0);
+  } else {
+    selectedReviewPly.value = null;
+    boardApi?.hideMoves();
+    boardApi?.viewStart(); 
+    refreshDisplay();
+  }
 };
 
 const viewPrev = () => { 
   hintFeedbackMessage.value = null;
-  boardApi?.hideMoves();
-  boardApi?.viewPrevious(); 
-  refreshDisplay();
+  if (gameReviewReport.value && !isReviewing.value) {
+    const current = selectedReviewPly.value ?? totalPlyCount.value;
+    if (current > 0) {
+      selectPlyForReview(current - 1);
+    }
+  } else {
+    selectedReviewPly.value = null;
+    boardApi?.hideMoves();
+    boardApi?.viewPrevious(); 
+    refreshDisplay();
+  }
 };
 
 const viewNext = () => { 
   hintFeedbackMessage.value = null;
-  boardApi?.hideMoves();
-  boardApi?.viewNext(); 
-  refreshDisplay();
+  if (gameReviewReport.value && !isReviewing.value) {
+    const current = selectedReviewPly.value ?? 0;
+    if (current < totalPlyCount.value) {
+      selectPlyForReview(current + 1);
+    }
+  } else {
+    selectedReviewPly.value = null;
+    boardApi?.hideMoves();
+    boardApi?.viewNext(); 
+    refreshDisplay();
+  }
 };
 
 const viewLast = () => { 
   hintFeedbackMessage.value = null;
-  boardApi?.hideMoves();
-  boardApi?.viewHistory(totalPlyCount.value); 
-  refreshDisplay();
+  if (gameReviewReport.value && !isReviewing.value) {
+    selectPlyForReview(totalPlyCount.value);
+  } else {
+    selectedReviewPly.value = null;
+    boardApi?.hideMoves();
+    boardApi?.viewHistory(totalPlyCount.value); 
+    refreshDisplay();
+  }
 };
 
 const toggleLiveAnalysis = () => {
@@ -611,6 +819,27 @@ const toggleLiveAnalysis = () => {
 const requestHint = () => {
   if (!boardApi) return;
   normalizeCastlingMoves(boardApi);
+
+  // Si un bilan est actif sur un coup, fournir immédiatement le meilleur coup identifié par le bilan
+  if (gameReviewReport.value && !isReviewing.value && selectedMoveAnalysis.value) {
+    const analysis = selectedMoveAnalysis.value;
+    if (analysis.bestMoveSan && analysis.bestMoveUci) {
+      const from = analysis.bestMoveUci.substring(0, 2);
+      const to = analysis.bestMoveUci.substring(2, 4);
+      hintFeedbackMessage.value = `Conseil Bilan : le meilleur coup était ${analysis.bestMoveSan} (${from.toUpperCase()} ➔ ${to.toUpperCase()})`;
+      if (!isViewingBeforeMove.value) {
+        toggleBeforeAfter(true);
+      } else {
+        updateReviewBoardDisplay();
+      }
+      if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
+      hintFeedbackTimer = setTimeout(() => {
+        hintFeedbackMessage.value = null;
+      }, 5000);
+      return;
+    }
+  }
+
   if (currentPly.value === totalPlyCount.value && totalPlyCount.value > 0 && boardApi.getIsGameOver()) {
     hintFeedbackMessage.value = 'Partie terminée sur cette position. Revenez en arrière pour demander un conseil.';
     if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
@@ -654,9 +883,13 @@ const handleEvaluation = (evaluation: StockfishEvaluation) => {
   currentEvaluation.value = evaluation;
   // Lors de l'analyse en continu, afficher le meilleur coup calculé pour la position visualisée
   if (isLiveAnalysis.value && boardApi && evaluation.bestMove && evaluation.bestMove.length >= 4) {
-    const from = evaluation.bestMove.substring(0, 2);
-    const to = evaluation.bestMove.substring(2, 4);
-    boardApi.drawMove(from, to, 'green');
+    if (selectedReviewPly.value !== null && isViewingBeforeMove.value) {
+      updateReviewBoardDisplay();
+    } else {
+      const from = evaluation.bestMove.substring(0, 2);
+      const to = evaluation.bestMove.substring(2, 4);
+      boardApi.drawMove(from, to, 'green');
+    }
   }
 };
 
@@ -716,6 +949,9 @@ const startReview = async () => {
     });
     if (isReviewing.value) {
       gameReviewReport.value = report;
+      const firstMistake = report.moves.find(m => ['inaccuracy', 'mistake', 'blunder', 'missed_win'].includes(m.judgement));
+      const targetPly = firstMistake ? firstMistake.ply : (report.moves.length > 0 ? 1 : 0);
+      selectPlyForReview(targetPly);
     }
   } catch (err: unknown) {
     if (err instanceof DOMException && err.name === 'AbortError') {

@@ -254,7 +254,11 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
      - Demande de conseil dynamique en cours de partie à pleine puissance 3500+ Elo même en mode 2 joueurs (`core.requestHint({ multiPv: 2, movetime: 1500 })`).
      - Réinitialisation propre de la partie et purge UCI (`core.newGame()`) sans détruire le Web Worker.
-     - Pour les membres connectés : enregistrement et envoi automatique de la partie PGN vers le plugin ROI.
+     - **Enregistrement et synchronisation automatique vers ROI (`/roi/v1/games`)** :
+       - Transmission systématique des parties terminées (mat, nulle, pat).
+       - Transmission des abandons (bouton drapeau dans la barre d'outils, réinitialisation ou bascule vers l'analyse) uniquement si la partie a atteint au moins 30 demi-coups (15 coups complets).
+       - Transmission ciblée selon l'identité active via l'en-tête `X-Selected-Identity` : adhérent (`member_id > 0`) et administrateur (`member_id = 0`), exclusion des profils non connectés et des responsables légaux (parents).
+       - Sauvegarde locale hors ligne (`dame_pending_games`) avec synchronisation automatique dès le rétablissement du réseau ou à l'arrivée sur l'écran de jeu.
    - **Mode 2 Joueurs (Pass & Play)** :
      - Jeu local sur le même écran pour deux joueurs humains, moteur d'analyse IA désactivé.
    - **Analyse & Revue de Partie (Stockfish 19 - `AnalysisPage.vue`)** :
@@ -263,7 +267,12 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - *Sur Tablette / Ordinateur (ou paysage, `≥ 768px`)* : Affichage ergonomique en 2 colonnes côte-à-côte (échiquier carré 1:1 et barre d'évaluation à gauche, commandes, carte de bilan et liste des coups à droite).
      - **Éval direct (Évaluation continue)** : Calcul continu Stockfish (`infinite: true`) avec barre d'évaluation verticale dynamique, score numérique (+1.2, -0.8, #M2), variante principale calculée (PV) et flèche verte du meilleur coup sur l'échiquier, avec synchronisation immédiate sans nécessiter de redimensionnement de fenêtre.
      - **Conseil (Hint ponctuel)** : Demande ponctuelle du meilleur coup calculé à pleine puissance (`core.requestHint({ multiPv: 2, movetime: 1500 })`) avec flèche verte tracée sur l'échiquier et retour textuel d'assistance clair (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*). Gestion explicite de la fin de partie invitant à reculer sur un coup antérieur si la partie est terminée sur la position affichée.
-     - **Bilan (Revue de partie autonome optimisée)** : Calcul autonome rapide à `depth: 10` (~15 à 20s au lieu de 5 min) avec barre de progression, support d'annulation fluide (`core.cancelReview()`), score de précision globale (Blancs & Noirs), carte récapitulative visuelle de synthèse des coups (`!!` brillant, `★` meilleur, `✓` excellent, `•` bon, `?!` imprécision, `?` erreur, `??` gaffe, `✗` victoire manquée) et annotation symbolique coup par coup dans le tableau d'historique.
+     - **Bilan (Revue de partie autonome & navigation didactique)** :
+      - *Calcul optimisé* : Analyse à `depth: 12` avec jauge de progression, annulation fluide, scores de précision globale Blancs/Noirs et tableau récapitulatif des jugements (`!!`, `★`, `✓`, `•`, `?!`, `?`, `??`, `✗`).
+      - *Inspection didactique coup par coup* : Dès la sélection d'un coup dans l'historique (ou sélection automatique de la première imprécision/erreur à la fin du bilan), l'échiquier se positionne par défaut sur la position **avant le coup** ($N-1$).
+      - *Double flèche visuelle* : Tracé simultané de la flèche du coup joué (couleur selon le jugement : rouge pour gaffe, jaune pour imprécision/erreur, bleue pour bon coup) et de la flèche verte du **meilleur coup alternatif**.
+      - *Fiche de coup interactive* : Carte dédiée affichant le coup joué, le meilleur coup recommandé, les annotations et un sélecteur « Avant le coup » / « Après le coup » pour alterner entre la vue de départ et le résultat sur le plateau.
+      - *Cohérence « Conseil » & « Éval direct »* : En mode Bilan, le bouton « Conseil » restitue directement la recommandation du bilan pour le coup analysé, et « Éval direct » évalue la position au trait du joueur qui doit exécuter ce coup.
 
 ## Module Profil & Personnalisation de l'Échiquier
 

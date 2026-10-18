@@ -39,26 +39,44 @@ export const useChessStore = defineStore(
 			oupsCount.value = 0;
 		};
 
-		const saveCompletedGame = async ( durationSeconds: number ) => {
+		const saveCompletedGame = async (
+			durationSeconds: number,
+			pgnOverride?: string
+		) => {
 			const authStore = useAuthStore();
 			const identity = authStore.selectedIdentity;
 
-			// Ignorer si pas de membre connecté ou si c'est un parent (representative)
+			// Règle métier : Ignorer si non authentifié, sans profil ou si c'est un responsable légal (parent)
 			if (
+				! authStore.isAuthenticated ||
 				! identity ||
-				identity.type === 'representative' ||
-				! identity.member_id
+				identity.type === 'representative'
 			) {
 				return;
 			}
 
+			const finalPgn = ( pgnOverride || currentPgn.value || '' ).trim();
+			if ( ! finalPgn ) {
+				return;
+			}
+
+			// Synchronisation préalable des éventuelles parties en attente
+			if ( navigator.onLine ) {
+				void syncPendingGames();
+			}
+
+			const targetMemberId =
+				typeof identity.member_id === 'number' && identity.member_id > 0
+					? identity.member_id
+					: 0;
+
 			const gameData: PendingGame = {
-				member_id: identity.member_id,
+				member_id: targetMemberId,
 				difficulty_level: engineElo.value,
 				hints_count: helpCount.value,
 				takebacks_count: oupsCount.value,
-				pgn: currentPgn.value,
-				duration: durationSeconds,
+				pgn: finalPgn,
+				duration: Math.max( 0, Math.round( durationSeconds ) ),
 				game_date: new Date().toISOString(),
 			};
 
@@ -70,11 +88,21 @@ export const useChessStore = defineStore(
 
 			// Sinon tenter l'envoi direct
 			try {
-				const response = await safeFetch( '/roi/v1/games', {
+				const headers: Record< string, string > = {
+					'Content-Type': 'application/json',
+				};
+				if ( identity.id ) {
+					headers[ 'X-Selected-Identity' ] = identity.id;
+				}
+
+				const apiUrl = import.meta.env.VITE_API_BASE_URL || '';
+				const endpoint = apiUrl
+					? `${ apiUrl }/roi/v1/games`
+					: '/roi/v1/games';
+
+				const response = await safeFetch( endpoint, {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
+					headers,
 					body: JSON.stringify( gameData ),
 				} );
 
@@ -131,11 +159,22 @@ export const useChessStore = defineStore(
 
 			for ( const game of pending ) {
 				try {
-					const response = await safeFetch( '/roi/v1/games', {
+					const headers: Record< string, string > = {
+						'Content-Type': 'application/json',
+					};
+					if ( authStore.selectedIdentity?.id ) {
+						headers[ 'X-Selected-Identity' ] =
+							authStore.selectedIdentity.id;
+					}
+
+					const apiUrl = import.meta.env.VITE_API_BASE_URL || '';
+					const endpoint = apiUrl
+						? `${ apiUrl }/roi/v1/games`
+						: '/roi/v1/games';
+
+					const response = await safeFetch( endpoint, {
 						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
+						headers,
 						body: JSON.stringify( game ),
 					} );
 

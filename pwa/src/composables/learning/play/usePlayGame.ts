@@ -33,6 +33,16 @@ export function usePlayGame() {
 		color: 'medium',
 	} );
 
+	const gameStartTime = ref( Date.now() );
+	const resetGameStartTime = () => {
+		gameStartTime.value = Date.now();
+	};
+	const getGameDurationSeconds = (): number =>
+		Math.max(
+			0,
+			Math.round( ( Date.now() - gameStartTime.value ) / 1000 )
+		);
+
 	const savedLevel = localStorage.getItem( 'dame_pwa_play_elo' );
 	const initialLevel = savedLevel ? parseInt( savedLevel, 10 ) : 1320;
 
@@ -133,10 +143,23 @@ export function usePlayGame() {
 
 	const goToAnalysis = () => {
 		if ( boardApi ) {
+			const finalPgn = boardApi.getPgn();
+			const ply = boardApi.getCurrentPlyNumber();
+			// Si la partie était active contre l'ordinateur et a au moins 30 demi-coups (15 coups),
+			// elle est enregistrée comme abandonnée avant de basculer vers l'analyse
+			if (
+				! boardConfig.viewOnly &&
+				gameSettings.gameMode === '1player' &&
+				ply >= 30
+			) {
+				handleGameOver( 'resigned' );
+			}
 			chessStore.saveGame(
-				boardApi.getPgn(),
+				finalPgn,
 				boardConfig.orientation,
-				gameSettings.level
+				gameSettings.level,
+				helpCount.value,
+				oupsCount.value
 			);
 			router.push( '/analysis' );
 		}
@@ -164,6 +187,7 @@ export function usePlayGame() {
 			oupsCount.value = chessStore.oupsCount || 0;
 		} else {
 			api.newGame();
+			resetGameStartTime();
 		}
 		refreshDisplay();
 		if ( isHintEnabled.value ) {
@@ -226,20 +250,49 @@ export function usePlayGame() {
 	};
 
 	const handleGameOver = (
-		type: 'checkmate' | 'stalemate' | 'draw',
-		timerSeconds: number = 0
+		type: 'checkmate' | 'stalemate' | 'draw' | 'resigned',
+		timerSeconds?: number
 	) => {
 		if ( boardConfig.viewOnly ) {
 			return;
 		}
 		const isDraw = type === 'stalemate' || type === 'draw';
 		const symbol = isDraw ? '🤝' : '🏁';
-		gameStatus.message = `${ symbol } ${ getGameOverReason( boardApi ) }`;
-		gameStatus.color = isDraw ? 'medium' : 'danger';
-		boardConfig.viewOnly = true;
-		if ( gameSettings.gameMode === '1player' ) {
-			chessStore.saveCompletedGame( timerSeconds );
+		if ( type === 'resigned' ) {
+			gameStatus.message = '🏁 Partie terminée par abandon.';
+			gameStatus.color = 'danger';
+		} else {
+			gameStatus.message = `${ symbol } ${ getGameOverReason(
+				boardApi
+			) }`;
+			gameStatus.color = isDraw ? 'medium' : 'danger';
 		}
+		boardConfig.viewOnly = true;
+
+		if ( gameSettings.gameMode === '1player' ) {
+			const finalPgn = boardApi
+				? boardApi.getPgn()
+				: chessStore.currentPgn;
+			const ply = boardApi
+				? boardApi.getCurrentPlyNumber()
+				: currentPly.value;
+			// Règle métier : les abandons ne sont enregistrés que s'ils atteignent au moins 30 ply (15 coups)
+			if ( type === 'resigned' && ply < 30 ) {
+				return;
+			}
+			const duration =
+				typeof timerSeconds === 'number' && timerSeconds > 0
+					? timerSeconds
+					: getGameDurationSeconds();
+			void chessStore.saveCompletedGame( duration, finalPgn );
+		}
+	};
+
+	const resignGame = () => {
+		if ( boardConfig.viewOnly || ! boardApi ) {
+			return;
+		}
+		handleGameOver( 'resigned' );
 	};
 
 	const handleEngineStatus = ( status: EngineStatus ) => {
@@ -274,6 +327,7 @@ export function usePlayGame() {
 		isHumanTurn,
 		requestHintForPlayer,
 		resetHelpState,
+		resetGameStartTime,
 		toggleHint,
 		handleStockfishHint,
 		handleEngineStatus,
@@ -284,5 +338,6 @@ export function usePlayGame() {
 		undoMove,
 		handleCheck,
 		handleGameOver,
+		resignGame,
 	};
 }

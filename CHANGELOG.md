@@ -6,6 +6,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Correction et Fiabilisation de la Transmission des Parties vers ROI (`PlayPage.vue`, `usePlayGame.ts`, `chess.ts`, `USING.md`)** :
+  - **Prise en Charge des Identités Mixtes & Administrateurs** : Correction du filtre de transmission dans `chessStore.saveCompletedGame` pour autoriser les administrateurs/entraîneurs (`wp_virtual`, `member_id = 0`) en plus des adhérents (`member_id > 0`), tout en excluant rigoureusement les utilisateurs non authentifiés et les responsables légaux (`representative`).
+  - **En-tête de Sélection d'Identité `X-Selected-Identity`** : Transmission systématique de l'identifiant d'identité active (`identity.id`) lors des requêtes REST vers `POST /roi/v1/games` et lors de la synchronisation hors ligne, assurant l'attribution exacte de la partie dans ROI.
+  - **Règle Métier des Abandons (Seuil de 30 demi-coups / 15 coups complets)** :
+    - Les parties terminées (échec et mat, nulle, pat) sont transmises sans condition de longueur.
+    - Les abandons de partie (via le nouveau bouton drapeau dans la barre d'outils, la réinitialisation de l'échiquier ou la bascule vers l'analyse) ne sont enregistrés et transmis que s'ils atteignent au moins **30 demi-coups (15 coups complets)** (`ply >= 30`), éliminant la pollution de la base par des parties abandonnées prématurément.
+  - **Ergonomie & Abandon Explicite** : Ajout d'un bouton d'abandon avec icône drapeau (`flagOutline`) et modale de confirmation native Ionic (`confirmResign`) dans la barre d'outils de `PlayPage`.
+  - **Chronométrage Réel de Partie** : Rétablissement du calcul précis du temps de jeu effectif (`getGameDurationSeconds()`) transmis dans le champ `duration`.
+  - **Synchronisation Hors Ligne Fiabilisée** : Dépilement automatique de la file d'attente locale `dame_pending_games` au montage de `PlayPage` et avant chaque nouvel enregistrement de partie.
+  - **Couverture de Tests Unitaires** : Ajout d'une suite complète de tests dans `chessStore.spec.ts` et `usePlayGame.spec.ts` validant le filtrage des identités, le seuil des 30 demi-coups, la mise en file d'attente hors ligne et les en-têtes réseau.
+
 - **Refonte Responsive & Optimisation du Module d'Analyse (`AnalysisPage.vue`, `_learning-layout.scss`, `_learning-components.scss`, `README.md`, `USING.md`)** :
   - **Affichage Responsive Dual-Mode (Mobile vs Tablette / Ordinateur)** :
     - Sur mobile portrait (`< 768px`) : Agencement en colonne unique avec échiquier en tête et corps de page scrollable (`:scroll-y="true"`), permettant de faire défiler naturellement les actions, la carte de bilan et l'historique complet des coups.
@@ -16,21 +27,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Ajout d'un bouton d'accès rapide « Position initiale » en tête de la table d'historique, actif dès l'arrivée sur l'écran d'analyse et permettant de naviguer instantanément à la position de départ.
     - Persistance du conteneur de la barre d'évaluation dès l'activation du mode direct, évitant tout décalage d'agencement (layout shift) et assurant le tracé immédiat et exact des flèches vectorielles de conseil.
     - Correction de la réactivité de `totalPlyCount` (passage en `ref` réactive synchronisée dans `refreshDisplay()`) résolvant l'anomalie d'affichage `Coup 35 / 0`.
-  - **Accélération et Restitution Visuelle du Bilan de Partie (Stockfish 19)** :
-    - Calibrage optimal de la profondeur d'analyse à `depth: 12`, garantissant une évaluation tactique fine et rapide (~50 ms par coup sur machine moderne, moins de 2 secondes pour une partie complète de 37 coups). Le bilan complet s'exécute de manière ultra-fluide avec jauge de progression en temps réel sans blocage.
-    - Ajout d'une carte de bilan détaillée post-mortem affichant les pourcentages de précision globale (Blancs et Noirs) ainsi que la grille récapitulative des jugements de coups (`!!` brillant, `★` meilleur, `✓` excellent, `•` bon, `?!` imprécision, `?` erreur, `??` gaffe, `✗` victoire manquée).
-  - **Amélioration du Retour Utilisateur sur le Conseil & Fin de Partie** :
-    - Gestion explicite de la fin de partie via `boardApi.getIsGameOver()` affichant un message d'assistance lorsque l'utilisateur sollicite un conseil sur une position finale terminée (mat/pat).
-    - Ajout d'un voyant lumineux d'état moteur en temps réel (`.engine-status-indicator`) avec pastille dynamique (vert fixe : *Moteur prêt*, rouge/orange pulsant : *En réflexion...*, ambre clignotant : *Chargement IA...*, gris : *Moteur inactif*, rouge : *Erreur moteur*) informant immédiatement l'utilisateur de l'activité interne de Stockfish.
-    - Mécanisme d'auto-récupération du moteur : interruption propre en cas d'erreur de calcul et redémarrage automatique à chaud de Stockfish en conservant le coup en cours de visualisation.
-    - Voyant d'état interactif : en cas d'erreur moteur résiduelle, un clic direct sur le voyant rouge redémarre instantanément le worker Stockfish.
-    - Ajout d'un timer de sécurité (watchdog de 6s) sur la demande de conseil évitant tout sentiment de blocage en boucle infinie en cas de non-réponse du moteur.
-    - Ajout d'un bandeau textuel informatif accompagnant le tracé de la flèche verte lors de la suggestion de coup (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*).
-  - **Correction Critique de l'Erreur Moteur sur les Roques (`O-O-O` / `0-0-0` et `O-O` / `0-0`)** :
-    - Identification de la cause racine du blocage à ~34% (coup 12) lors du bilan : dans la librairie interne `chessops` utilisée par `eg-chessboard`, les roques sont typés comme un déplacement du Roi vers la case de la Tour (`from: 'e8', to: 'a8'` pour le grand roque noir, `e1a1` pour le blanc, `e8h8` / `e1h1` pour le petit roque).
-    - Lors de la conversion en notation UCI pour Stockfish (`from + to`), le protocole UCI standard attend les cases de destination du Roi (`e8c8`, `e1c1`, `e8g8`, `e1g1`). Stockfish rejetait `e8a8` avec l'erreur `CRITICAL ERROR: Illegal move e8a8`, provoquant la mise en état d'erreur du moteur, la terminaison du worker, puis le ralentissement extrême du bilan (attente de 5s par coup sur tous les coups suivants) et l'indisponibilité ultérieure des fonctions Conseil et Éval direct.
-    - Implémentation d'un utilitaire de normalisation en mémoire `normalizeCastlingMoves` (`stockfish.ts`) convertissant de manière idempotente les coordonnées de roques (`a1` $\rightarrow$ `c1`, `a8` $\rightarrow$ `c8`, `h1` $\rightarrow$ `g1`, `h8` $\rightarrow$ `g8`) sur l'historique de partie avant toute transmission à Stockfish (`reviewGame`, `startLiveAnalysis`, `requestHint`).
-    - Couverture unitaire complète dans `stockfish.spec.ts` validant la préservation des coups standards et la normalisation exacte des 4 variantes de roque.
+  - **Navigation Didactique du Bilan & Double Flèche Visuelle (`AnalysisPage.vue`, `AnalysisReview.spec.ts`)** :
+    - *Positionnement Automatique Avant-Coup ($N-1$)* : Dès la sélection d'un coup dans l'historique ou à l'issue de la génération du bilan (sélection automatique du premier coup imprécis ou erreur), l'échiquier se positionne sur la position de départ précédant l'exécution du coup ($N-1$).
+    - *Double Flèche Visuelle Simultanée* : Tracé vectoriel simultané du coup joué (coloré selon l'appréciation : rouge pour gaffe, jaune pour imprécision/erreur, bleue pour bon coup) et de la flèche verte du meilleur coup alternatif recommandé par Stockfish.
+    - *Fiche Didactique du Coup (`analysis-move-card`)* : Carte contextuelle détaillée affichant le coup joué, le meilleur coup, les annotations SAN, les flèches directionnelles et un sélecteur à deux positions (« Avant le coup » / « Après le coup ») pour comparer visuellement la position de départ et la position résultante.
+    - *Cohérence « Conseil » & « Éval direct »* : En mode Bilan, le bouton Conseil restitue directement la recommandation du bilan pour le coup analysé, et l'Éval direct évalue la position au trait du joueur qui doit exécuter ce coup.
+  - **Correction et Optimisation Complète du Mode Sombre (Dark Mode)** :
+    - *Pont de Compatibilité Variables Step (`variables.css`)* : Définition d'un mappage `@media (prefers-color-scheme: dark)` redirigeant les anciennes variables `--ion-color-step-50..900` vers les variables de fond sombre natives d'Ionic 8/9 (`--ion-background-color-step-*`), éliminant les fallbacks clairs inopinés en mode sombre.
+    - *Contraste Garanti de la Carte de Bilan (`accuracy-box`)* : Adaptation des blocs Blancs (`white-box` sur fond ardoise sombre contrasté `#334155`) et Noirs (`black-box` sur fond noir bleuté `#0f172a`), garantissant une lisibilité parfaite des scores de précision.
+    - *Contraste de la Fiche de Coup & Bouton Position Initiale* : Stylisation explicite en mode sombre pour `move-details-grid`, les indicateurs de flèches saturées, les symboles de pièces et le bouton « Position initiale ».
   - **Mise à Niveau du Moteur d'Échiquier (`eg-chessboard` 1.7.2)** :
     - Intégration de la version 1.7.2 d'`eg-chessboard` embarquant la correction native des coups UCI de roque (`e1c1`/`e8c8`), l'auto-recyclage transparent du worker Stockfish en cas d'erreur de calcul, la gestion des scores de mat terminal (`mate 0`) dans la barre d'évaluation, ainsi que l'utilitaire `normalizePgn()` pour la conversion automatique des notations avec zéros (`0-0-0`) et figurines Unicode (`♔...♟`).
     - Ré-export de `normalizePgn()` dans `pwa/src/utils/chess/stockfish.ts` avec tests unitaires de validation.
