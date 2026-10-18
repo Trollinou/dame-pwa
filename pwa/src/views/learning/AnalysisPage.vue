@@ -320,7 +320,8 @@ import type {
 import {
   getStockfishUrls,
   formatEvaluationScore,
-  computeEvalBarPercentage
+  computeEvalBarPercentage,
+  normalizeCastlingMoves
 } from '@/utils/chess/stockfish';
 import { useChessStore } from '@/stores/chess';
 
@@ -541,6 +542,7 @@ const handleBoardCreated = (api: BoardCore) => {
   boardApi = api;
   if (chessStore.currentPgn) {
     boardApi.loadPgn(chessStore.currentPgn);
+    normalizeCastlingMoves(boardApi);
   }
   if (currentPly.value > 0) {
     boardApi.viewHistory(currentPly.value);
@@ -552,6 +554,9 @@ const handleBoardCreated = (api: BoardCore) => {
  * Nécessaire pour mettre à jour lors de la navigation
  */
 const handleMove = () => {
+  if (boardApi) {
+    normalizeCastlingMoves(boardApi);
+  }
   refreshDisplay();
 };
 
@@ -585,6 +590,7 @@ const viewLast = () => {
 
 const toggleLiveAnalysis = () => {
   if (!boardApi) return;
+  normalizeCastlingMoves(boardApi);
   isLiveAnalysis.value = !isLiveAnalysis.value;
   if (isLiveAnalysis.value) {
     boardApi.startLiveAnalysis();
@@ -604,6 +610,7 @@ const toggleLiveAnalysis = () => {
 
 const requestHint = () => {
   if (!boardApi) return;
+  normalizeCastlingMoves(boardApi);
   if (currentPly.value === totalPlyCount.value && totalPlyCount.value > 0 && boardApi.getIsGameOver()) {
     hintFeedbackMessage.value = 'Partie terminée sur cette position. Revenez en arrière pour demander un conseil.';
     if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
@@ -694,6 +701,7 @@ const toggleReview = async () => {
 
 const startReview = async () => {
   if (!boardApi || isReviewing.value) return;
+  normalizeCastlingMoves(boardApi);
   isReviewing.value = true;
   reviewProgress.value = 0;
   reviewAbortController = new AbortController();

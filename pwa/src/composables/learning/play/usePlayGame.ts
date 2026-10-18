@@ -10,6 +10,7 @@ import {
 	undoMove as apiUndoMove,
 	getGameOverReason,
 } from '@/utils/chess/boardApiWrapper';
+import { normalizeCastlingMoves } from '@/utils/chess/stockfish';
 
 export function usePlayGame() {
 	const chessStore = useChessStore();
@@ -77,6 +78,7 @@ export function usePlayGame() {
 		if ( ! boardApi || ! isHintEnabled.value || ! isHumanTurn() ) {
 			return;
 		}
+		normalizeCastlingMoves( boardApi );
 		const ply = boardApi.getCurrentPlyNumber();
 		if ( lastHelpPly !== ply ) {
 			lastHelpPly = ply;

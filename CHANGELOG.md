@@ -26,6 +26,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Voyant d'état interactif : en cas d'erreur moteur résiduelle, un clic direct sur le voyant rouge redémarre instantanément le worker Stockfish.
     - Ajout d'un timer de sécurité (watchdog de 6s) sur la demande de conseil évitant tout sentiment de blocage en boucle infinie en cas de non-réponse du moteur.
     - Ajout d'un bandeau textuel informatif accompagnant le tracé de la flèche verte lors de la suggestion de coup (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*).
+  - **Correction Critique de l'Erreur Moteur sur les Roques (`O-O-O` / `0-0-0` et `O-O` / `0-0`)** :
+    - Identification de la cause racine du blocage à ~34% (coup 12) lors du bilan : dans la librairie interne `chessops` utilisée par `eg-chessboard`, les roques sont typés comme un déplacement du Roi vers la case de la Tour (`from: 'e8', to: 'a8'` pour le grand roque noir, `e1a1` pour le blanc, `e8h8` / `e1h1` pour le petit roque).
+    - Lors de la conversion en notation UCI pour Stockfish (`from + to`), le protocole UCI standard attend les cases de destination du Roi (`e8c8`, `e1c1`, `e8g8`, `e1g1`). Stockfish rejetait `e8a8` avec l'erreur `CRITICAL ERROR: Illegal move e8a8`, provoquant la mise en état d'erreur du moteur, la terminaison du worker, puis le ralentissement extrême du bilan (attente de 5s par coup sur tous les coups suivants) et l'indisponibilité ultérieure des fonctions Conseil et Éval direct.
+    - Implémentation d'un utilitaire de normalisation en mémoire `normalizeCastlingMoves` (`stockfish.ts`) convertissant de manière idempotente les coordonnées de roques (`a1` $\rightarrow$ `c1`, `a8` $\rightarrow$ `c8`, `h1` $\rightarrow$ `g1`, `h8` $\rightarrow$ `g8`) sur l'historique de partie avant toute transmission à Stockfish (`reviewGame`, `startLiveAnalysis`, `requestHint`).
+    - Couverture unitaire complète dans `stockfish.spec.ts` validant la préservation des coups standards et la normalisation exacte des 4 variantes de roque.
+
 
 ## [1.10.1] - 2026-10-13
 
