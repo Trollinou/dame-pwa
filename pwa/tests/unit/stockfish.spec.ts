@@ -6,6 +6,7 @@ import {
 	formatEvaluationScore,
 	validateFen,
 	normalizeCastlingMoves,
+	normalizePgn,
 } from '@/utils/chess/stockfish';
 
 describe( 'Stockfish 19 Utilities', () => {
@@ -143,5 +144,11 @@ describe( 'Stockfish 19 Utilities', () => {
 		// Les coups réguliers ne sont pas altérés
 		expect( mockHistory[ 0 ].to ).toBe( 'e4' );
 		expect( mockHistory[ 1 ].to ).toBe( 'e5' );
+	} );
+
+	it( 'normalizes PGN with zero-castling and unicode figurines', () => {
+		const rawPgn = '1. e4 e5 2. 0-0 0-0-0 3. ♘f3 ♚e7';
+		const normalized = normalizePgn( rawPgn );
+		expect( normalized ).toBe( '1. e4 e5 2. O-O O-O-O 3. Nf3 Ke7' );
 	} );
 } );

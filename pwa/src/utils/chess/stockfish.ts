@@ -2,6 +2,7 @@ import {
 	getNodesForElo,
 	computeEvalBarPercentage,
 	validateFen,
+	normalizePgn,
 	type StockfishEvaluation,
 	type EngineStatus,
 } from 'eg-chessboard';
@@ -122,6 +123,7 @@ export {
 	getNodesForElo,
 	computeEvalBarPercentage,
 	validateFen,
+	normalizePgn,
 	type StockfishEvaluation,
 	type EngineStatus,
 };

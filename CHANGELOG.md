@@ -31,6 +31,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Lors de la conversion en notation UCI pour Stockfish (`from + to`), le protocole UCI standard attend les cases de destination du Roi (`e8c8`, `e1c1`, `e8g8`, `e1g1`). Stockfish rejetait `e8a8` avec l'erreur `CRITICAL ERROR: Illegal move e8a8`, provoquant la mise en état d'erreur du moteur, la terminaison du worker, puis le ralentissement extrême du bilan (attente de 5s par coup sur tous les coups suivants) et l'indisponibilité ultérieure des fonctions Conseil et Éval direct.
     - Implémentation d'un utilitaire de normalisation en mémoire `normalizeCastlingMoves` (`stockfish.ts`) convertissant de manière idempotente les coordonnées de roques (`a1` $\rightarrow$ `c1`, `a8` $\rightarrow$ `c8`, `h1` $\rightarrow$ `g1`, `h8` $\rightarrow$ `g8`) sur l'historique de partie avant toute transmission à Stockfish (`reviewGame`, `startLiveAnalysis`, `requestHint`).
     - Couverture unitaire complète dans `stockfish.spec.ts` validant la préservation des coups standards et la normalisation exacte des 4 variantes de roque.
+  - **Mise à Niveau du Moteur d'Échiquier (`eg-chessboard` 1.7.2)** :
+    - Intégration de la version 1.7.2 d'`eg-chessboard` embarquant la correction native des coups UCI de roque (`e1c1`/`e8c8`), l'auto-recyclage transparent du worker Stockfish en cas d'erreur de calcul, la gestion des scores de mat terminal (`mate 0`) dans la barre d'évaluation, ainsi que l'utilitaire `normalizePgn()` pour la conversion automatique des notations avec zéros (`0-0-0`) et figurines Unicode (`♔...♟`).
+    - Ré-export de `normalizePgn()` dans `pwa/src/utils/chess/stockfish.ts` avec tests unitaires de validation.
 
 
 ## [1.10.1] - 2026-10-13
