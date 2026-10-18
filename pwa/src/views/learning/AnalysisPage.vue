@@ -26,6 +26,16 @@
               </p>
             </div>
             <div class="meta-right">
+              <!-- Voyant d'état moteur Stockfish -->
+              <span
+                class="engine-status-indicator"
+                :class="`engine-status-${engineStatus}`"
+                :title="`État du moteur IA : ${engineStatusLabel}`"
+              >
+                <span class="status-dot"></span>
+                <span class="status-label">{{ engineStatusLabel }}</span>
+              </span>
+
               <span class="ply-badge">
                 Coup {{ currentPly }} / {{ totalPlyCount }} {{ currentPly === 0 ? '(Début)' : '' }}
               </span>
@@ -92,10 +102,11 @@
                   expand="block"
                   fill="outline"
                   color="secondary"
+                  :disabled="engineStatus === 'searching' && !isLiveAnalysis"
                   @click="requestHint"
                 >
                   <ion-icon slot="start" :icon="bulbOutline"></ion-icon>
-                  <span>Conseil</span>
+                  <span>{{ engineStatus === 'searching' && !isLiveAnalysis ? 'Calcul...' : 'Conseil' }}</span>
                 </ion-button>
 
                 <ion-button
@@ -352,6 +363,24 @@ const isReviewing = ref(false);
 const reviewProgress = ref(0);
 const gameReviewReport = ref<GameReviewReport | null>(null);
 
+const engineStatusLabel = computed(() => {
+  switch (engineStatus.value) {
+    case 'ready':
+      return 'Moteur prêt';
+    case 'searching':
+      return 'En réflexion...';
+    case 'loading':
+      return 'Chargement IA...';
+    case 'stopping':
+      return 'Arrêt en cours...';
+    case 'error':
+      return 'Erreur moteur';
+    case 'uninitialized':
+    default:
+      return 'Moteur inactif';
+  }
+});
+
 const hintFeedbackMessage = ref<string | null>(null);
 let hintFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -579,6 +608,15 @@ const requestHint = () => {
     return;
   }
   hintFeedbackMessage.value = 'Recherche du meilleur coup en cours...';
+  if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
+  hintFeedbackTimer = setTimeout(() => {
+    if (hintFeedbackMessage.value === 'Recherche du meilleur coup en cours...') {
+      hintFeedbackMessage.value = 'Le moteur n\'a pas retourné de coup dans le délai imparti. Réessayez ou naviguez vers un autre coup.';
+      setTimeout(() => {
+        hintFeedbackMessage.value = null;
+      }, 4000);
+    }
+  }, 6000);
   boardApi.requestHint({ multiPv: 2, movetime: 1500 });
 };
 
