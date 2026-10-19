@@ -42,6 +42,8 @@ export function includesNormalized(
 	return normalizedTarget.includes( normalizedQuery );
 }
 
+let sharedDomParser: DOMParser | null = null;
+
 /**
  * Decodes HTML entities (e.g. &#8211;, &rsquo;, &amp;, &quot;, &#039;) into plain text characters.
  * Safe against null, undefined, or empty inputs.
@@ -55,37 +57,46 @@ export function decodeHtmlEntities( str: string | null | undefined ): string {
 	}
 
 	let text = String( str );
+	if ( ! text.includes( '&' ) ) {
+		return text;
+	}
 
-	// Fast decoding via DOMParser in browser environment if entities exist
-	if ( typeof DOMParser !== 'undefined' && text.includes( '&' ) ) {
+	// Fast regex replacement for common numeric and named HTML entities without DOM overhead
+	text = text
+		.replace( /&#(\d+);/g, ( _, dec ) =>
+			String.fromCharCode( Number( dec ) )
+		)
+		.replace( /&#x([0-9a-f]+);/gi, ( _, hex ) =>
+			String.fromCharCode( parseInt( hex, 16 ) )
+		)
+		.replace( /&rsquo;/g, '’' )
+		.replace( /&lsquo;/g, '‘' )
+		.replace( /&rdquo;/g, '”' )
+		.replace( /&ldquo;/g, '“' )
+		.replace( /&ndash;/g, '–' )
+		.replace( /&mdash;/g, '—' )
+		.replace( /&nbsp;/g, '\u00a0' )
+		.replace( /&laquo;/g, '«' )
+		.replace( /&raquo;/g, '»' )
+		.replace( /&hellip;/g, '…' )
+		.replace( /&lt;/g, '<' )
+		.replace( /&gt;/g, '>' )
+		.replace( /&quot;/g, '"' )
+		.replace( /&#039;/g, "'" )
+		.replace( /&apos;/g, "'" )
+		.replace( /&amp;/g, '&' );
+
+	// Fallback to shared DOMParser only if rare named entities remain
+	if ( typeof DOMParser !== 'undefined' && /&[a-zA-Z0-9#]+;/.test( text ) ) {
 		try {
-			const doc = new DOMParser().parseFromString( text, 'text/html' );
+			if ( ! sharedDomParser ) {
+				sharedDomParser = new DOMParser();
+			}
+			const doc = sharedDomParser.parseFromString( text, 'text/html' );
 			return doc.documentElement.textContent || text;
 		} catch {
 			// Fallback if DOMParser is unavailable or fails
 		}
-	}
-
-	// Fallback regex replacement for common HTML entities
-	if ( text.includes( '&' ) ) {
-		text = text
-			.replace( /&#(\d+);/g, ( _, dec ) =>
-				String.fromCharCode( Number( dec ) )
-			)
-			.replace( /&#x([0-9a-f]+);/gi, ( _, hex ) =>
-				String.fromCharCode( parseInt( hex, 16 ) )
-			)
-			.replace( /&rsquo;/g, '’' )
-			.replace( /&lsquo;/g, '‘' )
-			.replace( /&rdquo;/g, '”' )
-			.replace( /&ldquo;/g, '“' )
-			.replace( /&ndash;/g, '–' )
-			.replace( /&mdash;/g, '—' )
-			.replace( /&amp;/g, '&' )
-			.replace( /&lt;/g, '<' )
-			.replace( /&gt;/g, '>' )
-			.replace( /&quot;/g, '"' )
-			.replace( /&#039;/g, "'" );
 	}
 
 	return text;

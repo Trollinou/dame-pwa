@@ -20,20 +20,16 @@ export const useDashboardStore = defineStore( 'dashboard', () => {
 	const { data: rawBirthdays, isLoading } = useQuery< Birthday[] >( {
 		queryKey: [ 'dashboard', 'birthdays' ],
 		queryFn: async () => {
-			const token = localStorage.getItem( 'dame_jwt_token' );
-			if ( ! token ) {
+			if ( ! authStore.isAuthenticated ) {
 				router.push( '/login' );
 				throw new Error( 'Non authentifié' );
 			}
 
 			const response = await safeFetch(
-				`${
-					import.meta.env.VITE_API_BASE_URL
-				}/dame/v1/birthdays/upcoming?limit=5`,
+				'/dame/v1/birthdays/upcoming?limit=5',
 				{
 					method: 'GET',
 					headers: {
-						Authorization: `Bearer ${ token }`,
 						'Content-Type': 'application/json',
 					},
 				}

@@ -81,7 +81,7 @@
 
             <!-- Message d'erreur -->
             <div class="dame-banner dame-banner--danger ion-margin-top" v-if="errorMessage">
-              <p v-html="errorMessage"></p>
+              <p v-safe-html="errorMessage"></p>
             </div>
 
             <!-- Soumission -->

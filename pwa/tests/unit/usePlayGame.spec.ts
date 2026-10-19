@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { usePlayGame } from '@/composables/learning/play/usePlayGame';
+import { useChessStore } from '@/stores/chess';
 import type { BoardCore } from 'eg-chessboard';
+
+const mockPush = vi.fn();
 
 // Mock vue-router
 vi.mock( 'vue-router', async ( importOriginal ) => {
@@ -9,7 +12,7 @@ vi.mock( 'vue-router', async ( importOriginal ) => {
 	return {
 		...actual,
 		useRouter: () => ( {
-			push: vi.fn(),
+			push: mockPush,
 		} ),
 	};
 } );
@@ -27,41 +30,44 @@ vi.mock( '@tanstack/vue-query', async ( importOriginal ) => {
 	};
 } );
 
+const createMockBoardApi = (
+	overrides: Partial< BoardCore > = {}
+): BoardCore & {
+	_setTurn: ( _turn: 'white' | 'black', _ply: number ) => void;
+} => {
+	let currentTurn: 'white' | 'black' = 'white';
+	let currentPly = 0;
+
+	return {
+		getTurnColor: vi.fn( () => currentTurn ),
+		getCurrentPlyNumber: vi.fn( () => currentPly ),
+		requestHint: vi.fn(),
+		drawMove: vi.fn(),
+		hideMoves: vi.fn(),
+		getShapes: vi.fn( () => [] ),
+		setShapes: vi.fn(),
+		newGame: vi.fn(),
+		loadPgn: vi.fn(),
+		getPgn: vi.fn( () => '' ),
+		getGameOverReason: vi.fn( () => 'Partie terminée' ),
+		getIsCheck: vi.fn( () => false ),
+		getInCheckColor: vi.fn( () => null ),
+		undoLastMove: vi.fn(),
+		// Helper to advance turn in tests
+		_setTurn: ( turn: 'white' | 'black', ply: number ) => {
+			currentTurn = turn;
+			currentPly = ply;
+		},
+		...overrides,
+	} as unknown as BoardCore & {
+		_setTurn: ( _turn: 'white' | 'black', _ply: number ) => void;
+	};
+};
+
 describe( 'usePlayGame - Hint Switch & Help Counter', () => {
 	beforeEach( () => {
 		setActivePinia( createPinia() );
 	} );
-
-	const createMockBoardApi = (
-		overrides: Partial< BoardCore > = {}
-	): BoardCore => {
-		let currentTurn: 'white' | 'black' = 'white';
-		let currentPly = 0;
-
-		return {
-			getTurnColor: vi.fn( () => currentTurn ),
-			getCurrentPlyNumber: vi.fn( () => currentPly ),
-			requestHint: vi.fn(),
-			drawMove: vi.fn(),
-			hideMoves: vi.fn(),
-			getShapes: vi.fn( () => [] ),
-			setShapes: vi.fn(),
-			newGame: vi.fn(),
-			loadPgn: vi.fn(),
-			getPgn: vi.fn( () => '' ),
-			getIsCheck: vi.fn( () => false ),
-			getInCheckColor: vi.fn( () => null ),
-			undoLastMove: vi.fn(),
-			// Helper to advance turn in tests
-			_setTurn: ( turn: 'white' | 'black', ply: number ) => {
-				currentTurn = turn;
-				currentPly = ply;
-			},
-			...overrides,
-		} as unknown as BoardCore & {
-			_setTurn: ( _turn: 'white' | 'black', _ply: number ) => void;
-		};
-	};
 
 	it( 'acts as an On/Off switch: requests hint and increments helpCount when turned ON on player turn', () => {
 		const {
@@ -187,5 +193,150 @@ describe( 'usePlayGame - Hint Switch & Help Counter', () => {
 			movetime: 1500,
 		} );
 		expect( helpCount.value ).toBe( 2 ); // Counted for human move 2 !
+	} );
+} );
+
+describe( 'usePlayGame - Game Over & Resignation (30-ply rule)', () => {
+	beforeEach( () => {
+		setActivePinia( createPinia() );
+		vi.clearAllMocks();
+	} );
+
+	it( 'saves completed game immediately on checkmate even if ply < 30', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		const { setBoardApi, handleGameOver, boardConfig } = usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => '1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7#' ),
+		} );
+		mockApi._setTurn( 'black', 7 ); // ply 7 < 30
+		setBoardApi( mockApi );
+
+		handleGameOver( 'checkmate', 45 );
+
+		expect( boardConfig.viewOnly ).toBe( true );
+		expect( spySave ).toHaveBeenCalledWith(
+			45,
+			'1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7#'
+		);
+	} );
+
+	it( 'saves completed game immediately on draw/stalemate even if ply < 30', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		const { setBoardApi, handleGameOver } = usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => '1. e4 e5 2. Nf3' ),
+		} );
+		mockApi._setTurn( 'white', 3 );
+		setBoardApi( mockApi );
+
+		handleGameOver( 'draw' );
+
+		expect( spySave ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'ignores resignation save if ply < 30', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		const { setBoardApi, handleGameOver, boardConfig } = usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => '1. e4 e5 2. Nf3 Nc6' ),
+		} );
+		mockApi._setTurn( 'black', 4 ); // 4 ply < 30
+		setBoardApi( mockApi );
+
+		handleGameOver( 'resigned' );
+
+		expect( boardConfig.viewOnly ).toBe( true );
+		expect( spySave ).not.toHaveBeenCalled();
+	} );
+
+	it( 'saves resignation game if ply >= 30 (at least 15 moves)', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		const { setBoardApi, handleGameOver, boardConfig } = usePlayGame();
+		const longPgn = '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 ...';
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => longPgn ),
+		} );
+		mockApi._setTurn( 'white', 30 ); // Exactly 30 ply
+		setBoardApi( mockApi );
+
+		handleGameOver( 'resigned' );
+
+		expect( boardConfig.viewOnly ).toBe( true );
+		expect( spySave ).toHaveBeenCalledWith( expect.any( Number ), longPgn );
+	} );
+
+	it( 'resignGame delegates to handleGameOver and locks the board', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		const { setBoardApi, resignGame, boardConfig, gameStatus } =
+			usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => '1. e4 e5 ...' ),
+		} );
+		mockApi._setTurn( 'white', 32 );
+		setBoardApi( mockApi );
+
+		resignGame();
+
+		expect( boardConfig.viewOnly ).toBe( true );
+		expect( gameStatus.message ).toContain( 'abandon' );
+		expect( spySave ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'goToAnalysis triggers resignation save when 1player game reaches >= 30 ply', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		const { setBoardApi, goToAnalysis } = usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => '1. e4 e5 ...' ),
+		} );
+		mockApi._setTurn( 'black', 35 ); // >= 30 ply
+		setBoardApi( mockApi );
+
+		goToAnalysis();
+
+		expect( spySave ).toHaveBeenCalledTimes( 1 );
+		expect( mockPush ).toHaveBeenCalledWith( '/analysis' );
+	} );
+
+	it( 'goToAnalysis does NOT trigger resignation save when ply < 30', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		const { setBoardApi, goToAnalysis } = usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => '1. e4 e5' ),
+		} );
+		mockApi._setTurn( 'black', 2 ); // 2 ply < 30
+		setBoardApi( mockApi );
+
+		goToAnalysis();
+
+		expect( spySave ).not.toHaveBeenCalled();
+		expect( mockPush ).toHaveBeenCalledWith( '/analysis' );
 	} );
 } );

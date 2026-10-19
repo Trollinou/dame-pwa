@@ -131,6 +131,7 @@ class Plugin {
 		$icon_512_url = ! empty( $site_icon_512 ) ? $site_icon_512 : \DAME_PWA_PLUGIN_URL . 'pwa/dist/assets/icon/icon-512.png';
 
 		header( 'Content-Type: application/manifest+json; charset=utf-8' );
+		header( 'Cache-Control: public, max-age=3600' );
 		echo wp_json_encode(
 			array(
 				'name'             => get_bloginfo( 'name' ),
@@ -144,13 +145,25 @@ class Plugin {
 						'src'     => $icon_192_url,
 						'sizes'   => '192x192',
 						'type'    => 'image/png',
-						'purpose' => 'any maskable',
+						'purpose' => 'any',
+					),
+					array(
+						'src'     => $icon_192_url,
+						'sizes'   => '192x192',
+						'type'    => 'image/png',
+						'purpose' => 'maskable',
 					),
 					array(
 						'src'     => $icon_512_url,
 						'sizes'   => '512x512',
 						'type'    => 'image/png',
-						'purpose' => 'any maskable',
+						'purpose' => 'any',
+					),
+					array(
+						'src'     => $icon_512_url,
+						'sizes'   => '512x512',
+						'type'    => 'image/png',
+						'purpose' => 'maskable',
 					),
 				),
 			)

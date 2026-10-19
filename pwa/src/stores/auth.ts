@@ -66,8 +66,73 @@ export const useAuthStore = defineStore(
 		const selectedIdentity = ref< Identity | null >( getStoredIdentity() );
 		const adminMode = ref( false );
 
+		// ─── SDK simple-jwt-login & Session ───────────────────────────────────────
+		const clearLocalSessionState = () => {
+			try {
+				queryClient.clear();
+			} catch ( e ) {
+				console.warn(
+					"Erreur lors de l'effacement du QueryClient:",
+					e
+				);
+			}
+			token.value = '';
+			isAuthState.value = false;
+			user.value = null;
+			selectedIdentity.value = null;
+			adminMode.value = false;
+			localStorage.removeItem( 'dame_jwt_token' );
+			localStorage.removeItem( 'dame_user' );
+			localStorage.removeItem( 'dame_selected_identity' );
+			useAgendaStore().clearData();
+			useContactStore().clearData();
+			useDashboardStore().clearData();
+			useMemberStore().clearData();
+			useMessageStore().clearData();
+			useBenevolatStore().clearData();
+			useTournamentStore().clearData();
+			useNewsStore().clearData();
+			useApprentissageStore().clearData();
+		};
+
+		const jwtSdk = createJwtSdk(
+			( jwt ) => {
+				token.value = jwt;
+				isAuthState.value = true;
+				localStorage.setItem( 'dame_jwt_token', jwt );
+			},
+			() => {
+				clearLocalSessionState();
+				router.push( {
+					path: '/login',
+					query: {
+						message:
+							'Votre session a expiré. Veuillez vous reconnecter.',
+					},
+				} );
+			}
+		);
+
+		if ( token.value && ! jwtSdk.getJwt() ) {
+			jwtSdk.setTokens( token.value );
+		} else if ( ! token.value && jwtSdk.getJwt() ) {
+			const sdkJwt = jwtSdk.getJwt() || '';
+			token.value = sdkJwt;
+			if ( sdkJwt ) {
+				localStorage.setItem( 'dame_jwt_token', sdkJwt );
+			}
+		}
+
+		const isAuthState = ref(
+			jwtSdk.isAuthenticated() ||
+				( !! token.value && token.value.length > 10 )
+		);
+
 		const isAuthenticated = computed(
-			() => !! token.value && token.value.length > 10
+			() =>
+				isAuthState.value ||
+				( !! token.value && token.value.length > 10 ) ||
+				jwtSdk.isAuthenticated()
 		);
 
 		const userRoles = computed( () => {
@@ -140,94 +205,58 @@ export const useAuthStore = defineStore(
 			selectIdentity,
 			fetchMyIdentities,
 			checkIdentities,
-		} = useIdentitiesService( token, selectedIdentity, router );
+		} = useIdentitiesService(
+			token,
+			selectedIdentity,
+			router,
+			isAuthenticated
+		);
 
-		// ─── SDK simple-jwt-login & Session ───────────────────────────────────────
-		const jwtSdk = createJwtSdk( ( jwt ) => {
-			token.value = jwt;
-			localStorage.setItem( 'dame_jwt_token', jwt );
-		} );
-
-		if ( token.value ) {
-			jwtSdk.setTokens( token.value );
-		}
-
-		let activeRefreshPromise: Promise< string | null > | null = null;
-
-		const tryRefreshToken = async (): Promise< string | null > => {
-			if ( activeRefreshPromise ) {
-				return activeRefreshPromise;
+		const tryRefreshToken = async (
+			force = true
+		): Promise< string | null > => {
+			if ( token.value && ! jwtSdk.getJwt() ) {
+				jwtSdk.setTokens( token.value );
 			}
-
-			activeRefreshPromise = ( async () => {
-				if ( ! token.value ) {
-					logout();
-					return null;
-				}
-				const storedRefreshToken =
-					typeof localStorage !== 'undefined'
-						? localStorage.getItem( 'dame:refresh_token' )
-						: null;
-
-				try {
-					let refreshResponse;
-					if ( storedRefreshToken ) {
-						refreshResponse = await jwtSdk.refreshToken( {
-							refresh_token: storedRefreshToken,
-						} );
-					} else {
-						refreshResponse = await jwtSdk.refreshToken( {
-							JWT: token.value,
-						} );
-					}
-
-					const newJwt = refreshResponse?.data?.jwt;
-					if ( newJwt ) {
-						token.value = newJwt;
-						localStorage.setItem( 'dame_jwt_token', newJwt );
-						return newJwt;
-					}
-					logout();
-					return null;
-				} catch ( refreshError: unknown ) {
-					const err = refreshError as
-						| { data?: { message?: string }; message?: string }
-						| undefined;
-					const msg = String(
-						err?.data?.message || err?.message || ''
-					).toLowerCase();
-					if (
-						! msg.includes( 'network' ) &&
-						! msg.includes( 'offline' ) &&
-						! msg.includes( 'fetch' )
-					) {
-						logout();
-					}
-					return null;
-				} finally {
-					activeRefreshPromise = null;
-				}
-			} )();
-
-			return activeRefreshPromise;
+			const newJwt = await jwtSdk.getValidJwt( force );
+			if ( newJwt ) {
+				token.value = newJwt;
+				isAuthState.value = true;
+				localStorage.setItem( 'dame_jwt_token', newJwt );
+				return newJwt;
+			}
+			// Ne déconnecter l'utilisateur que si sdk.isAuthenticated() est false
+			// (les erreurs réseau ou 5xx préservent les tokens dans le SDK)
+			if ( ! jwtSdk.isAuthenticated() ) {
+				isAuthState.value = false;
+			}
+			return null;
 		};
 
 		const validateSession = async () => {
-			if ( ! token.value ) {
+			if ( ! jwtSdk.isAuthenticated() && ! token.value ) {
 				return;
 			}
-			const info = getTokenExpiryInfo( token.value );
+			if ( token.value && ! jwtSdk.getJwt() ) {
+				jwtSdk.setTokens( token.value );
+			}
 
-			if ( info.isExpired ) {
-				await tryRefreshToken();
+			const currentJwt = await jwtSdk.getValidJwt();
+			if ( ! currentJwt ) {
+				// Si hors-ligne ou erreur réseau mais toujours authentifié localement, on garde la session active
 				return;
 			}
+
+			token.value = currentJwt;
+			isAuthState.value = true;
+			localStorage.setItem( 'dame_jwt_token', currentJwt );
+
 			try {
 				const response = await jwtSdk.validateToken( {
-					JWT: token.value,
+					JWT: currentJwt,
 				} );
 				if ( response && response.success === false ) {
-					await tryRefreshToken();
+					await tryRefreshToken( true );
 				}
 			} catch ( error: unknown ) {
 				const err = error as
@@ -259,7 +288,7 @@ export const useAuthStore = defineStore(
 					msg.includes( 'invalid' ) ||
 					msg.includes( 'revoked' )
 				) {
-					await tryRefreshToken();
+					await tryRefreshToken( true );
 				}
 			}
 		};
@@ -290,6 +319,7 @@ export const useAuthStore = defineStore(
 
 				if ( jwtToken ) {
 					token.value = jwtToken;
+					isAuthState.value = true;
 					localStorage.setItem( 'dame_jwt_token', jwtToken );
 
 					let roles: string[] = [];
@@ -298,9 +328,7 @@ export const useAuthStore = defineStore(
 
 					try {
 						const profileRes = await safeFetch(
-							`${
-								import.meta.env.VITE_API_BASE_URL
-							}/wp/v2/users/me?context=edit`,
+							'/wp/v2/users/me?context=edit',
 							{
 								headers: {
 									Authorization: `Bearer ${ token.value }`,
@@ -324,10 +352,9 @@ export const useAuthStore = defineStore(
 								roles.length === 1 &&
 								roles.includes( 'subscriber' )
 							) {
-								await jwtSdk
-									.revokeToken( { JWT: token.value } )
-									.catch( () => {} );
+								await jwtSdk.logout();
 								token.value = '';
+								isAuthState.value = false;
 								localStorage.removeItem( 'dame_jwt_token' );
 								throw new Error(
 									'Veuillez valider votre adresse e-mail avant de vous connecter.'
@@ -414,43 +441,13 @@ export const useAuthStore = defineStore(
 			}
 		};
 
-		const logout = () => {
-			if ( token.value ) {
-				jwtSdk.revokeToken( { JWT: token.value } ).catch( ( e ) => {
-					console.warn(
-						'Erreur lors de la révocation du jeton sur le serveur:',
-						e
-					);
-				} );
-				jwtSdk.clearTokens();
+		const logout = async () => {
+			if ( token.value && ! jwtSdk.getJwt() ) {
+				jwtSdk.setTokens( token.value );
 			}
-
-			try {
-				queryClient.clear();
-			} catch ( e ) {
-				console.warn(
-					"Erreur lors de l'effacement du QueryClient:",
-					e
-				);
-			}
-			token.value = '';
-			user.value = null;
-			selectedIdentity.value = null;
-			adminMode.value = false;
-			localStorage.removeItem( 'dame_jwt_token' );
-			localStorage.removeItem( 'dame_user' );
-			localStorage.removeItem( 'dame_selected_identity' );
-			queryClient.clear();
-			useAgendaStore().clearData();
-			useContactStore().clearData();
-			useDashboardStore().clearData();
-			useMemberStore().clearData();
-			useMessageStore().clearData();
-			useBenevolatStore().clearData();
-			useTournamentStore().clearData();
-			useNewsStore().clearData();
-			useApprentissageStore().clearData();
+			clearLocalSessionState();
 			router.push( '/tabs/home' );
+			await jwtSdk.logout();
 		};
 
 		let isSessionValidating = false;
@@ -489,6 +486,7 @@ export const useAuthStore = defineStore(
 		debouncedValidateSession();
 
 		return {
+			jwtSdk,
 			token,
 			user,
 			selectedIdentity,
@@ -517,7 +515,7 @@ export const useAuthStore = defineStore(
 	},
 	{
 		persist: {
-			omit: [ 'isLoading' ],
+			omit: [ 'isLoading', 'jwtSdk' ],
 		},
 	}
 );

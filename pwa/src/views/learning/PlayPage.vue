@@ -6,6 +6,17 @@
           <ion-back-button default-href="/tabs/apprentissage"></ion-back-button>
         </ion-buttons>
         <ion-title>Partie d'Échecs</ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            v-if="!boardConfig.viewOnly && currentPly > 0"
+            color="danger"
+            fill="clear"
+            title="Abandonner la partie"
+            @click="confirmResign"
+          >
+            <ion-icon slot="icon-only" :icon="flagOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -87,10 +98,14 @@ import {
   IonTitle,
   IonContent,
   IonButtons,
+  IonButton,
   IonBackButton,
   IonSpinner,
+  IonIcon,
+  alertController,
   onIonViewWillLeave
 } from '@ionic/vue';
+import { flagOutline } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { StockfishConfig, BoardCore } from 'eg-chessboard';
 import { useAuthStore } from '@/stores/auth';
@@ -125,6 +140,7 @@ const {
   boardConfig,
   requestHintForPlayer,
   resetHelpState,
+  resetGameStartTime,
   toggleHint,
   handleStockfishHint,
   handleEngineStatus,
@@ -135,6 +151,7 @@ const {
   undoMove,
   handleCheck,
   handleGameOver,
+  resignGame,
 } = usePlayGame();
 
 provide('gameSettings', gameSettings);
@@ -203,16 +220,50 @@ const handleMove = () => {
   }
 };
 
+const confirmResign = async () => {
+  const alert = await alertController.create({
+    header: 'Abandonner la partie ?',
+    message:
+      currentPly.value >= 30
+        ? 'La partie sera enregistrée comme abandonnée dans votre historique (au moins 15 coups complets joués).'
+        : 'La partie est trop courte (< 15 coups complets) pour être enregistrée.',
+    buttons: [
+      {
+        text: 'Continuer',
+        role: 'cancel',
+      },
+      {
+        text: 'Abandonner',
+        role: 'destructive',
+        handler: () => {
+          resignGame();
+        },
+      },
+    ],
+  });
+  await alert.present();
+};
+
 const resetGame = () => {
   showSettings.value = true;
 };
 
 const startNewGame = () => {
+  // Si une partie à 1 joueur était active avec au moins 30 ply, l'enregistrer comme abandonnée avant réinitialisation
+  if (
+    ! boardConfig.viewOnly &&
+    currentPly.value >= 30 &&
+    gameSettings.gameMode === '1player'
+  ) {
+    handleGameOver( 'resigned' );
+  }
+
   const api = getBoardApi();
   if (api) {
     api.cancelReview();
     api.newGame();
   }
+  resetGameStartTime();
 
   showSettings.value = false;
   gameStatus.message = '';
@@ -267,6 +318,7 @@ onMounted(() => {
     gameSettings.level = 1320;
   }
   engineLoaded.value = true;
+  void chessStore.syncPendingGames();
 });
 
 onUnmounted(() => {

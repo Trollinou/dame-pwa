@@ -254,13 +254,25 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
      - Demande de conseil dynamique en cours de partie à pleine puissance 3500+ Elo même en mode 2 joueurs (`core.requestHint({ multiPv: 2, movetime: 1500 })`).
      - Réinitialisation propre de la partie et purge UCI (`core.newGame()`) sans détruire le Web Worker.
-     - Pour les membres connectés : enregistrement et envoi automatique de la partie PGN vers le plugin ROI.
+     - **Enregistrement et synchronisation automatique vers ROI (`/roi/v1/games`)** :
+       - Transmission systématique des parties terminées (mat, nulle, pat).
+       - Transmission des abandons (bouton drapeau dans la barre d'outils, réinitialisation ou bascule vers l'analyse) uniquement si la partie a atteint au moins 30 demi-coups (15 coups complets).
+       - Transmission ciblée selon l'identité active via l'en-tête `X-Selected-Identity` : adhérent (`member_id > 0`) et administrateur (`member_id = 0`), exclusion des profils non connectés et des responsables légaux (parents).
+       - Sauvegarde locale hors ligne (`dame_pending_games`) avec synchronisation automatique dès le rétablissement du réseau ou à l'arrivée sur l'écran de jeu.
    - **Mode 2 Joueurs (Pass & Play)** :
      - Jeu local sur le même écran pour deux joueurs humains, moteur d'analyse IA désactivé.
-   - **Analyse & Revue de Partie (Stockfish 19)** :
-     - Évaluation en temps réel avec barre d'évaluation dynamique réagissant instantanément à la navigation dans l'historique (`core.viewHistory()`, `viewPrevious()`, `viewNext()`), reflétant immédiatement la position visualisée à l'écran.
-     - Variante principale (PV) et conseil du meilleur coup calculé à la demande (`core.requestHint()`).
-     - Revue de partie complète (`core.reviewGame()`) accélérée par chaînage d'évaluations, avec support d'annulation fluide (`core.cancelReview()` / `AbortSignal`), score de précision global (Blancs & Noirs) et classification affinée de chaque coup dans l'historique (`brilliant`, `best`, `excellent`, `good`, `inaccuracy`, `mistake`, `blunder`, `missed_win`).
+   - **Analyse & Revue de Partie (Stockfish 19 - `AnalysisPage.vue`)** :
+     - **Affichage Responsive Dual-Mode** :
+       - *Sur Mobile (mode portrait, `< 768px`)* : Échiquier avec barre d'évaluation en tête, corps de page scrollable verticalement pour faire défiler naturellement les actions, la carte de bilan et l'historique des coups.
+       - *Sur Tablette / Ordinateur (ou paysage, `≥ 768px`)* : Affichage ergonomique en 2 colonnes côte-à-côte (échiquier carré 1:1 et barre d'évaluation à gauche, commandes, carte de bilan et liste des coups à droite).
+     - **Éval direct (Évaluation continue)** : Calcul continu Stockfish (`infinite: true`) avec barre d'évaluation verticale dynamique, score numérique (+1.2, -0.8, #M2), variante principale calculée (PV) et flèche verte du meilleur coup sur l'échiquier, avec synchronisation immédiate sans nécessiter de redimensionnement de fenêtre.
+     - **Conseil (Hint ponctuel)** : Demande ponctuelle du meilleur coup calculé à pleine puissance (`core.requestHint({ multiPv: 2, movetime: 1500 })`) avec flèche verte tracée sur l'échiquier et retour textuel d'assistance clair (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*). Gestion explicite de la fin de partie invitant à reculer sur un coup antérieur si la partie est terminée sur la position affichée.
+     - **Bilan (Revue de partie autonome & navigation didactique)** :
+      - *Calcul optimisé* : Analyse à `depth: 12` avec jauge de progression, annulation fluide, scores de précision globale Blancs/Noirs et tableau récapitulatif des jugements (`!!`, `★`, `✓`, `•`, `?!`, `?`, `??`, `✗`).
+      - *Inspection didactique coup par coup* : Dès la sélection d'un coup dans l'historique (ou sélection automatique de la première imprécision/erreur à la fin du bilan), l'échiquier se positionne par défaut sur la position **avant le coup** ($N-1$).
+      - *Double flèche visuelle* : Tracé simultané de la flèche du coup joué (couleur selon le jugement : rouge pour gaffe, jaune pour imprécision/erreur, bleue pour bon coup) et de la flèche verte du **meilleur coup alternatif**.
+      - *Fiche de coup interactive* : Carte dédiée affichant le coup joué, le meilleur coup recommandé, les annotations et un sélecteur « Avant le coup » / « Après le coup » pour alterner entre la vue de départ et le résultat sur le plateau.
+      - *Cohérence « Conseil » & « Éval direct »* : En mode Bilan, le bouton « Conseil » restitue directement la recommandation du bilan pour le coup analysé, et « Éval direct » évalue la position au trait du joueur qui doit exécuter ce coup.
 
 ## Module Profil & Personnalisation de l'Échiquier
 
@@ -274,8 +286,8 @@ Dans l'onglet **Profil** (lorsque l'utilisateur est connecté), un panneau dépl
 3. **Sélecteur de Fond d'Échiquier (Rouleau Wheel-Picker)** :
    - Rouleau rotatif présentant les 9 nuances et textures d'arrière-plan : *Brown (Bois)* (défaut), *Bleu Acier*, *Vert Tournoi*, *Style IC*, *Gris Ardoise*, *Violet Lilas*, *Noyer Chaud*, *Bois Veiné HD*, *Érable Doré*.
 4. **Prévisualisation en Temps Réel & Préchargement Fluide** :
-   - Échiquier complet en position initiale actualisé instantanément selon la combinaison sélectionnée.
-   - À l'ouverture de l'accordéon, l'application précharge de manière transparente les 10 feuilles de style vectorielles pour que le défilement des rouleaux reste instantané sans aucun temps de chargement visible. Sur le reste des écrans (jeu, exercices, analyse), seul le jeu de pièces réellement sélectionné est chargé en mémoire (économie de 96.5% de CSS).
+   - Échiquier complet en position initiale monté à la demande (`v-if="isExpanded"`, `defineAsyncComponent`) et actualisé instantanément selon la combinaison sélectionnée, évitant de charger le moteur d'échiquier (`chess-vendor`) tant que l'accordéon reste replié.
+   - À l'ouverture de l'accordéon, l'application précharge de manière transparente les 10 feuilles de style vectorielles (mises en cache via Workbox `pwa-chess-pieces-cache`) pour que le défilement des rouleaux reste instantané sans aucun temps de chargement visible. Sur le reste des écrans (jeu, exercices, analyse), seul le jeu de pièces réellement sélectionné est chargé en mémoire (économie de 96.5% de CSS).
 5. **Validation & Persistance** :
    - Bouton **"Enregistrer mon style d'échiquier"** confirmant l'enregistrement avec notification toast.
    - Bouton **"Rétablir les valeurs par défaut"** pour revenir rapidement à la combinaison par défaut (CBurnett & Brown).
@@ -316,6 +328,11 @@ En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou
    - Permet de forcer un nettoyage complet manuel si nécessaire.
    - Purge le `CacheStorage` d'assets et le cache des requêtes tout en **préservant scrupuleusement la session active** (aucun mot de passe à resaisir).
    - Recharge immédiatement l'application pour afficher la dernière version disponible.
+5. **Résilience de Session Hors-Ligne (`simple-jwt-login`)** :
+   - Persistance des jetons JWT et `refresh_token` via `LocalStorageTokenStorage` avec initialisation instantanée de l'état connecté au démarrage (`sdk.isAuthenticated()`).
+   - Les requêtes authentifiées utilisent `sdk.fetchWithAuth()` (via `safeFetch`) pour injecter automatiquement le jeton Bearer et rejouer de manière transparente toute requête recevant un statut `401`.
+   - En cas de coupure réseau (mode hors-ligne, tunnel, perte 4G/Wi-Fi) ou d'erreur serveur `5xx` lors d'un rafraîchissement, la session reste active localement sans déconnecter l'utilisateur. Seul un rejet explicite du `refresh_token` par le serveur (`400`/`401`/`403`) déclenche `onSessionExpired` et redirige vers la page de connexion.
+   - La déconnexion (`await sdk.logout()`) nettoie immédiatement le stockage local et révoque le jeton côté serveur sans erreur même hors-ligne.
 
 ## Système de Design & Classes Canoniques Réutilisables
 

@@ -45,13 +45,19 @@ describe( 'safeFetch utility', () => {
 		).rejects.toThrow( 'Le serveur met trop de temps à répondre.' );
 	} );
 
-	test( 'attempts transparent token refresh on 401 Unauthorized status', async () => {
+	test( 'attempts transparent token refresh on 401 Unauthorized status via sdk.fetchWithAuth', async () => {
 		await app.runWithContext( async () => {
 			const authStore = useAuthStore();
-			vi.spyOn( authStore, 'tryRefreshToken' ).mockResolvedValue(
-				'new-refreshed-token'
-			);
 			localStorage.setItem( 'dame_jwt_token', 'expired-token' );
+			authStore.jwtSdk.setTokens( 'expired-token', 'refresh-token-123' );
+
+			vi.spyOn( authStore.jwtSdk, 'getValidJwt' ).mockImplementation(
+				async ( forceRefresh?: boolean ) => {
+					return forceRefresh
+						? 'new-refreshed-token'
+						: 'expired-token';
+				}
+			);
 
 			const unauthorizedResponse = new Response( null, { status: 401 } );
 			const successResponse = new Response(
@@ -68,13 +74,14 @@ describe( 'safeFetch utility', () => {
 
 			const res = await safeFetch( 'https://api.example.com/protected' );
 
-			expect( authStore.tryRefreshToken ).toHaveBeenCalledTimes( 1 );
+			expect( authStore.jwtSdk.getValidJwt ).toHaveBeenCalledWith( true );
 			expect( fetchMock ).toHaveBeenCalledTimes( 2 );
 			expect( res.status ).toBe( 200 );
 
-			const secondCallHeaders = fetchMock.mock.calls[ 1 ][ 1 ]
-				?.headers as Record< string, string >;
-			expect( secondCallHeaders?.Authorization ).toBe(
+			const secondCallHeaders = new Headers(
+				fetchMock.mock.calls[ 1 ][ 1 ]?.headers
+			);
+			expect( secondCallHeaders.get( 'Authorization' ) ).toBe(
 				'Bearer new-refreshed-token'
 			);
 		} );
@@ -118,11 +125,29 @@ describe( 'safeFetch utility', () => {
 			expect( fetchMock ).toHaveBeenCalledTimes( 2 );
 			expect( res.status ).toBe( 200 );
 
-			const secondCallHeaders = fetchMock.mock.calls[ 1 ][ 1 ]
-				?.headers as Record< string, string >;
-			expect( secondCallHeaders?.Authorization ).toBe(
+			const secondCallHeaders = new Headers(
+				fetchMock.mock.calls[ 1 ][ 1 ]?.headers
+			);
+			expect( secondCallHeaders.get( 'Authorization' ) ).toBe(
 				'Bearer new-refreshed-token-400'
 			);
+		} );
+	} );
+
+	test( 'preserves session when getValidJwt returns null due to network error while refresh_token is stored', async () => {
+		await app.runWithContext( async () => {
+			localStorage.setItem( 'dame:refresh_token', 'valid-refresh-token' );
+			const authStore = useAuthStore();
+			expect( authStore.isAuthenticated ).toBe( true );
+
+			vi.spyOn( authStore.jwtSdk, 'getValidJwt' ).mockResolvedValue(
+				null
+			);
+
+			const result = await authStore.tryRefreshToken( true );
+			expect( result ).toBeNull();
+			expect( authStore.jwtSdk.isAuthenticated() ).toBe( true );
+			expect( authStore.isAuthenticated ).toBe( true );
 		} );
 	} );
 } );

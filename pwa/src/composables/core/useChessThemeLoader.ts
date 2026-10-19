@@ -19,12 +19,15 @@ const pieceSetImportMap: Record< PieceSet, () => Promise< unknown > > = {
  * Charge à la demande la feuille de style CSS d'un jeu de pièces spécifique.
  * @param pieceSet
  */
-export async function loadPieceSetStyle( pieceSet: PieceSet ): Promise< void > {
+export async function loadPieceSetStyle(
+	pieceSet: PieceSet = 'cburnett'
+): Promise< void > {
 	if ( loadedPieceSets.has( pieceSet ) ) {
 		return;
 	}
 
-	const importer = pieceSetImportMap[ pieceSet ];
+	const importer =
+		pieceSetImportMap[ pieceSet ] ?? pieceSetImportMap.cburnett;
 	if ( importer ) {
 		try {
 			await importer();
@@ -37,6 +40,8 @@ export async function loadPieceSetStyle( pieceSet: PieceSet ): Promise< void > {
 		}
 	}
 }
+
+export const loadPieceSetCss = loadPieceSetStyle;
 
 /**
  * Précharge l'intégralité des jeux de pièces disponibles.

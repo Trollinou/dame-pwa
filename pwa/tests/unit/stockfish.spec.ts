@@ -5,6 +5,8 @@ import {
 	computeEvalBarPercentage,
 	formatEvaluationScore,
 	validateFen,
+	normalizeCastlingMoves,
+	normalizePgn,
 } from '@/utils/chess/stockfish';
 
 describe( 'Stockfish 19 Utilities', () => {
@@ -112,5 +114,41 @@ describe( 'Stockfish 19 Utilities', () => {
 
 		const invalid = validateFen( 'invalid fen string' );
 		expect( invalid.valid ).toBe( false );
+	} );
+
+	it( 'normalizes castling moves destination squares for Stockfish UCI compatibility', () => {
+		const mockHistory = [
+			{ san: 'e4', from: 'e2', to: 'e4', color: 'w' },
+			{ san: 'e5', from: 'e7', to: 'e5', color: 'b' },
+			// Grand roque blanc (chessops met to: a1)
+			{ san: 'O-O-O', from: 'e1', to: 'a1', color: 'w' },
+			// Grand roque noir (chessops met to: a8)
+			{ san: '0-0-0+', from: 'e8', to: 'a8', color: 'b' },
+			// Petit roque blanc (chessops met to: h1)
+			{ san: 'O-O', from: 'e1', to: 'h1', color: 'w' },
+			// Petit roque noir (chessops met to: h8)
+			{ san: '0-0#', from: 'e8', to: 'h8', color: 'b' },
+		];
+
+		const mockBoardApi = {
+			getHistory: ( verbose?: boolean ) =>
+				verbose ? mockHistory : mockHistory.map( ( m ) => m.san ),
+		};
+
+		normalizeCastlingMoves( mockBoardApi );
+
+		expect( mockHistory[ 2 ].to ).toBe( 'c1' );
+		expect( mockHistory[ 3 ].to ).toBe( 'c8' );
+		expect( mockHistory[ 4 ].to ).toBe( 'g1' );
+		expect( mockHistory[ 5 ].to ).toBe( 'g8' );
+		// Les coups réguliers ne sont pas altérés
+		expect( mockHistory[ 0 ].to ).toBe( 'e4' );
+		expect( mockHistory[ 1 ].to ).toBe( 'e5' );
+	} );
+
+	it( 'normalizes PGN with zero-castling and unicode figurines', () => {
+		const rawPgn = '1. e4 e5 2. 0-0 0-0-0 3. ♘f3 ♚e7';
+		const normalized = normalizePgn( rawPgn );
+		expect( normalized ).toBe( '1. e4 e5 2. O-O O-O-O 3. Nf3 Ke7' );
 	} );
 } );

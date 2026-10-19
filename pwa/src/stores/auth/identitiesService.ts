@@ -8,25 +8,33 @@ import { useAgendaStore } from '../agenda';
 export const useIdentitiesService = (
 	token: Ref< string >,
 	selectedIdentity: Ref< Identity | null >,
-	router: Router
+	router: Router,
+	isAuthenticated?: Ref< boolean >
 ) => {
 	const {
 		data: queryIdentities,
 		refetch: refetchIdentities,
 		isLoading: isIdentitiesLoading,
 	} = useQuery< Identity[] >( {
-		queryKey: [ 'identities', token ],
-		enabled: computed( () => !! token.value ),
+		queryKey: computed( () => [
+			'identities',
+			( isAuthenticated ? isAuthenticated.value : !! token.value )
+				? 'authenticated'
+				: 'anonymous',
+		] ),
+		enabled: computed( () =>
+			isAuthenticated ? isAuthenticated.value : !! token.value
+		),
 		queryFn: async () => {
-			if ( ! token.value ) {
+			if (
+				! ( isAuthenticated ? isAuthenticated.value : !! token.value )
+			) {
 				return [];
 			}
-			const response = await safeFetch(
-				`${ import.meta.env.VITE_API_BASE_URL }/dame/v1/my-identities`,
-				{
-					headers: { Authorization: `Bearer ${ token.value }` },
-				}
-			);
+			const response = await safeFetch( '/dame/v1/my-identities', {
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' },
+			} );
 			if ( ! response.ok ) {
 				throw new Error( 'Impossible de charger les identités.' );
 			}

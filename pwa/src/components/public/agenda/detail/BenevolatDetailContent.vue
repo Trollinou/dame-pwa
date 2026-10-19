@@ -231,7 +231,7 @@ const formatDate = (dateString: string) => {
 };
 
 const fetchMyVote = async () => {
-  if (!authStore.token || !activeId.value) {
+  if (!authStore.isAuthenticated || !activeId.value) {
     selectedChoices.value = [];
     hasInitialVote.value = false;
     return;
@@ -239,10 +239,11 @@ const fetchMyVote = async () => {
 
   try {
     const response = await safeFetch(
-      `${import.meta.env.VITE_API_BASE_URL}/dame/v1/benevolats/${activeId.value}/my-vote`,
+      `/dame/v1/benevolats/${activeId.value}/my-vote`,
       {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${authStore.token}`
+          'Content-Type': 'application/json'
         }
       }
     );
@@ -263,18 +264,17 @@ const fetchMyVote = async () => {
 };
 
 const submitVote = async () => {
-  if (selectedChoices.value.length === 0 || !authStore.token || !activeId.value) return;
+  if (selectedChoices.value.length === 0 || !authStore.isAuthenticated || !activeId.value) return;
 
   isSubmitting.value = true;
 
   try {
     const response = await safeFetch(
-      `${import.meta.env.VITE_API_BASE_URL}/dame/v1/benevolats/${activeId.value}/vote`,
+      `/dame/v1/benevolats/${activeId.value}/vote`,
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authStore.token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           choices: selectedChoices.value,

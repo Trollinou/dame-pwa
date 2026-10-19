@@ -147,11 +147,10 @@ export function usePreInscriptionApi() {
 
 		try {
 			const response = await safeFetch(
-				`${
-					import.meta.env.VITE_API_BASE_URL
-				}/dame/v1/adherent-details?adherent_id=${ memberId }`,
+				`/dame/v1/adherent-details?adherent_id=${ memberId }`,
 				{
-					headers: { Authorization: `Bearer ${ authStore.token }` },
+					method: 'GET',
+					headers: { 'Content-Type': 'application/json' },
 				}
 			);
 
@@ -196,14 +195,23 @@ export function usePreInscriptionApi() {
 
 				checkAge();
 			} else if ( response.status === 401 ) {
-				console.error( 'Session définitivement expirée.' );
-				authStore.logout();
+				// Si le SDK indique que la session est toujours authentifiée (ex: échec de refresh dû au hors-ligne),
+				// ne pas déconnecter de force l'utilisateur.
+				if ( ! authStore.jwtSdk.isAuthenticated() ) {
+					console.error( 'Session définitivement expirée.' );
+					await authStore.logout();
+				} else {
+					errorMessage.value =
+						'Mode hors-ligne ou erreur réseau : impossible de récupérer vos informations.';
+				}
 			}
 		} catch ( err ) {
 			console.error(
 				'Erreur lors de la récupération des détails adhérent:',
 				err
 			);
+			errorMessage.value =
+				'Mode hors-ligne ou erreur réseau : impossible de contacter le serveur.';
 		}
 	};
 
@@ -223,9 +231,6 @@ export function usePreInscriptionApi() {
 			const headers: Record< string, string > = {
 				'Content-Type': 'application/json',
 			};
-			if ( authStore.isAuthenticated ) {
-				headers.Authorization = `Bearer ${ authStore.token }`;
-			}
 
 			const bodyData: Record< string, unknown > = {
 				...form,
@@ -242,16 +247,11 @@ export function usePreInscriptionApi() {
 				bodyData.pre_inscription_id = currentPreInscriptionId.value;
 			}
 
-			const response = await safeFetch(
-				`${
-					import.meta.env.VITE_API_BASE_URL
-				}/dame/v1/pre-inscription`,
-				{
-					method: 'POST',
-					headers,
-					body: JSON.stringify( bodyData ),
-				}
-			);
+			const response = await safeFetch( '/dame/v1/pre-inscription', {
+				method: 'POST',
+				headers,
+				body: JSON.stringify( bodyData ),
+			} );
 
 			const resData = await response.json();
 
@@ -298,15 +298,8 @@ export function usePreInscriptionApi() {
 		const token = successData.value.download_token;
 
 		try {
-			const url = `${
-				import.meta.env.VITE_API_BASE_URL
-			}/dame/v1/pre-inscriptions/${ post_id }/pdf/${ type }?token=${ token }`;
-			const headers: Record< string, string > = {};
-			if ( authStore.isAuthenticated ) {
-				headers.Authorization = `Bearer ${ authStore.token }`;
-			}
-
-			const response = await safeFetch( url, { headers } );
+			const url = `/dame/v1/pre-inscriptions/${ post_id }/pdf/${ type }?token=${ token }`;
+			const response = await safeFetch( url );
 			if ( ! response.ok ) {
 				throw new Error( 'Erreur de téléchargement' );
 			}

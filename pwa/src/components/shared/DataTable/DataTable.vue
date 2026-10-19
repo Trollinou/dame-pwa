@@ -207,23 +207,6 @@ watch(
   { deep: true, immediate: true }
 );
 
-watch(
-  () => props.filters,
-  (newFilters) => {
-    if (newFilters && newFilters.length > 0) {
-      newFilters.forEach((f) => {
-        if (f.defaultValue !== undefined && f.defaultValue !== 'all' && f.defaultValue !== '') {
-          const existing = columnFilters.value.find((cf) => cf.id === f.id);
-          if (!existing) {
-            columnFilters.value = [...columnFilters.value, { id: f.id, value: f.defaultValue }];
-          }
-        }
-      });
-    }
-  },
-  { deep: true, immediate: true }
-);
-
 /**
  * Fonction de recherche globale personnalisée insensible aux accents.
  */

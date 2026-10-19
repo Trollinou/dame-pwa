@@ -70,7 +70,7 @@
       </div>
 
       <!-- Notes ou texte d'accompagnement de la vidéo si présent -->
-      <div v-if="contenuHtml && !isImmersiveFullscreen" class="video-accompanying-text ion-padding" v-html="contenuHtml"></div>
+      <div v-if="contenuHtml && !isImmersiveFullscreen" class="video-accompanying-text ion-padding" v-safe-html="contenuHtml"></div>
     </div>
 
     <!-- Footer Fixe Unifié SeriesCardFooter (Carte 1/1 - masqué si plein écran immersif) -->

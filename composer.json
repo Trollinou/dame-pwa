@@ -11,11 +11,11 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^1.2"
   },
   "scripts": {
-    "lint:php": "phpstan analyze --memory-limit=1G",
+    "lint:php": "phpstan analyze --debug --memory-limit=2G",
     "lint": "phpcs",
     "fix": "phpcbf",
     "test": "phpunit"
- },
+  },
   "autoload-dev": {
     "psr-4": {
       "DAME_PWA\\Tests\\": "tests/"

@@ -83,3 +83,27 @@ ion-toolbar {
   --padding-end: 12px;
   font-size: 0.9rem;
 }
+
+/* Compatibilité des variables de nuance en mode sombre (Ionic 8/9 dark.system.css) */
+@media (prefers-color-scheme: dark) {
+  :root,
+  :root.ios,
+  :root.md {
+    --ion-color-step-50: var(--ion-background-color-step-50, #141416);
+    --ion-color-step-100: var(--ion-background-color-step-100, #1e1e22);
+    --ion-color-step-150: var(--ion-background-color-step-150, #28282e);
+    --ion-color-step-200: var(--ion-background-color-step-200, #32323a);
+    --ion-color-step-250: var(--ion-background-color-step-250, #3c3c46);
+    --ion-color-step-300: var(--ion-background-color-step-300, #464652);
+    --ion-color-step-400: var(--ion-background-color-step-400, #5a5a68);
+    --ion-color-step-500: var(--ion-background-color-step-500, #737382);
+    --ion-color-step-600: var(--ion-background-color-step-600, #8e8e9e);
+    --ion-color-step-650: var(--ion-background-color-step-650, #9d9db0);
+    --ion-color-step-700: var(--ion-background-color-step-700, #adadb8);
+    --ion-color-step-750: var(--ion-background-color-step-750, #bdbdc4);
+    --ion-color-step-800: var(--ion-background-color-step-800, #cdccd0);
+    --ion-color-step-850: var(--ion-background-color-step-850, #dddddc);
+    --ion-color-step-900: var(--ion-background-color-step-900, #eeeeee);
+  }
+}
+

@@ -6,6 +6,41 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Correction et Fiabilisation de la Transmission des Parties vers ROI (`PlayPage.vue`, `usePlayGame.ts`, `chess.ts`, `USING.md`)** :
+  - **Prise en Charge des Identités Mixtes & Administrateurs** : Correction du filtre de transmission dans `chessStore.saveCompletedGame` pour autoriser les administrateurs/entraîneurs (`wp_virtual`, `member_id = 0`) en plus des adhérents (`member_id > 0`), tout en excluant rigoureusement les utilisateurs non authentifiés et les responsables légaux (`representative`).
+  - **En-tête de Sélection d'Identité `X-Selected-Identity`** : Transmission systématique de l'identifiant d'identité active (`identity.id`) lors des requêtes REST vers `POST /roi/v1/games` et lors de la synchronisation hors ligne, assurant l'attribution exacte de la partie dans ROI.
+  - **Règle Métier des Abandons (Seuil de 30 demi-coups / 15 coups complets)** :
+    - Les parties terminées (échec et mat, nulle, pat) sont transmises sans condition de longueur.
+    - Les abandons de partie (via le nouveau bouton drapeau dans la barre d'outils, la réinitialisation de l'échiquier ou la bascule vers l'analyse) ne sont enregistrés et transmis que s'ils atteignent au moins **30 demi-coups (15 coups complets)** (`ply >= 30`), éliminant la pollution de la base par des parties abandonnées prématurément.
+  - **Ergonomie & Abandon Explicite** : Ajout d'un bouton d'abandon avec icône drapeau (`flagOutline`) et modale de confirmation native Ionic (`confirmResign`) dans la barre d'outils de `PlayPage`.
+  - **Chronométrage Réel de Partie** : Rétablissement du calcul précis du temps de jeu effectif (`getGameDurationSeconds()`) transmis dans le champ `duration`.
+  - **Synchronisation Hors Ligne Fiabilisée** : Dépilement automatique de la file d'attente locale `dame_pending_games` au montage de `PlayPage` et avant chaque nouvel enregistrement de partie.
+  - **Couverture de Tests Unitaires** : Ajout d'une suite complète de tests dans `chessStore.spec.ts` et `usePlayGame.spec.ts` validant le filtrage des identités, le seuil des 30 demi-coups, la mise en file d'attente hors ligne et les en-têtes réseau.
+
+- **Refonte Responsive & Optimisation du Module d'Analyse (`AnalysisPage.vue`, `_learning-layout.scss`, `_learning-components.scss`, `README.md`, `USING.md`)** :
+  - **Affichage Responsive Dual-Mode (Mobile vs Tablette / Ordinateur)** :
+    - Sur mobile portrait (`< 768px`) : Agencement en colonne unique avec échiquier en tête et corps de page scrollable (`:scroll-y="true"`), permettant de faire défiler naturellement les actions, la carte de bilan et l'historique complet des coups.
+    - Sur tablette et ordinateur (`≥ 768px` ou paysage) : Disposition ergonomique en 2 colonnes côte-à-côte (échiquier carré `1:1` et barre d'évaluation à gauche, commandes, carte de bilan et historique des coups à droite).
+  - **Correction de la Géométrie et de la Stabilité de l'Échiquier** :
+    - Suppression de la règle intrusive `.main-board { height: 100% !important; }` en mode paysage et assouplissement de l'alignement (`align-items: center`) dans `.board-wrapper-with-eval`, rétablissant le calcul intrinsèque 1:1 de `eg-chessboard` (`padding-bottom: 100%`) et éliminant définitivement l'étirement des cases en rectangles verticaux sur écran large ou lors du redimensionnement.
+    - Synchronisation rigoureuse de l'état de visualisation (`getHistoryViewerState()`) : résout la discordance où le dernier coup était surligné dans l'historique alors que l'échiquier affichait la position initiale.
+    - Ajout d'un bouton d'accès rapide « Position initiale » en tête de la table d'historique, actif dès l'arrivée sur l'écran d'analyse et permettant de naviguer instantanément à la position de départ.
+    - Persistance du conteneur de la barre d'évaluation dès l'activation du mode direct, évitant tout décalage d'agencement (layout shift) et assurant le tracé immédiat et exact des flèches vectorielles de conseil.
+    - Correction de la réactivité de `totalPlyCount` (passage en `ref` réactive synchronisée dans `refreshDisplay()`) résolvant l'anomalie d'affichage `Coup 35 / 0`.
+  - **Navigation Didactique du Bilan & Double Flèche Visuelle (`AnalysisPage.vue`, `AnalysisReview.spec.ts`)** :
+    - *Positionnement Automatique Avant-Coup ($N-1$)* : Dès la sélection d'un coup dans l'historique ou à l'issue de la génération du bilan (sélection automatique du premier coup imprécis ou erreur), l'échiquier se positionne sur la position de départ précédant l'exécution du coup ($N-1$).
+    - *Double Flèche Visuelle Simultanée* : Tracé vectoriel simultané du coup joué (coloré selon l'appréciation : rouge pour gaffe, jaune pour imprécision/erreur, bleue pour bon coup) et de la flèche verte du meilleur coup alternatif recommandé par Stockfish.
+    - *Fiche Didactique du Coup (`analysis-move-card`)* : Carte contextuelle détaillée affichant le coup joué, le meilleur coup, les annotations SAN, les flèches directionnelles et un sélecteur à deux positions (« Avant le coup » / « Après le coup ») pour comparer visuellement la position de départ et la position résultante.
+    - *Cohérence « Conseil » & « Éval direct »* : En mode Bilan, le bouton Conseil restitue directement la recommandation du bilan pour le coup analysé, et l'Éval direct évalue la position au trait du joueur qui doit exécuter ce coup.
+  - **Correction et Optimisation Complète du Mode Sombre (Dark Mode)** :
+    - *Pont de Compatibilité Variables Step (`variables.css`)* : Définition d'un mappage `@media (prefers-color-scheme: dark)` redirigeant les anciennes variables `--ion-color-step-50..900` vers les variables de fond sombre natives d'Ionic 8/9 (`--ion-background-color-step-*`), éliminant les fallbacks clairs inopinés en mode sombre.
+    - *Contraste Garanti de la Carte de Bilan (`accuracy-box`)* : Adaptation des blocs Blancs (`white-box` sur fond ardoise sombre contrasté `#334155`) et Noirs (`black-box` sur fond noir bleuté `#0f172a`), garantissant une lisibilité parfaite des scores de précision.
+    - *Contraste de la Fiche de Coup & Bouton Position Initiale* : Stylisation explicite en mode sombre pour `move-details-grid`, les indicateurs de flèches saturées, les symboles de pièces et le bouton « Position initiale ».
+  - **Mise à Niveau du Moteur d'Échiquier (`eg-chessboard` 1.7.2)** :
+    - Intégration de la version 1.7.2 d'`eg-chessboard` embarquant la correction native des coups UCI de roque (`e1c1`/`e8c8`), l'auto-recyclage transparent du worker Stockfish en cas d'erreur de calcul, la gestion des scores de mat terminal (`mate 0`) dans la barre d'évaluation, ainsi que l'utilitaire `normalizePgn()` pour la conversion automatique des notations avec zéros (`0-0-0`) et figurines Unicode (`♔...♟`).
+    - Ré-export de `normalizePgn()` dans `pwa/src/utils/chess/stockfish.ts` avec tests unitaires de validation.
+
+
 ## [1.10.1] - 2026-10-13
 
 - **Optimisation Granulaire des Styles d'Échiquier `eg-chessboard` & Découpage CSS Dynamique (`Chessboard.vue`, `useChessThemeLoader.ts`, `chessPreferences.ts`, `ChessThemeCustomizer.vue`)** :

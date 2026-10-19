@@ -1,4 +1,8 @@
-import { SimpleJwtLogin, LocalStorageTokenStorage } from 'simple-jwt-login';
+import {
+	SimpleJwtLogin,
+	LocalStorageTokenStorage,
+	type SimpleJwtLoginApiError,
+} from 'simple-jwt-login';
 import type { TokenExpiryInfo } from './types';
 
 export const getApiOrigin = (): string => {
@@ -13,11 +17,16 @@ export const getApiOrigin = (): string => {
 	return base;
 };
 
-export const createJwtSdk = ( onTokenRefreshed: ( _jwt: string ) => void ) => {
+export const createJwtSdk = (
+	onTokenRefreshed: ( _jwt: string ) => void,
+	onSessionExpired?: ( _error: SimpleJwtLoginApiError ) => void
+) => {
 	return new SimpleJwtLogin( getApiOrigin(), {
 		tokenStorage: new LocalStorageTokenStorage( 'dame' ),
 		refreshBeforeExpirySeconds: 60,
+		useWpJson: true,
 		onTokenRefreshed,
+		onSessionExpired,
 	} );
 };
 

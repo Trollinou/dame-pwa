@@ -34,7 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import { h } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -54,6 +53,7 @@ import {
   type CustomColumnDef,
   type DataTableExportConfig
 } from '@/components/shared/DataTable';
+import { decodeHtmlEntities } from '@/utils/stringUtils';
 
 const router = useRouter();
 const messageStore = useMessageStore();
@@ -74,8 +74,8 @@ const columns: CustomColumnDef<Message>[] = [
   {
     id: 'title',
     header: 'Sujet / Titre',
-    accessorFn: (row) => row.title?.raw || row.title?.rendered || '',
-    cell: ({ row }) => h('span', { innerHTML: row.original.title.rendered }),
+    accessorFn: (row) => decodeHtmlEntities(row.title?.raw || row.title?.rendered || ''),
+    cell: ({ row }) => decodeHtmlEntities(row.original.title?.rendered || row.original.title?.raw || ''),
     enableSorting: true
   },
   {

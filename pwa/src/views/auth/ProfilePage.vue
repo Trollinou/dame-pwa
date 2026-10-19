@@ -207,12 +207,13 @@ import {
   cloudDownloadOutline,
   refreshOutline
 } from 'ionicons/icons';
-import { computed, ref } from 'vue';
+import { computed, ref, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePwaUpdate } from '@/composables/core/usePwaUpdate';
 import { useFeedback } from '@/composables/core/useFeedback';
-import ChessThemeCustomizer from '@/components/auth/profile/ChessThemeCustomizer.vue';
+
+const ChessThemeCustomizer = defineAsyncComponent(() => import('@/components/auth/profile/ChessThemeCustomizer.vue'));
 
 const router = useRouter();
 const ionRouter = useIonRouter();
