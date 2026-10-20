@@ -280,6 +280,159 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 	let isFetchingAgenda = false;
 
 	/**
+	 * Récupère l'intégralité des événements à venir depuis le serveur en passant par TanStack Query
+	 * @param referenceDate Date de référence YYYY-MM-DD
+	 */
+	const fetchAllUpcoming = async ( referenceDate: string ) => {
+		if ( isFetchingUpcoming ) {
+			return null;
+		}
+		isFetchingUpcoming = true;
+
+		try {
+			const isAuth = authStore.isAuthenticated;
+
+			return await queryClient.fetchQuery( {
+				queryKey: [
+					'agenda',
+					'upcoming',
+					'all',
+					referenceDate,
+					isAuth ? 'auth' : 'public',
+				],
+				queryFn: async () => {
+					if ( ! navigator.onLine ) {
+						throw new Error( 'Offline' );
+					}
+
+					const context = 'view';
+					const perPage = 100;
+					const baseUrl = `${
+						import.meta.env.VITE_API_BASE_URL
+					}/wp/v2/agenda`;
+					const queryParams = [
+						`per_page=${ perPage }`,
+						`context=${ context }`,
+						`orderby=meta_value`,
+						`meta_key=_dame_start_date`,
+						`order=asc`,
+						`after_date=${ referenceDate }`,
+					].join( '&' );
+
+					const headers: Record< string, string > = {
+						'Content-Type': 'application/json',
+					};
+
+					let response = await safeFetch(
+						`${ baseUrl }?${ queryParams }&page=1`,
+						{ method: 'GET', headers },
+						8000
+					);
+
+					// Repli gracieux : Si 400/401/403 avec un token invalide, on retente en mode public sans bloquer l'agenda
+					if (
+						( response.status === 401 ||
+							response.status === 403 ||
+							response.status === 400 ) &&
+						isAuth
+					) {
+						console.warn(
+							`Accès agenda authentifié refusé (${ response.status }), tentative de chargement public...`
+						);
+						response = await safeFetch(
+							`${ baseUrl }?${ queryParams }&page=1`,
+							{
+								method: 'GET',
+								headers: { 'Content-Type': 'application/json' },
+							},
+							8000,
+							true
+						);
+					}
+
+					if ( ! response.ok ) {
+						if ( response.status === 400 ) {
+							return [];
+						}
+						throw new Error( `Server status ${ response.status }` );
+					}
+
+					const totalPagesHeader =
+						response.headers.get( 'X-WP-TotalPages' ) ||
+						response.headers.get( 'x-wp-totalpages' );
+					const totalPages = totalPagesHeader
+						? parseInt( totalPagesHeader, 10 )
+						: 1;
+
+					let data: AgendaEvent[] = await response.json();
+
+					// Si plusieurs pages (> 100 événements futurs), charger les pages 2..totalPages
+					if ( totalPages > 1 ) {
+						const isFallbackAuth =
+							( response.status === 401 ||
+								response.status === 403 ||
+								response.status === 400 ) &&
+							isAuth;
+						const pagePromises = [];
+						for ( let p = 2; p <= totalPages; p++ ) {
+							pagePromises.push(
+								safeFetch(
+									`${ baseUrl }?${ queryParams }&page=${ p }`,
+									{ method: 'GET', headers },
+									8000,
+									isFallbackAuth
+								).then( async ( res ) => {
+									if ( res.ok ) {
+										return ( await res.json() ) as AgendaEvent[];
+									}
+									return [] as AgendaEvent[];
+								} )
+							);
+						}
+						const remainingPages = await Promise.all( pagePromises );
+						for ( const pageData of remainingPages ) {
+							data = data.concat( pageData );
+						}
+					}
+
+					return data;
+				},
+				staleTime: 1000 * 60 * 5, // 5 minutes
+			} );
+		} catch ( error: unknown ) {
+			const isOffline =
+				error instanceof Error && error.message === 'Offline';
+			if ( isOffline ) {
+				const isAuth = authStore.isAuthenticated;
+				const cached = queryClient.getQueryData< AgendaEvent[] >( [
+					'agenda',
+					'upcoming',
+					'all',
+					referenceDate,
+					isAuth ? 'auth' : 'public',
+				] );
+				if ( cached ) {
+					return cached;
+				}
+			}
+			const errObj = error as
+				| { name?: string; message?: string }
+				| undefined;
+			if (
+				errObj?.name !== 'AbortError' &&
+				errObj?.name !== 'CancelledError' &&
+				errObj?.message !== 'CancelledError' &&
+				navigator.onLine
+			) {
+				console.error( 'Erreur fetchAllUpcoming:', error );
+			}
+			return null;
+		} finally {
+			isFetchingUpcoming = false;
+		}
+	};
+
+	/**
 	 * Rafraîchit les données de base (utilisé par Home et Pull-to-refresh)
 	 */
 	const fetchAgenda = async () => {
@@ -296,22 +449,22 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 		isLoading.value = true;
 		try {
 			const today = getTodayLocal();
-			const data = await fetchBatch( 'upcoming', today, 1 );
+			const data = await fetchAllUpcoming( today );
 
-			// CRITIQUE : Si fetchBatch renvoie null (erreur), on arrête TOUT pour préserver le cache
+			// CRITIQUE : Si fetchAllUpcoming renvoie null (erreur), on arrête TOUT pour préserver le cache
 			if ( data === null ) {
 				return;
 			}
 
 			// --- LOGIQUE DE FUSION INTELLIGENTE ---
-			// On garde tous les événements passés déjà chargés en mémoire
+			// On garde tous les événements passés déjà chargés en mémoire (utiles au calendrier)
 			const pastEventsInCache = events.value.filter( ( e ) => {
 				const refDate =
 					e.meta?._dame_end_date || e.meta?._dame_start_date || '';
 				return refDate < today;
 			} );
 
-			// On remplace le bloc futur par les données fraîches
+			// On remplace le bloc futur par la totalité des données fraîches à venir
 			const mergedEvents = [ ...pastEventsInCache, ...data ];
 
 			// Sécurité anti-doublons et tri chronologique
@@ -321,6 +474,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 				)
 			);
 
+			hasMoreUpcoming.value = false;
 			upcomingPage.value = 1;
 		} finally {
 			isLoading.value = false;
@@ -451,6 +605,7 @@ export const useAgendaStore = defineStore( 'agenda', () => {
 		pastPage,
 		getTodayLocal,
 		fetchBatch,
+		fetchAllUpcoming,
 		fetchAgenda,
 		fetchAdminEvents,
 		fetchMonthEvents,

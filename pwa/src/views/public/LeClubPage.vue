@@ -88,12 +88,8 @@
             :search-query="searchQuery"
             :events="events"
             :is-loading="isLoading"
-            :has-more-past="hasMorePast"
-            :has-more-upcoming="hasMoreUpcoming"
             :today-str="todayStr"
             @go-to-detail="goToDetail"
-            @load-more-past="loadMorePast"
-            @load-more-upcoming="loadMoreUpcoming"
             @retry="agendaStore.fetchAgenda()"
           />
 
@@ -135,8 +131,7 @@ import {
   IonBadge,
   IonButtons,
   IonButton,
-  onIonViewWillEnter,
-  type InfiniteScrollCustomEvent
+  onIonViewWillEnter
 } from '@ionic/vue';
 import { listOutline, calendarOutline, checkmarkDoneOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
@@ -164,7 +159,7 @@ const benevolatStore = useBenevolatStore();
 const newsStore = useNewsStore();
 const unreadStore = useUnreadStore();
 
-const { events, isLoading, hasMoreUpcoming, hasMorePast, upcomingPage, pastPage } = storeToRefs(agendaStore);
+const { events, isLoading } = storeToRefs(agendaStore);
 const { selectedSegment, searchQuery, pageTitle, searchPlaceholder, onSegmentChange } = useAgendaSearch();
 
 const contentRef = ref();
@@ -283,83 +278,6 @@ watch(selectedSegment, (newSeg) => {
     scrollToCurrentEvent();
   }
 });
-
-const loadMoreUpcoming = async (ev: InfiniteScrollCustomEvent) => {
-  const target = ev?.target;
-  if (!hasMoreUpcoming.value || isLoading.value) {
-    if (target) {
-      try {
-        await target.complete();
-      } catch {
-        // Ignorer si déjà complété
-      }
-      target.disabled = true;
-    }
-    return;
-  }
-  try {
-    const data = await agendaStore.fetchBatch('upcoming', todayStr, upcomingPage.value);
-    if (data && data.length > 0) {
-      const newItems = data.filter((newItem) => !events.value.some((existing) => existing.id === newItem.id));
-      events.value = [...events.value, ...newItems];
-      upcomingPage.value++;
-    } else if (data !== null) {
-      hasMoreUpcoming.value = false;
-    }
-  } catch (err) {
-    console.error('Erreur chargement événements futurs:', err);
-  } finally {
-    if (target) {
-      try {
-        await target.complete();
-      } catch {
-        // Ignorer si déjà complété
-      }
-      if (!hasMoreUpcoming.value) {
-        target.disabled = true;
-      }
-    }
-  }
-};
-
-const loadMorePast = async (ev: InfiniteScrollCustomEvent) => {
-  const target = ev?.target;
-  if (!hasMorePast.value || isLoading.value) {
-    if (target) {
-      try {
-        await target.complete();
-      } catch {
-        // Ignorer si déjà complété
-      }
-      target.disabled = true;
-    }
-    return;
-  }
-  try {
-    const data = await agendaStore.fetchBatch('past', todayStr, pastPage.value);
-    if (data && data.length > 0) {
-      const dataAsc = [...data].reverse();
-      const newItems = dataAsc.filter((newItem) => !events.value.some((existing) => existing.id === newItem.id));
-      events.value = [...newItems, ...events.value];
-      pastPage.value++;
-    } else if (data !== null) {
-      hasMorePast.value = false;
-    }
-  } catch (err) {
-    console.error('Erreur chargement historique:', err);
-  } finally {
-    if (target) {
-      try {
-        await target.complete();
-      } catch {
-        // Ignorer si déjà complété
-      }
-      if (!hasMorePast.value) {
-        target.disabled = true;
-      }
-    }
-  }
-};
 
 const scrollToCurrentEvent = async () => {
   await nextTick();

@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Optimisation et Filtrage Strict de l'Agenda en Mode Liste (`AgendaSegmentView.vue`, `stores/agenda.ts`, `LeClubPage.vue`, `AgendaSegmentView.spec.ts`, `agendaStore.spec.ts`, `USING.md`)** :
+  - **Exclusion Définitive des Événements Antérieurs** : La vue Liste affiche désormais strictement et exclusivement les événements en cours ou à venir. Aucun événement passé ne peut apparaître dans cette liste, même si l'historique a été chargé au préalable via le calendrier.
+  - **Chargement Direct et Exhaustif Sans Palier** : Remplacement du chargement par paliers (pages de 20 avec scroll infini) par un chargement direct et intégral de tous les événements à venir dès l'accès à l'agenda (`fetchAllUpcoming`), supprimant les composants `ion-infinite-scroll` (haut et bas) de la vue liste.
+  - **Préservation Intégrale de la Vue Calendrier** : La vue Calendrier conserve son fonctionnement complet et permet de continuer à naviguer dans le passé (mois par mois via `fetchMonthEvents`) pour consulter les archives d'événements.
+  - **Couverture de Tests Unitaires** : Ajout de suites de tests dédiées validant l'exclusion stricte des événements passés en vue liste, l'absence de pagination infinie et la récupération multi-pages immédiate dans le store.
+
 - **Correction et Fiabilisation de la Transmission des Parties vers ROI (`PlayPage.vue`, `usePlayGame.ts`, `chess.ts`, `USING.md`)** :
   - **Prise en Charge des Identités Mixtes & Administrateurs** : Correction du filtre de transmission dans `chessStore.saveCompletedGame` pour autoriser les administrateurs/entraîneurs (`wp_virtual`, `member_id = 0`) en plus des adhérents (`member_id > 0`), tout en excluant rigoureusement les utilisateurs non authentifiés et les responsables légaux (`representative`).
   - **En-tête de Sélection d'Identité `X-Selected-Identity`** : Transmission systématique de l'identifiant d'identité active (`identity.id`) lors des requêtes REST vers `POST /roi/v1/games` et lors de la synchronisation hors ligne, assurant l'attribution exacte de la partie dans ROI.
