@@ -4,7 +4,6 @@ Thumbs.db
 [Dd]esktop.ini
 pwa/src/utils/desktop.ini
 .idea/
-.vscode/
 /pwa/.vscode/
 *~
 *.swp
@@ -40,3 +39,12 @@ pwa/www/
 # Sync & identifiants CI
 /.sync.ffs_db
 gha-creds-*.json
+
+# Ignorer tout le dossier .vscode par défaut (sécurité)
+.vscode/*
+
+# Mais versionner la configuration standardisée du projet
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
