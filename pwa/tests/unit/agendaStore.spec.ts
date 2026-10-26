@@ -55,7 +55,9 @@ describe( 'useAgendaStore - Chargement direct des événements à venir', () => 
 				status: 200,
 				headers: {
 					get: ( header: string ) => {
-						if ( header.toLowerCase() === 'x-wp-totalpages' ) return '1';
+						if ( header.toLowerCase() === 'x-wp-totalpages' ) {
+							return '1';
+						}
 						return null;
 					},
 				},
@@ -96,7 +98,9 @@ describe( 'useAgendaStore - Chargement direct des événements à venir', () => 
 					status: 200,
 					headers: {
 						get: ( header: string ) => {
-							if ( header.toLowerCase() === 'x-wp-totalpages' ) return '2';
+							if ( header.toLowerCase() === 'x-wp-totalpages' ) {
+								return '2';
+							}
 							return null;
 						},
 					},

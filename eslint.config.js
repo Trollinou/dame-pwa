@@ -49,6 +49,7 @@ export default [
 			// On désactive les règles trop restrictives pour ce projet
 			'camelcase': 'off',          // Autorise les variables avec des _ (snake_case)
 			'no-alert': 'off',          // Autorise alert() et confirm()
+			'prettier/prettier': 'off', // Ne bloque pas le linter sur du formatage pur
 			'no-console': [ 'warn', { allow: [ 'warn', 'error' ] } ],       // Avertit pour log() mais autorise warn() et error()
 			'eqeqeq': 'warn',           // Avertit au lieu de bloquer pour les == au lieu de ===
 			'no-unused-vars': [ 'warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' } ],   // Avertit pour les variables non utilisées (sauf préfixées par _)

@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-10-26
+
 - **Optimisation et Filtrage Strict de l'Agenda en Mode Liste (`AgendaSegmentView.vue`, `stores/agenda.ts`, `LeClubPage.vue`, `AgendaSegmentView.spec.ts`, `agendaStore.spec.ts`, `USING.md`)** :
   - **Exclusion Définitive des Événements Antérieurs** : La vue Liste affiche désormais strictement et exclusivement les événements en cours ou à venir. Aucun événement passé ne peut apparaître dans cette liste, même si l'historique a été chargé au préalable via le calendrier.
   - **Chargement Direct et Exhaustif Sans Palier** : Remplacement du chargement par paliers (pages de 20 avec scroll infini) par un chargement direct et intégral de tous les événements à venir dès l'accès à l'agenda (`fetchAllUpcoming`), supprimant les composants `ion-infinite-scroll` (haut et bas) de la vue liste.
