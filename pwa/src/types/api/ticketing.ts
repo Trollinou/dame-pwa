@@ -67,3 +67,13 @@ export interface AddOnSiteParticipantRequest {
 	payment_method?: 'Espèces' | 'Chèque' | 'Autre';
 }
 
+/**
+ * Filtres et options de tri pour la récupération des campagnes HelloAsso
+ */
+export interface CampaignQueryFilters {
+	form_type?: string;
+	orderby?: 'start_date' | 'title' | 'id' | 'form_type';
+	order?: 'asc' | 'desc';
+}
+
+

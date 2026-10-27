@@ -6,6 +6,7 @@ import { queryClient } from '@/queryClient';
 import { useTicketingStore } from '@/stores/ticketing';
 import type {
 	TicketingItemDTO,
+	TicketingCampaignDTO,
 	AddOnSiteParticipantRequest,
 } from '@/types/api/ticketing';
 
@@ -27,6 +28,46 @@ describe( 'useTicketingStore - Gestion de la billetterie & pointage HelloAsso', 
 		setActivePinia( pinia );
 		queryClient.clear();
 		vi.clearAllMocks();
+	} );
+
+	it( 'fetchCampaigns appelle correctement la route REST avec filtres et tri optionnels', async () => {
+		await app.runWithContext( async () => {
+			const store = useTicketingStore();
+
+			const mockCampaigns: TicketingCampaignDTO[] = [
+				{
+					id: 1,
+					form_slug: 'open-printemps',
+					form_type: 'Event',
+					title: 'Open Printemps',
+					campaign_category: 'tournament',
+					total_items: 20,
+					checked_in_count: 15,
+					total_amount_cents: 40000,
+					tiers: { 'Open A': 20 },
+				},
+			];
+
+			vi.mocked( safeFetch ).mockResolvedValueOnce( {
+				ok: true,
+				status: 200,
+				json: async () => mockCampaigns,
+			} as unknown as Response );
+
+			const res = await store.fetchCampaigns( {
+				form_type: 'Event',
+				orderby: 'start_date',
+				order: 'desc',
+			} );
+
+			expect( safeFetch ).toHaveBeenCalledWith(
+				'/dame/v1/ticketing/campaigns?form_type=Event&orderby=start_date&order=desc',
+				expect.objectContaining( {
+					headers: { Accept: 'application/json' },
+				} )
+			);
+			expect( res ).toEqual( mockCampaigns );
+		} );
 	} );
 
 	it( 'fetchCampaignItems appelle correctement la route REST avec filtres', async () => {

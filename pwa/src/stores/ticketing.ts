@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
 import { safeFetch } from '@/utils/safeFetch';
 import { useAuthStore } from './auth';
@@ -7,11 +7,51 @@ import type {
 	TicketingCampaignDTO,
 	TicketingItemDTO,
 	AddOnSiteParticipantRequest,
+	CampaignQueryFilters,
 } from '@/types/api/ticketing';
 
 export const useTicketingStore = defineStore( 'ticketing', () => {
 	const authStore = useAuthStore();
 	const queryClient = useQueryClient();
+
+	const campaignFilters = ref< CampaignQueryFilters >( {
+		orderby: 'start_date',
+		order: 'desc',
+	} );
+
+	/**
+	 * Récupère la liste des campagnes avec filtres et tri optionnels.
+	 *
+	 * @param filters           Options de filtre et de tri.
+	 * @param filters.form_type Type de formulaire HelloAsso.
+	 * @param filters.orderby   Champ de tri.
+	 * @param filters.order     Direction du tri.
+	 * @return Liste des campagnes de billetterie.
+	 */
+	const fetchCampaigns = async (
+		filters?: CampaignQueryFilters
+	): Promise< TicketingCampaignDTO[] > => {
+		const params = new URLSearchParams();
+		if ( filters?.form_type ) {
+			params.set( 'form_type', filters.form_type );
+		}
+		if ( filters?.orderby ) {
+			params.set( 'orderby', filters.orderby );
+		}
+		if ( filters?.order ) {
+			params.set( 'order', filters.order );
+		}
+		const qs = params.toString() ? `?${ params.toString() }` : '';
+		const res = await safeFetch( `/dame/v1/ticketing/campaigns${ qs }`, {
+			headers: {
+				Accept: 'application/json',
+			},
+		} );
+		if ( ! res.ok ) {
+			throw new Error( `Erreur récupération campagnes (${ res.status })` );
+		}
+		return res.json();
+	};
 
 	// 1. Liste des campagnes de billetterie HelloAsso
 	const {
@@ -19,18 +59,14 @@ export const useTicketingStore = defineStore( 'ticketing', () => {
 		isLoading: isCampaignsLoading,
 		refetch: refetchCampaigns,
 	} = useQuery< TicketingCampaignDTO[] >( {
-		queryKey: [ 'ticketing', 'campaigns' ],
-		queryFn: async () => {
-			const res = await safeFetch( '/dame/v1/ticketing/campaigns', {
-				headers: {
-					Accept: 'application/json',
-				},
-			} );
-			if ( ! res.ok ) {
-				throw new Error( `Erreur récupération campagnes (${ res.status })` );
-			}
-			return res.json();
-		},
+		queryKey: computed( () => [
+			'ticketing',
+			'campaigns',
+			campaignFilters.value.form_type || 'all',
+			campaignFilters.value.orderby || 'start_date',
+			campaignFilters.value.order || 'desc',
+		] ),
+		queryFn: () => fetchCampaigns( campaignFilters.value ),
 		enabled: computed( () => authStore.isAdmin ),
 		staleTime: 1000 * 60 * 2, // 2 minutes
 	} );
@@ -198,8 +234,11 @@ export const useTicketingStore = defineStore( 'ticketing', () => {
 
 	return {
 		campaigns,
+		campaignFilters,
 		isCampaignsLoading,
 		refetchCampaigns,
+		fetchCampaigns,
+		getCampaigns: fetchCampaigns,
 		getCampaignById,
 		fetchCampaignItems,
 		checkinMutation,
