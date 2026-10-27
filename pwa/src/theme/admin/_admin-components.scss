@@ -205,3 +205,481 @@
   white-space: nowrap;
 }
 
+
+
+/* ==========================================================================
+   4. HelloAsso — Campagnes, Billetterie & Émargement
+   ========================================================================== */
+
+.helloasso-campaign-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .helloasso-campaign-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ion-text-color, #1a1a1a);
+  }
+
+  .helloasso-campaign-dates {
+    font-size: 0.8rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+.helloasso-pointage-progress-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+
+  .pointage-counts {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+
+  .pointage-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--ion-color-step-100, #e0e0e0);
+    border-radius: 3px;
+    overflow: hidden;
+
+    .pointage-bar-fill {
+      height: 100%;
+      background: var(--ion-color-success, #2dd36f);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+  }
+}
+
+.helloasso-mobile-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+
+  .stat-badge {
+    font-size: 0.82rem;
+    color: var(--ion-color-medium-shade, #666);
+  }
+
+  .stat-amount {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+  }
+}
+
+.helloasso-badges-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+
+  .season-badge {
+    font-size: 0.7rem;
+  }
+}
+
+.helloasso-summary-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+
+  .summary-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .summary-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .summary-amount {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  .summary-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ion-text-color);
+  }
+
+  .checkin-progress-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--ion-color-step-50, #f8f9fa);
+    border-radius: 8px;
+
+    .checkin-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+
+      .progress-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.95rem;
+      }
+
+      .progress-percentage {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--ion-color-success);
+      }
+    }
+
+    .checkin-progress-bar {
+      height: 8px;
+      border-radius: 4px;
+    }
+  }
+
+  .tiers-breakdown {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .tiers-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+    }
+
+    .tiers-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+
+      ion-chip {
+        cursor: pointer;
+        font-size: 0.8rem;
+        height: 28px;
+      }
+    }
+  }
+
+  .action-buttons-row {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    ion-button {
+      --border-radius: 8px;
+      font-weight: 600;
+    }
+  }
+}
+
+.helloasso-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .helloasso-searchbar {
+      max-width: 480px;
+      padding: 0;
+    }
+
+    .status-segment {
+      width: auto;
+      min-width: 380px;
+    }
+  }
+}
+
+.empty-state-box {
+  background: var(--ion-color-step-50, #f8f9fa);
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+/* Grille Desktop */
+.desktop-items-view {
+  display: block;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  .helloasso-table {
+    tr {
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: var(--ion-color-step-50, rgba(0, 0, 0, 0.02));
+      }
+
+      &.row-checked-in {
+        background-color: rgba(45, 211, 111, 0.06);
+      }
+    }
+
+    .checkin-action-cell {
+      cursor: default;
+
+      .pointage-btn {
+        --border-radius: 6px;
+        font-weight: 600;
+        margin: 0;
+        min-width: 95px;
+      }
+    }
+
+    .participant-name-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      strong {
+        font-size: 0.95rem;
+      }
+
+      .cell-badges {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+    }
+
+    .sub-info-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.85rem;
+
+      .club-title {
+        font-weight: 500;
+      }
+
+      .license-label,
+      .fide-label,
+      .date-label {
+        font-size: 0.78rem;
+        color: var(--ion-color-medium);
+      }
+
+      .elo-badge {
+        font-weight: 600;
+        color: var(--ion-color-primary);
+      }
+
+      .tier-label {
+        font-weight: 500;
+      }
+
+      .amount-label {
+        font-weight: 700;
+        color: var(--ion-color-success);
+      }
+
+      .payment-method-label {
+        font-size: 0.82rem;
+      }
+    }
+
+    .action-cell {
+      text-align: center;
+    }
+  }
+}
+
+/* Badges de statut joueur */
+.badge-club-adherent {
+  background: var(--ion-color-success-tint, #e8f8f0);
+  color: var(--ion-color-success-shade, #1e8749);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.badge-external {
+  background: var(--ion-color-step-100, #edf0f5);
+  color: var(--ion-color-medium-shade, #505c6d);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.badge-onsite {
+  background: var(--ion-color-warning-tint, #fff4e5);
+  color: var(--ion-color-warning-shade, #b36b00);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Cartes Mobile */
+.mobile-items-view {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .participant-mobile-card {
+    margin: 0;
+    border-radius: 10px;
+    border-left: 4px solid var(--ion-color-medium);
+    transition: border-color 0.2s ease, background 0.2s ease;
+
+    &.card-checked-in {
+      border-left-color: var(--ion-color-success);
+      background: var(--ion-color-step-50, #fcfefe);
+    }
+
+    .card-mobile-body {
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+
+      .card-info-col {
+        flex: 1;
+        min-width: 0;
+
+        .participant-name {
+          margin: 0 0 4px 0;
+          font-size: 1rem;
+          font-weight: 700;
+          color: var(--ion-text-color);
+        }
+
+        .card-badges-line {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+          margin-bottom: 6px;
+
+          .elo-tag {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--ion-color-primary);
+            background: var(--ion-color-primary-tint, #edf3ff);
+            padding: 2px 6px;
+            border-radius: 4px;
+          }
+        }
+
+        .card-details-line {
+          p {
+            margin: 2px 0;
+            font-size: 0.8rem;
+            color: var(--ion-color-medium);
+
+            &.club-line {
+              font-weight: 500;
+              color: var(--ion-text-color);
+              display: flex;
+              align-items: center;
+              gap: 4px;
+            }
+
+            &.tier-line {
+              color: var(--ion-color-dark);
+            }
+          }
+        }
+      }
+
+      .card-action-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-width: 64px;
+
+        .mobile-checkin-btn {
+          --border-radius: 50%;
+          width: 48px;
+          height: 48px;
+          margin: 0;
+          font-size: 1.2rem;
+        }
+
+        .mobile-checkin-text {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: var(--ion-color-medium);
+        }
+      }
+    }
+  }
+}
+
+/* Modale Fiche Détail */
+.modal-detail-wrapper {
+  .detail-checkin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--ion-color-step-100, #f0f2f5);
+    border-radius: 8px;
+    margin-bottom: 16px;
+
+    &.is-checked {
+      background: var(--ion-color-success-tint, #e8f8f0);
+
+      h4 {
+        color: var(--ion-color-success-shade, #1e8749);
+      }
+
+      ion-icon {
+        color: var(--ion-color-success);
+      }
+    }
+
+    .checkin-header-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      ion-icon {
+        font-size: 1.8rem;
+        color: var(--ion-color-medium);
+      }
+
+      h4 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 2px 0 0 0;
+        font-size: 0.78rem;
+        color: var(--ion-color-medium);
+      }
+    }
+  }
+}

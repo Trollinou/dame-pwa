@@ -72,7 +72,8 @@ import {
   calendarOutline,
   handRightOutline,
   chatbubbleOutline,
-  eyeOutline
+  eyeOutline,
+  ticketOutline
 } from 'ionicons/icons';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -90,6 +91,7 @@ const adminPages = [
   { title: 'Adhérents', url: '/admin/members', icon: peopleOutline },
   { title: 'Contacts', url: '/admin/contact', icon: callOutline },
   { title: 'Événements', url: '/admin/agenda', icon: calendarOutline },
+  { title: 'HelloAsso', url: '/admin/helloasso', icon: ticketOutline },
   { title: 'Appels à bénévoles', url: '/admin/benevolat', icon: handRightOutline },
   { title: 'Messages', url: '/admin/message', icon: chatbubbleOutline }
 ];

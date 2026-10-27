@@ -87,6 +87,24 @@ const routes: Array< RouteRecordRaw > = [
 					import( '@/views/admin/AdminAgendaDetailPage.vue' ),
 			},
 			{
+				path: 'helloasso',
+				component: () => import( '@/views/admin/HelloAssoPage.vue' ),
+			},
+			{
+				path: 'helloasso/:id',
+				name: 'HelloAssoDetail',
+				component: () =>
+					import( '@/views/admin/HelloAssoDetailPage.vue' ),
+			},
+			{
+				path: 'ticketing',
+				redirect: '/admin/helloasso',
+			},
+			{
+				path: 'ticketing/:id',
+				redirect: ( to ) => `/admin/helloasso/${ to.params.id }`,
+			},
+			{
 				path: 'events',
 				redirect: '/admin/agenda',
 			},
