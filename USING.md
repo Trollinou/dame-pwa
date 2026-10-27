@@ -310,7 +310,7 @@ Accessible aux profils administrateurs via le menu latéral, l'espace d'administ
    - **Export Excel / CSV** : Export complet des données selon le filtre de saison affiché avec l'ensemble des colonnes disponibles (ID, titre, dates début/fin, plage/horaires, heures, journée entière, catégories avec code couleur, saison, lieu, adresse, code postal, ville, type/niveau de compétition et description).
 4. **Billetterie & Émargement HelloAsso (`/admin/helloasso`)** :
    - **Suivi des Collectes (`/admin/helloasso`)** : Tableau de bord de l'ensemble des campagnes synchronisées (Tournois, Adhésions, Stages, Dons & Autres) avec indicateurs en direct (nombre d'inscrits, pointés présents, total collecté en euros, saison sportive et dernière synchronisation).
-   - **Filtres combinés** : Filtrage par saison sportive et par type de collecte (Tournois, Adhésions, Stages, Dons & Autres).
+   - **Filtres combinés & Tri Automatique** : Filtrage par saison sportive et par type de collecte (Tournois, Adhésions, Stages, Dons & Autres). Les requêtes REST appliquent un tri par défaut par date décroissante (`orderby=start_date&order=desc`) affichant les collectes événementielles datées en tête et les formulaires permanents en fin de liste, avec support du filtrage par `form_type`.
    - **Pointage & Émargement (`/admin/helloasso/:id`)** :
      - Barre de progression visuelle du taux de présence (`checked_in_count / total_items`).
      - Bouton de **pointage direct 1-clic** avec mise à jour optimiste et retour visuel immédiat.

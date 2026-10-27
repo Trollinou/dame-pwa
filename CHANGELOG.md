@@ -6,6 +6,30 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Nouveau Module d'Administration HelloAsso — Billetterie & Émargement (`views/admin/HelloAssoPage.vue`, `views/admin/HelloAssoDetailPage.vue`, `stores/ticketing.ts`, `types/api/ticketing.ts`, `router/index.ts`, `AdminLayout.vue`, `_admin-components.scss`, `ticketingStore.spec.ts`, `README.md`, `USING.md`)** :
+  - **Entrée Menu & Routage Dédié** : Intégration d'une nouvelle entrée « HelloAsso » dans le menu latéral d'administration (`AdminLayout.vue`, icône `ticketOutline`) pointant vers `/admin/helloasso` et `/admin/helloasso/:id` (avec alias de redirection transparente `/admin/ticketing`).
+  - **Tableau de Bord des Collectes (`HelloAssoPage.vue`)** :
+    - Rendu responsive dual-mode via `DataTable` (grille tabulaire desktop avec colonnes triables et vue cartes optimisée mobile via le slot `#mobile-item`).
+    - Filtre par saison sportive (détection automatique de la saison de chaque collecte via `seasonUtils.ts`, sélection par défaut de la saison courante et option *Toutes les saisons*).
+    - Filtre par catégorie de collecte (*Tournois*, *Adhésions*, *Stages*, *Dons & Autres*).
+    - Recherche globale instantanée, jauge visuelle de pointage et total collecté en euros formaté.
+    - Export CSV des campagnes avec encodage UTF-8 BOM (`\uFEFF`) pour Excel.
+  - **Pointage & Émargement en Temps Réel (`HelloAssoDetailPage.vue`)** :
+    - Synthèse haute avec barre de progression de présence en temps réel (`checked_in_count / total_items`), pourcentage d'émargement et ventilation par formule tarifaire (`tiers`).
+    - Bouton d'action de **pointage 1-clic** sur chaque participant avec mise à jour optimiste immédiate (`checkinMutation`) et retour visuel (vert « Présent » / contour « Pointer »).
+    - Fiche détail modale complète au clic sur un participant : identité, date de naissance, téléphone, email, licence FFE, code FIDE, Elo, club, payeur, tarif et date d'enregistrement.
+    - Badges d'appartenance : `[ ★ Adhérent ]` (vert) si rattaché au club, `[ Externe / Ligue ]` (bleu/gris) et badge de source (`HelloAsso` en ligne vs `Sur place`).
+    - Recherche textuelle locale instantanée sur nom, prénom, licence, club, email et payeur.
+    - Filtres rapides par statut (*Tous*, *Présents*, *En attente*) et segmentation par tarif.
+    - Inscription sur place intégrée : modale avec sélection du tarif HelloAsso (ou saisie libre), montant ajustable, choix du moyen de paiement (Espèces, Chèque, Autre) et pointage automatique (`addOnSiteMutation`).
+    - Double export : export CSV standard complet et export spécifique arbitre au format Sharly Chess (`boule_inscrits.csv`) avec encodage UTF-8 BOM.
+  - **Couche Réseau, Typage & Store Pinia (`stores/ticketing.ts`, `types/api/ticketing.ts`)** :
+    - Typage strict TypeScript : `TicketingCampaignDTO`, `TicketingItemDTO`, `AddOnSiteParticipantRequest`, `CampaignCategory` et `CampaignQueryFilters`.
+    - Requêtes authentifiées sécurisées via `safeFetch` avec injection automatique du token JWT et support des paramètres optionnels `form_type`, `orderby` (défaut `start_date`) et `order` (défaut `desc`).
+    - Mutations TanStack Query avec annulation proactive des requêtes en vol (`cancelQueries`), mise à jour optimiste du cache local et invalidation synchrone.
+  - **Couverture de Tests Unitaires (`ticketingStore.spec.ts`)** :
+    - Suite complète de tests validant la récupération des campagnes avec filtres/tri, la récupération des participants avec filtres, la mutation de pointage 1-clic et l'ajout d'inscrits sur place.
+
 ## [1.11.0] - 2026-10-26
 
 - **Optimisation et Filtrage Strict de l'Agenda en Mode Liste (`AgendaSegmentView.vue`, `stores/agenda.ts`, `LeClubPage.vue`, `AgendaSegmentView.spec.ts`, `agendaStore.spec.ts`, `USING.md`)** :
