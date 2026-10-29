@@ -50,6 +50,9 @@
               <ion-badge v-if="getCampaignSeason(row)" color="light" class="season-badge">
                 {{ getCampaignSeason(row) }}
               </ion-badge>
+              <ion-badge v-else color="light" class="season-badge">
+                Permanente
+              </ion-badge>
             </div>
           </template>
         </DataTable>
@@ -171,7 +174,15 @@ const getCampaignSeason = (campaign: TicketingCampaignDTO): string => {
   if (campaign.linked_season_id) {
     return `${campaign.linked_season_id}-${campaign.linked_season_id + 1}`;
   }
-  return getSeasonFromDate(campaign.start_date) || '';
+  if (campaign.end_date) {
+    const s = getSeasonFromDate(campaign.end_date);
+    if (s) return s;
+  }
+  if (campaign.start_date) {
+    const s = getSeasonFromDate(campaign.start_date);
+    if (s) return s;
+  }
+  return '';
 };
 
 const formatAmount = (cents: number): string => {
@@ -182,16 +193,53 @@ const formatAmount = (cents: number): string => {
   }).format(euros);
 };
 
+const extractTimeFormatted = (dateStr?: string | null): string | null => {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  const parts = dateStr.trim().split(/[T ]/);
+  if (parts.length >= 2) {
+    const timeParts = parts[1].split(':');
+    if (timeParts.length >= 2) {
+      const h = timeParts[0].padStart(2, '0');
+      const m = timeParts[1].padStart(2, '0');
+      if (h !== '00' || m !== '00') {
+        return `${h}h${m}`;
+      }
+    }
+  }
+  return null;
+};
+
 const formatCampaignDate = (campaign: TicketingCampaignDTO): string => {
-  if (!campaign.start_date) {
-    return 'Date non définie';
+  if (!campaign.start_date && !campaign.end_date) {
+    return 'Formulaire permanent';
   }
-  const start = formatDateFr(campaign.start_date);
-  if (campaign.end_date && campaign.end_date !== campaign.start_date) {
-    const end = formatDateFr(campaign.end_date);
-    return `Du ${start} au ${end}`;
+  if (!campaign.start_date && campaign.end_date) {
+    return `Jusqu'au ${formatDateFr(campaign.end_date)}`;
   }
-  return start;
+  if (campaign.start_date && !campaign.end_date) {
+    const start = formatDateFr(campaign.start_date);
+    const startTime = extractTimeFormatted(campaign.start_date);
+    return startTime ? `${start} (à ${startTime})` : start;
+  }
+
+  const startDateFr = formatDateFr(campaign.start_date);
+  const endDateFr = formatDateFr(campaign.end_date);
+
+  // Même jour
+  if (startDateFr === endDateFr) {
+    const startTime = extractTimeFormatted(campaign.start_date);
+    const endTime = extractTimeFormatted(campaign.end_date);
+    if (startTime && endTime) {
+      return `${startDateFr} (${startTime} à ${endTime})`;
+    }
+    if (startTime) {
+      return `${startDateFr} (à ${startTime})`;
+    }
+    return startDateFr;
+  }
+
+  // Événement multi-jours
+  return `Du ${startDateFr} au ${endDateFr}`;
 };
 
 // Saisons disponibles calculées à partir des campagnes
@@ -275,6 +323,8 @@ const columns: CustomColumnDef<TicketingCampaignDTO>[] = [
     filterFn: (row, columnId, filterValue) => {
       if (!filterValue || filterValue === 'all') return true;
       const rowSeason = row.getValue(columnId) as string;
+      // Les collectes permanentes / sans date restent visibles quelle que soit la saison
+      if (!rowSeason) return true;
       return rowSeason === String(filterValue);
     },
     enableHiding: true

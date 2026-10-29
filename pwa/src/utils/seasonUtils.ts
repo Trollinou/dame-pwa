@@ -47,14 +47,16 @@ export function getCurrentSeason( refDate: Date = new Date() ): string {
 }
 
 /**
- * Formate une date YYYY-MM-DD en format français DD/MM/YYYY.
- * @param dateStr
+ * Formate une date YYYY-MM-DD ou datetime MySQL / ISO en format français DD/MM/YYYY.
+ *
+ * @param dateStr Chaîne de date à formater.
+ * @return Date formatée ou '-' si invalide.
  */
 export function formatDateFr( dateStr?: string | null ): string {
 	if ( ! dateStr || typeof dateStr !== 'string' ) {
 		return '-';
 	}
-	const cleanDate = dateStr.split( 'T' )[ 0 ];
+	const cleanDate = dateStr.trim().split( /[T ]/ )[ 0 ];
 	const parts = cleanDate.split( '-' );
 	if ( parts.length === 3 ) {
 		return `${ parts[ 2 ] }/${ parts[ 1 ] }/${ parts[ 0 ] }`;

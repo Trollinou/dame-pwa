@@ -61,6 +61,9 @@ describe( 'seasonUtils', () => {
 			expect( formatDateFr( '2026-01-05T12:00:00' ) ).toBe(
 				'05/01/2026'
 			);
+			expect( formatDateFr( '2026-10-25 23:00:00' ) ).toBe(
+				'25/10/2026'
+			);
 			expect( formatDateFr( null ) ).toBe( '-' );
 		} );
 	} );

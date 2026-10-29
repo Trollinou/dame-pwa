@@ -12,6 +12,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Alignement des options de filtrage et d'affichage sur le champ `form_type` de HelloAsso : *Tous (avec le total)*, *Événements (Event)*, *Adhésions (Membership)*, *Dons (Donation)*, *Boutique (Shop)*, et *Paiement direct (Checkout)* conditionnel si présent dans les collectes.
   - Harmonisation des badges visuels et de l'export CSV pour refléter les libellés traduits en français.
 
+- **Correction du Formatage des Dates et Détection des Saisons HelloAsso (`seasonUtils.ts`, `HelloAssoPage.vue`, `HelloAssoDetailPage.vue`, `seasonUtils.spec.ts`)** :
+  - **Prise en charge des Datetimes MySQL avec espace** : Élimination de l'anomalie de découpage produisant des dates corrompues (ex: `25 23:00:00/10/2026`) lors de la conversion de dates issues de MySQL (`YYYY-MM-DD HH:MM:SS`), garantissant un affichage `DD/MM/YYYY`.
+  - **Formatage des Horaires pour Événements Monojours** : Affichage enrichi des plages horaires pour les événements se déroulant sur une seule journée (ex. `25/10/2026 (14h00 à 17h00)`), préservation de la mention `Du ... au ...` pour les événements multi-jours et `Formulaire permanent` pour les collectes sans date.
+  - **Priorisation de la Date de Fin pour la Saison Sportive** : Détermination de la saison sportive basée en priorité sur `end_date` (ex: une adhésion ouverte fin juin 2026 mais s'étendant jusqu'en août 2027 est désormais attribuée à la saison `2026-2027` et non `2025-2026`).
+  - **Collectes Permanentes Trans-Saisonnières** : Les collectes permanentes ou sans date définie restent désormais visibles quel que soit le filtre de saison sportive sélectionné et arborent le badge dédié « Permanente ».
+
 ## [1.12.0] - 2026-10-27
 
 - **Nouveau Module d'Administration HelloAsso — Billetterie & Émargement (`views/admin/HelloAssoPage.vue`, `views/admin/HelloAssoDetailPage.vue`, `stores/ticketing.ts`, `types/api/ticketing.ts`, `router/index.ts`, `AdminLayout.vue`, `_admin-components.scss`, `ticketingStore.spec.ts`, `README.md`, `USING.md`)** :

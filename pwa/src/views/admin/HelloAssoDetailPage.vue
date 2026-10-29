@@ -34,6 +34,9 @@
                   <ion-badge v-if="campaignSeason" color="light">
                     Saison {{ campaignSeason }}
                   </ion-badge>
+                  <ion-badge v-else color="light">
+                    Permanente
+                  </ion-badge>
                 </div>
                 <div class="summary-amount">
                   {{ formatAmount(campaign.total_amount_cents) }}
@@ -675,7 +678,15 @@ const campaignSeason = computed(() => {
   if (campaign.value.linked_season_id) {
     return `${campaign.value.linked_season_id}-${campaign.value.linked_season_id + 1}`;
   }
-  return getSeasonFromDate(campaign.value.start_date) || '';
+  if (campaign.value.end_date) {
+    const s = getSeasonFromDate(campaign.value.end_date);
+    if (s) return s;
+  }
+  if (campaign.value.start_date) {
+    const s = getSeasonFromDate(campaign.value.start_date);
+    if (s) return s;
+  }
+  return '';
 });
 
 const totalCount = computed(() => items.value.length);
@@ -1021,13 +1032,53 @@ const formatAmount = (cents?: number | null): string => {
   }).format(euros);
 };
 
-const formatCampaignDate = (c: TicketingCampaignDTO): string => {
-  if (!c.start_date) return '';
-  const start = formatDateFr(c.start_date);
-  if (c.end_date && c.end_date !== c.start_date) {
-    return `Du ${start} au ${formatDateFr(c.end_date)}`;
+const extractTimeFormatted = (dateStr?: string | null): string | null => {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  const parts = dateStr.trim().split(/[T ]/);
+  if (parts.length >= 2) {
+    const timeParts = parts[1].split(':');
+    if (timeParts.length >= 2) {
+      const h = timeParts[0].padStart(2, '0');
+      const m = timeParts[1].padStart(2, '0');
+      if (h !== '00' || m !== '00') {
+        return `${h}h${m}`;
+      }
+    }
   }
-  return start;
+  return null;
+};
+
+const formatCampaignDate = (c: TicketingCampaignDTO): string => {
+  if (!c.start_date && !c.end_date) {
+    return 'Formulaire permanent';
+  }
+  if (!c.start_date && c.end_date) {
+    return `Jusqu'au ${formatDateFr(c.end_date)}`;
+  }
+  if (c.start_date && !c.end_date) {
+    const start = formatDateFr(c.start_date);
+    const startTime = extractTimeFormatted(c.start_date);
+    return startTime ? `${start} (à ${startTime})` : start;
+  }
+
+  const startDateFr = formatDateFr(c.start_date);
+  const endDateFr = formatDateFr(c.end_date);
+
+  // Même jour
+  if (startDateFr === endDateFr) {
+    const startTime = extractTimeFormatted(c.start_date);
+    const endTime = extractTimeFormatted(c.end_date);
+    if (startTime && endTime) {
+      return `${startDateFr} (${startTime} à ${endTime})`;
+    }
+    if (startTime) {
+      return `${startDateFr} (à ${startTime})`;
+    }
+    return startDateFr;
+  }
+
+  // Événement multi-jours
+  return `Du ${startDateFr} au ${endDateFr}`;
 };
 
 onMounted(async () => {
