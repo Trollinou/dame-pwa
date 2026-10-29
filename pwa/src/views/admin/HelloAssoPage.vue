@@ -31,7 +31,7 @@
             <ion-label>
               <h2>{{ row.title }}</h2>
               <p>
-                <span>{{ formatCampaignDate(row) }}</span>
+                <span>{{ formatCampaignSchedule(row.start_date, row.end_date) }}</span>
                 <span v-if="row.last_sync_at"> • Sync: {{ formatDateFr(row.last_sync_at) }}</span>
               </p>
               <div class="helloasso-mobile-stats">
@@ -88,7 +88,12 @@ import {
   type DataTableFilterConfig,
   type DataTableExportConfig
 } from '@/components/shared/DataTable';
-import { getSeasonFromDate, getCurrentSeason, formatDateFr } from '@/utils/seasonUtils';
+import {
+  formatCampaignSchedule,
+  getCampaignSeason,
+  getCurrentSeason,
+  formatDateFr
+} from '@/utils/seasonUtils';
 
 const router = useRouter();
 const ticketingStore = useTicketingStore();
@@ -170,76 +175,12 @@ const getFormTypeColor = (formType?: string | null): string => {
   }
 };
 
-const getCampaignSeason = (campaign: TicketingCampaignDTO): string => {
-  if (campaign.linked_season_id) {
-    return `${campaign.linked_season_id}-${campaign.linked_season_id + 1}`;
-  }
-  if (campaign.end_date) {
-    const s = getSeasonFromDate(campaign.end_date);
-    if (s) return s;
-  }
-  if (campaign.start_date) {
-    const s = getSeasonFromDate(campaign.start_date);
-    if (s) return s;
-  }
-  return '';
-};
-
 const formatAmount = (cents: number): string => {
   const euros = (cents || 0) / 100;
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'EUR'
   }).format(euros);
-};
-
-const extractTimeFormatted = (dateStr?: string | null): string | null => {
-  if (!dateStr || typeof dateStr !== 'string') return null;
-  const parts = dateStr.trim().split(/[T ]/);
-  if (parts.length >= 2) {
-    const timeParts = parts[1].split(':');
-    if (timeParts.length >= 2) {
-      const h = timeParts[0].padStart(2, '0');
-      const m = timeParts[1].padStart(2, '0');
-      if (h !== '00' || m !== '00') {
-        return `${h}h${m}`;
-      }
-    }
-  }
-  return null;
-};
-
-const formatCampaignDate = (campaign: TicketingCampaignDTO): string => {
-  if (!campaign.start_date && !campaign.end_date) {
-    return 'Formulaire permanent';
-  }
-  if (!campaign.start_date && campaign.end_date) {
-    return `Jusqu'au ${formatDateFr(campaign.end_date)}`;
-  }
-  if (campaign.start_date && !campaign.end_date) {
-    const start = formatDateFr(campaign.start_date);
-    const startTime = extractTimeFormatted(campaign.start_date);
-    return startTime ? `${start} (à ${startTime})` : start;
-  }
-
-  const startDateFr = formatDateFr(campaign.start_date);
-  const endDateFr = formatDateFr(campaign.end_date);
-
-  // Même jour
-  if (startDateFr === endDateFr) {
-    const startTime = extractTimeFormatted(campaign.start_date);
-    const endTime = extractTimeFormatted(campaign.end_date);
-    if (startTime && endTime) {
-      return `${startDateFr} (${startTime} à ${endTime})`;
-    }
-    if (startTime) {
-      return `${startDateFr} (à ${startTime})`;
-    }
-    return startDateFr;
-  }
-
-  // Événement multi-jours
-  return `Du ${startDateFr} au ${endDateFr}`;
 };
 
 // Saisons disponibles calculées à partir des campagnes
@@ -284,7 +225,7 @@ const columns: CustomColumnDef<TicketingCampaignDTO>[] = [
         h(
           'span',
           { class: 'helloasso-campaign-dates' },
-          formatCampaignDate(row.original)
+          formatCampaignSchedule(row.original.start_date, row.original.end_date)
         )
       ]),
     enableSorting: true

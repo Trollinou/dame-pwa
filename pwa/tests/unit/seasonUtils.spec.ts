@@ -5,8 +5,12 @@ import {
 	formatDateFr,
 	formatEventSchedule,
 	formatEventLocation,
+	extractTimeFormatted,
+	formatCampaignSchedule,
+	getCampaignSeason,
 } from '../../src/utils/seasonUtils';
 import type { AgendaEvent } from 'dame-types';
+import type { TicketingCampaignDTO } from '../../src/types/api/ticketing';
 
 describe( 'seasonUtils', () => {
 	describe( 'getSeasonFromDate', () => {
@@ -138,6 +142,93 @@ describe( 'seasonUtils', () => {
 		it( 'returns fallback dash if no location info', () => {
 			const event = { meta: {} } as AgendaEvent;
 			expect( formatEventLocation( event ) ).toBe( '-' );
+		} );
+	} );
+
+	describe( 'extractTimeFormatted', () => {
+		it( 'extracts formatted time HHhMM from date string', () => {
+			expect( extractTimeFormatted( '2026-10-25 14:30:00' ) ).toBe( '14h30' );
+			expect( extractTimeFormatted( '2026-10-25T09:05:00' ) ).toBe( '09h05' );
+		} );
+
+		it( 'ignores 00:00:00 and 23:59:59 as all-day markers', () => {
+			expect( extractTimeFormatted( '2026-10-25 00:00:00' ) ).toBeNull();
+			expect( extractTimeFormatted( '2026-10-25 23:59:59' ) ).toBeNull();
+		} );
+
+		it( 'returns null for null, empty or date-only inputs', () => {
+			expect( extractTimeFormatted( null ) ).toBeNull();
+			expect( extractTimeFormatted( '' ) ).toBeNull();
+			expect( extractTimeFormatted( '2026-10-25' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'formatCampaignSchedule', () => {
+		it( 'formats single-day events with start and end times', () => {
+			expect(
+				formatCampaignSchedule( '2026-10-25 14:00:00', '2026-10-25 17:00:00' )
+			).toBe( '25/10/2026 (14h00 à 17h00)' );
+		} );
+
+		it( 'formats single-day events with only start time', () => {
+			expect(
+				formatCampaignSchedule( '2026-10-25 14:00:00', '2026-10-25 23:59:59' )
+			).toBe( '25/10/2026 (à 14h00)' );
+		} );
+
+		it( 'formats single-day events without hours', () => {
+			expect(
+				formatCampaignSchedule( '2026-10-25 00:00:00', '2026-10-25 23:59:59' )
+			).toBe( '25/10/2026' );
+		} );
+
+		it( 'formats multi-day events', () => {
+			expect(
+				formatCampaignSchedule( '2026-10-25 09:00:00', '2026-10-27 18:00:00' )
+			).toBe( 'Du 25/10/2026 au 27/10/2026' );
+		} );
+
+		it( 'formats events with only end date', () => {
+			expect( formatCampaignSchedule( null, '2026-10-27 18:00:00' ) ).toBe(
+				"Jusqu'au 27/10/2026"
+			);
+		} );
+
+		it( 'formats undated campaigns as Formulaire permanent', () => {
+			expect( formatCampaignSchedule( null, null ) ).toBe( 'Formulaire permanent' );
+			expect( formatCampaignSchedule( '', '' ) ).toBe( 'Formulaire permanent' );
+		} );
+	} );
+
+	describe( 'getCampaignSeason', () => {
+		it( 'prioritizes explicit linked_season_id', () => {
+			const campaign = {
+				linked_season_id: 2026,
+				start_date: '2025-06-01 00:00:00',
+				end_date: '2025-08-31 00:00:00',
+			} as unknown as TicketingCampaignDTO;
+			expect( getCampaignSeason( campaign ) ).toBe( '2026-2027' );
+		} );
+
+		it( 'uses end_date to identify season for campaigns spanning past season boundary', () => {
+			// Early opened membership (opened in June 2026 but extends through August 2027)
+			const campaign = {
+				start_date: '2026-06-30 00:00:00',
+				end_date: '2027-08-31 00:00:00',
+			} as unknown as TicketingCampaignDTO;
+			expect( getCampaignSeason( campaign ) ).toBe( '2026-2027' );
+		} );
+
+		it( 'falls back to start_date when end_date is missing', () => {
+			const campaign = {
+				start_date: '2026-10-15 14:00:00',
+			} as unknown as TicketingCampaignDTO;
+			expect( getCampaignSeason( campaign ) ).toBe( '2026-2027' );
+		} );
+
+		it( 'returns empty string for undated permanent forms', () => {
+			const campaign = {} as unknown as TicketingCampaignDTO;
+			expect( getCampaignSeason( campaign ) ).toBe( '' );
 		} );
 	} );
 } );

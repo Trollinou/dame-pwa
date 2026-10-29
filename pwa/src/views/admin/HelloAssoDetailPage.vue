@@ -43,8 +43,8 @@
                 </div>
               </div>
               <ion-card-title class="summary-title">{{ campaign.title }}</ion-card-title>
-              <ion-card-subtitle v-if="formatCampaignDate(campaign)">
-                {{ formatCampaignDate(campaign) }}
+              <ion-card-subtitle v-if="formatCampaignSchedule(campaign.start_date, campaign.end_date)">
+                {{ formatCampaignSchedule(campaign.start_date, campaign.end_date) }}
               </ion-card-subtitle>
             </ion-card-header>
 
@@ -629,7 +629,11 @@ import type {
   AddOnSiteParticipantRequest,
   CampaignCategory
 } from '@/types/api/ticketing';
-import { getSeasonFromDate, formatDateFr } from '@/utils/seasonUtils';
+import {
+  formatCampaignSchedule,
+  getCampaignSeason,
+  formatDateFr
+} from '@/utils/seasonUtils';
 
 const route = useRoute();
 const ticketingStore = useTicketingStore();
@@ -673,21 +677,7 @@ const onSiteForm = ref<AddOnSiteParticipantRequest>({
 
 const isMutatingCheckin = (id: number) => mutatingItemIds.value.has(id);
 
-const campaignSeason = computed(() => {
-  if (!campaign.value) return '';
-  if (campaign.value.linked_season_id) {
-    return `${campaign.value.linked_season_id}-${campaign.value.linked_season_id + 1}`;
-  }
-  if (campaign.value.end_date) {
-    const s = getSeasonFromDate(campaign.value.end_date);
-    if (s) return s;
-  }
-  if (campaign.value.start_date) {
-    const s = getSeasonFromDate(campaign.value.start_date);
-    if (s) return s;
-  }
-  return '';
-});
+const campaignSeason = computed(() => (campaign.value ? getCampaignSeason(campaign.value) : ''));
 
 const totalCount = computed(() => items.value.length);
 const checkedInCount = computed(() => items.value.filter((i) => i.checked_in).length);
@@ -1030,55 +1020,6 @@ const formatAmount = (cents?: number | null): string => {
     style: 'currency',
     currency: 'EUR'
   }).format(euros);
-};
-
-const extractTimeFormatted = (dateStr?: string | null): string | null => {
-  if (!dateStr || typeof dateStr !== 'string') return null;
-  const parts = dateStr.trim().split(/[T ]/);
-  if (parts.length >= 2) {
-    const timeParts = parts[1].split(':');
-    if (timeParts.length >= 2) {
-      const h = timeParts[0].padStart(2, '0');
-      const m = timeParts[1].padStart(2, '0');
-      if (h !== '00' || m !== '00') {
-        return `${h}h${m}`;
-      }
-    }
-  }
-  return null;
-};
-
-const formatCampaignDate = (c: TicketingCampaignDTO): string => {
-  if (!c.start_date && !c.end_date) {
-    return 'Formulaire permanent';
-  }
-  if (!c.start_date && c.end_date) {
-    return `Jusqu'au ${formatDateFr(c.end_date)}`;
-  }
-  if (c.start_date && !c.end_date) {
-    const start = formatDateFr(c.start_date);
-    const startTime = extractTimeFormatted(c.start_date);
-    return startTime ? `${start} (à ${startTime})` : start;
-  }
-
-  const startDateFr = formatDateFr(c.start_date);
-  const endDateFr = formatDateFr(c.end_date);
-
-  // Même jour
-  if (startDateFr === endDateFr) {
-    const startTime = extractTimeFormatted(c.start_date);
-    const endTime = extractTimeFormatted(c.end_date);
-    if (startTime && endTime) {
-      return `${startDateFr} (${startTime} à ${endTime})`;
-    }
-    if (startTime) {
-      return `${startDateFr} (à ${startTime})`;
-    }
-    return startDateFr;
-  }
-
-  // Événement multi-jours
-  return `Du ${startDateFr} au ${endDateFr}`;
 };
 
 onMounted(async () => {
