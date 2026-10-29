@@ -6,17 +6,22 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.12.2] - 2026-10-29
+
+- **Centralisation & Finalisation du Formatage des Horaires et Détection des Saisons HelloAsso (`seasonUtils.ts`, `HelloAssoPage.vue`, `HelloAssoDetailPage.vue`, `seasonUtils.spec.ts`, `README.md`, `USING.md`)** :
+  - **Modularisation & Centralisation (`seasonUtils.ts`)** : Extraction et partage des utilitaires `extractTimeFormatted`, `formatCampaignSchedule` et `getCampaignSeason` réutilisés par l'ensemble des composants d'administration et publics.
+  - **Prise en charge des Datetimes MySQL avec espace** : Élimination de l'anomalie de découpage produisant des dates corrompues (ex: `25 23:00:00/10/2026`) lors de la conversion de chaînes issues de MySQL (`YYYY-MM-DD HH:MM:SS`), garantissant un affichage `DD/MM/YYYY`.
+  - **Formatage des Horaires pour Événements Monojours** : Affichage enrichi des plages horaires pour les événements sur une seule journée (ex. `25/10/2026 (14h00 à 17h00)` ou `25/10/2026 (à 14h00)`), préservation de la mention `Du ... au ...` pour les événements multi-jours et `Formulaire permanent` pour les collectes sans date.
+  - **Priorisation de la Date de Fin pour la Saison Sportive** : Détermination de la saison sportive basée en priorité sur `end_date` (ex: une adhésion ouverte fin juin 2026 mais s'étendant jusqu'en août 2027 est désormais attribuée à la saison `2026-2027` et non `2025-2026`).
+  - **Collectes Permanentes Trans-Saisonnières** : Les formulaires permanents ou sans date définie restent désormais visibles quel que soit le filtre de saison sportive sélectionné et arborent le badge dédié « Permanente ».
+  - **Couverture de Tests Unitaires (`seasonUtils.spec.ts`)** : 28 tests validant l'extraction d'horaires, l'exclusion des marqueurs `00:00:00`/`23:59:59`, les différents scénarios de plages calendaires et l'attribution de saison.
+  - **Mise à Jour de la Documentation** : Actualisation de `README.md` et `USING.md` reflétant les règles de gestion des horaires et des saisons.
+
 ## [1.12.1] - 2026-10-29
 
 - **Ajustement des Catégories de Filtre HelloAsso (`HelloAssoPage.vue`, `HelloAssoDetailPage.vue`, `USING.md`)** :
   - Alignement des options de filtrage et d'affichage sur le champ `form_type` de HelloAsso : *Tous (avec le total)*, *Événements (Event)*, *Adhésions (Membership)*, *Dons (Donation)*, *Boutique (Shop)*, et *Paiement direct (Checkout)* conditionnel si présent dans les collectes.
   - Harmonisation des badges visuels et de l'export CSV pour refléter les libellés traduits en français.
-
-- **Correction du Formatage des Dates et Détection des Saisons HelloAsso (`seasonUtils.ts`, `HelloAssoPage.vue`, `HelloAssoDetailPage.vue`, `seasonUtils.spec.ts`)** :
-  - **Prise en charge des Datetimes MySQL avec espace** : Élimination de l'anomalie de découpage produisant des dates corrompues (ex: `25 23:00:00/10/2026`) lors de la conversion de dates issues de MySQL (`YYYY-MM-DD HH:MM:SS`), garantissant un affichage `DD/MM/YYYY`.
-  - **Formatage des Horaires pour Événements Monojours** : Affichage enrichi des plages horaires pour les événements se déroulant sur une seule journée (ex. `25/10/2026 (14h00 à 17h00)`), préservation de la mention `Du ... au ...` pour les événements multi-jours et `Formulaire permanent` pour les collectes sans date.
-  - **Priorisation de la Date de Fin pour la Saison Sportive** : Détermination de la saison sportive basée en priorité sur `end_date` (ex: une adhésion ouverte fin juin 2026 mais s'étendant jusqu'en août 2027 est désormais attribuée à la saison `2026-2027` et non `2025-2026`).
-  - **Collectes Permanentes Trans-Saisonnières** : Les collectes permanentes ou sans date définie restent désormais visibles quel que soit le filtre de saison sportive sélectionné et arborent le badge dédié « Permanente ».
 
 ## [1.12.0] - 2026-10-27
 

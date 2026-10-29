@@ -310,6 +310,13 @@ Accessible aux profils administrateurs via le menu latéral, l'espace d'administ
    - **Export Excel / CSV** : Export complet des données selon le filtre de saison affiché avec l'ensemble des colonnes disponibles (ID, titre, dates début/fin, plage/horaires, heures, journée entière, catégories avec code couleur, saison, lieu, adresse, code postal, ville, type/niveau de compétition et description).
 4. **Billetterie & Émargement HelloAsso (`/admin/helloasso`)** :
    - **Suivi des Collectes (`/admin/helloasso`)** : Tableau de bord de l'ensemble des campagnes synchronisées (Tournois, Adhésions, Stages, Dons & Autres) avec indicateurs en direct (nombre d'inscrits, pointés présents, total collecté en euros, saison sportive et dernière synchronisation).
+   - **Formatage des Horaires & Périodes (`seasonUtils.ts`)** :
+     - Événements sur une seule journée avec horaires : affichage complet `JJ/MM/AAAA (HHhMM à HHhMM)` ou `JJ/MM/AAAA (à HHhMM)` en ignorant automatiquement les marqueurs de journée entière (`00:00:00` et `23:59:59`).
+     - Événements multi-jours : plage explicite `Du JJ/MM/AAAA au JJ/MM/AAAA`.
+     - Collectes non datées : libellé `Formulaire permanent` et badge `Permanente`.
+   - **Détection Intelligente des Saisons Sportives** :
+     - La saison d'une collecte est déterminée en priorité par son `linked_season_id`, puis par sa date de fin `end_date` (permettant à une campagne d'adhésion ouverte dès la fin juin mais courant jusqu'au 31 août de l'année suivante d'être correctement attribuée à la saison de destination), et enfin par sa date de début.
+     - Les formulaires permanents sans date restent visibles quel que soit le filtre de saison sportive sélectionné.
    - **Filtres combinés & Tri Automatique** : Filtrage par saison sportive et par type de collecte (*Tous (avec le total)*, *Événements (Event)*, *Adhésions (Membership)*, *Dons (Donation)*, *Boutique (Shop)*, et *Paiement direct (Checkout)* si présent). Les requêtes REST appliquent un tri par défaut par date décroissante (`orderby=start_date&order=desc`) affichant les collectes événementielles datées en tête et les formulaires permanents en fin de liste, avec support du filtrage par `form_type`.
    - **Pointage & Émargement (`/admin/helloasso/:id`)** :
      - Barre de progression visuelle du taux de présence (`checked_in_count / total_items`).
