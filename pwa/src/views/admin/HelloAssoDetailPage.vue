@@ -28,14 +28,11 @@
             <ion-card-header>
               <div class="summary-top-row">
                 <div class="summary-badges">
-                  <ion-badge :color="getCategoryColor(campaign.campaign_category)">
-                    {{ getCategoryLabel(campaign.campaign_category) }}
+                  <ion-badge :color="getFormTypeColor(campaign.form_type)">
+                    {{ getFormTypeLabel(campaign.form_type, campaign.campaign_category) }}
                   </ion-badge>
                   <ion-badge v-if="campaignSeason" color="light">
                     Saison {{ campaignSeason }}
-                  </ion-badge>
-                  <ion-badge v-if="campaign.form_type" color="medium">
-                    {{ campaign.form_type }}
                   </ion-badge>
                 </div>
                 <div class="summary-amount">
@@ -976,6 +973,43 @@ const getCategoryColor = (category: CampaignCategory): string => {
     case 'other':
     default:
       return 'tertiary';
+  }
+};
+
+const getFormTypeLabel = (formType?: string | null, fallbackCategory?: CampaignCategory): string => {
+  if (formType) {
+    switch (formType) {
+      case 'Event':
+        return 'Événements';
+      case 'Membership':
+        return 'Adhésions';
+      case 'Donation':
+        return 'Dons';
+      case 'Shop':
+        return 'Boutique';
+      case 'Checkout':
+        return 'Paiement direct';
+      default:
+        return formType;
+    }
+  }
+  return fallbackCategory ? getCategoryLabel(fallbackCategory) : 'Autre';
+};
+
+const getFormTypeColor = (formType?: string | null): string => {
+  switch (formType) {
+    case 'Event':
+      return 'primary';
+    case 'Membership':
+      return 'success';
+    case 'Donation':
+      return 'tertiary';
+    case 'Shop':
+      return 'warning';
+    case 'Checkout':
+      return 'secondary';
+    default:
+      return 'medium';
   }
 };
 

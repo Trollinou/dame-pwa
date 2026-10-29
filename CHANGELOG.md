@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-10-27
+
 - **Nouveau Module d'Administration HelloAsso — Billetterie & Émargement (`views/admin/HelloAssoPage.vue`, `views/admin/HelloAssoDetailPage.vue`, `stores/ticketing.ts`, `types/api/ticketing.ts`, `router/index.ts`, `AdminLayout.vue`, `_admin-components.scss`, `ticketingStore.spec.ts`, `README.md`, `USING.md`)** :
   - **Entrée Menu & Routage Dédié** : Intégration d'une nouvelle entrée « HelloAsso » dans le menu latéral d'administration (`AdminLayout.vue`, icône `ticketOutline`) pointant vers `/admin/helloasso` et `/admin/helloasso/:id` (avec alias de redirection transparente `/admin/ticketing`).
   - **Tableau de Bord des Collectes (`HelloAssoPage.vue`)** :

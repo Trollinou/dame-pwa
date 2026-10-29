@@ -44,8 +44,8 @@
               </div>
             </ion-label>
             <div slot="end" class="helloasso-badges-wrapper">
-              <ion-badge :color="getCategoryColor(row.campaign_category)">
-                {{ getCategoryLabel(row.campaign_category) }}
+              <ion-badge :color="getFormTypeColor(row.form_type)">
+                {{ getFormTypeLabel(row.form_type, row.campaign_category) }}
               </ion-badge>
               <ion-badge v-if="getCampaignSeason(row)" color="light" class="season-badge">
                 {{ getCampaignSeason(row) }}
@@ -130,6 +130,43 @@ const getCategoryColor = (category: CampaignCategory): string => {
   }
 };
 
+const getFormTypeLabel = (formType?: string | null, fallbackCategory?: CampaignCategory): string => {
+  if (formType) {
+    switch (formType) {
+      case 'Event':
+        return 'Événements';
+      case 'Membership':
+        return 'Adhésions';
+      case 'Donation':
+        return 'Dons';
+      case 'Shop':
+        return 'Boutique';
+      case 'Checkout':
+        return 'Paiement direct';
+      default:
+        return formType;
+    }
+  }
+  return fallbackCategory ? getCategoryLabel(fallbackCategory) : 'Autre';
+};
+
+const getFormTypeColor = (formType?: string | null): string => {
+  switch (formType) {
+    case 'Event':
+      return 'primary';
+    case 'Membership':
+      return 'success';
+    case 'Donation':
+      return 'tertiary';
+    case 'Shop':
+      return 'warning';
+    case 'Checkout':
+      return 'secondary';
+    default:
+      return 'medium';
+  }
+};
+
 const getCampaignSeason = (campaign: TicketingCampaignDTO): string => {
   if (campaign.linked_season_id) {
     return `${campaign.linked_season_id}-${campaign.linked_season_id + 1}`;
@@ -173,15 +210,20 @@ const availableSeasons = computed(() => {
 // Colonnes DataTable
 const columns: CustomColumnDef<TicketingCampaignDTO>[] = [
   {
-    id: 'category',
+    id: 'formTypeFilter',
     header: 'Type',
-    accessorFn: (row) => getCategoryLabel(row.campaign_category),
+    accessorFn: (row) => getFormTypeLabel(row.form_type, row.campaign_category),
     cell: ({ row }) =>
       h(
         IonBadge,
-        { color: getCategoryColor(row.original.campaign_category) },
-        () => getCategoryLabel(row.original.campaign_category)
+        { color: getFormTypeColor(row.original.form_type) },
+        () => getFormTypeLabel(row.original.form_type, row.original.campaign_category)
       ),
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      const rowType = String(row.original.form_type || '').toLowerCase();
+      return rowType === String(filterValue).toLowerCase();
+    },
     enableSorting: true
   },
   {
@@ -236,44 +278,47 @@ const columns: CustomColumnDef<TicketingCampaignDTO>[] = [
       return rowSeason === String(filterValue);
     },
     enableHiding: true
-  },
-  {
-    id: 'campaignCategoryFilter',
-    header: 'CatégorieFilter',
-    accessorFn: (row) => row.campaign_category,
-    filterFn: (row, columnId, filterValue) => {
-      if (!filterValue || filterValue === 'all') return true;
-      const rowCat = row.getValue(columnId) as string;
-      return rowCat === String(filterValue);
-    },
-    enableHiding: true
   }
 ];
 
-// Configuration des filtres (Saison & Catégorie)
-const filterConfigs = computed<DataTableFilterConfig[]>(() => [
-  {
-    id: 'season',
-    label: 'Saison',
-    defaultValue: selectedSeason.value,
-    options: [
-      { label: 'Toutes les saisons', value: 'all' },
-      ...availableSeasons.value.map((s) => ({ label: s, value: s }))
-    ]
-  },
-  {
-    id: 'campaignCategoryFilter',
-    label: 'Type de collecte',
-    defaultValue: 'all',
-    options: [
-      { label: 'Tous les types', value: 'all' },
-      { label: 'Tournois', value: 'tournament' },
-      { label: 'Adhésions', value: 'membership' },
-      { label: 'Stages', value: 'stage' },
-      { label: 'Dons & Autres', value: 'other' }
-    ]
+// Configuration des filtres (Saison & Type de collecte)
+const filterConfigs = computed<DataTableFilterConfig[]>(() => {
+  const total = campaigns.value.length;
+
+  const categoryOptions = [
+    { label: `Tous (${total})`, value: 'all' },
+    { label: 'Événements', value: 'Event' },
+    { label: 'Adhésions', value: 'Membership' },
+    { label: 'Dons', value: 'Donation' },
+    { label: 'Boutique', value: 'Shop' }
+  ];
+
+  // Et Paiement direct (Checkout) si présent
+  const hasCheckout = campaigns.value.some(
+    (c) => (c.form_type || '').toLowerCase() === 'checkout'
+  );
+  if (hasCheckout) {
+    categoryOptions.push({ label: 'Paiement direct', value: 'Checkout' });
   }
-]);
+
+  return [
+    {
+      id: 'season',
+      label: 'Saison',
+      defaultValue: selectedSeason.value,
+      options: [
+        { label: 'Toutes les saisons', value: 'all' },
+        ...availableSeasons.value.map((s) => ({ label: s, value: s }))
+      ]
+    },
+    {
+      id: 'formTypeFilter',
+      label: 'Type de collecte',
+      defaultValue: 'all',
+      options: categoryOptions
+    }
+  ];
+});
 
 // Configuration export CSV
 const exportConfig: DataTableExportConfig<TicketingCampaignDTO> = {
@@ -281,8 +326,9 @@ const exportConfig: DataTableExportConfig<TicketingCampaignDTO> = {
   columns: [
     { header: 'ID', accessor: (c) => c.id },
     { header: 'Titre', accessor: (c) => c.title },
-    { header: 'Type', accessor: (c) => getCategoryLabel(c.campaign_category) },
+    { header: 'Type', accessor: (c) => getFormTypeLabel(c.form_type, c.campaign_category) },
     { header: 'Form Slug', accessor: (c) => c.form_slug },
+    { header: 'Form Type', accessor: (c) => c.form_type },
     { header: 'Saison', accessor: (c) => getCampaignSeason(c) },
     { header: 'Date début', accessor: (c) => c.start_date || '' },
     { header: 'Date fin', accessor: (c) => c.end_date || '' },
