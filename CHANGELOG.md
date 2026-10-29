@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.12.1] - 2026-10-29
+
+- **Ajustement des Catégories de Filtre HelloAsso (`HelloAssoPage.vue`, `HelloAssoDetailPage.vue`, `USING.md`)** :
+  - Alignement des options de filtrage et d'affichage sur le champ `form_type` de HelloAsso : *Tous (avec le total)*, *Événements (Event)*, *Adhésions (Membership)*, *Dons (Donation)*, *Boutique (Shop)*, et *Paiement direct (Checkout)* conditionnel si présent dans les collectes.
+  - Harmonisation des badges visuels et de l'export CSV pour refléter les libellés traduits en français.
+
 ## [1.12.0] - 2026-10-27
 
 - **Nouveau Module d'Administration HelloAsso — Billetterie & Émargement (`views/admin/HelloAssoPage.vue`, `views/admin/HelloAssoDetailPage.vue`, `stores/ticketing.ts`, `types/api/ticketing.ts`, `router/index.ts`, `AdminLayout.vue`, `_admin-components.scss`, `ticketingStore.spec.ts`, `README.md`, `USING.md`)** :
