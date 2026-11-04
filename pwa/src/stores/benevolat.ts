@@ -9,9 +9,18 @@ import type {
 	BenevolatDay,
 	BenevolatTimeSlot,
 	BenevolatReponse,
+	BenevolatSlotStat,
+	BenevolatStatsResponse,
 } from 'dame-types';
 
-export type { Benevolat, BenevolatDay, BenevolatTimeSlot, BenevolatReponse };
+export type {
+	Benevolat,
+	BenevolatDay,
+	BenevolatTimeSlot,
+	BenevolatReponse,
+	BenevolatSlotStat,
+	BenevolatStatsResponse,
+};
 
 export const useBenevolatStore = defineStore( 'benevolat', () => {
 	const authStore = useAuthStore();
@@ -142,6 +151,29 @@ export const useBenevolatStore = defineStore( 'benevolat', () => {
 		}
 	};
 
+	const fetchBenevolatStats = async (
+		benevolatId: number
+	): Promise< BenevolatStatsResponse | null > => {
+		try {
+			const response = await safeFetch(
+				`/dame/v1/benevolats/${ benevolatId }/stats`,
+				{
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				},
+				4000
+			);
+			if ( ! response.ok ) {
+				return null;
+			}
+			return await response.json();
+		} catch ( error ) {
+			console.error( 'Erreur chargement statistiques bénévolat:', error );
+			return null;
+		}
+	};
+
 	const clearData = () => {
 		userVotedIds.value = [];
 		queryClient.removeQueries( { queryKey: [ 'benevolat', 'user-vote' ] } );
@@ -156,6 +188,7 @@ export const useBenevolatStore = defineStore( 'benevolat', () => {
 		hasUserVoted,
 		markAsVoted,
 		fetchBenevolatsData,
+		fetchBenevolatStats,
 		clearData,
 	};
 } );

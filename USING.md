@@ -50,7 +50,7 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
    - **Agenda (Mode Liste ☰)** : Affichage exclusif des événements en cours ou à venir (les événements antérieurs en sont exclus et restent consultables dans le mode Calendrier). Chargement direct et exhaustif de l'intégralité des événements futurs dès l'ouverture, sans palier ni pagination infinie. Sélection intelligente par défaut de l'événement courant ou du plus proche à venir. Prise en charge des galeries photos dans le descriptif de l'événement.
    - **Tournois** : Consultation instantanée des modalités, règlements, galeries photos (`eg-media` ou Piwigo) et formulaires HelloAsso. Les widgets intégrés (`<iframe>`) ou shortcodes (`[helloasso campaign="..."]`) insérés sur WordPress sont automatiquement convertis en boutons d'action natifs (`<ion-button>`) sécurisés et redirigent vers le formulaire HelloAsso complet sans être bloqués par le nettoyeur HTML.
    - **Visionneuse Photos & Galeries Découplées (`eg-media`)** : Les articles et pages intégrant le bloc WordPress `eg-media` (galeries de club, photos d'événements, y compris serveurs distants Piwigo) sont restitués sous forme de mosaïque justifiée fluide. Le clic sur une photo ouvre instantanément une lightbox plein écran haute résolution avec défilement tactile (swipe), touches directionnelles clavier (gauche/droite/échap) et bandeau de miniatures dynamique centré sur la photo active.
-   - **Bénévolat** : Sélection des créneaux horaires, formulaire d'inscription direct pour les adhérents ou vue administration des inscrits.
+   - **Bénévolat** : Sélection des créneaux horaires, formulaire d'inscription direct pour les adhérents avec affichage dynamique du ratio de bénévoles souhaités par tranche horaire `(X inscrit(s) / Y souhaité(s))` ou `(X inscrit(s))` si non spécifié (sans restriction de quota à l'inscription).
    - **Double défilement indépendant** : Le scroll de la liste de gauche ne déplace pas le panneau de détail de droite, et inversement.
 
 2. **Affichage Mobile & Portrait** :
@@ -325,7 +325,7 @@ Accessible aux profils administrateurs via le menu latéral, l'espace d'administ
      - Badges de distinction : `[ ★ Adhérent ]` (vert) vs `[ Externe / Ligue ]` (bleu) et source (`HelloAsso` vs `Sur place`).
      - **Inscription sur place** : Formulaire modal pour enregistrer des paiements comptants (espèces ou chèque) avec attribution d'une formule tarifaire et pointage automatique.
      - **Exports intégrés** : Téléchargement CSV standard (encodé en UTF-8 BOM pour Excel) et export spécial pour arbitres au format Sharly Chess (`boule_inscrits.csv`).
-5. **Appels à Bénévolat (`/admin/benevolat`)** : Suivi des réponses et créneaux avec filtrage par statut (*Tous les appels*, *Appels en cours*, *Appels terminés*).
+5. **Appels à Bénévolat (`/admin/benevolat`)** : Suivi des réponses et créneaux avec filtrage par statut (*Tous les appels*, *Appels en cours*, *Appels terminés*). Affichage consolidé du ratio d'avancement par créneau horaire (`X / Y souhaité(s)` en rouge si incomplet ou en bleu si atteint) et synthèse des créneaux pourvus.
 6. **Messages & Communications (`/admin/message`)** : Historique et consultation détaillée des messages reçus.
 
 ## Informations Système, Mises à Jour & Gestion du Cache

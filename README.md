@@ -341,6 +341,7 @@ Composant maître réutilisable pour l'affichage, le tri, la pagination, le filt
 ## API REST & Hooks Partagés
 
 *   **Champ personnalisé Agenda :** L'API REST WordPress (`dame`) enregistre le champ `categories_data` sur le type de contenu `dame_agenda` pour inclure la couleur de chaque catégorie (`id`, `name`, `slug`, `color`).
+*   **API Bénévolat & Besoins par créneau horaire :** L'API REST WP (`GET /wp/v2/benevolats` et `GET /wp-json/dame/v1/benevolats/{id}/stats`) expose la propriété `needed` par créneau et le dictionnaire consolidé d'inscriptions `dame_benevolat_counts`. La PWA adapte dynamiquement les intitulés des créneaux en public `(X inscrit(s) / Y souhaité(s))` et affiche les jauges de progression colorées (`X / Y souhaité(s)`) en administration.
 *   **Filtre Web Worker Stockfish (`dame_pwa_stockfish_worker_url`) :** Fournit l'URL absolue du Web Worker Stockfish (`pwa/dist/stockfish/stockfish.js`) pour mutualiser le moteur d'échecs avec d'autres extensions (ex: plugin `roi`).
 *   **Optimisation & Enregistrement des Assets WordPress (PageSpeed / DevTools Coverage) :**
     *   Séparation stricte entre `wp_register_style()` / `wp_register_script()` (priorité 5) et `wp_enqueue_*()` (priorité 10).

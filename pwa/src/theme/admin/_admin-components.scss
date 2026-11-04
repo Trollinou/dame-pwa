@@ -683,3 +683,43 @@
     }
   }
 }
+
+/* ==========================================================================
+   Bénévolat Admin - Récapitulatif et Ratios de Besoins
+   ========================================================================== */
+
+.benevolat-admin-header-group {
+  margin-bottom: 16px;
+
+  .benevolat-admin-stats-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+}
+
+.slot-card {
+  .slot-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 8px;
+
+    .slot-card-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    .slot-ratio-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+  }
+}
+

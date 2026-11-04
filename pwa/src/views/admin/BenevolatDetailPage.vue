@@ -12,7 +12,7 @@
 
     <ion-content :fullscreen="true" class="ion-padding">
       <div class="safe-area-wrapper">
-        <BenevolatDetailContent :benevolat-id="benevolatId" />
+        <BenevolatDetailContent :benevolat-id="benevolatId" :is-admin="true" />
       </div>
     </ion-content>
   </ion-page>

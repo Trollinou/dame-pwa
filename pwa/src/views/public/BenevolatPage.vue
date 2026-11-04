@@ -42,6 +42,13 @@
               >
                 {{ getResponseCount(row.id) }} rép.
               </ion-badge>
+              <ion-badge
+                v-if="authStore.adminMode && getBenevolatNeededSummary(row).needed > 0"
+                :color="getBenevolatNeededSummary(row).isFulfilled ? 'primary' : 'danger'"
+                @click.stop="viewResults(row)"
+              >
+                {{ getBenevolatNeededSummary(row).registered }} / {{ getBenevolatNeededSummary(row).needed }}
+              </ion-badge>
             </div>
           </template>
         </DataTable>
@@ -112,6 +119,31 @@ const formatBenevolatDates = (benevolat: Benevolat): string => {
     return `Du ${format(firstDate)} au ${format(lastDate)}`;
   }
   return 'Dates non définies';
+};
+
+const getBenevolatNeededSummary = (
+  benevolat: Benevolat
+): { needed: number; registered: number; isFulfilled: boolean } => {
+  let needed = 0;
+  let registered = 0;
+  if (Array.isArray(benevolat.dame_benevolat_data)) {
+    benevolat.dame_benevolat_data.forEach((day, dIdx) => {
+      day.time_slots?.forEach((slot, tIdx) => {
+        const slotNeeded = slot.needed ? Number(slot.needed) : 0;
+        if (slotNeeded > 0) {
+          needed += slotNeeded;
+          const choiceKey = `${dIdx}_${tIdx}`;
+          const count = benevolat.dame_benevolat_counts?.[choiceKey] ?? 0;
+          registered += count;
+        }
+      });
+    });
+  }
+  return {
+    needed,
+    registered,
+    isFulfilled: needed > 0 && registered >= needed
+  };
 };
 
 const viewBenevolat = (benevolat: Benevolat) => {
@@ -187,6 +219,21 @@ const columns: CustomColumnDef<Benevolat>[] = [
       return '-';
     },
     enableSorting: true
+  },
+  {
+    id: 'needed',
+    header: 'Besoins',
+    accessorFn: (row) => getBenevolatNeededSummary(row).needed,
+    cell: ({ row }) => {
+      const summary = getBenevolatNeededSummary(row.original);
+      if (summary.needed === 0) return '-';
+      return h(
+        IonBadge,
+        { color: summary.isFulfilled ? 'primary' : 'danger' },
+        () => `${summary.registered} / ${summary.needed} souhaité(s)`
+      );
+    },
+    enableSorting: true
   }
 ];
 
@@ -212,7 +259,14 @@ const exportConfig: DataTableExportConfig<Benevolat> = {
     { header: 'Titre', accessor: (b) => b.title?.raw || b.title?.rendered || '' },
     { header: 'Plage de dates', accessor: (b) => formatBenevolatDates(b) },
     { header: 'Statut', accessor: (b) => (isBenevolatExpired(b) ? 'Terminé' : 'En cours') },
-    { header: 'Nombre de réponses', accessor: (b) => getResponseCount(b.id) }
+    { header: 'Nombre de réponses', accessor: (b) => getResponseCount(b.id) },
+    {
+      header: 'Bénévoles souhaités',
+      accessor: (b) => {
+        const s = getBenevolatNeededSummary(b);
+        return s.needed > 0 ? `${s.registered} / ${s.needed}` : '-';
+      }
+    }
   ]
 };
 
