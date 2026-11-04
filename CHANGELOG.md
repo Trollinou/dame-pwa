@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.12.3] - 2026-11-04
+
 ## [1.12.2] - 2026-10-29
 
 - **Centralisation & Finalisation du Formatage des Horaires et Détection des Saisons HelloAsso (`seasonUtils.ts`, `HelloAssoPage.vue`, `HelloAssoDetailPage.vue`, `seasonUtils.spec.ts`, `README.md`, `USING.md`)** :

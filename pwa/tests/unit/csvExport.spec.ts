@@ -57,11 +57,15 @@ describe( 'csvExport utility', () => {
 		const removeChildSpy = vi
 			.spyOn( document.body, 'removeChild' )
 			.mockImplementation( ( node ) => node );
+		const clickSpy = vi
+			.spyOn( HTMLAnchorElement.prototype, 'click' )
+			.mockImplementation( () => {} );
 
 		exportToCsv( 'adherents', columns, mockData );
 
 		expect( URL.createObjectURL ).toHaveBeenCalledTimes( 1 );
 		expect( appendChildSpy ).toHaveBeenCalled();
+		expect( clickSpy ).toHaveBeenCalledTimes( 1 );
 		expect( removeChildSpy ).toHaveBeenCalled();
 
 		expect( createdBlob ).not.toBeNull();

@@ -12,6 +12,30 @@ const packageJson = JSON.parse(
 	)
 );
 
+function silenceSourcemapWarningsPlugin() {
+	return {
+		name: 'vite-plugin-silence-sourcemap-warnings',
+		enforce: 'post' as const,
+		configResolved( config: {
+			logger: {
+				warnOnce: ( _msg: string, _opts?: unknown ) => void;
+				warn: ( _msg: string, _opts?: unknown ) => void;
+			};
+		} ) {
+			const originalWarnOnce = config.logger.warnOnce;
+			config.logger.warnOnce = ( msg: string, opts?: unknown ) => {
+				if (
+					typeof msg === 'string' &&
+					msg.includes( 'points to missing source files' )
+				) {
+					return;
+				}
+				originalWarnOnce( msg, opts );
+			};
+		},
+	};
+}
+
 function versionJsonPlugin() {
 	return {
 		name: 'vite-plugin-version-json',
@@ -39,13 +63,15 @@ export default defineConfig( {
 	},
 	base: './', // Chemins relatifs pour les assets (indispensable pour WordPress)
 	cacheDir: '../node_modules/.vite', // Centralise le cache de pré-compilation à la racine
-	esbuild: {
-		drop:
-			process.env.NODE_ENV === 'production'
-				? [ 'console', 'debugger' ]
-				: [],
-	},
+	...( process.env.NODE_ENV === 'production'
+		? {
+				esbuild: {
+					drop: [ 'console', 'debugger' ] as [ 'console', 'debugger' ],
+				},
+		  }
+		: {} ),
 	plugins: [
+		silenceSourcemapWarningsPlugin(),
 		vue( {
 			template: {
 				compilerOptions: {
