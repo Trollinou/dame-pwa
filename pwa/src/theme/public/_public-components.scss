@@ -746,7 +746,12 @@
 
   .slot-count {
     font-size: 0.8em;
-    opacity: 0.7;
+    opacity: 0.75;
+
+    &.slot-count--needed {
+      font-weight: 500;
+      opacity: 0.9;
+    }
   }
 }
 

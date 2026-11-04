@@ -17,10 +17,24 @@
       ></div>
 
       <!-- VUE ADMIN : Liste des participants par créneau -->
-      <div v-if="authStore.adminMode">
-        <ion-list-header class="ion-no-padding ion-margin-bottom">
-          <ion-label color="primary">Réponses et participants (Admin)</ion-label>
-        </ion-list-header>
+      <div v-if="showAdminView">
+        <div class="benevolat-admin-header-group ion-margin-bottom">
+          <ion-list-header class="ion-no-padding">
+            <ion-label color="primary">Réponses et participants (Admin)</ion-label>
+          </ion-list-header>
+          <div v-if="statsData || adminSummary.totalNeeded > 0" class="benevolat-admin-stats-bar">
+            <ion-chip v-if="statsData" outline color="primary">
+              {{ statsData.total_distinct_voters }} {{ statsData.total_distinct_voters > 1 ? 'participants uniques' : 'participant unique' }}
+            </ion-chip>
+            <ion-chip
+              v-if="adminSummary.totalNeeded > 0"
+              outline
+              :color="adminSummary.totalFulfilled >= adminSummary.totalSlotsWithNeeded ? 'primary' : 'danger'"
+            >
+              {{ adminSummary.totalFulfilled }} / {{ adminSummary.totalSlotsWithNeeded }} créneaux pourvus
+            </ion-chip>
+          </div>
+        </div>
 
         <ion-accordion-group>
           <ion-accordion
@@ -37,8 +51,14 @@
                 :key="tIndex"
                 class="slot-card ion-no-margin ion-margin-bottom"
               >
-                <ion-card-header>
-                  <ion-card-subtitle>{{ slot.start }} - {{ slot.end }}</ion-card-subtitle>
+                <ion-card-header class="slot-card-header">
+                  <ion-card-subtitle class="slot-card-subtitle">{{ slot.start }} - {{ slot.end }}</ion-card-subtitle>
+                  <ion-badge
+                    :color="getSlotAdminBadgeColor(slot, dIndex, tIndex)"
+                    class="slot-ratio-badge"
+                  >
+                    {{ getSlotAdminRatioLabel(slot, dIndex, tIndex) }}
+                  </ion-badge>
                 </ion-card-header>
                 <ion-card-content>
                   <div v-if="getParticipants(dIndex, tIndex).length > 0">
@@ -92,8 +112,11 @@
                 >
                   <div class="slot-time-block">
                     <span>{{ slot.start }} - {{ slot.end }}</span>
-                    <span class="slot-count">
-                      {{ getSlotParticipantCount(dIndex, tIndex) }} inscrit(s)
+                    <span
+                      class="slot-count"
+                      :class="{ 'slot-count--needed': slot.needed && slot.needed > 0 }"
+                    >
+                      {{ getSlotPublicLabel(slot, dIndex, tIndex) }}
                     </span>
                   </div>
                 </ion-checkbox>
@@ -150,16 +173,37 @@ import {
 } from '@ionic/vue';
 import { alertCircle } from 'ionicons/icons';
 import { safeFetch } from '@/utils/safeFetch';
-import { useBenevolatStore, type Benevolat, type BenevolatReponse } from '@/stores/benevolat';
+import {
+  useBenevolatStore,
+  type Benevolat,
+  type BenevolatTimeSlot,
+  type BenevolatReponse,
+  type BenevolatStatsResponse
+} from '@/stores/benevolat';
 import { useAuthStore } from '@/stores/auth';
 
-const props = defineProps<{
-  benevolat?: Benevolat | null;
-  benevolatId?: number | null;
-}>();
+const props = withDefaults(
+  defineProps<{
+    benevolat?: Benevolat | null;
+    benevolatId?: number | null;
+    isAdmin?: boolean;
+  }>(),
+  {
+    benevolat: null,
+    benevolatId: null,
+    isAdmin: undefined
+  }
+);
 
 const benevolatStore = useBenevolatStore();
 const authStore = useAuthStore();
+
+const showAdminView = computed(() => {
+  if (props.isAdmin !== undefined) {
+    return props.isAdmin;
+  }
+  return authStore.adminMode;
+});
 
 const currentBenevolat = computed(() => {
   if (props.benevolat) return props.benevolat;
@@ -174,6 +218,7 @@ const activeId = computed(() => currentBenevolat.value?.id || 0);
 const selectedChoices = ref<string[]>([]);
 const isSubmitting = ref(false);
 const hasInitialVote = ref(false);
+const statsData = ref<BenevolatStatsResponse | null>(null);
 
 const getTodayStr = () => {
   const now = new Date();
@@ -195,13 +240,101 @@ const isPollFullyPast = computed(() => {
   return currentBenevolat.value.dame_benevolat_data.every((day) => isDayPast(day.date));
 });
 
-const getSlotParticipantCount = (dayIndex: number | string, timeIndex: number | string) => {
-  if (!activeId.value) return 0;
+const getSlotParticipantCount = (dayIndex: number | string, timeIndex: number | string): number => {
   const choiceKey = `${dayIndex}_${timeIndex}`;
+  if (statsData.value?.slots) {
+    const slotStat = statsData.value.slots.find((s) => s.choice_key === choiceKey);
+    if (slotStat !== undefined) {
+      return slotStat.registered_count;
+    }
+  }
+  if (currentBenevolat.value?.dame_benevolat_counts?.[choiceKey] !== undefined) {
+    return currentBenevolat.value.dame_benevolat_counts[choiceKey];
+  }
+  if (!activeId.value) return 0;
   return benevolatStore.reponses.filter(
     (r) => r.benevolat_id === activeId.value && Array.isArray(r.choices) && r.choices.includes(choiceKey)
   ).length;
 };
+
+const isSlotFulfilled = (
+  slot: BenevolatTimeSlot,
+  dayIndex: number | string,
+  timeIndex: number | string
+): boolean => {
+  const choiceKey = `${dayIndex}_${timeIndex}`;
+  if (statsData.value?.slots) {
+    const slotStat = statsData.value.slots.find((s) => s.choice_key === choiceKey);
+    if (slotStat !== undefined) {
+      return slotStat.is_fulfilled;
+    }
+  }
+  const count = getSlotParticipantCount(dayIndex, timeIndex);
+  const needed = slot.needed ? Number(slot.needed) : 0;
+  return needed > 0 && count >= needed;
+};
+
+const getSlotPublicLabel = (
+  slot: BenevolatTimeSlot,
+  dayIndex: number | string,
+  timeIndex: number | string
+): string => {
+  const count = getSlotParticipantCount(dayIndex, timeIndex);
+  const needed = slot.needed ? Number(slot.needed) : 0;
+  if (needed > 0) {
+    const countLabel = `${count} ${count > 1 ? 'inscrits' : 'inscrit'}`;
+    const neededLabel = `${needed} ${needed > 1 ? 'souhaités' : 'souhaité'}`;
+    return `(${countLabel} / ${neededLabel})`;
+  }
+  const countLabel = `${count} ${count > 1 ? 'inscrits' : 'inscrit'}`;
+  return `(${countLabel})`;
+};
+
+const getSlotAdminRatioLabel = (
+  slot: BenevolatTimeSlot,
+  dayIndex: number | string,
+  timeIndex: number | string
+): string => {
+  const count = getSlotParticipantCount(dayIndex, timeIndex);
+  const needed = slot.needed ? Number(slot.needed) : 0;
+  if (needed > 0) {
+    return `${count} / ${needed} souhaité(s)`;
+  }
+  return `${count} ${count > 1 ? 'inscrits' : 'inscrit'}`;
+};
+
+const getSlotAdminBadgeColor = (
+  slot: BenevolatTimeSlot,
+  dayIndex: number | string,
+  timeIndex: number | string
+): string => {
+  const needed = slot.needed ? Number(slot.needed) : 0;
+  if (needed > 0) {
+    return isSlotFulfilled(slot, dayIndex, timeIndex) ? 'primary' : 'danger';
+  }
+  return 'medium';
+};
+
+const adminSummary = computed(() => {
+  let totalNeeded = 0;
+  let totalSlotsWithNeeded = 0;
+  let totalFulfilled = 0;
+  if (currentBenevolat.value?.dame_benevolat_data) {
+    currentBenevolat.value.dame_benevolat_data.forEach((day, dIdx) => {
+      day.time_slots?.forEach((slot, tIdx) => {
+        const needed = slot.needed ? Number(slot.needed) : 0;
+        if (needed > 0) {
+          totalNeeded += needed;
+          totalSlotsWithNeeded++;
+          if (isSlotFulfilled(slot, dIdx, tIdx)) {
+            totalFulfilled++;
+          }
+        }
+      });
+    });
+  }
+  return { totalNeeded, totalSlotsWithNeeded, totalFulfilled };
+});
 
 const getParticipants = (dayIndex: number | string, timeIndex: number | string): BenevolatReponse[] => {
   if (!activeId.value) return [];
@@ -228,6 +361,14 @@ const formatDate = (dateString: string) => {
     day: 'numeric',
     month: 'long'
   }).format(date);
+};
+
+const fetchStats = async () => {
+  if (!activeId.value) {
+    statsData.value = null;
+    return;
+  }
+  statsData.value = await benevolatStore.fetchBenevolatStats(activeId.value);
 };
 
 const fetchMyVote = async () => {
@@ -261,6 +402,10 @@ const fetchMyVote = async () => {
   } catch (error) {
     console.error('Erreur fetchMyVote:', error);
   }
+};
+
+const loadData = async () => {
+  await Promise.all([fetchMyVote(), fetchStats()]);
 };
 
 const submitVote = async () => {
@@ -298,6 +443,7 @@ const submitVote = async () => {
       hasInitialVote.value = true;
       benevolatStore.markAsVoted(activeId.value);
       await benevolatStore.fetchBenevolatsData(true);
+      await fetchStats();
     } else if (response.status === 403 && data.code === 'already_voted') {
       const toast = await toastController.create({
         message: 'Vous avez déjà proposé votre aide pour cet appel.',
@@ -323,10 +469,10 @@ const submitVote = async () => {
 };
 
 watch(activeId, () => {
-  fetchMyVote();
+  loadData();
 });
 
 onMounted(() => {
-  fetchMyVote();
+  loadData();
 });
 </script>
