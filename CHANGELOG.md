@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.12.4] - 2026-11-05
+
 - **Liaison Bidirectionnelle Agenda ⟷ Bénévolat (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`, `AgendaDetailContent.vue`, `BenevolatSegmentView.vue`, `BenevolatDetailContent.vue`, `BenevolatPage.vue`, `types/api/agenda.ts`, `types/api/benevolat.ts`, `_public-components.scss`, `agendaBenevolatLinking.spec.ts`, `README.md`, `USING.md`)** :
   - **Passage de l'Agenda vers le Bénévolat** :
     - Badge interactif `[ 🤝 Bénévoles demandés ]` affiché dans les vues Liste et Calendrier lorsqu'un appel à bénévoles est actif (`linked_benevolat.is_active`), avec redirection in-app directe.
