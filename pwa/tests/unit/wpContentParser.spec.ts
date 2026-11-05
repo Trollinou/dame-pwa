@@ -62,4 +62,20 @@ describe( 'wpContentParser', () => {
 		expect( mediaBlock.context.images ).toHaveLength( 1 );
 		expect( mediaBlock.context.images[ 0 ].alt ).toBe( 'Test Photo' );
 	} );
+
+	it( 'devrait transformer les formulaires de bénévolat en bouton avec route /benevolat/participation/:id', () => {
+		const raw = `
+			<p>Article avec appel à bénévoles.</p>
+			<form id="dame-benevolat-form-18045" class="dame-benevolat-form">
+				<input type="hidden" name="benevolat_id" value="18045">
+				<button type="submit">Envoyer</button>
+			</form>
+		`;
+		const blocks = parseWpContent( raw );
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].type ).toBe( 'html' );
+		const content = ( blocks[ 0 ] as { content: string } ).content;
+		expect( content ).toContain( 'data-path="/benevolat/participation/18045"' );
+		expect( content ).not.toContain( '/tabs/benevolat/participation/' );
+	} );
 } );

@@ -29,6 +29,14 @@
             </ion-label>
             <div slot="end" class="dame-badge-group">
               <ion-badge
+                v-if="row.linked_agenda"
+                color="tertiary"
+                class="badge-linked-agenda"
+                @click.stop="router.push(authStore.adminMode ? '/admin/agenda/' + row.linked_agenda.id : '/agenda/' + row.linked_agenda.id)"
+              >
+                📅 Événement associé
+              </ion-badge>
+              <ion-badge
                 v-if="hasUserVoted(row.id) && !authStore.adminMode"
                 color="success"
                 :class="{ 'badge--dimmed': isBenevolatExpired(row) }"
@@ -178,6 +186,28 @@ const columns: CustomColumnDef<Benevolat>[] = [
     id: 'dates',
     header: 'Plage de dates',
     accessorFn: (row) => formatBenevolatDates(row),
+    enableSorting: true
+  },
+  {
+    id: 'linked_agenda',
+    header: 'Événement lié',
+    accessorFn: (row) => row.linked_agenda?.title || '',
+    cell: ({ row }) => {
+      const agenda = row.original.linked_agenda;
+      if (!agenda) return '-';
+      return h(
+        IonBadge,
+        {
+          color: 'tertiary',
+          class: 'badge-linked-agenda cursor-pointer',
+          onClick: (e: Event) => {
+            e.stopPropagation();
+            router.push(authStore.adminMode ? `/admin/agenda/${agenda.id}` : `/agenda/${agenda.id}`);
+          }
+        },
+        () => `📅 ${decodeHtmlEntities(agenda.title)}`
+      );
+    },
     enableSorting: true
   },
   {

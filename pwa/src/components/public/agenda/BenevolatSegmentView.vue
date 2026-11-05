@@ -34,6 +34,14 @@
                 </ion-label>
                 <div slot="end" class="dame-badge-group">
                   <ion-badge
+                    v-if="benevolat.linked_agenda"
+                    color="tertiary"
+                    class="badge-linked-agenda"
+                    @click.stop="openLinkedAgenda(benevolat.linked_agenda.id)"
+                  >
+                    📅 Événement associé
+                  </ion-badge>
+                  <ion-badge
                     v-if="unreadStore.isBenevolatUnread(benevolat)"
                     color="danger"
                   >
@@ -75,6 +83,14 @@
                 </ion-label>
                 <div slot="end" class="dame-badge-group">
                   <ion-badge
+                    v-if="benevolat.linked_agenda"
+                    color="tertiary"
+                    class="badge-linked-agenda badge--dimmed"
+                    @click.stop="openLinkedAgenda(benevolat.linked_agenda.id)"
+                  >
+                    📅 Événement associé
+                  </ion-badge>
+                  <ion-badge
                     v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode"
                     color="success"
                     class="badge--dimmed"
@@ -113,6 +129,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   IonSpinner,
   IonList,
@@ -131,10 +148,19 @@ import { useIsTabletLandscape } from '@/composables/core/useIsTabletLandscape';
 import SplitMasterDetail from '@/components/shared/SplitMasterDetail.vue';
 import BenevolatDetailContent from '@/components/public/agenda/detail/BenevolatDetailContent.vue';
 
+const router = useRouter();
 const benevolatStore = useBenevolatStore();
 const authStore = useAuthStore();
 const unreadStore = useUnreadStore();
 const { isTabletLandscape } = useIsTabletLandscape();
+
+const openLinkedAgenda = (agendaId: number) => {
+  if (authStore.adminMode) {
+    router.push(`/admin/agenda/${agendaId}`);
+  } else {
+    router.push(`/agenda/${agendaId}`);
+  }
+};
 
 const props = defineProps<{
   searchQuery: string;

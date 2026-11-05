@@ -28,7 +28,7 @@ export function parseWpContent( rawHtml: string ): ContentBlock[] {
       <div class="survey-action-container ion-padding ion-margin-vertical">
         <h3 class="survey-action-title">Bénévolat disponible</h3>
         <p class="survey-action-desc">Proposez votre aide directement depuis l'application.</p>
-        <ion-button expand="block" color="secondary" class="internal-benevolat-btn" data-path="/tabs/benevolat/participation/${ surveyId }">
+        <ion-button expand="block" color="secondary" class="internal-benevolat-btn" data-path="/benevolat/participation/${ surveyId }">
           Proposer mon aide
         </ion-button>
       </div>

@@ -253,6 +253,88 @@
   width: 100%;
 }
 
+/* Liaison Agenda <-> Bénévolat */
+.badge-benevolat {
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.badge-linked-agenda {
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.card-linked-benevolat {
+  border-left: 4px solid var(--ion-color-primary, #3880ff);
+
+  .linked-benevolat-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--ion-text-color, #222);
+    margin: 0;
+  }
+
+  .btn-benevolat-cta {
+    font-weight: 600;
+    --border-radius: var(--dame-button-radius, 8px);
+  }
+}
+
+.banner-linked-agenda {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
+  border-left: 4px solid var(--ion-color-primary, #3880ff);
+  border-radius: var(--dame-item-radius, 8px);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.14);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .banner-linked-agenda__text {
+    flex: 1;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--ion-text-color, #222);
+  }
+
+  .banner-linked-agenda__arrow {
+    font-size: 1.25rem;
+    color: var(--ion-color-primary, #3880ff);
+    flex-shrink: 0;
+  }
+}
+
 .poll-ended-msg {
   color: var(--ion-color-medium);
   font-size: 0.95rem;

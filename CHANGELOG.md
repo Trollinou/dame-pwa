@@ -6,6 +6,23 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Liaison Bidirectionnelle Agenda ⟷ Bénévolat (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`, `AgendaDetailContent.vue`, `BenevolatSegmentView.vue`, `BenevolatDetailContent.vue`, `BenevolatPage.vue`, `types/api/agenda.ts`, `types/api/benevolat.ts`, `_public-components.scss`, `agendaBenevolatLinking.spec.ts`, `README.md`, `USING.md`)** :
+  - **Passage de l'Agenda vers le Bénévolat** :
+    - Badge interactif `[ 🤝 Bénévoles demandés ]` affiché dans les vues Liste et Calendrier lorsqu'un appel à bénévoles est actif (`linked_benevolat.is_active`), avec redirection in-app directe.
+    - Carte dédiée `.card-linked-benevolat` insérée dans la fiche détail de l'événement avec description et bouton d'action principal CTA *« 🤝 Participer comme bénévole → »*.
+  - **Passage du Bénévolat vers l'Agenda** :
+    - Pastille `[ 📅 Événement associé ]` présente sur les items de la liste des appels (en cours, terminés et table desktop) renvoyant directement vers la fiche de l'événement lié.
+    - Bannière informative interactive `.banner-linked-agenda` positionnée en tête de formulaire de vote renvoyant vers `/agenda/:id`.
+  - **Typage Strict & Contrats de Données Partagés** : Ajout de `src/types/api/agenda.ts` et `src/types/api/benevolat.ts` (`LinkedBenevolatSummary`, `LinkedAgendaSummary`, enrichissement des modèles `AgendaEvent` et `Benevolat`).
+  - **Styles SCSS Centralisés** : Définition des classes canoniques dans `pwa/src/theme/public/_public-components.scss` dans le strict respect de l'architecture KISS (zéro style inline, zéro balise `<style>`).
+  - **Assurance Qualité & TDD** : Suite de tests `agendaBenevolatLinking.spec.ts` validant les navigations, le rendu conditionnel et la résilience hors-ligne.
+
+- **Correction du Routage des Boutons d'Appel à Bénévoles dans les Articles (`wpContentParser.ts`, `useInternalLinks.ts`, `router/index.ts`, `benevolatShortcodeRouting.spec.ts`, `wpContentParser.spec.ts`)** :
+  - **Alignement de la Route Canonique** : Correction du chemin généré par `parseWpContent` pour pointer vers `/benevolat/participation/:id` au lieu de `/tabs/benevolat/participation/:id`.
+  - **Redirections Défensives du Routeur** : Ajout de redirections `/tabs/benevolat/participation/:id`, `/tabs/benevolat/:id` et `/tabs/benevolat` vers les routes canoniques, éliminant l'anomalie « Actualité introuvable ».
+  - **Prise en Charge du Shadow DOM** : Utilisation de `event.composedPath()` dans `useInternalLinks.ts` pour capturer correctement l'attribut `data-path` au travers des Web Components Ionic (`<ion-button>`).
+
+
 ## [1.12.3] - 2026-11-04
 
 - **Gestion du Nombre de Bénévoles Souhaités par Créneau Horaire (`BenevolatDetailContent.vue`, `BenevolatPage.vue`, `BenevolatDetailPage.vue`, `benevolat.ts`, `benevolatNeeded.spec.ts`, `README.md`, `USING.md`)** :
