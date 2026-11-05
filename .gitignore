@@ -27,6 +27,8 @@ dist-temp/
 # Tests & Logs
 coverage/
 pwa/coverage/
+.phpunit.result.cache
+.phpunit.cache/
 *.log
 npm-debug.log*
 
