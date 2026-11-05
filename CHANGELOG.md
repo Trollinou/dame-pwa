@@ -8,6 +8,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [1.12.3] - 2026-11-04
 
+- **Gestion du Nombre de Bénévoles Souhaités par Créneau Horaire (`BenevolatDetailContent.vue`, `BenevolatPage.vue`, `BenevolatDetailPage.vue`, `benevolat.ts`, `benevolatNeeded.spec.ts`, `README.md`, `USING.md`)** :
+  - **Affichage Dynamique Public** : Restitution du ratio `(X inscrit(s) / Y souhaité(s))` ou `(X inscrit(s))` pour chaque créneau horaire sans restriction de quota à la soumission.
+  - **Tableau de Bord & Vue Admin Enrichie** :
+    - Bandeau récapitulatif présentant le nombre de participants uniques (`total_distinct_voters`) et la synthèse des créneaux pourvus (`X / Y créneaux pourvus`).
+    - Jauges d'avancement par tranche horaire avec badges colorés réactifs (bleu `primary` si l'objectif est atteint, rouge `danger` si incomplet).
+    - Ajout de la colonne « Besoins » dans la `DataTable` et intégration dans l'export CSV des appels à bénévolat.
+  - **Couche Réseau & Données Consolidées** : Intégration de l'action `fetchBenevolatStats` (`/dame/v1/benevolats/{id}/stats`), exploitation du dictionnaire `dame_benevolat_counts` et alignement avec les types partagés `dame-types`.
+  - **Tests Unitaires & Assurance Qualité** : Ajout de la suite `benevolatNeeded.spec.ts` validant les libellés publics, le singulier/pluriel et la colorimétrie des badges en mode administration.
+  - **Documentation Vivante** : Actualisation des sections API REST et Bénévolat dans `README.md` et `USING.md`.
+
 ## [1.12.2] - 2026-10-29
 
 - **Centralisation & Finalisation du Formatage des Horaires et Détection des Saisons HelloAsso (`seasonUtils.ts`, `HelloAssoPage.vue`, `HelloAssoDetailPage.vue`, `seasonUtils.spec.ts`, `README.md`, `USING.md`)** :
