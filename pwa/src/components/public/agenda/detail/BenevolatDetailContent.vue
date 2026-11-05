@@ -16,6 +16,23 @@
         v-safe-html="currentBenevolat.content.rendered"
       ></div>
 
+      <!-- Bannière Événement lié -->
+      <div
+        v-if="currentBenevolat.linked_agenda"
+        class="banner-linked-agenda ion-margin-bottom"
+        role="button"
+        tabindex="0"
+        @click="goToLinkedAgenda(currentBenevolat.linked_agenda.id)"
+        @keydown.enter="goToLinkedAgenda(currentBenevolat.linked_agenda.id)"
+      >
+        <span class="banner-linked-agenda__text">
+          📅 Cet appel concerne l'événement :
+          <strong v-safe-html="currentBenevolat.linked_agenda.title"></strong>
+          (le {{ formatLinkedAgendaDate(currentBenevolat.linked_agenda.start_date) }})
+        </span>
+        <ion-icon :icon="chevronForwardOutline" class="banner-linked-agenda__arrow"></ion-icon>
+      </div>
+
       <!-- VUE ADMIN : Liste des participants par créneau -->
       <div v-if="showAdminView">
         <div class="benevolat-admin-header-group ion-margin-bottom">
@@ -153,6 +170,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   IonList,
   IonListHeader,
@@ -169,9 +187,10 @@ import {
   IonAccordion,
   IonAccordionGroup,
   IonChip,
+  IonIcon,
   toastController
 } from '@ionic/vue';
-import { alertCircle } from 'ionicons/icons';
+import { alertCircle, chevronForwardOutline } from 'ionicons/icons';
 import { safeFetch } from '@/utils/safeFetch';
 import {
   useBenevolatStore,
@@ -197,6 +216,20 @@ const props = withDefaults(
 
 const benevolatStore = useBenevolatStore();
 const authStore = useAuthStore();
+const router = useRouter();
+
+const formatLinkedAgendaDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  return dateStr.split('-').reverse().join('/');
+};
+
+const goToLinkedAgenda = (agendaId: number) => {
+  if (authStore.adminMode) {
+    router.push(`/admin/agenda/${agendaId}`);
+  } else {
+    router.push(`/agenda/${agendaId}`);
+  }
+};
 
 const showAdminView = computed(() => {
   if (props.isAdmin !== undefined) {

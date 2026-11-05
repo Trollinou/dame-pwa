@@ -19,7 +19,15 @@ export function useInternalLinks() {
 	 * @param event
 	 */
 	const handleInternalLinks = ( event: MouseEvent ) => {
-		const target = event.target as HTMLElement;
+		const rawTarget = event.target as HTMLElement | null;
+		// Prise en charge du Shadow DOM (event.composedPath) si target est dans le shadow root
+		const target = ( rawTarget && typeof rawTarget.closest === 'function' )
+			? rawTarget
+			: ( ( event.composedPath?.()[ 0 ] as HTMLElement | null ) || rawTarget );
+
+		if ( ! target || typeof target.closest !== 'function' ) {
+			return;
+		}
 
 		// 1. Gestion des éléments avec data-path (Boutons injectés)
 		const clickableWithData = target.closest( '[data-path]' );
@@ -57,10 +65,22 @@ export function useInternalLinks() {
 					const slug = pathSegments[ pathSegments.length - 1 ];
 
 					if ( slug ) {
-						router.push( {
-							name: 'GenericPage',
-							params: { id: slug },
-						} );
+						// Détection fine des types de contenus du club
+						const isBenevolat =
+							pathSegments.includes( 'benevolat' ) ||
+							pathSegments.includes( 'benevolats' );
+						const isAgenda = pathSegments.includes( 'agenda' );
+
+						if ( isBenevolat ) {
+							router.push( `/benevolats/${ slug }` );
+						} else if ( isAgenda ) {
+							router.push( `/agenda/${ slug }` );
+						} else {
+							router.push( {
+								name: 'GenericPage',
+								params: { id: slug },
+							} );
+						}
 					}
 				}
 			} catch ( e ) {

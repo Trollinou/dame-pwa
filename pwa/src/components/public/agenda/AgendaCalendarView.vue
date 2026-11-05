@@ -88,6 +88,16 @@
               <h2 class="event-title" v-safe-html="event.title.rendered"></h2>
               <p class="event-time-location">{{ formatEventTime(event) }}</p>
             </ion-label>
+            <div slot="end" class="dame-badge-group">
+              <ion-badge
+                v-if="event.linked_benevolat?.is_active"
+                color="primary"
+                class="badge-benevolat"
+                @click.stop="openLinkedBenevolat(event.linked_benevolat.id)"
+              >
+                🤝 Bénévoles demandés
+              </ion-badge>
+            </div>
           </ion-item>
         </ion-list>
 
@@ -102,7 +112,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { IonButton, IonIcon, IonList, IonItem, IonLabel } from '@ionic/vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { IonButton, IonIcon, IonList, IonItem, IonLabel, IonBadge } from '@ionic/vue';
 import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
 
@@ -111,13 +123,35 @@ const props = defineProps<{
   todayStr: string;
 }>();
 
-
-
 defineEmits<{
   (e: 'go-to-detail', id: number): void;
 }>();
 
+const router = useRouter();
 const agendaStore = useAgendaStore();
+
+const openLinkedBenevolat = (benevolatId: number) => {
+  let adminMode = false;
+  let isAuthenticated = false;
+  try {
+    const authStore = useAuthStore();
+    adminMode = authStore.adminMode;
+    isAuthenticated = authStore.isAuthenticated;
+  } catch {
+    // Environnement de test sans Pinia actif
+  }
+
+  if (adminMode) {
+    router.push(`/admin/benevolat/${benevolatId}`);
+  } else if (isAuthenticated) {
+    router.push(`/benevolat/participation/${benevolatId}`);
+  } else {
+    router.push({
+      path: '/login',
+      query: { message: 'Identification requise pour proposer votre aide.' }
+    });
+  }
+};
 
 const weekdays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 

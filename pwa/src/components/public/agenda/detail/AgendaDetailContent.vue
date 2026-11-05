@@ -77,6 +77,35 @@
         </ion-card-content>
       </ion-card>
 
+      <!-- Carte Appel à bénévoles -->
+      <ion-card
+        v-if="currentEvent.linked_benevolat?.is_active"
+        class="ion-no-margin ion-margin-bottom dame-panel card-linked-benevolat"
+      >
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon :icon="handRightOutline" color="primary"></ion-icon>
+            🤝 Appel à bénévoles
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p class="linked-benevolat-description">
+            Un appel à bénévoles est en cours pour cet événement :
+            <strong v-safe-html="currentEvent.linked_benevolat.title"></strong>.
+            Votre club a besoin de vous !
+          </p>
+          <div class="ion-margin-top">
+            <ion-button
+              expand="block"
+              class="btn-benevolat-cta"
+              @click="goToBenevolat(currentEvent.linked_benevolat.id)"
+            >
+              🤝 Participer comme bénévole &rarr;
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
       <!-- Carte Description -->
       <ion-card v-if="descriptionHtml" class="ion-no-margin ion-margin-bottom dame-panel">
         <ion-card-header>
@@ -105,6 +134,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 import {
   IonCard,
   IonCardHeader,
@@ -121,7 +152,8 @@ import {
 import {
   calendarOutline,
   locationOutline,
-  informationCircleOutline
+  informationCircleOutline,
+  handRightOutline
 } from 'ionicons/icons';
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
 import WpContentRenderer from '@/components/shared/WpContent/WpContentRenderer.vue';
@@ -131,7 +163,22 @@ const props = defineProps<{
   eventId?: number | null;
 }>();
 
+const router = useRouter();
+const authStore = useAuthStore();
 const agendaStore = useAgendaStore();
+
+const goToBenevolat = (benevolatId: number) => {
+  if (authStore.adminMode) {
+    router.push(`/admin/benevolat/${benevolatId}`);
+  } else if (authStore.isAuthenticated) {
+    router.push(`/benevolat/participation/${benevolatId}`);
+  } else {
+    router.push({
+      path: '/login',
+      query: { message: 'Identification requise pour proposer votre aide.' }
+    });
+  }
+};
 
 const isLoading = computed(() => agendaStore.isLoading || agendaStore.isAdminEventsLoading);
 

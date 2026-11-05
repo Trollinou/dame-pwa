@@ -158,6 +158,30 @@ const routes: Array< RouteRecordRaw > = [
 		component: () => import( '@/views/public/BenevolatPage.vue' ),
 	},
 	{
+		path: '/tabs/benevolat/participation/:id',
+		redirect: ( to ) => `/benevolat/participation/${ to.params.id }`,
+	},
+	{
+		path: '/tabs/benevolats/:id',
+		redirect: ( to ) => `/benevolat/participation/${ to.params.id }`,
+	},
+	{
+		path: '/tabs/benevolat/:id',
+		redirect: ( to ) => `/benevolat/participation/${ to.params.id }`,
+	},
+	{
+		path: '/tabs/benevolat',
+		redirect: '/benevolat',
+	},
+	{
+		path: '/benevolats/:id',
+		redirect: ( to ) => `/benevolat/participation/${ to.params.id }`,
+	},
+	{
+		path: '/benevolat/:id',
+		redirect: ( to ) => `/benevolat/participation/${ to.params.id }`,
+	},
+	{
 		path: '/benevolat/participation/:id',
 		name: 'BenevolatVote',
 		meta: { requiresAuth: true },
