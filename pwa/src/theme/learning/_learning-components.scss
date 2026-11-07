@@ -1890,6 +1890,17 @@ cg-board.piece-icon-box {
   align-items: flex-end;
 }
 
+.coach-badge {
+  background: var(--ion-color-success, #2dd36f);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
 .elo-badge {
   background: var(--ion-color-primary, #3880ff);
   color: #ffffff;
@@ -1980,7 +1991,8 @@ cg-board.piece-icon-box {
   overflow: hidden;
 }
 
-.actions-row {
+.actions-row,
+.coach-confirmation-row {
   margin: 0 -3px;
   width: calc(100% + 6px);
 

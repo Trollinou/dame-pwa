@@ -28,6 +28,7 @@
           :player-name="authStore.selectedIdentity?.firstname || 'Adhérent'"
           :level="gameSettings.level"
           :game-mode="gameSettings.gameMode"
+          :coach-mode="gameSettings.coachMode"
         />
 
         <div class="main-container" :class="{ 'landscape-mode': isLandscape }">
@@ -67,10 +68,14 @@
             :view-only="boardConfig.viewOnly"
             :game-mode="gameSettings.gameMode"
             :engine-status="engineStatus"
+            :is-coach-mode="gameSettings.coachMode"
+            :is-awaiting-coach-confirmation="isAwaitingCoachConfirmation"
             @reset-game="resetGame"
             @toggle-hint="toggleHint"
             @undo-move="undoMove"
             @go-to-analysis="goToAnalysis"
+            @coach-undo="coachUndoMove"
+            @coach-proceed="coachProceed"
           />
 
           <div v-if="!engineLoaded" class="ion-text-center ion-padding board-section">
@@ -130,6 +135,7 @@ const {
   engineStatus,
   showSettings,
   isHintEnabled,
+  isAwaitingCoachConfirmation,
   currentPly,
   turnColor,
   oupsCount,
@@ -149,6 +155,9 @@ const {
   goToAnalysis,
   refreshDisplay,
   undoMove,
+  coachUndoMove,
+  coachProceed,
+  onPlayerMove,
   handleCheck,
   handleGameOver,
   resignGame,
@@ -170,11 +179,12 @@ const stockfishConfig = computed<StockfishConfig>(() => {
   const playerCol = boardConfig.orientation;
   const nodes = getNodesForElo(gameSettings.level);
   const moveTime = Math.round(gameSettings.level * 1.2);
+  const isComputerSuspended = isAwaitingCoachConfirmation.value;
 
   return {
-    whiteMode: playerCol === 'white' ? 'disabled' : 'elo',
+    whiteMode: (playerCol === 'white' || isComputerSuspended) ? 'disabled' : 'elo',
     whiteElo: playerCol === 'black' ? gameSettings.level : undefined,
-    blackMode: playerCol === 'black' ? 'disabled' : 'elo',
+    blackMode: (playerCol === 'black' || isComputerSuspended) ? 'disabled' : 'elo',
     blackElo: playerCol === 'white' ? gameSettings.level : undefined,
     stockfishMoveTime: moveTime,
     showWdl: true,
@@ -192,32 +202,7 @@ const handleBoardCreated = (api: BoardCore) => {
 };
 
 const handleMove = () => {
-  const api = getBoardApi();
-  if (!api) return;
-
-  refreshDisplay();
-
-  lastSuggestedMove.value = '';
-  api.hideMoves();
-
-  chessStore.saveGame(
-    api.getPgn(),
-    boardConfig.orientation,
-    gameSettings.level,
-    helpCount.value,
-    oupsCount.value
-  );
-
-  if (gameStatus.color === 'warning') {
-    gameStatus.message = '';
-    gameStatus.color = 'medium';
-  }
-
-  // Dès qu'un coup est joué, si l'aide est active comme commutateur permanent
-  // et que c'est au tour du joueur humain, on calcule le conseil pour le nouveau coup
-  if (isHintEnabled.value) {
-    requestHintForPlayer();
-  }
+  onPlayerMove();
 };
 
 const confirmResign = async () => {

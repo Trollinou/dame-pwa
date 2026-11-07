@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
 	getStockfishUrls,
+	isValidStockfishUrl,
 	getNodesForElo,
 	computeEvalBarPercentage,
 	formatEvaluationScore,
@@ -150,5 +151,18 @@ describe( 'Stockfish 19 Utilities', () => {
 		const rawPgn = '1. e4 e5 2. 0-0 0-0-0 3. ♘f3 ♚e7';
 		const normalized = normalizePgn( rawPgn );
 		expect( normalized ).toBe( '1. e4 e5 2. O-O O-O-O 3. Nf3 Ke7' );
+	} );
+
+	it( 'validates Stockfish Worker security constraints strictly', () => {
+		expect( isValidStockfishUrl( '/stockfish.js' ) ).toBe( true );
+		expect( isValidStockfishUrl( './stockfish/stockfish.js' ) ).toBe( true );
+		expect( isValidStockfishUrl( 'https://example.com/stockfish.js' ) ).toBe( true );
+		expect( isValidStockfishUrl( 'http://localhost:5173/stockfish.js' ) ).toBe( true );
+		expect( isValidStockfishUrl( 'blob:http://localhost:5173/uuid-123' ) ).toBe( true );
+
+		// Schémas interdits
+		expect( isValidStockfishUrl( 'data:text/javascript;base64,AAA' ) ).toBe( false );
+		expect( isValidStockfishUrl( 'javascript:alert(1)' ) ).toBe( false );
+		expect( isValidStockfishUrl( '' ) ).toBe( false );
 	} );
 } );

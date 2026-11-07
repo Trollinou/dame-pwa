@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, shallowRef, onMounted, onUnmounted, watch } from 'vue';
 import { default as TheChessboard } from 'eg-chessboard/vue';
 // Structure de base et plateaux uniquement (13 Ko au lieu de 374 Ko avec toutes les pièces)
 import 'eg-chessboard/base.css';
@@ -86,7 +86,9 @@ import type {
   StockfishEvaluation,
   EngineStatus,
   Move,
-  DrawShape
+  DrawShape,
+  BoardGlyph,
+  Key
 } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { loadPieceSetStyle } from '@/composables/core/useChessThemeLoader';
@@ -108,12 +110,37 @@ const props = withDefaults(defineProps<ChessboardProps>(), {
 
 const emit = defineEmits<ChessboardEmits>();
 
-const boardApi = ref<BoardCore | null>(null);
+const boardApi = shallowRef<BoardCore | null>(null);
+
+const applyGlyphsToApi = (
+  api: Pick<BoardCore, 'clearGlyphs' | 'setGlyph'>,
+  glyphs?: Record<string, BoardGlyph | null> | Map<Key, BoardGlyph>
+) => {
+  api.clearGlyphs();
+  if (!glyphs) return;
+
+  if (glyphs instanceof Map) {
+    for (const [sq, glyph] of glyphs) {
+      if (glyph) {
+        api.setGlyph(sq, glyph);
+      }
+    }
+  } else {
+    for (const [sq, glyph] of Object.entries(glyphs)) {
+      if (glyph) {
+        api.setGlyph(sq as Key, glyph);
+      }
+    }
+  }
+};
 
 const handleBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
   if (props.fen && props.fen !== 'start') {
     api.setPosition(props.fen);
+  }
+  if (props.glyphs) {
+    applyGlyphsToApi(api, props.glyphs);
   }
   emit('board-created', api);
 };
@@ -132,6 +159,16 @@ watch(
   (newShapes) => {
     if (boardApi.value && newShapes) {
       boardApi.value.setShapes(newShapes);
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  () => props.glyphs,
+  (newGlyphs) => {
+    if (boardApi.value) {
+      applyGlyphsToApi(boardApi.value, newGlyphs);
     }
   },
   { deep: true }
@@ -238,7 +275,7 @@ const resolvedStockfishConfig = computed<StockfishConfig>(() => {
 // Gestion du Zoom Universel (Appui long / Clic droit)
 // ========================================================
 const isZoomOpen = ref(false);
-const zoomBoardApi = ref<BoardCore | null>(null);
+const zoomBoardApi = shallowRef<BoardCore | null>(null);
 let pressTimer: ReturnType<typeof setTimeout> | null = null;
 let touchStartX = 0;
 let touchStartY = 0;
@@ -266,6 +303,10 @@ const handleZoomBoardCreated = (api: BoardCore) => {
   zoomBoardApi.value = api;
   if (props.shapes && props.shapes.length > 0) {
     api.setShapes(props.shapes);
+  }
+  const currentGlyphs = props.glyphs || boardApi.value?.getGlyphs();
+  if (currentGlyphs) {
+    applyGlyphsToApi(api, currentGlyphs);
   }
   api.redraw(true);
 };
@@ -395,6 +436,10 @@ onUnmounted(() => {
 defineExpose({
   boardApi,
   openZoom,
-  closeZoom
+  closeZoom,
+  setGlyph: (square: Key | string, glyph: BoardGlyph | null) => boardApi.value?.setGlyph(square, glyph),
+  clearGlyphs: () => boardApi.value?.clearGlyphs(),
+  getGlyph: (square: Key | string) => boardApi.value?.getGlyph(square) ?? null,
+  getGlyphs: () => boardApi.value?.getGlyphs() ?? new Map()
 });
 </script>

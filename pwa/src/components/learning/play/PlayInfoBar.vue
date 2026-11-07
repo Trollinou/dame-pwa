@@ -14,6 +14,9 @@
       </div>
 
       <div class="meta-right">
+        <span v-if="gameMode !== '2players' && coachMode" class="coach-badge">
+          🎓 Coach
+        </span>
         <span v-if="gameMode !== '2players'" class="elo-badge">
           {{ level }} ELO
         </span>
@@ -34,9 +37,11 @@ withDefaults(
     playerName: string;
     level: number;
     gameMode?: '1player' | '2players';
+    coachMode?: boolean;
   }>(),
   {
-    gameMode: '1player'
+    gameMode: '1player',
+    coachMode: false
   }
 );
 

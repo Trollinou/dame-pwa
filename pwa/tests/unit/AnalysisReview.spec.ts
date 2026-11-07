@@ -72,6 +72,8 @@ describe( 'AnalysisPage - Revue de partie (Bilan et analyse de coup)', () => {
 		requestHint: vi.fn(),
 		getIsGameOver: vi.fn( () => false ),
 		getTurnColor: vi.fn( () => 'white' ),
+		setGlyph: vi.fn(),
+		clearGlyphs: vi.fn(),
 	} );
 
 	const mockReviewReport: GameReviewReport = {
@@ -187,6 +189,7 @@ describe( 'AnalysisPage - Revue de partie (Bilan et analyse de coup)', () => {
 		expect( vm.activePly ).toBe( 4 );
 		// Vérification clé : l'échiquier est positionné sur le ply précédent (ply 3) pour voir la position de départ
 		expect( mockBoard.viewHistory ).toHaveBeenCalledWith( 3 );
+		expect( mockBoard.clearGlyphs ).toHaveBeenCalled();
 
 		// Vérification des flèches : coup joué (g8f6 en jaune) et meilleur coup (d7d5 en vert)
 		expect( mockBoard.setShapes ).toHaveBeenCalledWith( [

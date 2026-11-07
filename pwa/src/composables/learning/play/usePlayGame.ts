@@ -1,16 +1,23 @@
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type {
 	BoardCore,
 	EngineStatus,
 	StockfishEvaluation,
-} from 'eg-chessboard';
+	Key,
+	Move,
+} from '@/components/shared/Chessboard/types';
 import { useChessStore } from '@/stores/chess';
 import {
 	undoMove as apiUndoMove,
 	getGameOverReason,
 } from '@/utils/chess/boardApiWrapper';
 import { normalizeCastlingMoves } from '@/utils/chess/stockfish';
+import {
+	analyzePositionTactics,
+	classifyMoveDiff,
+	judgementToGlyph,
+} from '@/utils/chess/tacticalGlyphs';
 
 export function usePlayGame() {
 	const chessStore = useChessStore();
@@ -45,12 +52,30 @@ export function usePlayGame() {
 
 	const savedLevel = localStorage.getItem( 'dame_pwa_play_elo' );
 	const initialLevel = savedLevel ? parseInt( savedLevel, 10 ) : 1320;
+	const savedCoachMode = localStorage.getItem( 'dame_pwa_coach_mode' );
+	const initialCoachMode = savedCoachMode !== null ? savedCoachMode === 'true' : true;
 
 	const gameSettings = reactive( {
 		gameMode: '1player' as '1player' | '2players',
 		playerColor: 'white' as 'white' | 'black' | 'random',
 		level: isNaN( initialLevel ) ? 1320 : initialLevel,
+		coachMode: initialCoachMode,
 	} );
+
+	const isAwaitingCoachConfirmation = ref( false );
+	const lastEvalBeforeMove = ref< StockfishEvaluation | null >( null );
+
+	watch(
+		() => gameSettings.coachMode,
+		( enabled ) => {
+			localStorage.setItem( 'dame_pwa_coach_mode', enabled ? 'true' : 'false' );
+			if ( ! enabled && boardApi ) {
+				boardApi.clearGlyphs();
+				isAwaitingCoachConfirmation.value = false;
+			}
+		},
+		{ flush: 'sync' }
+	);
 
 	const boardConfig = reactive( {
 		coordinates: true,
@@ -175,6 +200,8 @@ export function usePlayGame() {
 	const setBoardApi = ( api: BoardCore ) => {
 		boardApi = api;
 		lastHelpPly = null;
+		isAwaitingCoachConfirmation.value = false;
+		lastEvalBeforeMove.value = null;
 		if ( chessStore.currentPgn ) {
 			boardApi.loadPgn( chessStore.currentPgn );
 			boardConfig.orientation = chessStore.orientation;
@@ -208,8 +235,10 @@ export function usePlayGame() {
 			return;
 		}
 
+		isAwaitingCoachConfirmation.value = false;
 		oupsCount.value++;
 		boardApi.hideMoves();
+		boardApi.clearGlyphs();
 		lastSuggestedMove.value = '';
 		lastHelpPly = null;
 
@@ -295,6 +324,124 @@ export function usePlayGame() {
 		handleGameOver( 'resigned' );
 	};
 
+	const onPlayerMove = () => {
+		if ( ! boardApi ) {
+			return;
+		}
+
+		refreshDisplay();
+
+		lastSuggestedMove.value = '';
+		boardApi.hideMoves();
+
+		chessStore.saveGame(
+			boardApi.getPgn(),
+			boardConfig.orientation,
+			gameSettings.level,
+			helpCount.value,
+			oupsCount.value
+		);
+
+		const isHumanJustPlayed =
+			gameSettings.gameMode === '1player'
+				? boardApi.getTurnColor() !== boardConfig.playerColor
+				: true;
+
+		if ( gameSettings.coachMode && isHumanJustPlayed ) {
+			const currentFen = boardApi.getFen();
+			const playerCol = (
+				boardConfig.playerColor === 'both'
+					? 'white'
+					: boardConfig.playerColor
+			) as 'white' | 'black';
+			const tactics = analyzePositionTactics( currentFen, playerCol );
+			const history = ( boardApi.getHistory( true ) as Move[] ) || [];
+			const lastMove =
+				history.length > 0 ? history[ history.length - 1 ] : null;
+
+			boardApi.clearGlyphs();
+
+			for ( const sq of tactics.pinnedSquares ) {
+				boardApi.setGlyph( sq, 'pin' );
+			}
+
+			if ( tactics.undefendedSquares.length > 0 && tactics.hasMajorThreat ) {
+				for ( const sq of tactics.undefendedSquares ) {
+					boardApi.setGlyph( sq, 'undefended' );
+				}
+				if ( lastMove && lastMove.to ) {
+					boardApi.setGlyph( lastMove.to as Key, '??' );
+				}
+
+				isAwaitingCoachConfirmation.value = true;
+				gameStatus.message =
+					'⚠️ Oups ! Tu laisses une pièce sans défense. Veux-tu corriger ?';
+				gameStatus.color = 'warning';
+				return;
+			}
+
+			isAwaitingCoachConfirmation.value = false;
+			if ( lastMove && lastMove.to ) {
+				boardApi.setGlyph( lastMove.to as Key, '!' );
+			}
+			if ( gameStatus.color === 'warning' ) {
+				gameStatus.message = '';
+				gameStatus.color = 'medium';
+			}
+		} else {
+			isAwaitingCoachConfirmation.value = false;
+			if ( gameStatus.color === 'warning' ) {
+				gameStatus.message = '';
+				gameStatus.color = 'medium';
+			}
+		}
+
+		if ( isHintEnabled.value ) {
+			requestHintForPlayer();
+		}
+	};
+
+	const coachUndoMove = () => {
+		if ( ! boardApi ) {
+			return;
+		}
+		isAwaitingCoachConfirmation.value = false;
+		oupsCount.value++;
+		boardApi.clearGlyphs();
+		boardApi.hideMoves();
+		lastSuggestedMove.value = '';
+		lastHelpPly = null;
+
+		apiUndoMove( boardApi, false );
+		boardConfig.viewOnly = false;
+		refreshDisplay();
+
+		gameStatus.message =
+			'Tu as repris ton coup. À toi de trouver une meilleure case !';
+		gameStatus.color = 'primary';
+
+		chessStore.saveGame(
+			boardApi.getPgn(),
+			boardConfig.orientation,
+			gameSettings.level,
+			helpCount.value,
+			oupsCount.value
+		);
+
+		if ( isHintEnabled.value ) {
+			requestHintForPlayer();
+		}
+	};
+
+	const coachProceed = () => {
+		if ( ! boardApi ) {
+			return;
+		}
+		isAwaitingCoachConfirmation.value = false;
+		gameStatus.message = '';
+		gameStatus.color = 'medium';
+	};
+
 	const handleEngineStatus = ( status: EngineStatus ) => {
 		engineStatus.value = status;
 		if ( status === 'ready' || status === 'searching' ) {
@@ -304,6 +451,49 @@ export function usePlayGame() {
 
 	const handleEvaluation = ( evaluation: StockfishEvaluation ) => {
 		currentEvaluation.value = evaluation;
+
+		if ( gameSettings.coachMode && boardApi && isHumanTurn() ) {
+			lastEvalBeforeMove.value = evaluation;
+		} else if (
+			gameSettings.coachMode &&
+			boardApi &&
+			! isHumanTurn() &&
+			lastEvalBeforeMove.value &&
+			! isAwaitingCoachConfirmation.value
+		) {
+			const playerCol = (
+				boardConfig.playerColor === 'both'
+					? 'white'
+					: boardConfig.playerColor
+			) as 'white' | 'black';
+			const bestWinChance =
+				playerCol === 'white'
+					? lastEvalBeforeMove.value.winChancePercentage
+					: 100 - lastEvalBeforeMove.value.winChancePercentage;
+			const playedWinChance =
+				playerCol === 'white'
+					? evaluation.winChancePercentage
+					: 100 - evaluation.winChancePercentage;
+
+			const diff = Math.max( 0, bestWinChance - playedWinChance );
+			const judgement = classifyMoveDiff( diff );
+			const glyph = judgementToGlyph( judgement );
+
+			const history = ( boardApi.getHistory( true ) as Move[] ) || [];
+			const lastMove =
+				history.length > 0 ? history[ history.length - 1 ] : null;
+
+			if ( lastMove && lastMove.to ) {
+				boardApi.setGlyph( lastMove.to as Key, glyph );
+			}
+
+			if ( diff > 30 ) {
+				isAwaitingCoachConfirmation.value = true;
+				gameStatus.message =
+					'⚠️ Gaffe détectée (??). Veux-tu corriger ton coup ?';
+				gameStatus.color = 'warning';
+			}
+		}
 	};
 
 	return {
@@ -314,6 +504,7 @@ export function usePlayGame() {
 		currentEvaluation,
 		showSettings,
 		isHintEnabled,
+		isAwaitingCoachConfirmation,
 		currentPly,
 		turnColor,
 		oupsCount,
@@ -336,6 +527,9 @@ export function usePlayGame() {
 		goToAnalysis,
 		refreshDisplay,
 		undoMove,
+		coachUndoMove,
+		coachProceed,
+		onPlayerMove,
 		handleCheck,
 		handleGameOver,
 		resignGame,

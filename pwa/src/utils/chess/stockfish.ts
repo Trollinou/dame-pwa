@@ -37,6 +37,32 @@ export function getStockfishUrls(): { workerUrl: string; wasmUrl: string } {
 }
 
 /**
+ * Valide qu'une URL de worker Stockfish respecte les contraintes de sécurité
+ * (chemins relatifs ou protocoles autorisés http:, https:, blob:) et proscrit
+ * strictement les schémas non sécurisés (data:, javascript:).
+ *
+ * @param url URL à contrôler
+ */
+export function isValidStockfishUrl( url: string ): boolean {
+	if ( ! url || typeof url !== 'string' ) {
+		return false;
+	}
+	const trimmed = url.trim().toLowerCase();
+	if ( trimmed.startsWith( 'data:' ) || trimmed.startsWith( 'javascript:' ) ) {
+		return false;
+	}
+	if ( trimmed.startsWith( '/' ) || trimmed.startsWith( './' ) || trimmed.startsWith( '../' ) ) {
+		return true;
+	}
+	try {
+		const parsed = new URL( trimmed );
+		return [ 'http:', 'https:', 'blob:' ].includes( parsed.protocol );
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Formate le score d'évaluation pour l'affichage visuel (+1.2, -0.8, #2, etc.)
  *
  * @param evaluation Évaluation Stockfish ou null

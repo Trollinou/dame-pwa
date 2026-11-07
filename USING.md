@@ -253,6 +253,14 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
    - **Mode 1 Joueur (vs Stockfish 19)** :
      - Choix de la couleur (Blancs, Noirs ou Aléatoire).
      - Choix du niveau Elo de 1320 à 3190 (mémorisé pour les prochaines parties).
+     - **Mode Coach Bienveillant (Feedback Didactique en Temps Réel)** :
+       - Option activable / désactivable dans les paramètres de la partie (mémorisée localement) avec indicateur `🎓 Coach` dans la barre d'information.
+       - **Fluidité continue sur les bons coups** : Appréciation visuelle sur la case d'arrivée (`!`, `✓`) sans aucun clic de confirmation rébarbatif, laissant Stockfish répondre à son rythme naturel.
+       - **Interruption conditionnelle sur Gaffe (`??`) ou Pièce en prise (`undefended`)** : Dès qu'une vulnérabilité tactique majeure est commise (ou pièce clouée `pin`), Stockfish est automatiquement mis en pause pour éviter une capture brutale immédiate.
+       - **Bandeau didactique interactif** : Propose deux choix instantanés en 1 clic :
+         - `[ 🔄 Reprendre ]` : Rembobine le coup d'un demi-coup (incrémente le compteur « Oups ») pour laisser l'élève trouver une meilleure case.
+         - `[ ⏩ Laisser jouer ]` : Réactive Stockfish pour observer la réplique du moteur.
+       - **Persistance des glyphes** : Les badges d'évaluation et alertes tactiques restent affichés jusqu'au début du coup suivant de l'adhérent pour faciliter la compréhension cause-à-effet.
      - Temps de réflexion et limitation fine en nœuds déterministes selon l'Elo (`getNodesForElo`).
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
      - Demande de conseil dynamique en cours de partie à pleine puissance 3500+ Elo même en mode 2 joueurs (`core.requestHint({ multiPv: 2, movetime: 1500 })`).
@@ -272,9 +280,10 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - **Conseil (Hint ponctuel)** : Demande ponctuelle du meilleur coup calculé à pleine puissance (`core.requestHint({ multiPv: 2, movetime: 1500 })`) avec flèche verte tracée sur l'échiquier et retour textuel d'assistance clair (ex: *« Conseil Stockfish : Dg7 ➔ e5 »*). Gestion explicite de la fin de partie invitant à reculer sur un coup antérieur si la partie est terminée sur la position affichée.
      - **Bilan (Revue de partie autonome & navigation didactique)** :
       - *Calcul optimisé* : Analyse à `depth: 12` avec jauge de progression, annulation fluide, scores de précision globale Blancs/Noirs et tableau récapitulatif des jugements (`!!`, `★`, `✓`, `•`, `?!`, `?`, `??`, `✗`).
+      - *Badges visuels automatiques (v1.7.4+)* : Lors de la navigation dans l'historique de la partie analysée, l'échiquier affiche nativement le badge de jugement du coup (`!!`, `??`, `!`, `?`, `?!`) sur la case d'arrivée sans surcharger le PGN.
       - *Inspection didactique coup par coup* : Dès la sélection d'un coup dans l'historique (ou sélection automatique de la première imprécision/erreur à la fin du bilan), l'échiquier se positionne par défaut sur la position **avant le coup** ($N-1$).
       - *Double flèche visuelle* : Tracé simultané de la flèche du coup joué (couleur selon le jugement : rouge pour gaffe, jaune pour imprécision/erreur, bleue pour bon coup) et de la flèche verte du **meilleur coup alternatif**.
-      - *Fiche de coup interactive* : Carte dédiée affichant le coup joué, le meilleur coup recommandé, les annotations et un sélecteur « Avant le coup » / « Après le coup » pour alterner entre la vue de départ et le résultat sur le plateau.
+      - *Fiche de coup interactive* : Carte dédiée affichant le coup joué, le meilleur coup recommandé, les annotations et un sélecteur « Avant le coup » / « Après le coup » pour alterner entre la vue de départ et le résultat sur le plateau (avec nettoyage propre des glyphes pré-coup).
       - *Cohérence « Conseil » & « Éval direct »* : En mode Bilan, le bouton « Conseil » restitue directement la recommandation du bilan pour le coup analysé, et « Éval direct » évalue la position au trait du joueur qui doit exécuter ce coup.
 
 ## Module Profil & Personnalisation de l'Échiquier

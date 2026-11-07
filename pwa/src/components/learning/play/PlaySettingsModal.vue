@@ -51,6 +51,15 @@
           </ion-range>
         </ion-item>
 
+        <!-- Mode Coach Bienveillant (Uniquement en mode 1 joueur) -->
+        <ion-item v-if="gameSettings.gameMode === '1player'" class="ion-margin-top">
+          <ion-label>
+            <h3>Mode Coach Bienveillant</h3>
+            <p>Apprécie vos coups et suspend le jeu sur une gaffe pour vous laisser corriger</p>
+          </ion-label>
+          <ion-toggle slot="end" v-model="gameSettings.coachMode" color="success"></ion-toggle>
+        </ion-item>
+
         <ion-button expand="block" class="ion-margin-top" @click="$emit('start-game')">
           Lancer la partie
         </ion-button>
@@ -75,6 +84,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonRange,
+  IonToggle,
   IonIcon
 } from '@ionic/vue';
 import { handRightOutline } from 'ionicons/icons';
@@ -83,6 +93,7 @@ interface GameSettingsState {
   gameMode: '1player' | '2players';
   playerColor: 'white' | 'black' | 'random';
   level: number;
+  coachMode: boolean;
 }
 
 const gameSettings = inject<GameSettingsState>('gameSettings')!;

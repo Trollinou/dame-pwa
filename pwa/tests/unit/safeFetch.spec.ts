@@ -72,7 +72,7 @@ describe( 'safeFetch utility', () => {
 
 			vi.stubGlobal( 'fetch', fetchMock );
 
-			const res = await safeFetch( 'https://api.example.com/protected' );
+			const res = await safeFetch( `${ authStore.jwtSdk.host }/protected` );
 
 			expect( authStore.jwtSdk.getValidJwt ).toHaveBeenCalledWith( true );
 			expect( fetchMock ).toHaveBeenCalledTimes( 2 );

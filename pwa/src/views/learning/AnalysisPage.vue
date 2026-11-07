@@ -647,6 +647,8 @@ const updateReviewBoardDisplay = () => {
     } else {
       boardApi.viewHistory(ply - 1);
     }
+    // Nettoyer les glyphes pour que le badge du coup précédent n'apparaisse pas avant le coup analysé
+    boardApi.clearGlyphs();
 
     if (analysis && analysis.uci && analysis.uci.length >= 4) {
       const playedBrush = judgementConfig[analysis.judgement]?.brush || 'yellow';
@@ -705,6 +707,7 @@ const closeReviewReport = () => {
   gameReviewReport.value = null;
   selectedReviewPly.value = null;
   boardApi?.hideMoves();
+  boardApi?.clearGlyphs();
   refreshDisplay();
 };
 
@@ -921,6 +924,7 @@ const cancelReview = () => {
     reviewAbortController = null;
   }
   boardApi?.cancelReview();
+  boardApi?.clearGlyphs();
   isReviewing.value = false;
 };
 

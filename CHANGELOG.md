@@ -6,6 +6,31 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Mode Coach Bienveillant & Feedback Didactique en Temps Réel (`tacticalGlyphs.ts`, `usePlayGame.ts`, `PlayPage.vue`, `PlayActionsPanel.vue`, `PlaySettingsModal.vue`, `PlayInfoBar.vue`, `_learning-components.scss`, `tacticalGlyphs.spec.ts`, `PlayCoachMode.spec.ts`, `README.md`, `USING.md`)** :
+  - **Module Tactique Pur (`pwa/src/utils/chess/tacticalGlyphs.ts`)** :
+    - Détection statique synchrone (<1ms) via `chessops` des pièces clouées devant le Roi (`detectPinnedPieces`) et des pièces attaquées sans défense ou sous-défendues (`detectUndefendedPieces`).
+    - Classification qualitative du coup (`classifyMoveDiff`) et conversion en glyphes officiels (`judgementToGlyph`).
+  - **Interruption Douce Conditionnelle sur Gaffe** :
+    - Fluidité intégrale à 0 clic sur les bons coups (`!`, `✓`) laissant l'ordinateur répondre à son rythme habituel.
+    - Mise en pause automatique de Stockfish dès qu'une gaffe (`??`) ou une pièce majeure en prise (`undefended`) est identifiée, évitant la punition immédiate brutale.
+    - Bandeau d'action à 2 boutons rapides : `[ 🔄 Reprendre ]` (rembobine le coup d'un demi-coup pour laisser chercher une meilleure suite) ou `[ ⏩ Laisser jouer ]` (reprend l'analyse de l'ordinateur).
+  - **Paramétrage & Ergonomie** :
+    - Option activable/désactivable dans la modale de réglages (`PlaySettingsModal.vue`) mémorisée dans le `localStorage`.
+    - Indicateur visuel `🎓 Coach` dans la barre d'information du joueur (`PlayInfoBar.vue`).
+    - Persistance visuelle des glyphes pendant et après le coup adverse jusqu'au coup suivant de l'adhérent.
+
+- **Intégration d'`eg-chessboard` v1.7.4+ (embarquant `@lichess-org/chessground@^10.5.0`) & Badges Visuels de Revue (`Chessboard.vue`, `types.ts`, `AnalysisPage.vue`, `stockfish.ts`, `ChessboardGlyphs.spec.ts`, `AnalysisReview.spec.ts`, `README.md`, `USING.md`)** :
+  - **Couche Visuelle de Badges & Glyphes sur `<Chessboard>`** :
+    - Exposition des types `BoardGlyph`, `TacticalGlyph`, `AssessmentGlyph` depuis `pwa/src/components/shared/Chessboard/types.ts`.
+    - Prise en charge réactive de la prop `glyphs` (`Map<Key, BoardGlyph>` ou `Record<string, BoardGlyph | null>`) dans `Chessboard.vue`, synchronisée sur le plateau principal et sur la modale zoom plein écran.
+    - Exposition des méthodes publiques `setGlyph()`, `clearGlyphs()`, `getGlyph()`, `getGlyphs()` via `defineExpose`.
+  - **Affichage Automatique en Revue de Partie Stockfish (`AnalysisPage.vue`)** :
+    - Exploitation native des badges de jugement (`!!`, `??`, `!`, `?`, `?!`, `★`, `✓`, `•`) sur la case de destination lors de la navigation dans l'historique analysé (`viewNext()`, `viewPrevious()`, `viewHistory(ply)`).
+    - Nettoyage rigoureux des glyphes (`clearGlyphs()`) lors de la fermeture du bilan, de l'annulation ou de l'affichage de la position « Avant le coup ».
+  - **Sécurité Stockfish & Prise en Passant** :
+    - Animation native fluide en un seul cycle des captures en passant.
+    - Contrôle et validation stricte des URLs des workers (`isValidStockfishUrl`), interdisant les protocoles `data:` et `javascript:`.
+
 ## [1.12.4] - 2026-11-05
 
 - **Liaison Bidirectionnelle Agenda ⟷ Bénévolat (`AgendaSegmentView.vue`, `AgendaCalendarView.vue`, `AgendaDetailContent.vue`, `BenevolatSegmentView.vue`, `BenevolatDetailContent.vue`, `BenevolatPage.vue`, `types/api/agenda.ts`, `types/api/benevolat.ts`, `_public-components.scss`, `agendaBenevolatLinking.spec.ts`, `README.md`, `USING.md`)** :

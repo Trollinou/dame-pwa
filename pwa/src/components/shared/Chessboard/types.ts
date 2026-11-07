@@ -13,6 +13,9 @@ import type {
 	BoardTheme,
 	DrawShape,
 	Key,
+	BoardGlyph,
+	TacticalGlyph,
+	AssessmentGlyph,
 } from 'eg-chessboard';
 export type {
 	BoardCore,
@@ -29,6 +32,9 @@ export type {
 	BoardTheme,
 	DrawShape,
 	Key,
+	BoardGlyph,
+	TacticalGlyph,
+	AssessmentGlyph,
 };
 export {
 	computeEvalBarPercentage,
@@ -64,6 +70,11 @@ export interface ChessboardProps {
 	 * Formes graphiques dessinées sur l'échiquier (flèches, cercles).
 	 */
 	shapes?: DrawShape[];
+
+	/**
+	 * Badges tactiques ou d'évaluation à afficher sur des cases cibles.
+	 */
+	glyphs?: Record<string, BoardGlyph | null> | Map<Key, BoardGlyph>;
 
 	/**
 	 * Mode lecture seule (aucun coup déplaçable par l'utilisateur).

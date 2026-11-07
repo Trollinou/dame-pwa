@@ -18,7 +18,35 @@
     <!-- Barre d'actions épurée -->
     <div class="actions-container">
       <ion-grid class="ion-no-padding">
-        <ion-row class="actions-row">
+        <!-- Interruption bienveillante lors d'une gaffe en Mode Coach -->
+        <ion-row v-if="isAwaitingCoachConfirmation" class="coach-confirmation-row">
+          <ion-col :size="isLandscape ? '12' : '6'">
+            <ion-button
+              expand="block"
+              fill="solid"
+              color="warning"
+              class="game-action-btn coach-undo-btn"
+              @click="$emit('coach-undo')"
+            >
+              <ion-icon slot="start" :icon="arrowUndoOutline"></ion-icon>
+              <span>Reprendre</span>
+            </ion-button>
+          </ion-col>
+          <ion-col :size="isLandscape ? '12' : '6'">
+            <ion-button
+              expand="block"
+              fill="outline"
+              color="medium"
+              class="game-action-btn coach-proceed-btn"
+              @click="$emit('coach-proceed')"
+            >
+              <ion-icon slot="start" :icon="playForwardOutline"></ion-icon>
+              <span>Laisser jouer</span>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+        <ion-row v-else class="actions-row">
           <!-- Bouton Nouvelle partie / Options -->
           <ion-col :size="isLandscape ? '12' : (gameMode === '2players' ? '4' : '3')">
             <ion-button
@@ -98,7 +126,8 @@ import {
   optionsOutline,
   bulbOutline,
   arrowUndoOutline,
-  analyticsOutline
+  analyticsOutline,
+  playForwardOutline
 } from 'ionicons/icons';
 
 withDefaults(
@@ -113,10 +142,14 @@ withDefaults(
     viewOnly: boolean;
     gameMode?: '1player' | '2players';
     engineStatus?: EngineStatus;
+    isCoachMode?: boolean;
+    isAwaitingCoachConfirmation?: boolean;
   }>(),
   {
     gameMode: '1player',
-    engineStatus: 'uninitialized'
+    engineStatus: 'uninitialized',
+    isCoachMode: false,
+    isAwaitingCoachConfirmation: false
   }
 );
 
@@ -125,5 +158,7 @@ defineEmits<{
   (e: 'toggle-hint'): void;
   (e: 'undo-move'): void;
   (e: 'go-to-analysis'): void;
+  (e: 'coach-undo'): void;
+  (e: 'coach-proceed'): void;
 }>();
 </script>
