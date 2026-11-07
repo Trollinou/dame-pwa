@@ -161,4 +161,26 @@ describe( 'usePlayGame - Mode Coach Bienveillant', () => {
 
 		expect( isAwaitingCoachConfirmation.value ).toBe( false );
 	} );
+
+	it( 'does not re-intercept in loop when user proceeds with coachProceed', () => {
+		const { setBoardApi, onPlayerMove, coachProceed, isAwaitingCoachConfirmation } = usePlayGame();
+		const mockBoard = createMockBoardApi();
+
+		mockBoard._addMove( { from: 'd1', to: 'a4', color: 'w', san: 'Qa4' } as Move );
+		mockBoard._setTurn( 'black' );
+		mockBoard._setFen( 'r1bqkbnr/pppppppp/1n6/8/Q7/8/PPPPPPPP/RNB1KBNR b KQkq - 0 1' );
+
+		setBoardApi( mockBoard );
+		onPlayerMove();
+
+		expect( isAwaitingCoachConfirmation.value ).toBe( true );
+
+		// User clicks "Continuer"
+		coachProceed();
+		expect( isAwaitingCoachConfirmation.value ).toBe( false );
+
+		// Subsequent triggers for same ply must NOT re-activate confirmation
+		onPlayerMove();
+		expect( isAwaitingCoachConfirmation.value ).toBe( false );
+	} );
 } );

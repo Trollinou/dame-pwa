@@ -13,7 +13,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Interruption Douce Conditionnelle sur Gaffe** :
     - Fluidité intégrale à 0 clic sur les bons coups (`!`, `✓`) laissant l'ordinateur répondre à son rythme habituel.
     - Mise en pause automatique de Stockfish dès qu'une gaffe (`??`) ou une pièce majeure en prise (`undefended`) est identifiée, évitant la punition immédiate brutale.
-    - Bandeau d'action à 2 boutons rapides : `[ 🔄 Reprendre ]` (rembobine le coup d'un demi-coup pour laisser chercher une meilleure suite) ou `[ ⏩ Laisser jouer ]` (reprend l'analyse de l'ordinateur).
+    - Bandeau d'action à 2 boutons rapides : `[ 🔄 Reprendre ]` (rembobine le coup d'un demi-coup pour laisser chercher une meilleure suite) ou `[ ⏩ Continuer ]` (reprend l'analyse de l'ordinateur, mémorisé via `userDismissedPly` pour éliminer toute boucle d'interruption).
+    - Fiabilisation de l'évaluation asynchrone : suspension du coach restreinte à la phase de lâcher de pièce (`onPlayerMove`) et seuil de profondeur minimum (`depth >= 6`) pour éliminer les faux positifs d'analyse intermédiaire de l'ordinateur.
   - **Paramétrage & Ergonomie** :
     - Option activable/désactivable dans la modale de réglages (`PlaySettingsModal.vue`) mémorisée dans le `localStorage`.
     - Indicateur visuel `🎓 Coach` dans la barre d'information du joueur (`PlayInfoBar.vue`).

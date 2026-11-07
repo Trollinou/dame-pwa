@@ -41,7 +41,7 @@
               @click="$emit('coach-proceed')"
             >
               <ion-icon slot="start" :icon="playForwardOutline"></ion-icon>
-              <span>Laisser jouer</span>
+              <span>Continuer</span>
             </ion-button>
           </ion-col>
         </ion-row>

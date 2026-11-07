@@ -63,6 +63,7 @@ export function usePlayGame() {
 	} );
 
 	const isAwaitingCoachConfirmation = ref( false );
+	const userDismissedPly = ref< number | null >( null );
 	const lastEvalBeforeMove = ref< StockfishEvaluation | null >( null );
 
 	watch(
@@ -201,6 +202,7 @@ export function usePlayGame() {
 		boardApi = api;
 		lastHelpPly = null;
 		isAwaitingCoachConfirmation.value = false;
+		userDismissedPly.value = null;
 		lastEvalBeforeMove.value = null;
 		if ( chessStore.currentPgn ) {
 			boardApi.loadPgn( chessStore.currentPgn );
@@ -236,6 +238,7 @@ export function usePlayGame() {
 		}
 
 		isAwaitingCoachConfirmation.value = false;
+		userDismissedPly.value = null;
 		oupsCount.value++;
 		boardApi.hideMoves();
 		boardApi.clearGlyphs();
@@ -358,11 +361,17 @@ export function usePlayGame() {
 			const history = ( boardApi.getHistory( true ) as Move[] ) || [];
 			const lastMove =
 				history.length > 0 ? history[ history.length - 1 ] : null;
+			const ply = boardApi.getCurrentPlyNumber();
 
 			boardApi.clearGlyphs();
 
 			for ( const sq of tactics.pinnedSquares ) {
 				boardApi.setGlyph( sq, 'pin' );
+			}
+
+			// Si l'utilisateur a déjà choisi de continuer sur ce ply, ne pas ré-interrompre
+			if ( userDismissedPly.value === ply ) {
+				return;
 			}
 
 			if ( tactics.undefendedSquares.length > 0 && tactics.hasMajorThreat ) {
@@ -405,6 +414,7 @@ export function usePlayGame() {
 		if ( ! boardApi ) {
 			return;
 		}
+		userDismissedPly.value = null;
 		isAwaitingCoachConfirmation.value = false;
 		oupsCount.value++;
 		boardApi.clearGlyphs();
@@ -437,6 +447,7 @@ export function usePlayGame() {
 		if ( ! boardApi ) {
 			return;
 		}
+		userDismissedPly.value = boardApi.getCurrentPlyNumber();
 		isAwaitingCoachConfirmation.value = false;
 		gameStatus.message = '';
 		gameStatus.color = 'medium';
@@ -459,7 +470,8 @@ export function usePlayGame() {
 			boardApi &&
 			! isHumanTurn() &&
 			lastEvalBeforeMove.value &&
-			! isAwaitingCoachConfirmation.value
+			evaluation.depth >= 6 &&
+			lastEvalBeforeMove.value.ply === currentPly.value - 1
 		) {
 			const playerCol = (
 				boardConfig.playerColor === 'both'
@@ -485,13 +497,6 @@ export function usePlayGame() {
 
 			if ( lastMove && lastMove.to ) {
 				boardApi.setGlyph( lastMove.to as Key, glyph );
-			}
-
-			if ( diff > 30 ) {
-				isAwaitingCoachConfirmation.value = true;
-				gameStatus.message =
-					'⚠️ Gaffe détectée (??). Veux-tu corriger ton coup ?';
-				gameStatus.color = 'warning';
 			}
 		}
 	};
