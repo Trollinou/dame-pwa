@@ -46,9 +46,9 @@
           </ion-col>
         </ion-row>
 
-        <ion-row v-else class="actions-row">
-          <!-- Bouton Nouvelle partie / Options -->
-          <ion-col :size="isLandscape ? '12' : (gameMode === '2players' ? '4' : '3')">
+        <!-- État 1 : Fin de partie -> Uniquement Nouveau et Analyse -->
+        <ion-row v-else-if="isGameOver" class="actions-row">
+          <ion-col :size="isLandscape ? '12' : '6'">
             <ion-button
               expand="block"
               fill="outline"
@@ -57,27 +57,44 @@
               @click="$emit('reset-game')"
             >
               <ion-icon slot="start" :icon="optionsOutline"></ion-icon>
-              <span>Nouv.</span>
+              <span>Nouveau</span>
             </ion-button>
           </ion-col>
 
-          <!-- Bouton Aide -->
-          <ion-col v-if="gameMode !== '2players'" :size="isLandscape ? '12' : '3'">
+          <ion-col :size="isLandscape ? '12' : '6'">
             <ion-button
               expand="block"
-              :fill="isHintEnabled ? 'solid' : 'outline'"
-              :color="isHintEnabled ? 'success' : 'medium'"
+              fill="solid"
+              color="tertiary"
               class="game-action-btn"
-              @click="$emit('toggle-hint')"
+              @click="$emit('go-to-analysis')"
             >
-              <ion-icon slot="start" :icon="bulbOutline"></ion-icon>
-              <span>Aide</span>
-              <ion-badge v-if="helpCount > 0" color="success" class="btn-counter-badge">{{ helpCount }}</ion-badge>
+              <ion-icon slot="start" :icon="analyticsOutline"></ion-icon>
+              <span>Analyse</span>
             </ion-button>
           </ion-col>
+        </ion-row>
 
-          <!-- Bouton Oups / Annuler -->
-          <ion-col :size="isLandscape ? '12' : (gameMode === '2players' ? '4' : '3')">
+        <!-- État 2 : Avant le 1er coup -> Uniquement Nouveau / Réglages -->
+        <ion-row v-else-if="currentPly === 0" class="actions-row">
+          <ion-col size="12">
+            <ion-button
+              expand="block"
+              fill="outline"
+              color="primary"
+              class="game-action-btn"
+              @click="$emit('reset-game')"
+            >
+              <ion-icon slot="start" :icon="optionsOutline"></ion-icon>
+              <span>Nouvelle partie / Réglages</span>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+        <!-- État 3 : En cours de partie -> Pas de Nouveau, [Oups], ([Aide]), [Nulle], [Abandon] -->
+        <ion-row v-else class="actions-row">
+          <!-- 1. Bouton Oups / Annuler (parer au missclick dans tous les modes) -->
+          <ion-col :size="inGameColSize">
             <ion-button
               expand="block"
               fill="outline"
@@ -92,17 +109,46 @@
             </ion-button>
           </ion-col>
 
-          <!-- Bouton Analyse -->
-          <ion-col :size="isLandscape ? '12' : (gameMode === '2players' ? '4' : '3')">
+          <!-- 2. Bouton Aide (uniquement en mode Coach) -->
+          <ion-col v-if="isCoachMode" :size="inGameColSize">
+            <ion-button
+              expand="block"
+              :fill="isHintEnabled ? 'solid' : 'outline'"
+              :color="isHintEnabled ? 'success' : 'medium'"
+              class="game-action-btn"
+              @click="$emit('toggle-hint')"
+            >
+              <ion-icon slot="start" :icon="bulbOutline"></ion-icon>
+              <span>Aide</span>
+              <ion-badge v-if="helpCount > 0" color="success" class="btn-counter-badge">{{ helpCount }}</ion-badge>
+            </ion-button>
+          </ion-col>
+
+          <!-- 3. Bouton Nulle (proposition / arbitrage nulle eg-chessboard 1.8.0) -->
+          <ion-col :size="inGameColSize">
             <ion-button
               expand="block"
               fill="outline"
-              color="tertiary"
+              color="medium"
               class="game-action-btn"
-              @click="$emit('go-to-analysis')"
+              @click="$emit('offer-draw')"
             >
-              <ion-icon slot="start" :icon="analyticsOutline"></ion-icon>
-              <span>Analyse</span>
+              <ion-icon slot="start" :icon="scaleOutline"></ion-icon>
+              <span>Nulle</span>
+            </ion-button>
+          </ion-col>
+
+          <!-- 4. Bouton Abandon (arbitrage abandon eg-chessboard 1.8.0) -->
+          <ion-col :size="inGameColSize">
+            <ion-button
+              expand="block"
+              fill="outline"
+              color="danger"
+              class="game-action-btn"
+              @click="$emit('resign-game')"
+            >
+              <ion-icon slot="start" :icon="flagOutline"></ion-icon>
+              <span>Abandon</span>
             </ion-button>
           </ion-col>
         </ion-row>
@@ -112,6 +158,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
   IonGrid,
   IonRow,
@@ -127,10 +174,12 @@ import {
   bulbOutline,
   arrowUndoOutline,
   analyticsOutline,
-  playForwardOutline
+  playForwardOutline,
+  scaleOutline,
+  flagOutline
 } from 'ionicons/icons';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     isLandscape: boolean;
     gameStatusMessage: string;
@@ -144,12 +193,16 @@ withDefaults(
     engineStatus?: EngineStatus;
     isCoachMode?: boolean;
     isAwaitingCoachConfirmation?: boolean;
+    isGameOver?: boolean;
+    currentPly?: number;
   }>(),
   {
     gameMode: '1player',
     engineStatus: 'uninitialized',
     isCoachMode: false,
-    isAwaitingCoachConfirmation: false
+    isAwaitingCoachConfirmation: false,
+    isGameOver: false,
+    currentPly: 0
   }
 );
 
@@ -160,5 +213,14 @@ defineEmits<{
   (e: 'go-to-analysis'): void;
   (e: 'coach-undo'): void;
   (e: 'coach-proceed'): void;
+  (e: 'offer-draw'): void;
+  (e: 'resign-game'): void;
 }>();
+
+const inGameColSize = computed(() => {
+  if (props.isLandscape) {
+    return '12';
+  }
+  return props.isCoachMode ? '3' : '4';
+});
 </script>

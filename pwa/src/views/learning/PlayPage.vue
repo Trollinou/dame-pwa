@@ -6,17 +6,6 @@
           <ion-back-button default-href="/tabs/apprentissage"></ion-back-button>
         </ion-buttons>
         <ion-title>Partie d'Échecs</ion-title>
-        <ion-buttons slot="end">
-          <ion-button
-            v-if="!boardConfig.viewOnly && currentPly > 0"
-            color="danger"
-            fill="clear"
-            title="Abandonner la partie"
-            @click="confirmResign"
-          >
-            <ion-icon slot="icon-only" :icon="flagOutline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -47,6 +36,9 @@
                 @checkmate="() => handleGameOver('checkmate')"
                 @stalemate="() => handleGameOver('stalemate')"
                 @draw="() => handleGameOver('draw')"
+                @resign="handleResign"
+                @draw-declined="handleDrawDeclined"
+                @draw-offer="handleDrawOffer"
                 @stockfish-hint="handleStockfishHint"
                 @engine-status="handleEngineStatus"
                 @evaluation="handleEvaluation"
@@ -70,12 +62,16 @@
             :engine-status="engineStatus"
             :is-coach-mode="gameSettings.coachMode"
             :is-awaiting-coach-confirmation="isAwaitingCoachConfirmation"
+            :is-game-over="isGameOver"
+            :current-ply="currentPly"
             @reset-game="resetGame"
             @toggle-hint="toggleHint"
             @undo-move="undoMove"
             @go-to-analysis="goToAnalysis"
             @coach-undo="coachUndoMove"
             @coach-proceed="coachProceed"
+            @offer-draw="offerDraw"
+            @resign-game="confirmResign"
           />
 
           <div v-if="!engineLoaded" class="ion-text-center ion-padding board-section">
@@ -106,11 +102,8 @@ import {
   IonButton,
   IonBackButton,
   IonSpinner,
-  IonIcon,
-  alertController,
   onIonViewWillLeave
 } from '@ionic/vue';
-import { flagOutline } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { StockfishConfig, BoardCore } from 'eg-chessboard';
 import { useAuthStore } from '@/stores/auth';
@@ -136,6 +129,7 @@ const {
   showSettings,
   isHintEnabled,
   isAwaitingCoachConfirmation,
+  isGameOver,
   currentPly,
   turnColor,
   oupsCount,
@@ -161,6 +155,11 @@ const {
   handleCheck,
   handleGameOver,
   resignGame,
+  confirmResign,
+  handleResign,
+  offerDraw,
+  handleDrawDeclined,
+  handleDrawOffer,
 } = usePlayGame();
 
 provide('gameSettings', gameSettings);
@@ -203,30 +202,6 @@ const handleBoardCreated = (api: BoardCore) => {
 
 const handleMove = () => {
   onPlayerMove();
-};
-
-const confirmResign = async () => {
-  const alert = await alertController.create({
-    header: 'Abandonner la partie ?',
-    message:
-      currentPly.value >= 30
-        ? 'La partie sera enregistrée comme abandonnée dans votre historique (au moins 15 coups complets joués).'
-        : 'La partie est trop courte (< 15 coups complets) pour être enregistrée.',
-    buttons: [
-      {
-        text: 'Continuer',
-        role: 'cancel',
-      },
-      {
-        text: 'Abandonner',
-        role: 'destructive',
-        handler: () => {
-          resignGame();
-        },
-      },
-    ],
-  });
-  await alert.present();
 };
 
 const resetGame = () => {

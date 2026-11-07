@@ -36,6 +36,9 @@
       @square-click="(square: string) => emit('square-click', square)"
       @shapes-change="(shapes: DrawShape[]) => emit('shapes-change', shapes)"
       @promotion="(detail: { from: string; to: string; promotedTo: string }) => emit('promotion', detail)"
+      @resign="(detail: { color: 'white' | 'black'; winner: 'white' | 'black' }) => emit('resign', detail)"
+      @draw-declined="(detail?: { reason?: string }) => emit('draw-declined', detail)"
+      @draw-offer="(fromColor: 'white' | 'black') => emit('draw-offer', fromColor)"
     />
 
     <!-- Modale de Zoom Téléportée dans le body -->

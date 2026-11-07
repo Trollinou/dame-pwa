@@ -224,4 +224,47 @@ describe( 'chessStore - saveCompletedGame & syncPendingGames', () => {
 		);
 		expect( localStorage.getItem( 'dame_pending_games' ) ).toBe( '[]' );
 	} );
+
+	it( 'does not save or queue completed game when isCoachMode is true', async () => {
+		const authStore = useAuthStore();
+		authStore.token = 'dummy_valid_jwt_token';
+		authStore.selectedIdentity = {
+			id: 'member_42',
+			name: 'Adhérent Joueur',
+			type: 'member',
+			member_id: 42,
+		} as unknown as Identity;
+
+		const chessStore = useChessStore();
+		await chessStore.saveCompletedGame( 120, '1. e4 e5', true );
+
+		expect( safeFetch ).not.toHaveBeenCalled();
+		expect( localStorage.getItem( 'dame_pending_games' ) ).toBeNull();
+	} );
+
+	it( 'saveGame and clearGame correctly handle isGameOver state', () => {
+		const chessStore = useChessStore();
+		chessStore.saveGame(
+			'1. e4 e5',
+			'white',
+			1320,
+			1,
+			2,
+			true,
+			'Échec et mat',
+			'1-0',
+			true
+		);
+
+		expect( chessStore.isGameOver ).toBe( true );
+		expect( chessStore.gameOverReason ).toBe( 'Échec et mat' );
+		expect( chessStore.gameResult ).toBe( '1-0' );
+		expect( chessStore.isCoachModeGame ).toBe( true );
+
+		chessStore.clearGame();
+		expect( chessStore.isGameOver ).toBe( false );
+		expect( chessStore.gameOverReason ).toBe( '' );
+		expect( chessStore.gameResult ).toBe( '*' );
+		expect( chessStore.isCoachModeGame ).toBe( false );
+	} );
 } );

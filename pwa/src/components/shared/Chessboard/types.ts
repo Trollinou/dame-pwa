@@ -172,4 +172,13 @@ export type ChessboardEmits = {
 		_e: 'promotion',
 		_detail: { from: string; to: string; promotedTo: string }
 	): void;
+	(
+		_e: 'resign',
+		_detail?: { color: 'white' | 'black'; winner: 'white' | 'black' } | string
+	): void;
+	( _e: 'draw-declined', _detail?: { reason?: string } ): void;
+	(
+		_e: 'draw-offer',
+		_fromColor?: 'white' | 'black' | { color?: string }
+	): void;
 };

@@ -265,9 +265,19 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
      - Demande de conseil dynamique en cours de partie à pleine puissance 3500+ Elo même en mode 2 joueurs (`core.requestHint({ multiPv: 2, movetime: 1500 })`).
      - Réinitialisation propre de la partie et purge UCI (`core.newGame()`) sans détruire le Web Worker.
+     - **Panneau d'actions dynamique épuré (`PlayActionsPanel.vue`)** :
+       - *Avant engagement (`ply = 0`)* : Bouton unique `[ Nouvelle partie / Réglages ]` pour configurer la partie avant engagement.
+       - *En cours de partie (`ply > 0` et partie non finie)* : Disparition de `[Nouv.]` (oblige à terminer ou abandonner formellement).
+         - `[ 🔄 Oups ]` (1ère position, tous modes) : Annulation du dernier coup pour parer aux erreurs de clic (missclicks).
+         - `[ 💡 Aide ]` (2ème position, mode Coach uniquement) : Demande d'un conseil tactique Stockfish.
+         - `[ ⚖️ Nulle ]` (3ème position) : Proposition de partie nulle arbitrée par Stockfish (`core.offerDraw()`, acceptée si $\ge 20$ coups et score $\le +0.30$ pion, sinon toast explicatif) ou soumise à acceptation en mode 2 joueurs.
+         - `[ 🏳️ Abandon ]` (4ème position) : Abandon formel avec alerte de confirmation (remplaçant le bouton drapeau dans l'en-tête).
+       - *En fin de partie (`isGameOver`)* : Seuls deux boutons sont affichés : `[ ⚙️ Nouveau ]` et `[ 📊 Analyse ]`.
+       - *Reprise de partie* : Si une partie rechargée était déjà terminée, le plateau est immédiatement verrouillé en lecture seule (`viewOnly = true`) et seuls `[Nouveau]` et `[Analyse]` sont disponibles.
      - **Enregistrement et synchronisation automatique vers ROI (`/roi/v1/games`)** :
        - Transmission systématique des parties terminées (mat, nulle, pat).
-       - Transmission des abandons (bouton drapeau dans la barre d'outils, réinitialisation ou bascule vers l'analyse) uniquement si la partie a atteint au moins 30 demi-coups (15 coups complets).
+       - **Exclusion stricte du Mode Coach** : Les parties disputées avec l'assistance du Coach ne sont jamais transmises à l'API REST ni enregistrées dans la file d'attente hors ligne, afin de préserver l'intégrité des statistiques officielles des adhérents.
+       - Transmission des abandons uniquement si la partie a atteint au moins 30 demi-coups (15 coups complets).
        - Transmission ciblée selon l'identité active via l'en-tête `X-Selected-Identity` : adhérent (`member_id > 0`) et administrateur (`member_id = 0`), exclusion des profils non connectés et des responsables légaux (parents).
        - Sauvegarde locale hors ligne (`dame_pending_games`) avec synchronisation automatique dès le rétablissement du réseau ou à l'arrivée sur l'écran de jeu.
    - **Mode 2 Joueurs (Pass & Play)** :
@@ -285,6 +295,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
       - *Double flèche visuelle* : Tracé simultané de la flèche du coup joué (couleur selon le jugement : rouge pour gaffe, jaune pour imprécision/erreur, bleue pour bon coup) et de la flèche verte du **meilleur coup alternatif**.
       - *Fiche de coup interactive* : Carte dédiée affichant le coup joué, le meilleur coup recommandé, les annotations et un sélecteur « Avant le coup » / « Après le coup » pour alterner entre la vue de départ et le résultat sur le plateau (avec nettoyage propre des glyphes pré-coup).
       - *Cohérence « Conseil » & « Éval direct »* : En mode Bilan, le bouton « Conseil » restitue directement la recommandation du bilan pour le coup analysé, et « Éval direct » évalue la position au trait du joueur qui doit exécuter ce coup.
+     - **Exportation et Copie PGN Enrichie (`copyOutline`)** : Bouton dans la barre d'en-tête permettant de copier instantanément le PGN complet dans le presse-papier avec le Seven Tag Roster standard FIDE (`Event`, `Site`, `Date`, `Round`, `White`, `Black`, `Result`) et les métadonnées d'arbitrage et d'entraînement (`WhiteElo`, `BlackElo`, `Variant`, `Termination`, `Annotator`, `Takebacks`, `Hints`), accompagné d'un toast de confirmation.
 
 ## Module Profil & Personnalisation de l'Échiquier
 

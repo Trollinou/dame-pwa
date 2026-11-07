@@ -17,6 +17,10 @@ export const useChessStore = defineStore(
 		const engineElo = ref( 1320 );
 		const helpCount = ref( 0 );
 		const oupsCount = ref( 0 );
+		const isGameOver = ref( false );
+		const gameOverReason = ref( '' );
+		const gameResult = ref( '*' );
+		const isCoachModeGame = ref( false );
 		const isSyncing = ref( false );
 
 		const saveGame = (
@@ -24,25 +28,42 @@ export const useChessStore = defineStore(
 			playerOrientation: 'white' | 'black',
 			elo: number,
 			help: number = 0,
-			oups: number = 0
+			oups: number = 0,
+			isOver: boolean = false,
+			overReason: string = '',
+			result: string = '*',
+			coachMode: boolean = false
 		) => {
 			currentPgn.value = pgn;
 			orientation.value = playerOrientation;
 			engineElo.value = elo;
 			helpCount.value = help;
 			oupsCount.value = oups;
+			isGameOver.value = isOver;
+			gameOverReason.value = overReason;
+			gameResult.value = result;
+			isCoachModeGame.value = coachMode;
 		};
 
 		const clearGame = () => {
 			currentPgn.value = '';
 			helpCount.value = 0;
 			oupsCount.value = 0;
+			isGameOver.value = false;
+			gameOverReason.value = '';
+			gameResult.value = '*';
+			isCoachModeGame.value = false;
 		};
 
 		const saveCompletedGame = async (
 			durationSeconds: number,
-			pgnOverride?: string
+			pgnOverride?: string,
+			isCoachMode: boolean = false
 		) => {
+			// Règle métier : Ne jamais transmettre les parties jouées en Mode Coach
+			if ( isCoachMode || isCoachModeGame.value ) {
+				return;
+			}
 			const authStore = useAuthStore();
 			const identity = authStore.selectedIdentity;
 
@@ -206,6 +227,10 @@ export const useChessStore = defineStore(
 			engineElo,
 			helpCount,
 			oupsCount,
+			isGameOver,
+			gameOverReason,
+			gameResult,
+			isCoachModeGame,
 			saveGame,
 			clearGame,
 			saveCompletedGame,

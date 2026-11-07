@@ -6,6 +6,26 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-11-07
+
+- **Refonte des Boutons d'Action, Arbitrage eg-chessboard 1.8.0, Mode Coach & PGN (`PlayActionsPanel.vue`, `PlayPage.vue`, `usePlayGame.ts`, `chess.ts`, `Chessboard.vue`, `AnalysisPage.vue`, `pgnExport.ts`, `PlayActionsPanel.spec.ts`, `pgnExport.spec.ts`, `usePlayGame.spec.ts`, `chessStore.spec.ts`, `README.md`, `USING.md`)** :
+  - **Cycle de Vie Dynamique des Boutons (`PlayActionsPanel.vue`)** :
+    - *Avant engagement (`ply === 0 && !isGameOver`)* : Bouton unique pleine largeur `[ Nouvelle partie / Réglages ]` (`size="12"`).
+    - *En cours de partie (`ply > 0 && !isGameOver`)* : Suppression du bouton `[Nouv.]` (empêche l'abandon accidentel et oblige à terminer ou abandonner formellement) et masquage du bouton `[Analyse]`. Rendu compact sur 1 ligne : `[Oups]` (parer au missclick, tous modes), `[Aide]` (uniquement en mode Coach), `[Nulle]` (icône `scaleOutline`), et `[Abandon]` (icône `flagOutline`, couleur `danger`).
+    - *En fin de partie (`isGameOver`)* : Seuls deux boutons sont conservés à 50% (`size="6"`) : `[Nouveau]` (pour relancer) et `[Analyse]`.
+  - **Intégration d'arbitrage `eg-chessboard` 1.8.0** :
+    - Bouton **`[Nulle]`** : Appel de `core.offerDraw()`, gestion automatique du refus/accord Stockfish en mode 1 joueur (règle des 20 coups et seuil d'égalité $\le +0.30$ pion) avec notification toast explicative sur refus, et dialogue d'acceptation/refus en mode 2 joueurs (`core.agreeDraw()`, `core.declineDraw()`).
+    - Bouton **`[Abandon]`** : Boîte de dialogue de confirmation native avant déclenchement de `core.resign()`, et suppression du bouton drapeau devenu redondant dans la barre d'en-tête de `PlayPage.vue`.
+    - Relais des événements `@resign`, `@draw-declined` et `@draw-offer` dans `Chessboard.vue` et `ChessboardEmits`.
+  - **Exclusion REST Stricte en Mode Coach** :
+    - Les parties disputées avec `coachMode: true` ne sont jamais transmises à `POST /roi/v1/games` ni stockées dans la file d'attente hors-ligne `dame_pending_games`, afin de préserver l'intégrité des statistiques et classements officiels.
+  - **Copie PGN Enrichie en Mode Analyse (`AnalysisPage.vue`)** :
+    - Bouton d'action avec icône `copyOutline` dans l'en-tête pour copier instantanément le PGN dans le presse-papier avec toast de confirmation.
+  - **Enrichissement Maximal des En-têtes PGN (`pwa/src/utils/chess/pgnExport.ts`)** :
+    - Module dédié générant le Seven Tag Roster standard complet (`Event`, `Site`, `Date`, `Round`, `White`, `Black`, `Result`) ainsi que les métadonnées étendues d'entraînement (`WhiteElo`, `BlackElo`, `Variant`, `Termination`, `Annotator`, `Takebacks`, `Hints`).
+  - **Reprise Résiliente de Partie** :
+    - Mémorisation de l'état de fin de partie (`isGameOver`, raison, résultat) dans `chessStore` ; lors du retour sur `/play`, une partie finie verrouille immédiatement le plateau (`viewOnly = true`) et affiche uniquement `[Nouveau]` et `[Analyse]`.
+
 - **Mode Coach Bienveillant & Feedback Didactique en Temps Réel (`tacticalGlyphs.ts`, `usePlayGame.ts`, `PlayPage.vue`, `PlayActionsPanel.vue`, `PlaySettingsModal.vue`, `PlayInfoBar.vue`, `_learning-components.scss`, `tacticalGlyphs.spec.ts`, `PlayCoachMode.spec.ts`, `README.md`, `USING.md`)** :
   - **Module Tactique Pur (`pwa/src/utils/chess/tacticalGlyphs.ts`)** :
     - Détection statique synchrone (<1ms) via `chessops` des pièces clouées devant le Roi (`detectPinnedPieces`) et des pièces attaquées sans défense ou sous-défendues (`detectUndefendedPieces`).

@@ -199,6 +199,7 @@ describe( 'usePlayGame - Hint Switch & Help Counter', () => {
 describe( 'usePlayGame - Game Over & Resignation (30-ply rule)', () => {
 	beforeEach( () => {
 		setActivePinia( createPinia() );
+		localStorage.setItem( 'dame_pwa_coach_mode', 'false' );
 		vi.clearAllMocks();
 	} );
 
@@ -220,7 +221,10 @@ describe( 'usePlayGame - Game Over & Resignation (30-ply rule)', () => {
 		expect( boardConfig.viewOnly ).toBe( true );
 		expect( spySave ).toHaveBeenCalledWith(
 			45,
-			'1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7#'
+			expect.stringContaining(
+				'1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7#'
+			),
+			false
 		);
 	} );
 
@@ -278,7 +282,11 @@ describe( 'usePlayGame - Game Over & Resignation (30-ply rule)', () => {
 		handleGameOver( 'resigned' );
 
 		expect( boardConfig.viewOnly ).toBe( true );
-		expect( spySave ).toHaveBeenCalledWith( expect.any( Number ), longPgn );
+		expect( spySave ).toHaveBeenCalledWith(
+			expect.any( Number ),
+			expect.stringContaining( longPgn ),
+			false
+		);
 	} );
 
 	it( 'resignGame delegates to handleGameOver and locks the board', () => {
@@ -338,5 +346,77 @@ describe( 'usePlayGame - Game Over & Resignation (30-ply rule)', () => {
 
 		expect( spySave ).not.toHaveBeenCalled();
 		expect( mockPush ).toHaveBeenCalledWith( '/analysis' );
+	} );
+
+	it( 'resuming a completed game locks the board with viewOnly = true and restores message', () => {
+		const chessStore = useChessStore();
+		chessStore.saveGame(
+			'1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7# 1-0',
+			'white',
+			1320,
+			0,
+			0,
+			true,
+			'🏁 Échec et mat',
+			'1-0'
+		);
+
+		const { setBoardApi, boardConfig, gameStatus, isGameOver } = usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => chessStore.currentPgn ),
+			getIsGameOver: vi.fn( () => true ),
+		} );
+
+		setBoardApi( mockApi );
+
+		expect( boardConfig.viewOnly ).toBe( true );
+		expect( isGameOver.value ).toBe( true );
+		expect( gameStatus.message ).toBe( '🏁 Échec et mat' );
+	} );
+
+	it( 'offerDraw delegates to boardApi.offerDraw', () => {
+		const { setBoardApi, offerDraw } = usePlayGame();
+		const mockApi = createMockBoardApi();
+		( mockApi as unknown as { offerDraw: ReturnType<typeof vi.fn> } ).offerDraw = vi.fn();
+
+		setBoardApi( mockApi );
+		offerDraw();
+
+		expect( ( mockApi as unknown as { offerDraw: ReturnType<typeof vi.fn> } ).offerDraw ).toHaveBeenCalledWith( 'white' );
+	} );
+
+	it( 'handleGameOver does not call saveCompletedGame if coachMode is true', () => {
+		const chessStore = useChessStore();
+		const spySave = vi
+			.spyOn( chessStore, 'saveCompletedGame' )
+			.mockResolvedValue();
+
+		localStorage.setItem( 'dame_pwa_coach_mode', 'true' );
+		const { setBoardApi, handleGameOver, boardConfig, gameSettings } = usePlayGame();
+		expect( gameSettings.coachMode ).toBe( true );
+
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => '1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7#' ),
+		} );
+		mockApi._setTurn( 'black', 7 );
+		setBoardApi( mockApi );
+
+		handleGameOver( 'checkmate', 50 );
+
+		expect( boardConfig.viewOnly ).toBe( true );
+		expect( spySave ).not.toHaveBeenCalled();
+	} );
+
+	it( 'handleResign records resignation and sets viewOnly = true', () => {
+		const { setBoardApi, handleResign, boardConfig, gameStatus } = usePlayGame();
+		const mockApi = createMockBoardApi();
+		mockApi._setTurn( 'black', 12 );
+		setBoardApi( mockApi );
+
+		handleResign( 'white' );
+
+		expect( boardConfig.viewOnly ).toBe( true );
+		expect( gameStatus.message ).toContain( 'abandon' );
+		expect( gameStatus.message ).toContain( 'Noirs' );
 	} );
 } );

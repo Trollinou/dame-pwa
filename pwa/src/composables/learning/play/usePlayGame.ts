@@ -1,5 +1,6 @@
 import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { alertController } from '@ionic/vue';
 import type {
 	BoardCore,
 	EngineStatus,
@@ -8,16 +9,45 @@ import type {
 	Move,
 } from '@/components/shared/Chessboard/types';
 import { useChessStore } from '@/stores/chess';
+import { useFeedback } from '@/composables/core/useFeedback';
 import {
 	undoMove as apiUndoMove,
 	getGameOverReason,
 } from '@/utils/chess/boardApiWrapper';
 import { normalizeCastlingMoves } from '@/utils/chess/stockfish';
+import { formatExportPgn, formatPgnDate } from '@/utils/chess/pgnExport';
 import {
 	analyzePositionTactics,
 	classifyMoveDiff,
 	judgementToGlyph,
 } from '@/utils/chess/tacticalGlyphs';
+
+function getStoredPlayerName(): string {
+	try {
+		if ( typeof localStorage !== 'undefined' ) {
+			const storedIdentity = localStorage.getItem( 'dame_selected_identity' );
+			if ( storedIdentity ) {
+				const parsed = JSON.parse( storedIdentity );
+				if ( parsed.name ) {
+					return parsed.name;
+				}
+				if ( parsed.firstname ) {
+					return parsed.firstname;
+				}
+			}
+			const storedUser = localStorage.getItem( 'dame_user' );
+			if ( storedUser ) {
+				const parsed = JSON.parse( storedUser );
+				if ( parsed.display_name ) {
+					return parsed.display_name;
+				}
+			}
+		}
+	} catch {
+		// ignore
+	}
+	return 'Adhérent';
+}
 
 export function usePlayGame() {
 	const chessStore = useChessStore();
@@ -185,7 +215,11 @@ export function usePlayGame() {
 				boardConfig.orientation,
 				gameSettings.level,
 				helpCount.value,
-				oupsCount.value
+				oupsCount.value,
+				boardConfig.viewOnly,
+				gameStatus.message,
+				chessStore.gameResult,
+				gameSettings.coachMode
 			);
 			router.push( '/analysis' );
 		}
@@ -214,9 +248,28 @@ export function usePlayGame() {
 
 			helpCount.value = chessStore.helpCount || 0;
 			oupsCount.value = chessStore.oupsCount || 0;
+
+			// Vérifier si la partie rechargée était déjà terminée
+			const isEnded = chessStore.isGameOver || boardApi.getIsGameOver();
+			if ( isEnded ) {
+				boardConfig.viewOnly = true;
+				if ( chessStore.gameOverReason ) {
+					gameStatus.message = chessStore.gameOverReason;
+					gameStatus.color =
+						chessStore.gameResult === '1/2-1/2'
+							? 'medium'
+							: 'danger';
+				} else {
+					gameStatus.message = `🏁 ${ getGameOverReason( boardApi ) }`;
+					gameStatus.color = 'danger';
+				}
+			} else {
+				boardConfig.viewOnly = false;
+			}
 		} else {
 			api.newGame();
 			resetGameStartTime();
+			boardConfig.viewOnly = false;
 		}
 		refreshDisplay();
 		if ( isHintEnabled.value ) {
@@ -266,7 +319,11 @@ export function usePlayGame() {
 			boardConfig.orientation,
 			gameSettings.level,
 			helpCount.value,
-			oupsCount.value
+			oupsCount.value,
+			false,
+			'',
+			'*',
+			gameSettings.coachMode
 		);
 
 		if ( isHintEnabled.value ) {
@@ -283,28 +340,91 @@ export function usePlayGame() {
 
 	const handleGameOver = (
 		type: 'checkmate' | 'stalemate' | 'draw' | 'resigned',
-		timerSeconds?: number
+		timerSeconds?: number,
+		resignedColor?: string
 	) => {
 		if ( boardConfig.viewOnly ) {
 			return;
 		}
 		const isDraw = type === 'stalemate' || type === 'draw';
 		const symbol = isDraw ? '🤝' : '🏁';
+		let result = '*';
+
 		if ( type === 'resigned' ) {
-			gameStatus.message = '🏁 Partie terminée par abandon.';
+			const resigned =
+				resignedColor ||
+				( boardConfig.orientation === 'white' ? 'white' : 'black' );
+			result = resigned === 'white' ? '0-1' : '1-0';
+			const winner = resigned === 'white' ? 'Noirs' : 'Blancs';
+			gameStatus.message = `🏁 Partie terminée par abandon. Victoire des ${ winner }.`;
 			gameStatus.color = 'danger';
-		} else {
-			gameStatus.message = `${ symbol } ${ getGameOverReason(
-				boardApi
-			) }`;
-			gameStatus.color = isDraw ? 'medium' : 'danger';
+		} else if ( isDraw ) {
+			result = '1/2-1/2';
+			gameStatus.message = `${ symbol } ${ getGameOverReason( boardApi ) }`;
+			gameStatus.color = 'medium';
+		} else if ( type === 'checkmate' ) {
+			const loser = boardApi?.getTurnColor() || 'white';
+			result = loser === 'white' ? '0-1' : '1-0';
+			gameStatus.message = `${ symbol } ${ getGameOverReason( boardApi ) }`;
+			gameStatus.color = 'danger';
 		}
+
 		boardConfig.viewOnly = true;
 
-		if ( gameSettings.gameMode === '1player' ) {
-			const finalPgn = boardApi
-				? boardApi.getPgn()
-				: chessStore.currentPgn;
+		// Enrichir le PGN avec en-têtes complets Seven Tag Roster + entraînement
+		const playerName = getStoredPlayerName();
+		const isPlayerWhite = boardConfig.orientation === 'white';
+
+		let eventName = "Partie contre l'ordinateur";
+		if ( gameSettings.coachMode ) {
+			eventName = 'Partie en Mode Coach';
+		} else if ( gameSettings.gameMode === '2players' ) {
+			eventName = 'Partie locale 2 joueurs';
+		}
+
+		let whitePlayer = isPlayerWhite
+			? playerName
+			: `Stockfish (Niveau ${ gameSettings.level })`;
+		let blackPlayer = ! isPlayerWhite
+			? playerName
+			: `Stockfish (Niveau ${ gameSettings.level })`;
+		if ( gameSettings.gameMode === '2players' ) {
+			whitePlayer = 'Joueur 1 (Blancs)';
+			blackPlayer = 'Joueur 2 (Noirs)';
+		}
+
+		const rawPgn = boardApi ? boardApi.getPgn() : chessStore.currentPgn;
+		const enrichedPgn = formatExportPgn( {
+			pgn: rawPgn,
+			event: eventName,
+			site: 'DAME PWA',
+			date: formatPgnDate(),
+			round: '1',
+			white: whitePlayer,
+			black: blackPlayer,
+			result,
+			whiteElo: isPlayerWhite ? undefined : gameSettings.level,
+			blackElo: ! isPlayerWhite ? undefined : gameSettings.level,
+			variant: 'Standard',
+			termination: gameStatus.message,
+			annotator: gameSettings.coachMode ? 'DAME Coach' : undefined,
+			takebacks: oupsCount.value,
+			hints: helpCount.value,
+		} );
+
+		chessStore.saveGame(
+			enrichedPgn,
+			boardConfig.orientation,
+			gameSettings.level,
+			helpCount.value,
+			oupsCount.value,
+			true,
+			gameStatus.message,
+			result,
+			gameSettings.coachMode
+		);
+
+		if ( gameSettings.gameMode === '1player' && ! gameSettings.coachMode ) {
 			const ply = boardApi
 				? boardApi.getCurrentPlyNumber()
 				: currentPly.value;
@@ -316,15 +436,172 @@ export function usePlayGame() {
 				typeof timerSeconds === 'number' && timerSeconds > 0
 					? timerSeconds
 					: getGameDurationSeconds();
-			void chessStore.saveCompletedGame( duration, finalPgn );
+			void chessStore.saveCompletedGame( duration, enrichedPgn, false );
 		}
+	};
+
+	const confirmResign = async () => {
+		if ( boardConfig.viewOnly || ! boardApi ) {
+			return;
+		}
+		const alert = await alertController.create( {
+			header: 'Abandonner la partie ?',
+			message:
+				currentPly.value >= 30
+					? 'La partie sera enregistrée comme abandonnée dans votre historique (au moins 15 coups complets joués).'
+					: 'La partie est trop courte (< 15 coups complets) pour être enregistrée.',
+			buttons: [
+				{
+					text: 'Continuer',
+					role: 'cancel',
+				},
+				{
+					text: 'Abandonner',
+					role: 'destructive',
+					handler: () => {
+						resignGame();
+					},
+				},
+			],
+		} );
+		await alert.present();
+	};
+
+	const handleResign = (
+		detail?:
+			| { color: 'white' | 'black'; winner: 'white' | 'black' }
+			| string
+	) => {
+		const color = typeof detail === 'string' ? detail : detail?.color;
+		handleGameOver( 'resigned', undefined, color );
+	};
+
+	const offerDraw = () => {
+		if ( boardConfig.viewOnly || ! boardApi ) {
+			return;
+		}
+		if (
+			typeof (
+				boardApi as unknown as {
+					offerDraw?: ( _col?: string ) => unknown;
+				}
+			).offerDraw === 'function'
+		) {
+			(
+				boardApi as unknown as {
+					offerDraw: ( _col?: string ) => unknown;
+				}
+			).offerDraw(
+				boardConfig.playerColor === 'both'
+					? undefined
+					: boardConfig.playerColor
+			);
+		}
+	};
+
+	const handleDrawDeclined = ( detail?: { reason?: string } ) => {
+		const { showToast } = useFeedback();
+		const reason = detail?.reason;
+		if ( reason === 'too_early' ) {
+			void showToast(
+				'Stockfish refuse la nulle : moins de 20 coups complets ont été joués.',
+				'warning'
+			);
+		} else {
+			void showToast(
+				"Stockfish refuse la nulle : l'ordinateur estime avoir l'avantage.",
+				'warning'
+			);
+		}
+	};
+
+	const handleDrawOffer = async (
+		detail?: { color?: string } | 'white' | 'black'
+	) => {
+		const color = typeof detail === 'string' ? detail : detail?.color;
+		const offeringColor = color === 'white' ? 'Blancs' : 'Noirs';
+		const alert = await alertController.create( {
+			header: 'Proposition de nulle',
+			message: `Les ${ offeringColor } proposent la partie nulle. Acceptez-vous ?`,
+			backdropDismiss: false,
+			buttons: [
+				{
+					text: 'Refuser',
+					role: 'cancel',
+					handler: () => {
+						if (
+							typeof (
+								boardApi as unknown as {
+									declineDraw?: () => void;
+								}
+							)?.declineDraw === 'function'
+						) {
+							(
+								boardApi as unknown as {
+									declineDraw: () => void;
+								}
+							).declineDraw();
+						}
+					},
+				},
+				{
+					text: 'Accepter',
+					handler: () => {
+						if (
+							typeof (
+								boardApi as unknown as {
+									agreeDraw?: () => void;
+								}
+							)?.agreeDraw === 'function'
+						) {
+							(
+								boardApi as unknown as {
+									agreeDraw: () => void;
+								}
+							).agreeDraw();
+						} else if (
+							typeof (
+								boardApi as unknown as {
+									acceptDraw?: () => void;
+								}
+							)?.acceptDraw === 'function'
+						) {
+							(
+								boardApi as unknown as {
+									acceptDraw: () => void;
+								}
+							).acceptDraw();
+						}
+					},
+				},
+			],
+		} );
+		await alert.present();
 	};
 
 	const resignGame = () => {
 		if ( boardConfig.viewOnly || ! boardApi ) {
 			return;
 		}
-		handleGameOver( 'resigned' );
+		if (
+			typeof (
+				boardApi as unknown as {
+					resign?: ( _col?: string ) => void;
+				}
+			)?.resign === 'function'
+		) {
+			(
+				boardApi as unknown as {
+					resign: ( _col?: string ) => void;
+				}
+			).resign(
+				boardConfig.playerColor === 'both'
+					? undefined
+					: boardConfig.playerColor
+			);
+		} else {
+			handleGameOver( 'resigned' );
+		}
 	};
 
 	const onPlayerMove = () => {
@@ -342,7 +619,11 @@ export function usePlayGame() {
 			boardConfig.orientation,
 			gameSettings.level,
 			helpCount.value,
-			oupsCount.value
+			oupsCount.value,
+			false,
+			'',
+			'*',
+			gameSettings.coachMode
 		);
 
 		const isHumanJustPlayed =
@@ -435,7 +716,11 @@ export function usePlayGame() {
 			boardConfig.orientation,
 			gameSettings.level,
 			helpCount.value,
-			oupsCount.value
+			oupsCount.value,
+			false,
+			'',
+			'*',
+			gameSettings.coachMode
 		);
 
 		if ( isHintEnabled.value ) {
@@ -501,6 +786,10 @@ export function usePlayGame() {
 		}
 	};
 
+	const isGameOver = computed(
+		() => boardConfig.viewOnly || chessStore.isGameOver
+	);
+
 	return {
 		getBoardApi: () => boardApi,
 		setBoardApi,
@@ -510,6 +799,7 @@ export function usePlayGame() {
 		showSettings,
 		isHintEnabled,
 		isAwaitingCoachConfirmation,
+		isGameOver,
 		currentPly,
 		turnColor,
 		oupsCount,
@@ -538,5 +828,10 @@ export function usePlayGame() {
 		handleCheck,
 		handleGameOver,
 		resignGame,
+		confirmResign,
+		handleResign,
+		offerDraw,
+		handleDrawDeclined,
+		handleDrawOffer,
 	};
 }

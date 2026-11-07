@@ -6,6 +6,16 @@
           <ion-back-button default-href="/play"></ion-back-button>
         </ion-buttons>
         <ion-title>Analyse de la partie</ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            fill="clear"
+            title="Copier le PGN"
+            aria-label="Copier le PGN dans le presse-papier"
+            @click="copyPgn"
+          >
+            <ion-icon slot="icon-only" :icon="copyOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -375,10 +385,13 @@ import {
   bulbOutline,
   ribbonOutline,
   informationCircleOutline,
-  closeOutline
+  closeOutline,
+  copyOutline
 } from 'ionicons/icons';
 import { ref, onMounted, onUnmounted, reactive, watch, computed, nextTick } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
+import { useFeedback } from '@/composables/core/useFeedback';
+import { formatExportPgn } from '@/utils/chess/pgnExport';
 import type {
   BoardCore,
   StockfishConfig,
@@ -404,7 +417,40 @@ export interface HistoryMoveItem {
 }
 
 const chessStore = useChessStore();
+const { showSuccess, showError } = useFeedback();
 let boardApi: BoardCore | null = null;
+
+const copyPgn = async () => {
+  try {
+    const rawPgn = (boardApi ? boardApi.getPgn() : '') || chessStore.currentPgn || '';
+    if (!rawPgn) {
+      void showError('Aucun PGN disponible pour cette partie.');
+      return;
+    }
+    const fullPgn = formatExportPgn({
+      pgn: rawPgn,
+      result: chessStore.gameResult || undefined,
+      takebacks: chessStore.oupsCount,
+      hints: chessStore.helpCount
+    });
+
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(fullPgn);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = fullPgn;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    void showSuccess('PGN copié dans le presse-papier !');
+  } catch (err) {
+    void showError('Échec de la copie du PGN.');
+  }
+};
 const isReady = ref(false);
 const boardKey = ref(0);
 const currentPly = ref(0);
