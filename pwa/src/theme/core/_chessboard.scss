@@ -82,13 +82,3 @@
   padding: 16px;
   box-sizing: border-box;
 }
-
-/* Élévation du calque des glyphes au-dessus des pièces et de l'échiquier pour éviter le rognage */
-.cg-wrap .cg-custom-svgs {
-  z-index: 25 !important;
-  overflow: visible !important;
-
-  svg {
-    overflow: visible !important;
-  }
-}

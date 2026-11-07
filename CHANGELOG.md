@@ -19,8 +19,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Indicateur visuel `🎓 Coach` dans la barre d'information du joueur (`PlayInfoBar.vue`).
     - Persistance visuelle des glyphes pendant et après le coup adverse jusqu'au coup suivant de l'adhérent.
 
-- **Intégration d'`eg-chessboard` v1.7.4+ (embarquant `@lichess-org/chessground@^10.5.0`) & Badges Visuels de Revue (`Chessboard.vue`, `types.ts`, `AnalysisPage.vue`, `stockfish.ts`, `ChessboardGlyphs.spec.ts`, `AnalysisReview.spec.ts`, `README.md`, `USING.md`)** :
+- **Intégration d'`eg-chessboard` v1.7.5 (embarquant `@lichess-org/chessground@^10.5.0`) & Badges Visuels (`Chessboard.vue`, `types.ts`, `AnalysisPage.vue`, `stockfish.ts`, `ChessboardGlyphs.spec.ts`, `AnalysisReview.spec.ts`, `README.md`, `USING.md`)** :
   - **Couche Visuelle de Badges & Glyphes sur `<Chessboard>`** :
+    - Élévation native (`z-index: 25`, `overflow: visible`) du calque vectoriel dans `eg-chessboard` 1.7.5 pour empêcher tout masquage par les pièces ou rognage par les cases adjacentes.
     - Exposition des types `BoardGlyph`, `TacticalGlyph`, `AssessmentGlyph` depuis `pwa/src/components/shared/Chessboard/types.ts`.
     - Prise en charge réactive de la prop `glyphs` (`Map<Key, BoardGlyph>` ou `Record<string, BoardGlyph | null>`) dans `Chessboard.vue`, synchronisée sur le plateau principal et sur la modale zoom plein écran.
     - Exposition des méthodes publiques `setGlyph()`, `clearGlyphs()`, `getGlyph()`, `getGlyphs()` via `defineExpose`.
