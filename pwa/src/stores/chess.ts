@@ -128,6 +128,18 @@ export const useChessStore = defineStore(
 				} );
 
 				if ( ! response.ok ) {
+					if (
+						response.status >= 400 &&
+						response.status < 500 &&
+						response.status !== 408 &&
+						response.status !== 429
+					) {
+						console.warn(
+							`Sauvegarde serveur rejetée (${ response.status }) :`,
+							response.statusText
+						);
+						return;
+					}
 					throw new Error( 'Erreur de sauvegarde serveur' );
 				}
 
@@ -200,7 +212,20 @@ export const useChessStore = defineStore(
 					} );
 
 					if ( ! response.ok ) {
-						remaining.push( game );
+						const isDefinitiveClientError =
+							response.status >= 400 &&
+							response.status < 500 &&
+							response.status !== 408 &&
+							response.status !== 429;
+
+						if ( ! isDefinitiveClientError ) {
+							remaining.push( game );
+						} else {
+							console.warn(
+								`Partie en attente rejetée définitivement par le serveur (${ response.status }), purgée de la file locale.`,
+								game
+							);
+						}
 					}
 				} catch {
 					remaining.push( game );

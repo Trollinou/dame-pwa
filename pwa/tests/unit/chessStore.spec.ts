@@ -242,6 +242,68 @@ describe( 'chessStore - saveCompletedGame & syncPendingGames', () => {
 		expect( localStorage.getItem( 'dame_pending_games' ) ).toBeNull();
 	} );
 
+	it( 'does not queue game offline on definitive 4xx client errors (e.g. 400 Bad Request)', async () => {
+		const authStore = useAuthStore();
+		authStore.token = 'dummy_valid_jwt_token';
+		authStore.selectedIdentity = {
+			id: 'member_42',
+			name: 'Adhérent Joueur',
+			type: 'member',
+			member_id: 42,
+		} as unknown as Identity;
+
+		const chessStore = useChessStore();
+		vi.mocked( safeFetch ).mockResolvedValueOnce( {
+			ok: false,
+			status: 400,
+			statusText: 'Bad Request',
+		} as unknown as Response );
+
+		await chessStore.saveCompletedGame( 60, '1. e4 e5' );
+
+		expect( safeFetch ).toHaveBeenCalledTimes( 1 );
+		expect( localStorage.getItem( 'dame_pending_games' ) ).toBeNull();
+	} );
+
+	it( 'syncPendingGames purges permanently rejected 4xx games instead of looping infinitely', async () => {
+		const authStore = useAuthStore();
+		authStore.token = 'dummy_valid_jwt_token';
+		authStore.selectedIdentity = {
+			id: 'member_42',
+			name: 'Adhérent Joueur',
+			type: 'member',
+			member_id: 42,
+		} as unknown as Identity;
+
+		localStorage.setItem(
+			'dame_pending_games',
+			JSON.stringify( [
+				{
+					member_id: 42,
+					difficulty_level: 1320,
+					hints_count: 0,
+					takebacks_count: 0,
+					pgn: '1. e4 e5',
+					duration: 80,
+					game_date: new Date().toISOString(),
+				},
+			] )
+		);
+
+		vi.mocked( safeFetch ).mockResolvedValueOnce( {
+			ok: false,
+			status: 400,
+			statusText: 'Bad Request',
+		} as unknown as Response );
+
+		const chessStore = useChessStore();
+		await chessStore.syncPendingGames();
+
+		expect( safeFetch ).toHaveBeenCalledTimes( 1 );
+		// The rejected game is purged from the queue
+		expect( localStorage.getItem( 'dame_pending_games' ) ).toBe( '[]' );
+	} );
+
 	it( 'saveGame and clearGame correctly handle isGameOver state', () => {
 		const chessStore = useChessStore();
 		chessStore.saveGame(

@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.3] - 2026-11-08
+
+- **Résilience de Synchronisation des Parties & Gestion des Erreurs 4xx (`chess.ts`, `chessStore.spec.ts`, `AnalysisPage.vue`)** :
+  - **Purge Automatique des Rejets Serveur 4xx** : Détection des erreurs client définitives (codes HTTP 400 à 499 hors 408 Timeout et 429 Rate Limit) lors de `syncPendingGames()`, purgeant les parties rejetées de la file locale `dame_pending_games` pour éliminer toute boucle d'erreur lors du montage de `PlayPage`.
+  - **Prévention de l'Empilement Hors Ligne** : `saveCompletedGame()` n'insère plus dans la file d'attente hors ligne les requêtes ayant reçu un rejet client structurel.
+  - **Sécurisation du Défilement Automatique en Analyse (`AnalysisPage.vue`)** : Contrôle défensif de disponibilité sur `container.scrollTo` garantissant la robustesse du centrage automatique du coup actif en environnement headless ou sous navigateur restreint.
+
 ## [1.13.2] - 2026-11-08
 
 - **Support Multi-Coups MultiPV, Filtrage par Écart de Score & Délégation des Flèches (`eg-chessboard` 1.8.3) (`types.ts`, `Chessboard.vue`, `PlayPage.vue`, `usePlayGame.ts`, `AnalysisPage.vue`, `ChessboardStockfish.spec.ts`, `usePlayGame.spec.ts`, `AnalysisReview.spec.ts`, `README.md`, `USING.md`)** :

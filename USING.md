@@ -279,7 +279,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - **Exclusion stricte du Mode Coach** : Les parties disputées avec l'assistance du Coach ne sont jamais transmises à l'API REST ni enregistrées dans la file d'attente hors ligne, afin de préserver l'intégrité des statistiques officielles des adhérents.
        - Transmission des abandons uniquement si la partie a atteint au moins 30 demi-coups (15 coups complets).
        - Transmission ciblée selon l'identité active via l'en-tête `X-Selected-Identity` : adhérent (`member_id > 0`) et administrateur (`member_id = 0`), exclusion des profils non connectés et des responsables légaux (parents).
-       - Sauvegarde locale hors ligne (`dame_pending_games`) avec synchronisation automatique dès le rétablissement du réseau ou à l'arrivée sur l'écran de jeu.
+       - Sauvegarde locale hors ligne (`dame_pending_games`) avec synchronisation automatique dès le rétablissement du réseau ou à l'arrivée sur l'écran de jeu, assortie d'une purge automatique des rejets client définitifs (codes HTTP 4xx hors 408/429) pour prévenir toute boucle de requêtes invalides.
    - **Mode 2 Joueurs (Pass & Play)** :
      - Jeu local sur le même écran pour deux joueurs humains, moteur d'analyse IA désactivé.
    - **Analyse & Revue de Partie (Stockfish 19 - `AnalysisPage.vue`)** :

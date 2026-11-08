@@ -736,7 +736,11 @@ watch(activePly, () => {
         const activeRect = activeEl.getBoundingClientRect();
         const relativeTop = activeRect.top - containerRect.top + container.scrollTop;
         const topPos = relativeTop - (container.clientHeight / 2) + (activeRect.height / 2);
-        container.scrollTo({ top: topPos, behavior: 'smooth' });
+        if (typeof container.scrollTo === 'function') {
+          container.scrollTo({ top: topPos, behavior: 'smooth' });
+        } else {
+          container.scrollTop = topPos;
+        }
       }
     }
   }, 100);
