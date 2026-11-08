@@ -5,6 +5,7 @@ import type {
 	BoardCore,
 	EngineStatus,
 	StockfishEvaluation,
+	StockfishHint,
 	CoachAlertDetail,
 } from '@/components/shared/Chessboard/types';
 import { useChessStore } from '@/stores/chess';
@@ -57,6 +58,7 @@ export function usePlayGame() {
 	const oupsCount = ref( 0 );
 	const helpCount = ref( 0 );
 	const lastSuggestedMove = ref( '' );
+	const lastSuggestedHints = ref< StockfishHint[] >( [] );
 	const turnColor = ref< 'white' | 'black' >( 'white' );
 
 	const gameStatus = reactive( {
@@ -143,7 +145,12 @@ export function usePlayGame() {
 			helpCount.value++;
 		}
 		if ( typeof boardApi.requestHint === 'function' ) {
-			boardApi.requestHint( { multiPv: 2, movetime: 1500 } );
+			void boardApi.requestHint( {
+				multiPv: 3,
+				movetime: 1500,
+				maxScoreDiffCp: 50,
+				drawArrows: true,
+			} );
 		}
 	};
 
@@ -154,38 +161,41 @@ export function usePlayGame() {
 		} else if ( boardApi ) {
 			boardApi.hideMoves();
 			lastSuggestedMove.value = '';
+			lastSuggestedHints.value = [];
 		}
 	};
 
-	const handleStockfishHint = ( bestMove: string ) => {
+	const handleStockfishHint = (
+		bestMove: string,
+		hints: StockfishHint[] = []
+	) => {
 		if ( ! isHintEnabled.value || ! isHumanTurn() ) {
+			boardApi?.hideMoves();
 			return;
 		}
 		lastSuggestedMove.value = bestMove;
-		if ( boardApi ) {
-			const from = bestMove.substring( 0, 2 );
-			const to = bestMove.substring( 2, 4 );
-			if ( isValidSquare( from ) && isValidSquare( to ) ) {
-				boardApi.drawMove( from, to, 'green' );
-			}
+		lastSuggestedHints.value = Array.isArray( hints ) ? hints : [];
+		if ( ! boardApi ) {
+			return;
 		}
-	};
-
-	const handleShapesChange = () => {
 		if (
-			isHintEnabled.value &&
-			isHumanTurn() &&
-			boardApi &&
-			lastSuggestedMove.value
+			lastSuggestedHints.value.length > 0 &&
+			typeof boardApi.drawMoves === 'function'
 		) {
-			const shapes = boardApi.getShapes();
-			if ( ! shapes || shapes.length === 0 ) {
-				const from = lastSuggestedMove.value.substring( 0, 2 );
-				const to = lastSuggestedMove.value.substring( 2, 4 );
-				if ( isValidSquare( from ) && isValidSquare( to ) ) {
-					boardApi.drawMove( from, to, 'green' );
-				}
-			}
+			boardApi.drawMoves(
+				lastSuggestedHints.value.map( ( h ) => ( {
+					from: h.from,
+					to: h.to,
+					brush: h.brush,
+				} ) ),
+				true
+			);
+			return;
+		}
+		const from = bestMove.substring( 0, 2 );
+		const to = bestMove.substring( 2, 4 );
+		if ( isValidSquare( from ) && isValidSquare( to ) ) {
+			boardApi.drawMove( from, to, 'green' );
 		}
 	};
 
@@ -270,6 +280,7 @@ export function usePlayGame() {
 	const resetHelpState = () => {
 		lastHelpPly = null;
 		lastSuggestedMove.value = '';
+		lastSuggestedHints.value = [];
 	};
 
 	const undoMove = () => {
@@ -285,6 +296,7 @@ export function usePlayGame() {
 		boardApi.hideMoves();
 		boardApi.clearGlyphs();
 		lastSuggestedMove.value = '';
+		lastSuggestedHints.value = [];
 		lastHelpPly = null;
 
 		apiUndoMove( boardApi, true );
@@ -602,6 +614,7 @@ export function usePlayGame() {
 		refreshDisplay();
 
 		lastSuggestedMove.value = '';
+		lastSuggestedHints.value = [];
 		boardApi.hideMoves();
 
 		chessStore.saveGame(
@@ -644,6 +657,7 @@ export function usePlayGame() {
 		oupsCount.value++;
 		boardApi.hideMoves();
 		lastSuggestedMove.value = '';
+		lastSuggestedHints.value = [];
 		lastHelpPly = null;
 
 		if ( typeof boardApi.coachUndo === 'function' ) {
@@ -718,6 +732,7 @@ export function usePlayGame() {
 		oupsCount,
 		helpCount,
 		lastSuggestedMove,
+		lastSuggestedHints,
 		gameStatus,
 		gameSettings,
 		boardConfig,
@@ -731,7 +746,6 @@ export function usePlayGame() {
 		handleStockfishHint,
 		handleEngineStatus,
 		handleEvaluation,
-		handleShapesChange,
 		goToAnalysis,
 		refreshDisplay,
 		undoMove,

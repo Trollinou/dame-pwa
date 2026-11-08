@@ -422,6 +422,7 @@ import type {
   BoardCore,
   StockfishConfig,
   StockfishEvaluation,
+  StockfishHint,
   EngineStatus,
   GameReviewReport,
   MoveJudgement,
@@ -567,6 +568,8 @@ const analysisStockfishConfig = computed<StockfishConfig>(() => {
     whiteMode: 'disabled',
     blackMode: 'disabled',
     multiPv: 1,
+    hintMaxScoreDiffCp: 50,
+    drawHintArrows: true,
     showWdl: true,
     workerUrl: urls.workerUrl,
     wasmUrl: urls.wasmUrl,
@@ -988,12 +991,40 @@ const requestHint = () => {
       }, 4000);
     }
   }, 6000);
-  boardApi.requestHint({ multiPv: 2, movetime: 1500 });
+  void boardApi.requestHint({
+    multiPv: 3,
+    movetime: 1500,
+    maxScoreDiffCp: 50,
+    drawArrows: true,
+  });
 };
 
-const handleStockfishHint = (bestMove: string) => {
+const handleStockfishHint = (bestMove: string, hints: StockfishHint[] = []) => {
   if (hintFeedbackTimer) clearTimeout(hintFeedbackTimer);
-  if (boardApi && bestMove && bestMove.length >= 4) {
+  const validHints = Array.isArray(hints) ? hints : [];
+  if (boardApi && validHints.length > 0) {
+    if (typeof boardApi.drawMoves === 'function') {
+      boardApi.drawMoves(
+        validHints.map((h) => ({ from: h.from, to: h.to, brush: h.brush })),
+        true
+      );
+    } else {
+      const first = validHints[0];
+      boardApi.drawMove(first.from, first.to, first.brush || 'green');
+    }
+    const formattedList = validHints
+      .map((h, idx) => {
+        const rankNum = h.rank || idx + 1;
+        const coords = `${h.from.toUpperCase()} ➔ ${h.to.toUpperCase()}`;
+        const moveLabel = h.san ? `${h.san} (${coords})` : coords;
+        return validHints.length > 1 ? `${rankNum}. ${moveLabel}` : moveLabel;
+      })
+      .join(' • ');
+    hintFeedbackMessage.value = `Conseil Stockfish : ${formattedList}`;
+    hintFeedbackTimer = setTimeout(() => {
+      hintFeedbackMessage.value = null;
+    }, 5000);
+  } else if (boardApi && bestMove && bestMove.length >= 4) {
     const from = bestMove.substring(0, 2);
     const to = bestMove.substring(2, 4);
     boardApi.drawMove(from, to, 'green');

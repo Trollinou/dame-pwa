@@ -3,6 +3,9 @@ import type {
 	StockfishConfig,
 	StockfishMode,
 	StockfishEvaluation,
+	StockfishHint,
+	HintBrush,
+	HintRequestOptions,
 	EngineStatus,
 	GameReviewReport,
 	MoveAnalysisReport,
@@ -25,6 +28,9 @@ export type {
 	StockfishConfig,
 	StockfishMode,
 	StockfishEvaluation,
+	StockfishHint,
+	HintBrush,
+	HintRequestOptions,
 	EngineStatus,
 	GameReviewReport,
 	MoveAnalysisReport,
@@ -168,7 +174,7 @@ export type ChessboardEmits = {
 	( _e: 'checkmate', _color: string ): void;
 	( _e: 'stalemate' ): void;
 	( _e: 'draw' ): void;
-	( _e: 'stockfish-hint', _move: string ): void;
+	( _e: 'stockfish-hint', _move: string, _hints: StockfishHint[] ): void;
 	( _e: 'evaluation', _evaluation: StockfishEvaluation ): void;
 	( _e: 'engine-status', _status: EngineStatus ): void;
 	( _e: 'game-review-progress', _percent: number ): void;

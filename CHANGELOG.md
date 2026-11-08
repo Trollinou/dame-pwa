@@ -6,6 +6,21 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.2] - 2026-11-08
+
+- **Support Multi-Coups MultiPV, Filtrage par Écart de Score & Délégation des Flèches (`eg-chessboard` 1.8.3) (`types.ts`, `Chessboard.vue`, `PlayPage.vue`, `usePlayGame.ts`, `AnalysisPage.vue`, `ChessboardStockfish.spec.ts`, `usePlayGame.spec.ts`, `AnalysisReview.spec.ts`, `README.md`, `USING.md`)** :
+  - **Suggestions Multi-Coups (`StockfishHint[]`) & Couleurs par Rang** :
+    - Réception et transmission des suggestions MultiPV complètes (`hints: StockfishHint[]`) dans le wrapper `<Chessboard>` via l'événement `@stockfish-hint="(move, hints) => ..."`.
+    - Ré-export des types `StockfishHint`, `HintBrush` et `HintRequestOptions` dans `types.ts`, et exposition de `drawMoves`, `getLastHints` et `getLastEvaluations` sur `defineExpose`.
+    - Attribution des couleurs de flèches selon le rang de suggestion (`1 -> 'green'`, `2 -> 'blue'`, `3 -> 'yellow'`).
+  - **Filtrage Intelligent & Délégation Native (`drawArrows` / `drawHintArrows`)** :
+    - Activation de `drawHintArrows: true` dans `stockfishConfig` en mode Partie/Coach (`PlayPage.vue`) et Analyse (`AnalysisPage.vue`).
+    - Demande de conseils jusqu'à 3 coups (`multiPv: 3`, `movetime: 1500`, `maxScoreDiffCp: 50`) en Partie comme en Analyse pour écarter automatiquement les variantes secondaires trop inférieures au meilleur coup.
+    - Maintien natif des formes et glyphes assuré à 100% par `eg-chessboard` 1.8.3 (`AnnotationService.currentProgrammaticShapes`) lors de la sélection/désélection d'une pièce sans aucun code de contournement applicatif dans `dame-pwa`.
+    - Tracé et affichage classé avec notation SAN et cases dans le bandeau de conseil en Analyse (`Conseil Stockfish : 1. e4 (E2 ➔ E4) • 2. d4 (D2 ➔ D4)`).
+  - **Immunité Étendue en Mode Coach** :
+    - Jouer n'importe lequel des coups suggérés (1er, 2e ou 3e choix retenu) accorde l'immunité Coach et le glyphe `'!'` sans déclencher d'alerte de gaffe (`core.lastSuggestedMoves`).
+
 ## [1.13.1] - 2026-11-08
 
 - **Mode Coach Bienveillant Natif (`eg-chessboard` 1.8.2), Préservation de la Mainline PGN & Signalement des Coups Repris en Analyse (`types.ts`, `Chessboard.vue`, `PlayPage.vue`, `usePlayGame.ts`, `PlayActionsPanel.vue`, `PlaySettingsModal.vue`, `PlayInfoBar.vue`, `AnalysisPage.vue`, `_learning-components.scss`, `PlayCoachMode.spec.ts`, `PlayActionsPanel.spec.ts`, `AnalysisReview.spec.ts`, `pgnExport.spec.ts`, `README.md`, `USING.md`)** :

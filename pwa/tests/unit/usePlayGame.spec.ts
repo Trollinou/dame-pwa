@@ -43,6 +43,7 @@ const createMockBoardApi = (
 		getCurrentPlyNumber: vi.fn( () => currentPly ),
 		requestHint: vi.fn(),
 		drawMove: vi.fn(),
+		drawMoves: vi.fn(),
 		hideMoves: vi.fn(),
 		getShapes: vi.fn( () => [] ),
 		setShapes: vi.fn(),
@@ -90,8 +91,10 @@ describe( 'usePlayGame - Hint Switch & Help Counter', () => {
 		expect( isHintEnabled.value ).toBe( true );
 		expect( helpCount.value ).toBe( 1 );
 		expect( mockApi.requestHint ).toHaveBeenCalledWith( {
-			multiPv: 2,
+			multiPv: 3,
 			movetime: 1500,
+			maxScoreDiffCp: 50,
+			drawArrows: true,
 		} );
 
 		// Simulate hint arrival
@@ -189,10 +192,79 @@ describe( 'usePlayGame - Hint Switch & Help Counter', () => {
 		requestHintForPlayer();
 
 		expect( mockApi.requestHint ).toHaveBeenCalledWith( {
-			multiPv: 2,
+			multiPv: 3,
 			movetime: 1500,
+			maxScoreDiffCp: 50,
+			drawArrows: true,
 		} );
 		expect( helpCount.value ).toBe( 2 ); // Counted for human move 2 !
+	} );
+
+	it( 'draws multiple colored hint arrows via drawMoves when multi-PV hints arrive', () => {
+		const {
+			setBoardApi,
+			toggleHint,
+			handleStockfishHint,
+			lastSuggestedHints,
+		} = usePlayGame();
+
+		const mockApi = createMockBoardApi();
+		setBoardApi( mockApi );
+		toggleHint();
+
+		const hints = [
+			{
+				uci: 'e2e4',
+				from: 'e2' as const,
+				to: 'e4' as const,
+				san: 'e4',
+				rank: 1,
+				scoreType: 'cp' as const,
+				scoreValue: 35,
+				whiteScoreValue: 35,
+				winChancePercentage: 54,
+				pv: [ 'e2e4' ],
+				brush: 'green' as const,
+			},
+			{
+				uci: 'd2d4',
+				from: 'd2' as const,
+				to: 'd4' as const,
+				san: 'd4',
+				rank: 2,
+				scoreType: 'cp' as const,
+				scoreValue: 25,
+				whiteScoreValue: 25,
+				winChancePercentage: 52,
+				pv: [ 'd2d4' ],
+				brush: 'blue' as const,
+			},
+			{
+				uci: 'g1f3',
+				from: 'g1' as const,
+				to: 'f3' as const,
+				san: 'Nf3',
+				rank: 3,
+				scoreType: 'cp' as const,
+				scoreValue: 15,
+				whiteScoreValue: 15,
+				winChancePercentage: 51,
+				pv: [ 'g1f3' ],
+				brush: 'yellow' as const,
+			},
+		];
+
+		handleStockfishHint( 'e2e4', hints );
+
+		expect( lastSuggestedHints.value ).toHaveLength( 3 );
+		expect( mockApi.drawMoves ).toHaveBeenCalledWith(
+			[
+				{ from: 'e2', to: 'e4', brush: 'green' },
+				{ from: 'd2', to: 'd4', brush: 'blue' },
+				{ from: 'g1', to: 'f3', brush: 'yellow' },
+			],
+			true
+		);
 	} );
 } );
 

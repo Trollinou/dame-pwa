@@ -75,10 +75,41 @@ describe( 'Chessboard - Stockfish 19 Events & Config', () => {
 		);
 
 		// Simulate stockfish-hint event
-		await innerChessboard.vm.$emit( 'stockfish-hint', 'e2e4' );
+		const mockHints = [
+			{
+				uci: 'e2e4',
+				from: 'e2',
+				to: 'e4',
+				san: 'e4',
+				rank: 1,
+				scoreType: 'cp' as const,
+				scoreValue: 30,
+				whiteScoreValue: 30,
+				winChancePercentage: 53,
+				pv: [ 'e2e4' ],
+				brush: 'green' as const,
+			},
+			{
+				uci: 'd2d4',
+				from: 'd2',
+				to: 'd4',
+				san: 'd4',
+				rank: 2,
+				scoreType: 'cp' as const,
+				scoreValue: 20,
+				whiteScoreValue: 20,
+				winChancePercentage: 52,
+				pv: [ 'd2d4' ],
+				brush: 'blue' as const,
+			},
+		];
+		await innerChessboard.vm.$emit( 'stockfish-hint', 'e2e4', mockHints );
 		expect( wrapper.emitted( 'stockfish-hint' ) ).toBeTruthy();
 		expect( wrapper.emitted( 'stockfish-hint' )?.[ 0 ][ 0 ] ).toBe(
 			'e2e4'
+		);
+		expect( wrapper.emitted( 'stockfish-hint' )?.[ 0 ][ 1 ] ).toEqual(
+			mockHints
 		);
 	} );
 

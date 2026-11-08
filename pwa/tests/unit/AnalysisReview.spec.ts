@@ -9,6 +9,9 @@ interface AnalysisPageVm {
 	viewPly: ( _ply: number ) => void;
 	selectPlyForReview: ( _ply: number ) => void;
 	toggleBeforeAfter: ( _before: boolean ) => void;
+	requestHint: () => void;
+	handleStockfishHint: ( _bestMove: string, _hints?: unknown[] ) => void;
+	hintFeedbackMessage: string | null;
 	activePly: number;
 	isViewingBeforeMove: boolean;
 }
@@ -64,6 +67,7 @@ describe( 'AnalysisPage - Revue de partie (Bilan et analyse de coup)', () => {
 		hideMoves: vi.fn(),
 		setShapes: vi.fn(),
 		drawMove: vi.fn(),
+		drawMoves: vi.fn(),
 		redraw: vi.fn(),
 		reviewGame: vi.fn(),
 		cancelReview: vi.fn(),
@@ -297,5 +301,80 @@ describe( 'AnalysisPage - Revue de partie (Bilan et analyse de coup)', () => {
 		expect( undoneRow.exists() ).toBe( true );
 		expect( undoneRow.text() ).toContain( 'Coup(s) repris' );
 		expect( undoneRow.text() ).toContain( 'h5' );
+	} );
+
+	it( 'affiche la liste classée avec SAN et cases et trace les flèches multiples lors d’une demande de conseil Stockfish (eg-chessboard 1.8.3)', async () => {
+		setActivePinia( createPinia() );
+		const mockBoard = createMockBoardApi();
+
+		const wrapper = mount( AnalysisPage, {
+			global: {
+				directives: {
+					'safe-html': ( el, binding ) => {
+						el.innerHTML = binding.value;
+					},
+				},
+				stubs: {
+					Chessboard: {
+						template: '<div class="chessboard-stub" />',
+						emits: [ 'board-created' ],
+						mounted() {
+							this.$emit( 'board-created', mockBoard );
+						},
+					},
+				},
+			},
+		} );
+
+		await wrapper.vm.$nextTick();
+		const vm = wrapper.vm as unknown as AnalysisPageVm;
+
+		vm.requestHint();
+		expect( mockBoard.requestHint ).toHaveBeenCalledWith( {
+			multiPv: 3,
+			movetime: 1500,
+			maxScoreDiffCp: 50,
+			drawArrows: true,
+		} );
+
+		vm.handleStockfishHint( 'e2e4', [
+			{
+				uci: 'e2e4',
+				from: 'e2',
+				to: 'e4',
+				san: 'e4',
+				rank: 1,
+				scoreType: 'cp',
+				scoreValue: 30,
+				whiteScoreValue: 30,
+				winChancePercentage: 53,
+				pv: [ 'e2e4' ],
+				brush: 'green',
+			},
+			{
+				uci: 'd2d4',
+				from: 'd2',
+				to: 'd4',
+				san: 'd4',
+				rank: 2,
+				scoreType: 'cp',
+				scoreValue: 20,
+				whiteScoreValue: 20,
+				winChancePercentage: 52,
+				pv: [ 'd2d4' ],
+				brush: 'blue',
+			},
+		] );
+
+		expect( mockBoard.drawMoves ).toHaveBeenCalledWith(
+			[
+				{ from: 'e2', to: 'e4', brush: 'green' },
+				{ from: 'd2', to: 'd4', brush: 'blue' },
+			],
+			true
+		);
+		expect( vm.hintFeedbackMessage ).toBe(
+			'Conseil Stockfish : 1. e4 (E2 ➔ E4) • 2. d4 (D2 ➔ D4)'
+		);
 	} );
 } );

@@ -29,7 +29,7 @@
       @checkmate="(color: string) => emit('checkmate', color)"
       @stalemate="() => emit('stalemate')"
       @draw="() => emit('draw')"
-      @stockfish-hint="(move: string) => emit('stockfish-hint', move)"
+      @stockfish-hint="(move: string, hints: StockfishHint[]) => emit('stockfish-hint', move, hints)"
       @evaluation="(evaluation: StockfishEvaluation) => emit('evaluation', evaluation)"
       @engine-status="(status: EngineStatus) => emit('engine-status', status)"
       @game-review-progress="(percent: number) => emit('game-review-progress', percent)"
@@ -88,6 +88,7 @@ import type {
   BoardCore,
   StockfishConfig,
   StockfishEvaluation,
+  StockfishHint,
   EngineStatus,
   Move,
   DrawShape,
@@ -445,6 +446,10 @@ defineExpose({
   setGlyph: (square: Key | string, glyph: BoardGlyph | null) => boardApi.value?.setGlyph(square, glyph),
   clearGlyphs: () => boardApi.value?.clearGlyphs(),
   getGlyph: (square: Key | string) => boardApi.value?.getGlyph(square) ?? null,
-  getGlyphs: () => boardApi.value?.getGlyphs() ?? new Map()
+  getGlyphs: () => boardApi.value?.getGlyphs() ?? new Map(),
+  drawMoves: (moves: Array<{ from: Key | string; to: Key | string; brush?: string }>, append = true) =>
+    boardApi.value?.drawMoves(moves, append),
+  getLastHints: () => boardApi.value?.getLastHints() ?? [],
+  getLastEvaluations: () => boardApi.value?.getLastEvaluations() ?? []
 });
 </script>

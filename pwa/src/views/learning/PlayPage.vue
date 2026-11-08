@@ -42,7 +42,6 @@
                 @stockfish-hint="handleStockfishHint"
                 @engine-status="handleEngineStatus"
                 @evaluation="handleEvaluation"
-                @shapes-change="handleShapesChange"
                 @coach-alert="handleCoachAlert"
               />
             </div>
@@ -146,7 +145,6 @@ const {
   handleStockfishHint,
   handleEngineStatus,
   handleEvaluation,
-  handleShapesChange,
   goToAnalysis,
   refreshDisplay,
   undoMove,
@@ -172,6 +170,7 @@ const stockfishConfig = computed<StockfishConfig>(() => {
     return {
       whiteMode: 'disabled',
       blackMode: 'disabled',
+      drawHintArrows: true,
       workerUrl: urls.workerUrl,
       wasmUrl: urls.wasmUrl,
     };
@@ -187,6 +186,7 @@ const stockfishConfig = computed<StockfishConfig>(() => {
     blackMode: playerCol === 'black' ? 'disabled' : 'elo',
     blackElo: playerCol === 'white' ? gameSettings.level : undefined,
     coachMode: gameSettings.coachMode,
+    drawHintArrows: true,
     stockfishMoveTime: moveTime,
     showWdl: true,
     searchLimit: {
