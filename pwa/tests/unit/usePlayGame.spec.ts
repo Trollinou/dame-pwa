@@ -45,6 +45,7 @@ const createMockBoardApi = (
 		drawMove: vi.fn(),
 		drawMoves: vi.fn(),
 		hideMoves: vi.fn(),
+		clearGlyphs: vi.fn(),
 		getShapes: vi.fn( () => [] ),
 		setShapes: vi.fn(),
 		newGame: vi.fn(),
@@ -265,6 +266,77 @@ describe( 'usePlayGame - Hint Switch & Help Counter', () => {
 			],
 			true
 		);
+	} );
+
+	it( 'strictly ignores and prevents hints when coachMode is disabled', () => {
+		const {
+			setBoardApi,
+			toggleHint,
+			isHintEnabled,
+			helpCount,
+			requestHintForPlayer,
+			handleStockfishHint,
+			gameSettings,
+		} = usePlayGame();
+
+		const mockApi = createMockBoardApi();
+		setBoardApi( mockApi );
+
+		gameSettings.coachMode = false;
+
+		toggleHint();
+		expect( isHintEnabled.value ).toBe( false );
+		expect( helpCount.value ).toBe( 0 );
+		expect( mockApi.requestHint ).not.toHaveBeenCalled();
+
+		requestHintForPlayer();
+		expect( mockApi.requestHint ).not.toHaveBeenCalled();
+
+		handleStockfishHint( 'e2e4' );
+		expect( mockApi.drawMove ).not.toHaveBeenCalled();
+		expect( mockApi.hideMoves ).toHaveBeenCalled();
+	} );
+
+	it( 'disables hints and hides moves when coachMode transitions from true to false', () => {
+		const {
+			setBoardApi,
+			toggleHint,
+			isHintEnabled,
+			gameSettings,
+		} = usePlayGame();
+
+		const mockApi = createMockBoardApi();
+		setBoardApi( mockApi );
+
+		gameSettings.coachMode = true;
+		toggleHint();
+		expect( isHintEnabled.value ).toBe( true );
+
+		// Switch off coach mode
+		gameSettings.coachMode = false;
+		expect( isHintEnabled.value ).toBe( false );
+		expect( mockApi.hideMoves ).toHaveBeenCalled();
+	} );
+
+	it( 'resets isHintEnabled and hides moves on resetHelpState', () => {
+		const {
+			setBoardApi,
+			toggleHint,
+			isHintEnabled,
+			resetHelpState,
+			gameSettings,
+		} = usePlayGame();
+
+		const mockApi = createMockBoardApi();
+		setBoardApi( mockApi );
+
+		gameSettings.coachMode = true;
+		toggleHint();
+		expect( isHintEnabled.value ).toBe( true );
+
+		resetHelpState();
+		expect( isHintEnabled.value ).toBe( false );
+		expect( mockApi.hideMoves ).toHaveBeenCalled();
 	} );
 } );
 

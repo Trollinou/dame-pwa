@@ -28,7 +28,7 @@ describe( 'PlayActionsPanel.vue', () => {
 		expect( text ).not.toContain( 'Abandon' );
 	} );
 
-	it( 'renders only [Nouvelle partie / Réglages] when currentPly is 0 and not isGameOver', () => {
+	it( 'renders in-game actions with [Oups] disabled when currentPly is 0 and not isGameOver', () => {
 		const wrapper = mount( PlayActionsPanel, {
 			props: {
 				isLandscape: false,
@@ -40,17 +40,22 @@ describe( 'PlayActionsPanel.vue', () => {
 				oupsCount: 0,
 				viewOnly: false,
 				isGameOver: false,
+				isCoachMode: true,
 				currentPly: 0,
 			},
 		} );
 
 		const text = wrapper.text();
-		expect( text ).toContain( 'Nouvelle partie / Réglages' );
-		expect( text ).not.toContain( 'Oups' );
-		expect( text ).not.toContain( 'Aide' );
-		expect( text ).not.toContain( 'Nulle' );
-		expect( text ).not.toContain( 'Abandon' );
+		expect( text ).not.toContain( 'Nouvelle partie' );
+		expect( text ).not.toContain( 'Nouveau' );
 		expect( text ).not.toContain( 'Analyse' );
+		expect( text ).toContain( 'Oups' );
+		expect( text ).toContain( 'Aide' );
+		expect( text ).toContain( 'Nulle' );
+		expect( text ).toContain( 'Abandon' );
+
+		const oupsBtn = wrapper.findAllComponents( { name: 'IonButton' } ).find( ( b ) => b.text().includes( 'Oups' ) );
+		expect( oupsBtn?.props( 'disabled' ) ).toBe( true );
 	} );
 
 	it( 'renders [Oups], [Nulle], [Abandon] in Normal Mode when currentPly > 0 and not isGameOver', () => {

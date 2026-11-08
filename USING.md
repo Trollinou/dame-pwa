@@ -265,14 +265,14 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
      - Demande de conseil dynamique MultiPV en cours de partie à pleine puissance 3500+ Elo même en mode 2 joueurs (`core.requestHint({ multiPv: 3, movetime: 1500, maxScoreDiffCp: 50, drawArrows: true })`).
      - Réinitialisation propre de la partie et purge UCI (`core.newGame()`) sans détruire le Web Worker.
-     - **Panneau d'actions dynamique épuré (`PlayActionsPanel.vue`)** :
-       - *Avant engagement (`ply = 0`)* : Bouton unique `[ Nouvelle partie / Réglages ]` pour configurer la partie avant engagement.
-       - *En cours de partie (`ply > 0` et partie non finie)* : Disparition de `[Nouv.]` (oblige à terminer ou abandonner formellement).
-         - `[ 🔄 Oups ]` (1ère position, tous modes) : Annulation du dernier coup pour parer aux erreurs de clic (missclicks).
-         - `[ 💡 Aide ]` (2ème position, mode Coach uniquement) : Demande d'un conseil tactique Stockfish.
+     - **Panneau d'actions dynamique épuré (`PlayActionsPanel.vue`) & Tiroir de Réglages (`PlaySettingsModal.vue`)** :
+       - *Tiroir Nouvelle Partie (`PlaySettingsModal.vue`)* : Hauteur d'ouverture adaptée (`breakpoint: 0.6`) et bouton d'action principal « Jouer » intégré en haut à droite de la barre d'outils (standard iOS avec bouton « Annuler » à gauche), affichant l'intégralité du formulaire sans nécessiter de défilement ou d'étirement du tiroir.
+       - *En cours de partie (`!isGameOver`, dès le lancement à `ply = 0` et jusqu'à la fin de partie)* : Les contrôles de jeu sont immédiatement disponibles sous l'échiquier. Aucun bouton de nouvelle partie n'est proposé afin de respecter l'arbitrage officiel (la partie en cours doit être formellement conclue par mat, nulle ou abandon avant de pouvoir en démarrer une autre) :
+         - `[ 🔄 Oups ]` (1ère position, tous modes) : Désactivé au coup initial (`ply = 0`), puis actif dès qu'un coup a été joué pour parer aux erreurs de manipulation (missclicks).
+         - `[ 💡 Aide ]` (2ème position, mode Coach uniquement) : Demande d'un conseil tactique Stockfish, activable dès l'ouverture. Strictement réservé au mode Coach avec purge automatique des flèches lors du passage en mode normal.
          - `[ ⚖️ Nulle ]` (3ème position) : Proposition de partie nulle arbitrée par Stockfish (`core.offerDraw()`, acceptée si $\ge 20$ coups et score $\le +0.30$ pion, sinon toast explicatif) ou soumise à acceptation en mode 2 joueurs.
-         - `[ 🏳️ Abandon ]` (4ème position) : Abandon formel avec alerte de confirmation (remplaçant le bouton drapeau dans l'en-tête).
-       - *En fin de partie (`isGameOver`)* : Seuls deux boutons sont affichés : `[ ⚙️ Nouveau ]` et `[ 📊 Analyse ]`.
+         - `[ 🏳️ Abandon ]` (4ème position) : Abandon formel avec dialogue de confirmation avant enregistrement et clôture de partie.
+       - *En fin de partie (`isGameOver`)* : Seuls deux boutons sont affichés : `[ ⚙️ Nouveau ]` (ouvre le tiroir de réglages pour lancer une nouvelle partie) et `[ 📊 Analyse ]`.
        - *Reprise de partie* : Si une partie rechargée était déjà terminée, le plateau est immédiatement verrouillé en lecture seule (`viewOnly = true`) et seuls `[Nouveau]` et `[Analyse]` sont disponibles.
      - **Enregistrement et synchronisation automatique vers ROI (`/roi/v1/games`)** :
        - Transmission systématique des parties terminées (mat, nulle, pat).

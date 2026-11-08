@@ -2,14 +2,17 @@
   <ion-modal
     :is-open="isOpen"
     @didDismiss="$emit('update:isOpen', false)"
-    :initial-breakpoint="0.5"
-    :breakpoints="[0, 0.5, 0.8]"
+    :initial-breakpoint="0.6"
+    :breakpoints="[0, 0.6]"
   >
     <ion-header>
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button @click="$emit('update:isOpen', false)">Annuler</ion-button>
+        </ion-buttons>
         <ion-title>Nouvelle Partie</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="$emit('update:isOpen', false)">Annuler</ion-button>
+          <ion-button :strong="true" color="primary" @click="$emit('start-game')">Jouer</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -59,10 +62,6 @@
           </ion-label>
           <ion-toggle slot="end" v-model="gameSettings.coachMode" color="success"></ion-toggle>
         </ion-item>
-
-        <ion-button expand="block" class="ion-margin-top" @click="$emit('start-game')">
-          Lancer la partie
-        </ion-button>
       </ion-list>
     </ion-content>
   </ion-modal>

@@ -75,23 +75,7 @@
           </ion-col>
         </ion-row>
 
-        <!-- État 2 : Avant le 1er coup -> Uniquement Nouveau / Réglages -->
-        <ion-row v-else-if="currentPly === 0" class="actions-row">
-          <ion-col size="12">
-            <ion-button
-              expand="block"
-              fill="outline"
-              color="primary"
-              class="game-action-btn"
-              @click="$emit('reset-game')"
-            >
-              <ion-icon slot="start" :icon="optionsOutline"></ion-icon>
-              <span>Nouvelle partie / Réglages</span>
-            </ion-button>
-          </ion-col>
-        </ion-row>
-
-        <!-- État 3 : En cours de partie -> Pas de Nouveau, [Oups], ([Aide]), [Nulle], [Abandon] -->
+        <!-- État 2 : En cours de partie -> [Oups], ([Aide]), [Nulle], [Abandon] -->
         <ion-row v-else class="actions-row">
           <!-- 1. Bouton Oups / Annuler (parer au missclick dans tous les modes) -->
           <ion-col :size="inGameColSize">
@@ -99,7 +83,7 @@
               expand="block"
               fill="outline"
               color="warning"
-              :disabled="viewOnly"
+              :disabled="currentPly === 0 || viewOnly"
               class="game-action-btn"
               @click="$emit('undo-move')"
             >

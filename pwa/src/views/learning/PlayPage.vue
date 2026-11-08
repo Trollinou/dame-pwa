@@ -256,12 +256,6 @@ const startNewGame = () => {
     localStorage.setItem('dame_pwa_play_elo', String(gameSettings.level));
   }
   renderKey.value++;
-
-  if (isHintEnabled.value) {
-    setTimeout(() => {
-      requestHintForPlayer();
-    }, 100);
-  }
 };
 
 onMounted(() => {

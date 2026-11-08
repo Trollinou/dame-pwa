@@ -6,6 +6,24 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.4] - 2026-11-08
+
+- **Ergonomie du Tiroir « Nouvelle Partie », Contrôles de Jeu Immédiats & Étanchéité du Mode Coach (`PlaySettingsModal.vue`, `PlayActionsPanel.vue`, `usePlayGame.ts`, `PlayPage.vue`, `PlayActionsPanel.spec.ts`, `usePlayGame.spec.ts`, `USING.md`)** :
+  - **Tiroir Nouvelle Partie Optimisé (`PlaySettingsModal.vue`)** :
+    - Déplacement de l'action principale **Jouer** dans la barre d'outils supérieure en haut à droite (`slot="end"`, `:strong="true"`, `color="primary"`) et bouton **Annuler** à gauche (`slot="start"`), conforme aux standards d'ergonomie iOS/Ionic.
+    - Hauteur d'ouverture adaptée (`breakpoint: 0.6`) et suppression du bouton pleine largeur inférieur redondant, affichant l'intégralité du formulaire dès l'ouverture sans nécessiter de défilement ou d'étirement du tiroir.
+  - **Contrôles de Jeu Immédiats & Respect de l'Arbitrage de Fin de Partie (`PlayActionsPanel.vue`)** :
+    - Suppression du blocage artificiel `currentPly === 0` qui affichait à tort un unique bouton « Nouvelle partie / Réglages » masquant les actions de jeu au lancement d'une partie.
+    - Disponibilité immédiate des boutons d'actions en cours de jeu dès l'engagement : **Oups** (désactivé au coup initial `currentPly === 0 || viewOnly`, puis actif dès le premier coup), **Aide** (si mode Coach actif), **Nulle** et **Abandon**.
+    - Interdiction de lancer une nouvelle partie à la volée tant que la partie active n'a pas été formellement conclue par mat, nulle ou abandon, garantissant le respect de l'arbitrage officiel.
+  - **Étanchéité du Mode Coach & Purge des Suggestions d'Aide (`usePlayGame.ts`, `PlayPage.vue`)** :
+    - Contrôle strict de `gameSettings.coachMode` dans `requestHintForPlayer`, `handleStockfishHint` et `toggleHint`, empêchant toute fuite de requêtes Stockfish ou de flèches résiduelles lorsque le mode Coach est inactif.
+    - Réinitialisation systématique de `isHintEnabled` à `false` et masquage immédiat des formes (`boardApi.hideMoves()`) lors de la désactivation du mode Coach, dans `resetHelpState()` et lors de la fin de partie (`handleGameOver`).
+    - Suppression de la relance automatique d'aide au démarrage d'une nouvelle partie dans `PlayPage.vue`.
+  - **Tests Unitaires & QA** :
+    - Mise à jour des tests dans `PlayActionsPanel.spec.ts` pour valider l'état actif des boutons en cours de partie et l'état désactivé de *Oups* à `currentPly === 0`.
+    - Ajout de 3 tests unitaires dans `usePlayGame.spec.ts` validant le blocage de l'aide en mode standard, la réinitialisation automatique lors du passage de Coach à Normal, et le nettoyage dans `resetHelpState()`.
+
 ## [1.13.3] - 2026-11-08
 
 - **Résilience de Synchronisation des Parties & Gestion des Erreurs 4xx (`chess.ts`, `chessStore.spec.ts`, `AnalysisPage.vue`)** :

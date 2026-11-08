@@ -94,8 +94,18 @@ export function usePlayGame() {
 		() => gameSettings.coachMode,
 		( enabled ) => {
 			localStorage.setItem( 'dame_pwa_coach_mode', enabled ? 'true' : 'false' );
-			if ( ! enabled && boardApi ) {
-				boardApi.clearGlyphs();
+			if ( ! enabled ) {
+				isHintEnabled.value = false;
+				if ( boardApi ) {
+					if ( typeof boardApi.clearGlyphs === 'function' ) {
+						boardApi.clearGlyphs();
+					}
+					if ( typeof boardApi.hideMoves === 'function' ) {
+						boardApi.hideMoves();
+					}
+				}
+				lastSuggestedMove.value = '';
+				lastSuggestedHints.value = [];
 				isAwaitingCoachConfirmation.value = false;
 			}
 		},
@@ -135,7 +145,12 @@ export function usePlayGame() {
 	};
 
 	const requestHintForPlayer = () => {
-		if ( ! boardApi || ! isHintEnabled.value || ! isHumanTurn() ) {
+		if (
+			! boardApi ||
+			! isHintEnabled.value ||
+			! gameSettings.coachMode ||
+			! isHumanTurn()
+		) {
 			return;
 		}
 		normalizeCastlingMoves( boardApi );
@@ -155,6 +170,11 @@ export function usePlayGame() {
 	};
 
 	const toggleHint = () => {
+		if ( ! gameSettings.coachMode ) {
+			isHintEnabled.value = false;
+			boardApi?.hideMoves();
+			return;
+		}
 		isHintEnabled.value = ! isHintEnabled.value;
 		if ( isHintEnabled.value ) {
 			requestHintForPlayer();
@@ -169,7 +189,11 @@ export function usePlayGame() {
 		bestMove: string,
 		hints: StockfishHint[] = []
 	) => {
-		if ( ! isHintEnabled.value || ! isHumanTurn() ) {
+		if (
+			! isHintEnabled.value ||
+			! gameSettings.coachMode ||
+			! isHumanTurn()
+		) {
 			boardApi?.hideMoves();
 			return;
 		}
@@ -278,9 +302,13 @@ export function usePlayGame() {
 	};
 
 	const resetHelpState = () => {
+		isHintEnabled.value = false;
 		lastHelpPly = null;
 		lastSuggestedMove.value = '';
 		lastSuggestedHints.value = [];
+		if ( typeof boardApi?.hideMoves === 'function' ) {
+			boardApi.hideMoves();
+		}
 	};
 
 	const undoMove = () => {
@@ -348,6 +376,12 @@ export function usePlayGame() {
 			return;
 		}
 		isAwaitingCoachConfirmation.value = false;
+		isHintEnabled.value = false;
+		if ( typeof boardApi?.hideMoves === 'function' ) {
+			boardApi.hideMoves();
+		}
+		lastSuggestedMove.value = '';
+		lastSuggestedHints.value = [];
 		const isDraw = type === 'stalemate' || type === 'draw';
 		const symbol = isDraw ? '🤝' : '🏁';
 		let result = '*';
