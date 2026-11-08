@@ -18,6 +18,7 @@
           :level="gameSettings.level"
           :game-mode="gameSettings.gameMode"
           :coach-mode="gameSettings.coachMode"
+          @open-coach-legend="showCoachLegend = true"
         />
 
         <div class="main-container" :class="{ 'landscape-mode': isLandscape }">
@@ -85,13 +86,18 @@
           v-model:is-open="showSettings"
           @start-game="startNewGame"
         />
+
+        <!-- Modal de légende du Coach -->
+        <CoachLegendModal
+          v-model:is-open="showCoachLegend"
+        />
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, provide, defineAsyncComponent } from 'vue';
+import { ref, computed, onMounted, onUnmounted, provide, defineAsyncComponent } from 'vue';
 import {
   IonPage,
   IonHeader,
@@ -115,6 +121,9 @@ import PlayInfoBar from '@/components/learning/play/PlayInfoBar.vue';
 import PlayActionsPanel from '@/components/learning/play/PlayActionsPanel.vue';
 
 const PlaySettingsModal = defineAsyncComponent(() => import('@/components/learning/play/PlaySettingsModal.vue'));
+const CoachLegendModal = defineAsyncComponent(() => import('@/components/learning/play/CoachLegendModal.vue'));
+
+const showCoachLegend = ref(false);
 
 const authStore = useAuthStore();
 const chessStore = useChessStore();

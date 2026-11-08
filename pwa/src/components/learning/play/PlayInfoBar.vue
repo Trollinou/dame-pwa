@@ -14,9 +14,16 @@
       </div>
 
       <div class="meta-right">
-        <span v-if="gameMode !== '2players' && coachMode" class="coach-badge">
-          🎓 Coach
-        </span>
+        <button
+          v-if="gameMode !== '2players' && coachMode"
+          type="button"
+          class="coach-badge coach-badge--interactive"
+          aria-label="Légende des symboles du mode Coach"
+          @click="$emit('open-coach-legend')"
+        >
+          <span>🎓 Coach</span>
+          <ion-icon :icon="informationCircleOutline" class="coach-badge__icon" aria-hidden="true"></ion-icon>
+        </button>
         <span v-if="gameMode !== '2players'" class="elo-badge">
           {{ level }} ELO
         </span>
@@ -32,6 +39,9 @@
 </template>
 
 <script setup lang="ts">
+import { IonIcon } from '@ionic/vue';
+import { informationCircleOutline } from 'ionicons/icons';
+
 withDefaults(
   defineProps<{
     playerName: string;
@@ -44,6 +54,10 @@ withDefaults(
     coachMode: false
   }
 );
+
+defineEmits<{
+  (e: 'open-coach-legend'): void;
+}>();
 
 const getLevelDescription = (elo: number) => {
   if (elo <= 1400) return 'Débutant';

@@ -6,6 +6,20 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.5] - 2026-11-08
+
+- **Légende des Glyphes en Mode Coach & Analyse (`CoachLegendModal.vue`, `PlayInfoBar.vue`, `PlayPage.vue`, `_learning-components.scss`, `CoachLegendModal.spec.ts`, `PlayInfoBar.spec.ts`, `README.md`, `USING.md`)** :
+  - **Modale Didactique « Légende du Coach » (`CoachLegendModal.vue`)** :
+    - Nouvelle modale Ionic responsive (`breakpoints="[0, 0.75, 1.0]"`) chargée en différé via `defineAsyncComponent` dans `PlayPage.vue` afin de préserver l'intégrité et la légèreté du bundle initial.
+    - **Section 1 : Évaluation des coups** : Documentation complète des 7 niveaux d'appréciation avec pastilles vectorielles SVG authentiques (`Chessground` / `eg-chessboard`) : `!!` (Coup brillant, `#168226`), `!` (Bon coup / Coup validé, `#22ac38`), `!?` (Coup intéressant, `#ea45d8`), `?!` (Imprécision, `#56b4e9`), `?` (Erreur, `#e69f00`), `??` (Gaffe / Coup risqué, `#df5353`), et `□` (Coup forcé, `#a04048`).
+    - **Section 2 : Alertes & Motifs tactiques** : Explications détaillées des repères tactiques affichés en direct sur l'échiquier : `pin` (Clouage, `#333333`), `undefended` (Pièce non défendue / En prise, `#df5353`), `checkable` (Menace d'échec, `#2660a4`), et `trapped` (Pièce piégée, `#df5353`).
+  - **Déclencheur Interactif dans la Barre d'Information (`PlayInfoBar.vue`)** :
+    - Transformation du badge `🎓 Coach` en bouton interactif (`coach-badge--interactive`) avec icône d'information `informationCircleOutline` (`🎓 Coach ℹ️`), confort tactile mobile (effet ripple / hover / active) et émission de l'événement `@open-coach-legend`.
+  - **Styles SCSS Centralisés (`_learning-components.scss`)** :
+    - Centralisation rigoureuse de l'ensemble des règles de style dans le pilier SCSS `theme/learning/`, conformément aux normes d'architecture du projet (zéro balise `<style>` locale, zéro style inline).
+  - **Tests Unitaires & QA** :
+    - Création de la suite de tests unitaires Vitest dédiée `CoachLegendModal.spec.ts` et `PlayInfoBar.spec.ts` validant le rendu de la modale, l'interaction du bouton et l'émission des événements.
+
 ## [1.13.4] - 2026-11-08
 
 - **Ergonomie du Tiroir « Nouvelle Partie », Contrôles de Jeu Immédiats & Étanchéité du Mode Coach (`PlaySettingsModal.vue`, `PlayActionsPanel.vue`, `usePlayGame.ts`, `PlayPage.vue`, `PlayActionsPanel.spec.ts`, `usePlayGame.spec.ts`, `USING.md`)** :

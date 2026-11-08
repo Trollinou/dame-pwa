@@ -1899,6 +1899,32 @@ cg-board.piece-icon-box {
   border-radius: 6px;
   letter-spacing: 0.3px;
   margin-bottom: 2px;
+  border: none;
+  font-family: inherit;
+
+  &--interactive {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    .coach-badge__icon {
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+  }
 }
 
 .elo-badge {
@@ -2072,6 +2098,96 @@ cg-board.piece-icon-box {
     ion-col {
       padding: 3px 0;
     }
+  }
+}
+
+/* Modale Légende du Coach */
+.coach-legend-modal {
+  --border-radius: 16px 16px 0 0;
+
+  ion-header ion-toolbar {
+    --background: var(--ion-background-color, #ffffff);
+    --border-color: var(--ion-color-step-150, rgba(0, 0, 0, 0.08));
+  }
+}
+
+.coach-legend-intro {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ion-color-step-700, #4b5563);
+  margin: 0 0 16px 0;
+}
+
+.coach-legend-section {
+  margin-bottom: 24px;
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ion-text-color, #111827);
+    margin: 0 0 8px 4px;
+    letter-spacing: -0.2px;
+  }
+}
+
+.coach-legend-list {
+  background: var(--ion-card-background, #ffffff);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.coach-legend-item {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --inner-padding-end: 8px;
+  --min-height: 60px;
+
+  .coach-legend-badge {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    margin-right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .coach-legend-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  &__symbol {
+    font-family: monospace;
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--ion-color-step-100, #f3f4f6);
+    color: var(--ion-color-step-800, #1f2937);
+  }
+
+  &__name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ion-text-color, #111827);
+  }
+
+  &__desc {
+    font-size: 0.8rem;
+    line-height: 1.35;
+    color: var(--ion-color-step-600, #6b7280);
+    margin: 0;
   }
 }
 
