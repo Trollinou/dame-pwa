@@ -18,36 +18,8 @@
     <!-- Barre d'actions épurée -->
     <div class="actions-container">
       <ion-grid class="ion-no-padding">
-        <!-- Interruption bienveillante lors d'une gaffe en Mode Coach -->
-        <ion-row v-if="isAwaitingCoachConfirmation" class="coach-confirmation-row">
-          <ion-col :size="isLandscape ? '12' : '6'">
-            <ion-button
-              expand="block"
-              fill="solid"
-              color="warning"
-              class="game-action-btn coach-undo-btn"
-              @click="$emit('coach-undo')"
-            >
-              <ion-icon slot="start" :icon="arrowUndoOutline"></ion-icon>
-              <span>Reprendre</span>
-            </ion-button>
-          </ion-col>
-          <ion-col :size="isLandscape ? '12' : '6'">
-            <ion-button
-              expand="block"
-              fill="outline"
-              color="medium"
-              class="game-action-btn coach-proceed-btn"
-              @click="$emit('coach-proceed')"
-            >
-              <ion-icon slot="start" :icon="playForwardOutline"></ion-icon>
-              <span>Continuer</span>
-            </ion-button>
-          </ion-col>
-        </ion-row>
-
         <!-- État 1 : Fin de partie -> Uniquement Nouveau et Analyse -->
-        <ion-row v-else-if="isGameOver" class="actions-row">
+        <ion-row v-if="isGameOver" class="actions-row">
           <ion-col :size="isLandscape ? '12' : '6'">
             <ion-button
               expand="block"
@@ -71,6 +43,34 @@
             >
               <ion-icon slot="start" :icon="analyticsOutline"></ion-icon>
               <span>Analyse</span>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+        <!-- Interruption bienveillante lors d'une gaffe en Mode Coach -->
+        <ion-row v-else-if="isAwaitingCoachConfirmation" class="coach-confirmation-row">
+          <ion-col :size="isLandscape ? '12' : '6'">
+            <ion-button
+              expand="block"
+              fill="solid"
+              color="warning"
+              class="game-action-btn coach-undo-btn"
+              @click="$emit('coach-undo')"
+            >
+              <ion-icon slot="start" :icon="arrowUndoOutline"></ion-icon>
+              <span>Reprendre</span>
+            </ion-button>
+          </ion-col>
+          <ion-col :size="isLandscape ? '12' : '6'">
+            <ion-button
+              expand="block"
+              fill="outline"
+              color="medium"
+              class="game-action-btn coach-proceed-btn"
+              @click="$emit('coach-proceed')"
+            >
+              <ion-icon slot="start" :icon="playForwardOutline"></ion-icon>
+              <span>Continuer</span>
             </ion-button>
           </ion-col>
         </ion-row>

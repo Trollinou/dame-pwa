@@ -6,6 +6,24 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.1] - 2026-11-08
+
+- **Mode Coach Bienveillant Natif (`eg-chessboard` 1.8.2), Préservation de la Mainline PGN & Signalement des Coups Repris en Analyse (`types.ts`, `Chessboard.vue`, `PlayPage.vue`, `usePlayGame.ts`, `PlayActionsPanel.vue`, `PlaySettingsModal.vue`, `PlayInfoBar.vue`, `AnalysisPage.vue`, `_learning-components.scss`, `PlayCoachMode.spec.ts`, `PlayActionsPanel.spec.ts`, `AnalysisReview.spec.ts`, `pgnExport.spec.ts`, `README.md`, `USING.md`)** :
+  - **Délégation Native à `eg-chessboard` 1.8.2** :
+    - Activation déclarative via `coachMode: gameSettings.coachMode` dans `StockfishConfig`, supprimant la logique dupliquée côté PWA (`tacticalGlyphs.ts`) et évitant toute destruction/recréation du Web Worker Stockfish lors des mises en pause.
+    - Ré-export des types `CoachAlertDetail`, `CoachAlertReason` et `TacticalAnalysisResult` et relais de l'événement `@coach-alert` dans `<Chessboard>`.
+    - Immunité native garantie sur les coups suggérés par le bouton Aide (`lastSuggestedMove`) et sur les coups de fin de partie (mat/pat/nulle), éliminant tout faux positif de gaffe (`??`).
+    - Préservation de la ligne principale (mainline) après annulation (`undoLastMove()` / `coachUndo()`) : le nouveau coup joué remplace le coup annulé en tête (`unshift`) tandis que le coup repris est conservé en sous-variante PGN (`( 2. Qh5 )`).
+    - Signalement visuel des coups repris dans `AnalysisPage.vue` via `boardApi.getVariationsAtPly(ply)` : badge `↺` dans la grille d'historique, ligne dédiée `Coup(s) repris` dans la fiche de coup en mode Bilan et bandeau contextuel hors mode Bilan.
+  - **Interruption Douce Conditionnelle & Contrôle Direct** :
+    - Réception de `@coach-alert` dans `handleCoachAlert(detail)` avec message différencié selon `detail.reason` (`'bad_trade'` vs `'hanging_piece'`).
+    - Bandeau d'action à 2 boutons rapides : `[ 🔄 Reprendre ]` (délégué à `boardApi.coachUndo()`) ou `[ ⏩ Continuer ]` (délégué à `boardApi.coachProceed()`).
+    - Priorité d'affichage accordée à l'état de fin de partie (`v-if="isGameOver"`) avant `v-else-if="isAwaitingCoachConfirmation"` dans `PlayActionsPanel.vue`.
+  - **Paramétrage & Ergonomie** :
+    - Option activable/désactivable dans la modale de réglages (`PlaySettingsModal.vue`) mémorisée dans le `localStorage`.
+    - Indicateur visuel `🎓 Coach` dans la barre d'information du joueur (`PlayInfoBar.vue`).
+    - Persistance visuelle des glyphes pendant et après le coup adverse jusqu'au coup suivant de l'adhérent.
+
 ## [1.13.0] - 2026-11-07
 
 - **Refonte des Boutons d'Action, Arbitrage eg-chessboard 1.8.0, Mode Coach & PGN (`PlayActionsPanel.vue`, `PlayPage.vue`, `usePlayGame.ts`, `chess.ts`, `Chessboard.vue`, `AnalysisPage.vue`, `pgnExport.ts`, `PlayActionsPanel.spec.ts`, `pgnExport.spec.ts`, `usePlayGame.spec.ts`, `chessStore.spec.ts`, `README.md`, `USING.md`)** :
@@ -25,20 +43,6 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - Module dédié générant le Seven Tag Roster standard complet (`Event`, `Site`, `Date`, `Round`, `White`, `Black`, `Result`) ainsi que les métadonnées étendues d'entraînement (`WhiteElo`, `BlackElo`, `Variant`, `Termination`, `Annotator`, `Takebacks`, `Hints`).
   - **Reprise Résiliente de Partie** :
     - Mémorisation de l'état de fin de partie (`isGameOver`, raison, résultat) dans `chessStore` ; lors du retour sur `/play`, une partie finie verrouille immédiatement le plateau (`viewOnly = true`) et affiche uniquement `[Nouveau]` et `[Analyse]`.
-
-- **Mode Coach Bienveillant & Feedback Didactique en Temps Réel (`tacticalGlyphs.ts`, `usePlayGame.ts`, `PlayPage.vue`, `PlayActionsPanel.vue`, `PlaySettingsModal.vue`, `PlayInfoBar.vue`, `_learning-components.scss`, `tacticalGlyphs.spec.ts`, `PlayCoachMode.spec.ts`, `README.md`, `USING.md`)** :
-  - **Module Tactique Pur (`pwa/src/utils/chess/tacticalGlyphs.ts`)** :
-    - Détection statique synchrone (<1ms) via `chessops` des pièces clouées devant le Roi (`detectPinnedPieces`) et des pièces attaquées sans défense ou sous-défendues (`detectUndefendedPieces`).
-    - Classification qualitative du coup (`classifyMoveDiff`) et conversion en glyphes officiels (`judgementToGlyph`).
-  - **Interruption Douce Conditionnelle sur Gaffe** :
-    - Fluidité intégrale à 0 clic sur les bons coups (`!`, `✓`) laissant l'ordinateur répondre à son rythme habituel.
-    - Mise en pause automatique de Stockfish dès qu'une gaffe (`??`) ou une pièce majeure en prise (`undefended`) est identifiée, évitant la punition immédiate brutale.
-    - Bandeau d'action à 2 boutons rapides : `[ 🔄 Reprendre ]` (rembobine le coup d'un demi-coup pour laisser chercher une meilleure suite) ou `[ ⏩ Continuer ]` (reprend l'analyse de l'ordinateur, mémorisé via `userDismissedPly` pour éliminer toute boucle d'interruption).
-    - Fiabilisation de l'évaluation asynchrone : suspension du coach restreinte à la phase de lâcher de pièce (`onPlayerMove`) et seuil de profondeur minimum (`depth >= 6`) pour éliminer les faux positifs d'analyse intermédiaire de l'ordinateur.
-  - **Paramétrage & Ergonomie** :
-    - Option activable/désactivable dans la modale de réglages (`PlaySettingsModal.vue`) mémorisée dans le `localStorage`.
-    - Indicateur visuel `🎓 Coach` dans la barre d'information du joueur (`PlayInfoBar.vue`).
-    - Persistance visuelle des glyphes pendant et après le coup adverse jusqu'au coup suivant de l'adhérent.
 
 - **Intégration d'`eg-chessboard` v1.7.5 (embarquant `@lichess-org/chessground@^10.5.0`) & Badges Visuels (`Chessboard.vue`, `types.ts`, `AnalysisPage.vue`, `stockfish.ts`, `ChessboardGlyphs.spec.ts`, `AnalysisReview.spec.ts`, `README.md`, `USING.md`)** :
   - **Couche Visuelle de Badges & Glyphes sur `<Chessboard>`** :

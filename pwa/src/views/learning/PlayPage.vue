@@ -43,6 +43,7 @@
                 @engine-status="handleEngineStatus"
                 @evaluation="handleEvaluation"
                 @shapes-change="handleShapesChange"
+                @coach-alert="handleCoachAlert"
               />
             </div>
           </div>
@@ -151,6 +152,7 @@ const {
   undoMove,
   coachUndoMove,
   coachProceed,
+  handleCoachAlert,
   onPlayerMove,
   handleCheck,
   handleGameOver,
@@ -178,13 +180,13 @@ const stockfishConfig = computed<StockfishConfig>(() => {
   const playerCol = boardConfig.orientation;
   const nodes = getNodesForElo(gameSettings.level);
   const moveTime = Math.round(gameSettings.level * 1.2);
-  const isComputerSuspended = isAwaitingCoachConfirmation.value;
 
   return {
-    whiteMode: (playerCol === 'white' || isComputerSuspended) ? 'disabled' : 'elo',
+    whiteMode: playerCol === 'white' ? 'disabled' : 'elo',
     whiteElo: playerCol === 'black' ? gameSettings.level : undefined,
-    blackMode: (playerCol === 'black' || isComputerSuspended) ? 'disabled' : 'elo',
+    blackMode: playerCol === 'black' ? 'disabled' : 'elo',
     blackElo: playerCol === 'white' ? gameSettings.level : undefined,
+    coachMode: gameSettings.coachMode,
     stockfishMoveTime: moveTime,
     showWdl: true,
     searchLimit: {

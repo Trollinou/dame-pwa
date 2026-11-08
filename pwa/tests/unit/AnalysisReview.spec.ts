@@ -74,6 +74,7 @@ describe( 'AnalysisPage - Revue de partie (Bilan et analyse de coup)', () => {
 		getTurnColor: vi.fn( () => 'white' ),
 		setGlyph: vi.fn(),
 		clearGlyphs: vi.fn(),
+		getVariationsAtPly: vi.fn( (): Array< { index: number; san: string; fen: string; move: never; isMainline: boolean } > => [] ),
 	} );
 
 	const mockReviewReport: GameReviewReport = {
@@ -244,5 +245,57 @@ describe( 'AnalysisPage - Revue de partie (Bilan et analyse de coup)', () => {
 		vm.toggleBeforeAfter( true );
 		expect( mockBoard.viewHistory ).toHaveBeenCalledWith( 3 );
 		expect( vm.isViewingBeforeMove ).toBe( true );
+	} );
+
+	it( 'signale visuellement les coups repris (sous-variantes eg-chessboard 1.8.2) dans le tableau et la fiche de coup', async () => {
+		setActivePinia( createPinia() );
+		const mockBoard = createMockBoardApi();
+		mockBoard.getVariationsAtPly = vi.fn( ( ply?: number ) => {
+			if ( ply === 3 ) {
+				return [
+					{ index: 0, san: 'd4', fen: '', move: {} as never, isMainline: true },
+					{ index: 1, san: 'Qh5', fen: '', move: {} as never, isMainline: false },
+				];
+			}
+			return [];
+		} );
+
+		const wrapper = mount( AnalysisPage, {
+			global: {
+				directives: {
+					'safe-html': ( el, binding ) => {
+						el.innerHTML = binding.value;
+					},
+				},
+				stubs: {
+					Chessboard: {
+						template: '<div class="chessboard-stub" />',
+						emits: [ 'board-created' ],
+						mounted() {
+							this.$emit( 'board-created', mockBoard );
+						},
+					},
+				},
+			},
+		} );
+
+		await wrapper.vm.$nextTick();
+
+		// Le badge ↺ doit apparaître dans la grille d'historique sur le coup ply 3
+		const badge = wrapper.find( '.undone-move-badge' );
+		expect( badge.exists() ).toBe( true );
+		expect( badge.attributes( 'title' ) ).toContain( 'Qh5' );
+
+		const vm = wrapper.vm as unknown as AnalysisPageVm;
+
+		// En mode Bilan, la sélection du ply 3 affiche la ligne "Coup(s) repris : ♛h5"
+		vm.gameReviewReport = mockReviewReport;
+		vm.viewPly( 3 );
+		await wrapper.vm.$nextTick();
+
+		const undoneRow = wrapper.find( '.undone-row' );
+		expect( undoneRow.exists() ).toBe( true );
+		expect( undoneRow.text() ).toContain( 'Coup(s) repris' );
+		expect( undoneRow.text() ).toContain( 'h5' );
 	} );
 } );

@@ -5,8 +5,7 @@ import type {
 	BoardCore,
 	EngineStatus,
 	StockfishEvaluation,
-	Key,
-	Move,
+	CoachAlertDetail,
 } from '@/components/shared/Chessboard/types';
 import { useChessStore } from '@/stores/chess';
 import { useFeedback } from '@/composables/core/useFeedback';
@@ -16,11 +15,6 @@ import {
 } from '@/utils/chess/boardApiWrapper';
 import { normalizeCastlingMoves } from '@/utils/chess/stockfish';
 import { formatExportPgn, formatPgnDate } from '@/utils/chess/pgnExport';
-import {
-	analyzePositionTactics,
-	classifyMoveDiff,
-	judgementToGlyph,
-} from '@/utils/chess/tacticalGlyphs';
 
 function getStoredPlayerName(): string {
 	try {
@@ -93,8 +87,6 @@ export function usePlayGame() {
 	} );
 
 	const isAwaitingCoachConfirmation = ref( false );
-	const userDismissedPly = ref< number | null >( null );
-	const lastEvalBeforeMove = ref< StockfishEvaluation | null >( null );
 
 	watch(
 		() => gameSettings.coachMode,
@@ -236,8 +228,6 @@ export function usePlayGame() {
 		boardApi = api;
 		lastHelpPly = null;
 		isAwaitingCoachConfirmation.value = false;
-		userDismissedPly.value = null;
-		lastEvalBeforeMove.value = null;
 		if ( chessStore.currentPgn ) {
 			boardApi.loadPgn( chessStore.currentPgn );
 			boardConfig.orientation = chessStore.orientation;
@@ -291,7 +281,6 @@ export function usePlayGame() {
 		}
 
 		isAwaitingCoachConfirmation.value = false;
-		userDismissedPly.value = null;
 		oupsCount.value++;
 		boardApi.hideMoves();
 		boardApi.clearGlyphs();
@@ -346,6 +335,7 @@ export function usePlayGame() {
 		if ( boardConfig.viewOnly ) {
 			return;
 		}
+		isAwaitingCoachConfirmation.value = false;
 		const isDraw = type === 'stalemate' || type === 'draw';
 		const symbol = isDraw ? '🤝' : '🏁';
 		let result = '*';
@@ -626,64 +616,10 @@ export function usePlayGame() {
 			gameSettings.coachMode
 		);
 
-		const isHumanJustPlayed =
-			gameSettings.gameMode === '1player'
-				? boardApi.getTurnColor() !== boardConfig.playerColor
-				: true;
-
-		if ( gameSettings.coachMode && isHumanJustPlayed ) {
-			const currentFen = boardApi.getFen();
-			const playerCol = (
-				boardConfig.playerColor === 'both'
-					? 'white'
-					: boardConfig.playerColor
-			) as 'white' | 'black';
-			const tactics = analyzePositionTactics( currentFen, playerCol );
-			const history = ( boardApi.getHistory( true ) as Move[] ) || [];
-			const lastMove =
-				history.length > 0 ? history[ history.length - 1 ] : null;
-			const ply = boardApi.getCurrentPlyNumber();
-
-			boardApi.clearGlyphs();
-
-			for ( const sq of tactics.pinnedSquares ) {
-				boardApi.setGlyph( sq, 'pin' );
-			}
-
-			// Si l'utilisateur a déjà choisi de continuer sur ce ply, ne pas ré-interrompre
-			if ( userDismissedPly.value === ply ) {
-				return;
-			}
-
-			if ( tactics.undefendedSquares.length > 0 && tactics.hasMajorThreat ) {
-				for ( const sq of tactics.undefendedSquares ) {
-					boardApi.setGlyph( sq, 'undefended' );
-				}
-				if ( lastMove && lastMove.to ) {
-					boardApi.setGlyph( lastMove.to as Key, '??' );
-				}
-
-				isAwaitingCoachConfirmation.value = true;
-				gameStatus.message =
-					'⚠️ Oups ! Tu laisses une pièce sans défense. Veux-tu corriger ?';
-				gameStatus.color = 'warning';
-				return;
-			}
-
-			isAwaitingCoachConfirmation.value = false;
-			if ( lastMove && lastMove.to ) {
-				boardApi.setGlyph( lastMove.to as Key, '!' );
-			}
-			if ( gameStatus.color === 'warning' ) {
-				gameStatus.message = '';
-				gameStatus.color = 'medium';
-			}
-		} else {
-			isAwaitingCoachConfirmation.value = false;
-			if ( gameStatus.color === 'warning' ) {
-				gameStatus.message = '';
-				gameStatus.color = 'medium';
-			}
+		isAwaitingCoachConfirmation.value = false;
+		if ( gameStatus.color === 'warning' ) {
+			gameStatus.message = '';
+			gameStatus.color = 'medium';
 		}
 
 		if ( isHintEnabled.value ) {
@@ -691,19 +627,31 @@ export function usePlayGame() {
 		}
 	};
 
+	const handleCoachAlert = ( detail: CoachAlertDetail ) => {
+		isAwaitingCoachConfirmation.value = true;
+		gameStatus.message =
+			detail.reason === 'bad_trade'
+				? '⚠️ Oups ! Cet échange semble défavorable. Veux-tu corriger ?'
+				: '⚠️ Oups ! Tu laisses une pièce sans défense. Veux-tu corriger ?';
+		gameStatus.color = 'warning';
+	};
+
 	const coachUndoMove = () => {
 		if ( ! boardApi ) {
 			return;
 		}
-		userDismissedPly.value = null;
 		isAwaitingCoachConfirmation.value = false;
 		oupsCount.value++;
-		boardApi.clearGlyphs();
 		boardApi.hideMoves();
 		lastSuggestedMove.value = '';
 		lastHelpPly = null;
 
-		apiUndoMove( boardApi, false );
+		if ( typeof boardApi.coachUndo === 'function' ) {
+			boardApi.coachUndo();
+		} else {
+			boardApi.clearGlyphs();
+			apiUndoMove( boardApi, false );
+		}
 		boardConfig.viewOnly = false;
 		refreshDisplay();
 
@@ -732,10 +680,12 @@ export function usePlayGame() {
 		if ( ! boardApi ) {
 			return;
 		}
-		userDismissedPly.value = boardApi.getCurrentPlyNumber();
 		isAwaitingCoachConfirmation.value = false;
 		gameStatus.message = '';
 		gameStatus.color = 'medium';
+		if ( typeof boardApi.coachProceed === 'function' ) {
+			boardApi.coachProceed();
+		}
 	};
 
 	const handleEngineStatus = ( status: EngineStatus ) => {
@@ -747,43 +697,6 @@ export function usePlayGame() {
 
 	const handleEvaluation = ( evaluation: StockfishEvaluation ) => {
 		currentEvaluation.value = evaluation;
-
-		if ( gameSettings.coachMode && boardApi && isHumanTurn() ) {
-			lastEvalBeforeMove.value = evaluation;
-		} else if (
-			gameSettings.coachMode &&
-			boardApi &&
-			! isHumanTurn() &&
-			lastEvalBeforeMove.value &&
-			evaluation.depth >= 6 &&
-			lastEvalBeforeMove.value.ply === currentPly.value - 1
-		) {
-			const playerCol = (
-				boardConfig.playerColor === 'both'
-					? 'white'
-					: boardConfig.playerColor
-			) as 'white' | 'black';
-			const bestWinChance =
-				playerCol === 'white'
-					? lastEvalBeforeMove.value.winChancePercentage
-					: 100 - lastEvalBeforeMove.value.winChancePercentage;
-			const playedWinChance =
-				playerCol === 'white'
-					? evaluation.winChancePercentage
-					: 100 - evaluation.winChancePercentage;
-
-			const diff = Math.max( 0, bestWinChance - playedWinChance );
-			const judgement = classifyMoveDiff( diff );
-			const glyph = judgementToGlyph( judgement );
-
-			const history = ( boardApi.getHistory( true ) as Move[] ) || [];
-			const lastMove =
-				history.length > 0 ? history[ history.length - 1 ] : null;
-
-			if ( lastMove && lastMove.to ) {
-				boardApi.setGlyph( lastMove.to as Key, glyph );
-			}
-		}
 	};
 
 	const isGameOver = computed(
@@ -824,6 +737,7 @@ export function usePlayGame() {
 		undoMove,
 		coachUndoMove,
 		coachProceed,
+		handleCoachAlert,
 		onPlayerMove,
 		handleCheck,
 		handleGameOver,

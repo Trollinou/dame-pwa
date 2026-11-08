@@ -232,6 +232,13 @@
                       <span v-safe-html="formatSan(selectedMoveAnalysis.san)"></span>
                     </span>
                   </div>
+                  <div v-if="activeUndoneMoves.length > 0" class="move-detail-row undone-row">
+                    <span class="detail-label">Coup(s) repris :</span>
+                    <span class="detail-move undone-move">
+                      <span class="arrow-indicator arrow-yellow">↺</span>
+                      <span v-safe-html="formatSan(activeUndoneMoves.join(', '))"></span>
+                    </span>
+                  </div>
                   <div v-if="selectedMoveAnalysis.bestMoveSan && selectedMoveAnalysis.bestMoveUci !== selectedMoveAnalysis.uci" class="move-detail-row best-row">
                     <span class="detail-label">Meilleur coup :</span>
                     <span class="detail-move best-move">
@@ -269,6 +276,15 @@
                 class="analysis-pv-info"
               >
                 <strong>Meilleure suite :</strong> {{ currentEvaluation.pv.slice(0, 5).join(' ') }}
+              </div>
+
+              <!-- Bandeau coup(s) repris hors mode Bilan -->
+              <div
+                v-if="(!gameReviewReport || isReviewing) && activeUndoneMoves.length > 0"
+                class="analysis-undone-banner"
+              >
+                <span class="undone-banner-label">↺ Coup(s) repris à ce tour :</span>
+                <span class="undone-banner-moves" v-safe-html="formatSan(activeUndoneMoves.join(', '))"></span>
               </div>
 
               <div class="history-controls">
@@ -320,6 +336,11 @@
                         >
                           <span v-safe-html="formatSan(move.white.san)"></span>
                           <span
+                            v-if="move.white.undoneMoves.length > 0"
+                            class="undone-move-badge"
+                            :title="`Coup(s) repris : ${move.white.undoneMoves.join(', ')}`"
+                          >↺</span>
+                          <span
                             v-if="judgementsMap.get(move.white.ply)"
                             :class="['judgement-badge', judgementConfig[judgementsMap.get(move.white.ply)!].class]"
                           >{{ judgementConfig[judgementsMap.get(move.white.ply)!].symbol }}</span>
@@ -330,6 +351,11 @@
                           @click="viewPly(move.black.ply)"
                         >
                           <span v-safe-html="formatSan(move.black.san)"></span>
+                          <span
+                            v-if="move.black.undoneMoves.length > 0"
+                            class="undone-move-badge"
+                            :title="`Coup(s) repris : ${move.black.undoneMoves.join(', ')}`"
+                          >↺</span>
                           <span
                             v-if="judgementsMap.get(move.black.ply)"
                             :class="['judgement-badge', judgementConfig[judgementsMap.get(move.black.ply)!].class]"
@@ -410,10 +436,16 @@ import {
 } from '@/utils/chess/stockfish';
 import { useChessStore } from '@/stores/chess';
 
+export interface HistoryMoveEntry {
+  san: string;
+  ply: number;
+  undoneMoves: string[];
+}
+
 export interface HistoryMoveItem {
   number: number;
-  white: { san: string; ply: number };
-  black: { san: string; ply: number } | null;
+  white: HistoryMoveEntry;
+  black: HistoryMoveEntry | null;
 }
 
 const chessStore = useChessStore();
@@ -458,6 +490,7 @@ const selectedReviewPly = ref<number | null>(null);
 const isViewingBeforeMove = ref(true);
 const totalPlyCount = ref(0);
 const historyMoves = ref<HistoryMoveItem[]>([]);
+const undoneMovesMap = ref<Map<number, string[]>>(new Map());
 const historyScrollContainer = ref<HTMLElement | null>(null);
 
 const activePly = computed(() => {
@@ -465,6 +498,10 @@ const activePly = computed(() => {
     return selectedReviewPly.value;
   }
   return currentPly.value;
+});
+
+const activeUndoneMoves = computed(() => {
+  return undoneMovesMap.value.get(activePly.value) || [];
 });
 
 const isLandscape = ref(window.innerWidth > window.innerHeight);
@@ -603,6 +640,26 @@ const formatSan = (san: string) => {
 };
 
 /**
+ * Extrait les sous-variantes (coups repris) enregistrées à un demi-coup donné.
+ */
+const getUndoneMovesAtPly = (ply: number): string[] => {
+  if (!boardApi || typeof boardApi.getVariationsAtPly !== 'function') {
+    return [];
+  }
+  try {
+    const variations = boardApi.getVariationsAtPly(ply);
+    if (!Array.isArray(variations) || variations.length <= 1) {
+      return [];
+    }
+    return variations
+      .filter(v => !v.isMainline && v.san)
+      .map(v => v.san);
+  } catch {
+    return [];
+  }
+};
+
+/**
  * Organise l'historique brut en liste structurée
  */
 const updateMoveHistory = () => {
@@ -611,15 +668,39 @@ const updateMoveHistory = () => {
   const getSan = (item: string | { san: string }): string =>
     typeof item === 'string' ? item : item.san;
   const moves: HistoryMoveItem[] = [];
+  const nextUndoneMap = new Map<number, string[]>();
   for (let i = 0; i < rawHistory.length; i += 2) {
     const whiteMove = rawHistory[i];
     const blackMove = rawHistory[i + 1];
+    const whitePly = i + 1;
+    const whiteUndone = getUndoneMovesAtPly(whitePly);
+    if (whiteUndone.length > 0) {
+      nextUndoneMap.set(whitePly, whiteUndone);
+    }
+    let blackEntry: HistoryMoveEntry | null = null;
+    if (blackMove) {
+      const blackPly = i + 2;
+      const blackUndone = getUndoneMovesAtPly(blackPly);
+      if (blackUndone.length > 0) {
+        nextUndoneMap.set(blackPly, blackUndone);
+      }
+      blackEntry = {
+        san: getSan(blackMove),
+        ply: blackPly,
+        undoneMoves: blackUndone
+      };
+    }
     moves.push({
       number: Math.floor(i / 2) + 1,
-      white: { san: getSan(whiteMove), ply: i + 1 },
-      black: blackMove ? { san: getSan(blackMove), ply: i + 2 } : null
+      white: {
+        san: getSan(whiteMove),
+        ply: whitePly,
+        undoneMoves: whiteUndone
+      },
+      black: blackEntry
     });
   }
+  undoneMovesMap.value = nextUndoneMap;
   historyMoves.value = moves;
 };
 

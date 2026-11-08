@@ -253,13 +253,13 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
    - **Mode 1 Joueur (vs Stockfish 19)** :
      - Choix de la couleur (Blancs, Noirs ou Aléatoire).
      - Choix du niveau Elo de 1320 à 3190 (mémorisé pour les prochaines parties).
-     - **Mode Coach Bienveillant (Feedback Didactique en Temps Réel)** :
-       - Option activable / désactivable dans les paramètres de la partie (mémorisée localement) avec indicateur `🎓 Coach` dans la barre d'information.
-       - **Fluidité continue sur les bons coups** : Appréciation visuelle sur la case d'arrivée (`!`, `✓`) sans aucun clic de confirmation rébarbatif, laissant Stockfish répondre à son rythme naturel.
-       - **Interruption conditionnelle sur Gaffe (`??`) ou Pièce en prise (`undefended`)** : Dès qu'une vulnérabilité tactique majeure est commise (ou pièce clouée `pin`), Stockfish est automatiquement mis en pause pour éviter une capture brutale immédiate.
+     - **Mode Coach Bienveillant Natif (`eg-chessboard` 1.8.2)** :
+       - Option activable / désactivable dans les paramètres de la partie (`StockfishConfig.coachMode`, mémorisée localement) avec indicateur `🎓 Coach` dans la barre d'information.
+       - **Fluidité continue & Immunité Intelligente** : Appréciation visuelle sur la case d'arrivée (`!`) sans aucun clic de confirmation rébarbatif, laissant Stockfish répondre à son rythme naturel. Les coups recommandés par l'aide Stockfish (`💡 Aide`) ainsi que les coups mettant fin à la partie (échec et mat, pat, nulle) bénéficient d'une immunité automatique et ne déclenchent jamais de fausse alerte de gaffe.
+       - **Interruption conditionnelle sur Pièce en prise (`hanging_piece`) ou Échange défavorable (`bad_trade`)** : Dès qu'une vulnérabilité tactique majeure est commise (`@coach-alert`), Stockfish est mis en pause douce par `eg-chessboard` (sans détruire le Web Worker) pour éviter une capture brutale immédiate.
        - **Bandeau didactique interactif** : Propose deux choix instantanés en 1 clic :
-         - `[ 🔄 Reprendre ]` : Rembobine le coup d'un demi-coup (incrémente le compteur « Oups ») pour laisser l'élève trouver une meilleure case.
-         - `[ ⏩ Laisser jouer ]` : Réactive Stockfish pour observer la réplique du moteur.
+         - `[ 🔄 Reprendre ]` : Appelle `boardApi.coachUndo()` pour annuler le demi-coup du joueur et nettoyer les glyphes d'alerte (incrémente le compteur « Oups »). Lorsqu'un nouveau coup est joué ensuite, il devient automatiquement la ligne principale (mainline) tandis que le coup annulé est conservé en sous-variante PGN (`( 2. Qh5 )`).
+         - `[ ⏩ Continuer ]` : Appelle `boardApi.coachProceed()` pour lever la pause et laisser Stockfish jouer immédiatement sa réplique.
        - **Persistance des glyphes** : Les badges d'évaluation et alertes tactiques restent affichés jusqu'au début du coup suivant de l'adhérent pour faciliter la compréhension cause-à-effet.
      - Temps de réflexion et limitation fine en nœuds déterministes selon l'Elo (`getNodesForElo`).
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
@@ -293,7 +293,8 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
       - *Badges visuels automatiques (v1.7.4+)* : Lors de la navigation dans l'historique de la partie analysée, l'échiquier affiche nativement le badge de jugement du coup (`!!`, `??`, `!`, `?`, `?!`) sur la case d'arrivée sans surcharger le PGN.
       - *Inspection didactique coup par coup* : Dès la sélection d'un coup dans l'historique (ou sélection automatique de la première imprécision/erreur à la fin du bilan), l'échiquier se positionne par défaut sur la position **avant le coup** ($N-1$).
       - *Double flèche visuelle* : Tracé simultané de la flèche du coup joué (couleur selon le jugement : rouge pour gaffe, jaune pour imprécision/erreur, bleue pour bon coup) et de la flèche verte du **meilleur coup alternatif**.
-      - *Fiche de coup interactive* : Carte dédiée affichant le coup joué, le meilleur coup recommandé, les annotations et un sélecteur « Avant le coup » / « Après le coup » pour alterner entre la vue de départ et le résultat sur le plateau (avec nettoyage propre des glyphes pré-coup).
+      - *Fiche de coup interactive* : Carte dédiée affichant le coup joué, les éventuels coups repris (`↺ Coup(s) repris`), le meilleur coup recommandé, les annotations et un sélecteur « Avant le coup » / « Après le coup » pour alterner entre la vue de départ et le résultat sur le plateau (avec nettoyage propre des glyphes pré-coup).
+      - *Signalement visuel des coups repris (`eg-chessboard` 1.8.2)* : Les coups ayant fait l'objet d'une reprise (`undoLastMove()` / `coachUndo()`) arborent un badge `↺` dans la grille d'historique et affichent le détail des coups annulés dans la fiche de coup (en mode Bilan) ou dans un bandeau dédié lors de la navigation.
       - *Cohérence « Conseil » & « Éval direct »* : En mode Bilan, le bouton « Conseil » restitue directement la recommandation du bilan pour le coup analysé, et « Éval direct » évalue la position au trait du joueur qui doit exécuter ce coup.
      - **Exportation et Copie PGN Enrichie (`copyOutline`)** : Bouton dans la barre d'en-tête permettant de copier instantanément le PGN complet dans le presse-papier avec le Seven Tag Roster standard FIDE (`Event`, `Site`, `Date`, `Round`, `White`, `Black`, `Result`) et les métadonnées d'arbitrage et d'entraînement (`WhiteElo`, `BlackElo`, `Variant`, `Termination`, `Annotator`, `Takebacks`, `Hints`), accompagné d'un toast de confirmation.
 

@@ -75,4 +75,18 @@ describe( 'pgnExport utils', () => {
 		expect( pgn ).toContain( '[Result "*"]' );
 		expect( pgn.endsWith( '1. d4 d5 2. c4 *' ) ).toBe( true );
 	} );
+
+	it( 'formatExportPgn preserves sub-variations from undone moves (eg-chessboard 1.8.2)', () => {
+		const pgn = formatExportPgn( {
+			pgn: '1. e4 e5 2. Nf3 ( 2. Qh5 ) 2... Nc6 *',
+			white: 'Adhérent',
+			black: 'Stockfish',
+			result: '1-0',
+			takebacks: 1,
+		} );
+
+		expect( pgn ).toContain( '[Takebacks "1"]' );
+		expect( pgn ).toContain( '[Result "1-0"]' );
+		expect( pgn ).toContain( '1. e4 e5 2. Nf3 ( 2. Qh5 ) 2... Nc6 1-0' );
+	} );
 } );

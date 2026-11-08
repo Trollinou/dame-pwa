@@ -39,6 +39,7 @@
       @resign="(detail: { color: 'white' | 'black'; winner: 'white' | 'black' }) => emit('resign', detail)"
       @draw-declined="(detail?: { reason?: string }) => emit('draw-declined', detail)"
       @draw-offer="(fromColor: 'white' | 'black') => emit('draw-offer', fromColor)"
+      @coach-alert="(detail: CoachAlertDetail) => emit('coach-alert', detail)"
     />
 
     <!-- Modale de Zoom Téléportée dans le body -->
@@ -91,7 +92,8 @@ import type {
   Move,
   DrawShape,
   BoardGlyph,
-  Key
+  Key,
+  CoachAlertDetail
 } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { loadPieceSetStyle } from '@/composables/core/useChessThemeLoader';

@@ -16,6 +16,9 @@ import type {
 	BoardGlyph,
 	TacticalGlyph,
 	AssessmentGlyph,
+	CoachAlertDetail,
+	CoachAlertReason,
+	TacticalAnalysisResult,
 } from 'eg-chessboard';
 export type {
 	BoardCore,
@@ -35,6 +38,9 @@ export type {
 	BoardGlyph,
 	TacticalGlyph,
 	AssessmentGlyph,
+	CoachAlertDetail,
+	CoachAlertReason,
+	TacticalAnalysisResult,
 };
 export {
 	computeEvalBarPercentage,
@@ -181,4 +187,5 @@ export type ChessboardEmits = {
 		_e: 'draw-offer',
 		_fromColor?: 'white' | 'black' | { color?: string }
 	): void;
+	( _e: 'coach-alert', _detail: CoachAlertDetail ): void;
 };

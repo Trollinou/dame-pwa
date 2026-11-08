@@ -104,4 +104,29 @@ describe( 'PlayActionsPanel.vue', () => {
 		expect( text ).not.toContain( 'Nouveau' );
 		expect( text ).not.toContain( 'Analyse' );
 	} );
+
+	it( 'gives priority to isGameOver over isAwaitingCoachConfirmation', () => {
+		const wrapper = mount( PlayActionsPanel, {
+			props: {
+				isLandscape: false,
+				gameStatusMessage: '🏁 Échec et mat',
+				gameStatusColor: 'danger',
+				turnColor: 'black',
+				isHintEnabled: false,
+				helpCount: 0,
+				oupsCount: 0,
+				viewOnly: true,
+				isGameOver: true,
+				isAwaitingCoachConfirmation: true,
+				isCoachMode: true,
+				currentPly: 15,
+			},
+		} );
+
+		const text = wrapper.text();
+		expect( text ).toContain( 'Nouveau' );
+		expect( text ).toContain( 'Analyse' );
+		expect( text ).not.toContain( 'Reprendre' );
+		expect( text ).not.toContain( 'Continuer' );
+	} );
 } );
