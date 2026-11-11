@@ -120,6 +120,9 @@ export function usePlayGame() {
 		movable: {
 			color: 'white' as 'white' | 'black' | 'both',
 		},
+		highlight: {
+			lastMove: true,
+		},
 		viewOnly: false,
 	} );
 

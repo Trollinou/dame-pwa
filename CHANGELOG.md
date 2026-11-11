@@ -6,6 +6,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.6] - 2026-11-11
+
+- **Surbrillance Visuelle du Dernier Coup en Partie & Alignement `eg-chessboard` 1.8.4 (`PlayPage.vue`, `usePlayGame.ts`, `README.md`, `USING.md`)** :
+  - **Persistance de la Surbrillance du Coup Joué (`PlayPage.vue`, `usePlayGame.ts`)** :
+    - Activation explicite de la prop `:highlight-last-move="true"` sur le composant `<Chessboard>` et déclaration de `highlight: { lastMove: true }` dans `boardConfig` au sein du composable `usePlayGame`.
+    - Assure le maintien visuel des cases de départ et d'arrivée en surbrillance (.`last-move`) aussi bien pour les répliques du moteur Stockfish que pour les coups du joueur.
+  - **Compatibilité & Alignement Bibliothèque (`eg-chessboard` v1.8.4)** :
+    - Exploitation des améliorations de synchronisation et de gestion des options de surbrillance introduites dans `eg-chessboard` v1.8.4.
+
 ## [1.13.5] - 2026-11-08
 
 - **Légende des Glyphes en Mode Coach & Analyse (`CoachLegendModal.vue`, `PlayInfoBar.vue`, `PlayPage.vue`, `_learning-components.scss`, `CoachLegendModal.spec.ts`, `PlayInfoBar.spec.ts`, `README.md`, `USING.md`)** :

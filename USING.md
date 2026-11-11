@@ -263,6 +263,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
        - **Persistance des glyphes** : Les badges d'évaluation et alertes tactiques restent affichés jusqu'au début du coup suivant de l'adhérent pour faciliter la compréhension cause-à-effet.
      - Temps de réflexion et limitation fine en nœuds déterministes selon l'Elo (`getNodesForElo`).
      - Indicateur dynamique de réflexion de l'ordinateur en direct.
+     - **Surbrillance du dernier coup joué (`highlightLastMove`)** : Maintien continu de la surbrillance des cases de départ et d'arrivée (`.last-move`) aussi bien pour les coups du joueur que pour les répliques de l'ordinateur, offrant un repère visuel immédiat lors des transitions tactiques.
      - Demande de conseil dynamique MultiPV en cours de partie à pleine puissance 3500+ Elo même en mode 2 joueurs (`core.requestHint({ multiPv: 3, movetime: 1500, maxScoreDiffCp: 50, drawArrows: true })`).
      - Réinitialisation propre de la partie et purge UCI (`core.newGame()`) sans détruire le Web Worker.
      - **Panneau d'actions dynamique épuré (`PlayActionsPanel.vue`) & Tiroir de Réglages (`PlaySettingsModal.vue`)** :

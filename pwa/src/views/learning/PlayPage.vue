@@ -30,6 +30,7 @@
                 :board-config="boardConfig"
                 :player-color="boardConfig.playerColor"
                 :stockfish-config="stockfishConfig"
+                :highlight-last-move="true"
                 @board-created="handleBoardCreated"
                 @move="handleMove"
                 @turn-change="(turn, ply) => { turnColor = turn; currentPly = ply; }"
