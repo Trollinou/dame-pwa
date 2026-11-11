@@ -109,6 +109,7 @@ import {
   IonButton,
   IonBackButton,
   IonSpinner,
+  onIonViewDidEnter,
   onIonViewWillLeave
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
@@ -269,22 +270,36 @@ const startNewGame = () => {
 };
 
 onMounted(() => {
-  const savedLevel = localStorage.getItem('dame_pwa_play_elo');
-  if (savedLevel) {
-    const parsed = parseInt(savedLevel, 10);
-    if (!isNaN(parsed) && parsed >= 1320 && parsed <= 3190) {
-      gameSettings.level = parsed;
+  if (!chessStore.currentPgn) {
+    const savedLevel = localStorage.getItem('dame_pwa_play_elo');
+    if (savedLevel) {
+      const parsed = parseInt(savedLevel, 10);
+      if (!isNaN(parsed) && parsed >= 1320 && parsed <= 3190) {
+        gameSettings.level = parsed;
+      }
+    } else if (authStore.selectedIdentity?.elo_rapide) {
+      const eloRaw = String(authStore.selectedIdentity.elo_rapide);
+      const match = eloRaw.match(/\d+/);
+      const eloNum = match ? parseInt(match[0], 10) : 1320;
+      gameSettings.level = isNaN(eloNum) || eloNum < 1320 ? 1320 : eloNum > 3190 ? 3190 : eloNum;
+    } else {
+      gameSettings.level = 1320;
     }
-  } else if (authStore.selectedIdentity?.elo_rapide) {
-    const eloRaw = String(authStore.selectedIdentity.elo_rapide);
-    const match = eloRaw.match(/\d+/);
-    const eloNum = match ? parseInt(match[0], 10) : 1320;
-    gameSettings.level = isNaN(eloNum) || eloNum < 1320 ? 1320 : eloNum > 3190 ? 3190 : eloNum;
-  } else {
-    gameSettings.level = 1320;
   }
   engineLoaded.value = true;
   void chessStore.syncPendingGames();
+});
+
+onIonViewDidEnter(() => {
+  const api = getBoardApi();
+  if (api) {
+    if (typeof api.isViewingHistory === 'function' && api.isViewingHistory()) {
+      api.stopViewingHistory();
+    }
+    if (typeof api.redraw === 'function') {
+      api.redraw();
+    }
+  }
 });
 
 onUnmounted(() => {

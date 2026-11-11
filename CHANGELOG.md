@@ -6,6 +6,20 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.7] - 2026-11-11
+
+- **Restauration Fidèle de la Position Active en Partie d'Échecs (`usePlayGame.ts`, `PlayPage.vue`, `usePlayGame.spec.ts`, `USING.md`)** :
+  - **Correction du Rétablissement de l'Échiquier lors d'un Changement d'Écran (`usePlayGame.ts`)** :
+    - Résolution du problème où le rechargement d'une partie en cours (`loadPgn`) basculait l'échiquier en mode historique au premier coup (`viewStart`, ply 0), affichant l'échiquier de départ alors que la partie était active.
+    - Appel immédiat de `boardApi.stopViewingHistory()` dès le chargement du PGN sauvegardé pour quitter le mode historique et restaurer la position exacte au dernier coup joué avec ses surbrillances.
+    - Initialisation synchrone des configurations du plateau (`orientation`, `playerColor`, `level`, `viewOnly`, compteurs `helpCount` / `oupsCount`) à partir du state persisté `chessStore`, assurant un affichage instantané et conforme avant même la création de l'API d'échiquier.
+    - Relance automatique du moteur Stockfish (`updateStockfishConfig({})`) lors de la reprise si la partie était en attente du coup de l'ordinateur.
+  - **Cycle de Vie Ionic & Rendu Visuel Robuste (`PlayPage.vue`)** :
+    - Ajout du hook `onIonViewDidEnter` pour s'assurer que si la vue est restaurée depuis le cache d'historique Ionic, l'échiquier quitte systématiquement la vue historique et recalcule son agencement DOM (`boardApi.redraw()`).
+    - Préservation du niveau Elo de la partie en cours sans écrasement par les préférences par défaut lors du rechargement.
+  - **Couverture de Tests (`usePlayGame.spec.ts`)** :
+    - Ajout de tests unitaires Vitest vérifiant le rétablissement de la position en cours lors de la reprise (sortie d'historique `stopViewingHistory`, déclenchement de Stockfish si tour IA, maintien en attente si tour joueur).
+
 ## [1.13.6] - 2026-11-11
 
 - **Surbrillance Visuelle du Dernier Coup en Partie & Alignement `eg-chessboard` 1.8.4 (`PlayPage.vue`, `usePlayGame.ts`, `README.md`, `USING.md`)** :

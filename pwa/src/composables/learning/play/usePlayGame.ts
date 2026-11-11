@@ -52,18 +52,49 @@ export function usePlayGame() {
 	const engineLoaded = ref( false );
 	const engineStatus = ref< EngineStatus >( 'uninitialized' );
 	const currentEvaluation = ref< StockfishEvaluation | null >( null );
+	const hasSavedGame = Boolean( chessStore.currentPgn );
+	const initialOrientation =
+		hasSavedGame && chessStore.orientation
+			? chessStore.orientation
+			: 'white';
+	const savedLevel = localStorage.getItem( 'dame_pwa_play_elo' );
+	const initialLevel = savedLevel ? parseInt( savedLevel, 10 ) : 1320;
+	const fallbackLevel = isNaN( initialLevel ) ? 1320 : initialLevel;
+	const initialElo =
+		hasSavedGame && chessStore.engineElo
+			? chessStore.engineElo
+			: fallbackLevel;
+	const savedCoachMode = localStorage.getItem( 'dame_pwa_coach_mode' );
+	const initialCoachMode =
+		savedCoachMode !== null ? savedCoachMode === 'true' : true;
+
 	const showSettings = ref( false );
 	const isHintEnabled = ref( false );
 	const currentPly = ref( 0 );
-	const oupsCount = ref( 0 );
-	const helpCount = ref( 0 );
+	const oupsCount = ref(
+		hasSavedGame ? chessStore.oupsCount || 0 : 0
+	);
+	const helpCount = ref(
+		hasSavedGame ? chessStore.helpCount || 0 : 0
+	);
 	const lastSuggestedMove = ref( '' );
 	const lastSuggestedHints = ref< StockfishHint[] >( [] );
 	const turnColor = ref< 'white' | 'black' >( 'white' );
 
+	let initialGameStatusMessage = '';
+	if ( hasSavedGame && chessStore.isGameOver && chessStore.gameOverReason ) {
+		initialGameStatusMessage = chessStore.gameOverReason;
+	}
+
+	let initialGameStatusColor = 'medium';
+	if ( hasSavedGame && chessStore.isGameOver ) {
+		initialGameStatusColor =
+			chessStore.gameResult === '1/2-1/2' ? 'medium' : 'danger';
+	}
+
 	const gameStatus = reactive( {
-		message: '',
-		color: 'medium',
+		message: initialGameStatusMessage,
+		color: initialGameStatusColor,
 	} );
 
 	const gameStartTime = ref( Date.now() );
@@ -76,15 +107,10 @@ export function usePlayGame() {
 			Math.round( ( Date.now() - gameStartTime.value ) / 1000 )
 		);
 
-	const savedLevel = localStorage.getItem( 'dame_pwa_play_elo' );
-	const initialLevel = savedLevel ? parseInt( savedLevel, 10 ) : 1320;
-	const savedCoachMode = localStorage.getItem( 'dame_pwa_coach_mode' );
-	const initialCoachMode = savedCoachMode !== null ? savedCoachMode === 'true' : true;
-
 	const gameSettings = reactive( {
 		gameMode: '1player' as '1player' | '2players',
-		playerColor: 'white' as 'white' | 'black' | 'random',
-		level: isNaN( initialLevel ) ? 1320 : initialLevel,
+		playerColor: initialOrientation as 'white' | 'black' | 'random',
+		level: initialElo,
 		coachMode: initialCoachMode,
 	} );
 
@@ -115,15 +141,15 @@ export function usePlayGame() {
 	const boardConfig = reactive( {
 		coordinates: true,
 		autoCastling: true,
-		orientation: 'white' as 'white' | 'black',
-		playerColor: 'white' as 'white' | 'black' | 'both',
+		orientation: initialOrientation as 'white' | 'black',
+		playerColor: initialOrientation as 'white' | 'black' | 'both',
 		movable: {
-			color: 'white' as 'white' | 'black' | 'both',
+			color: initialOrientation as 'white' | 'black' | 'both',
 		},
 		highlight: {
 			lastMove: true,
 		},
-		viewOnly: false,
+		viewOnly: hasSavedGame ? chessStore.isGameOver : false,
 	} );
 
 	const playerColor = computed< 'white' | 'black' >(
@@ -266,12 +292,25 @@ export function usePlayGame() {
 		lastHelpPly = null;
 		isAwaitingCoachConfirmation.value = false;
 		if ( chessStore.currentPgn ) {
-			boardApi.loadPgn( chessStore.currentPgn );
 			boardConfig.orientation = chessStore.orientation;
 			boardConfig.playerColor = chessStore.orientation;
 			boardConfig.movable.color = chessStore.orientation;
 			gameSettings.level = chessStore.engineElo;
 			gameSettings.playerColor = chessStore.orientation;
+
+			if ( typeof boardApi.setPlayerColor === 'function' ) {
+				boardApi.setPlayerColor( chessStore.orientation );
+			}
+
+			try {
+				boardApi.loadPgn( chessStore.currentPgn );
+				normalizeCastlingMoves( boardApi );
+				if ( typeof boardApi.stopViewingHistory === 'function' ) {
+					boardApi.stopViewingHistory();
+				}
+			} catch ( err ) {
+				console.error( 'Erreur lors du rechargement du PGN en cours:', err );
+			}
 
 			helpCount.value = chessStore.helpCount || 0;
 			oupsCount.value = chessStore.oupsCount || 0;
@@ -290,8 +329,27 @@ export function usePlayGame() {
 					gameStatus.message = `🏁 ${ getGameOverReason( boardApi ) }`;
 					gameStatus.color = 'danger';
 				}
+				if ( typeof boardApi.setConfig === 'function' ) {
+					boardApi.setConfig( { viewOnly: true } );
+				}
 			} else {
 				boardConfig.viewOnly = false;
+				if ( boardApi.getIsCheck() ) {
+					const checkColor = boardApi.getInCheckColor();
+					if ( checkColor ) {
+						gameStatus.message = `⚠️ Échec au Roi ${
+							checkColor === 'white' ? 'Blanc' : 'Noir'
+						} !`;
+						gameStatus.color = 'warning';
+					}
+				}
+				if (
+					gameSettings.gameMode === '1player' &&
+					! isHumanTurn() &&
+					typeof boardApi.updateStockfishConfig === 'function'
+				) {
+					boardApi.updateStockfishConfig( {} );
+				}
 			}
 		} else {
 			api.newGame();

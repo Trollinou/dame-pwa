@@ -55,6 +55,10 @@ const createMockBoardApi = (
 		getIsCheck: vi.fn( () => false ),
 		getInCheckColor: vi.fn( () => null ),
 		undoLastMove: vi.fn(),
+		stopViewingHistory: vi.fn(),
+		setPlayerColor: vi.fn(),
+		setConfig: vi.fn(),
+		updateStockfishConfig: vi.fn(),
 		// Helper to advance turn in tests
 		_setTurn: ( turn: 'white' | 'black', ply: number ) => {
 			currentTurn = turn;
@@ -562,5 +566,72 @@ describe( 'usePlayGame - Game Over & Resignation (30-ply rule)', () => {
 		expect( boardConfig.viewOnly ).toBe( true );
 		expect( gameStatus.message ).toContain( 'abandon' );
 		expect( gameStatus.message ).toContain( 'Noirs' );
+	} );
+
+	it( 'resumes an in-progress game by exiting history viewing mode to show current position', () => {
+		const chessStore = useChessStore();
+		chessStore.saveGame(
+			'1. e4 e5 2. Nf3 Nc6',
+			'black',
+			1600,
+			1,
+			2,
+			false,
+			'',
+			'*',
+			true
+		);
+
+		const { setBoardApi, boardConfig, gameSettings, helpCount, oupsCount } =
+			usePlayGame();
+		expect( boardConfig.orientation ).toBe( 'black' );
+		expect( boardConfig.playerColor ).toBe( 'black' );
+		expect( gameSettings.level ).toBe( 1600 );
+		expect( helpCount.value ).toBe( 1 );
+		expect( oupsCount.value ).toBe( 2 );
+
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => chessStore.currentPgn ),
+			getIsGameOver: vi.fn( () => false ),
+		} );
+		mockApi._setTurn( 'white', 4 ); // Computer's turn (White), player is Black
+
+		setBoardApi( mockApi );
+
+		expect( mockApi.setPlayerColor ).toHaveBeenCalledWith( 'black' );
+		expect( mockApi.loadPgn ).toHaveBeenCalledWith( '1. e4 e5 2. Nf3 Nc6' );
+		expect( mockApi.stopViewingHistory ).toHaveBeenCalled();
+		expect( boardConfig.viewOnly ).toBe( false );
+		// Since it is computer's turn (White) in 1player mode, Stockfish calculation should be triggered
+		expect( mockApi.updateStockfishConfig ).toHaveBeenCalledWith( {} );
+	} );
+
+	it( 'resumes an in-progress game on human turn without triggering Stockfish', () => {
+		const chessStore = useChessStore();
+		chessStore.saveGame(
+			'1. e4 e5 2. Nf3 Nc6 3. Bc4',
+			'black',
+			1600,
+			0,
+			0,
+			false,
+			'',
+			'*',
+			true
+		);
+
+		const { setBoardApi, boardConfig } = usePlayGame();
+		const mockApi = createMockBoardApi( {
+			getPgn: vi.fn( () => chessStore.currentPgn ),
+			getIsGameOver: vi.fn( () => false ),
+		} );
+		mockApi._setTurn( 'black', 5 ); // Human's turn (Black)
+
+		setBoardApi( mockApi );
+
+		expect( mockApi.stopViewingHistory ).toHaveBeenCalled();
+		expect( boardConfig.viewOnly ).toBe( false );
+		// Since it is human's turn, updateStockfishConfig is not triggered
+		expect( mockApi.updateStockfishConfig ).not.toHaveBeenCalled();
 	} );
 } );
