@@ -634,4 +634,15 @@ describe( 'usePlayGame - Game Over & Resignation (30-ply rule)', () => {
 		// Since it is human's turn, updateStockfishConfig is not triggered
 		expect( mockApi.updateStockfishConfig ).not.toHaveBeenCalled();
 	} );
+
+	it( 'does not redundantly call newGame or updateStockfishConfig on fresh game initialization (eg-chessboard 1.8.5)', () => {
+		const { setBoardApi, boardConfig } = usePlayGame();
+		const mockApi = createMockBoardApi();
+
+		setBoardApi( mockApi );
+
+		expect( boardConfig.viewOnly ).toBe( false );
+		expect( mockApi.newGame ).not.toHaveBeenCalled();
+		expect( mockApi.updateStockfishConfig ).not.toHaveBeenCalled();
+	} );
 } );

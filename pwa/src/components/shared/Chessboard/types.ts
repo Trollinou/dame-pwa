@@ -52,6 +52,7 @@ export {
 	computeEvalBarPercentage,
 	getNodesForElo,
 	validateFen,
+	normalizeCastlingUci,
 } from 'eg-chessboard';
 
 export interface ChessboardConfig {

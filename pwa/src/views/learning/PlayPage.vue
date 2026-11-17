@@ -234,7 +234,6 @@ const startNewGame = () => {
   const api = getBoardApi();
   if (api) {
     api.cancelReview();
-    api.newGame();
   }
   resetGameStartTime();
 

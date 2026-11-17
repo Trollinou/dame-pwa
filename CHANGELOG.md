@@ -6,6 +6,21 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.8] - 2026-11-17
+
+- **Intégration `eg-chessboard` v1.8.5 (`stockfish.ts`, `Chessboard/types.ts`, `Chessboard.vue`, `usePlayGame.ts`, `PlayPage.vue`, tests & documentation)** :
+  - **Démarrage Automatique Stockfish sans `diagram` (`usePlayGame.ts`, `PlayPage.vue`)** :
+    - Suppression des appels redondants à `api.newGame()` au montage initial d'une nouvelle partie (`setBoardApi`) et avant remontage du composant (`startNewGame`), exploitant l'initialisation et le déclenchement natifs de Stockfish par `BoardCore` 1.8.5 dès sa construction.
+    - Maintien de la relance ciblée `updateStockfishConfig({})` uniquement lors de la reprise d'une partie sauvegardée après `loadPgn()` + `stopViewingHistory()`.
+  - **Normalisation UCI des Roques via `normalizeCastlingUci` (`stockfish.ts`, `Chessboard/types.ts`)** :
+    - Import et ré-export de l'utilitaire natif `normalizeCastlingUci` depuis `eg-chessboard` dans `pwa/src/utils/chess/stockfish.ts` et `pwa/src/components/shared/Chessboard/types.ts`.
+    - Refactorisation de `normalizeCastlingMoves(api)` pour déléguer la conversion `chessops`/Chessground (`e1h1`, `e1a1`, `e8h8`, `e8a8`) vers le standard UCI (`e1g1`, `e1c1`, `e8g8`, `e8c8`) à `normalizeCastlingUci`.
+  - **Exposition de `drawCircle` sur `<Chessboard>` (`Chessboard.vue`)** :
+    - Ajout de `drawCircle(square, brush)` dans `defineExpose` du wrapper maître `<Chessboard>`, désormais compatible avec les glyphes actifs (`customSvg` filtrés par `getShapes()` dans `eg-chessboard` 1.8.5).
+  - **Tests Unitaires & Documentation (`stockfish.spec.ts`, `usePlayGame.spec.ts`, `ChessboardGlyphs.spec.ts`, `README.md`, `USING.md`)** :
+    - Ajout de tests couvrant `normalizeCastlingUci`, l'absence d'appels redondants à `newGame()` / `updateStockfishConfig()` au démarrage d'une nouvelle partie, et la délégation de `drawCircle()` sur `<Chessboard>`.
+    - Mise à jour des dépendances (`package-lock.json`) et de la documentation (`README.md`, `USING.md`).
+
 ## [1.13.7] - 2026-11-11
 
 - **Restauration Fidèle de la Position Active en Partie d'Échecs (`usePlayGame.ts`, `PlayPage.vue`, `usePlayGame.spec.ts`, `USING.md`)** :
