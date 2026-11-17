@@ -7,6 +7,7 @@ import {
 	formatEvaluationScore,
 	validateFen,
 	normalizeCastlingMoves,
+	normalizeCastlingUci,
 	normalizePgn,
 } from '@/utils/chess/stockfish';
 
@@ -145,6 +146,16 @@ describe( 'Stockfish 19 Utilities', () => {
 		// Les coups réguliers ne sont pas altérés
 		expect( mockHistory[ 0 ].to ).toBe( 'e4' );
 		expect( mockHistory[ 1 ].to ).toBe( 'e5' );
+	} );
+
+	it( 'exposes normalizeCastlingUci from eg-chessboard for direct UCI castling normalization', () => {
+		expect( normalizeCastlingUci( 'e1h1' ) ).toBe( 'e1g1' );
+		expect( normalizeCastlingUci( 'e1a1' ) ).toBe( 'e1c1' );
+		expect( normalizeCastlingUci( 'e8h8' ) ).toBe( 'e8g8' );
+		expect( normalizeCastlingUci( 'e8a8' ) ).toBe( 'e8c8' );
+		expect( normalizeCastlingUci( 'e1h1', 'O-O', 'w' ) ).toBe( 'e1g1' );
+		expect( normalizeCastlingUci( 'e8a8', '0-0-0+', 'b' ) ).toBe( 'e8c8' );
+		expect( normalizeCastlingUci( 'e2e4', 'e4', 'w' ) ).toBe( 'e2e4' );
 	} );
 
 	it( 'normalizes PGN with zero-castling and unicode figurines', () => {

@@ -9,6 +9,7 @@ interface ChessboardExposeVm {
 	clearGlyphs: () => void;
 	getGlyph: ( _sq: Key | string ) => BoardGlyph | null;
 	getGlyphs: () => Map<Key, BoardGlyph>;
+	drawCircle: ( _sq: Key | string, _brush: string ) => void;
 }
 
 // Mock eg-chessboard/vue
@@ -48,6 +49,7 @@ describe( 'Chessboard - Badges & Glyphes tactiques (v1.7.4+)', () => {
 			getGlyph: vi.fn( ( sq: Key ) => glyphMap.get( sq ) ?? null ),
 			getGlyphs: vi.fn( () => glyphMap ),
 			clearGlyphs: vi.fn( () => glyphMap.clear() ),
+			drawCircle: vi.fn(),
 			redraw: vi.fn(),
 			destroy: vi.fn(),
 		} as unknown as BoardCore;
@@ -115,9 +117,13 @@ describe( 'Chessboard - Badges & Glyphes tactiques (v1.7.4+)', () => {
 		expect( typeof vm.clearGlyphs ).toBe( 'function' );
 		expect( typeof vm.getGlyph ).toBe( 'function' );
 		expect( typeof vm.getGlyphs ).toBe( 'function' );
+		expect( typeof vm.drawCircle ).toBe( 'function' );
 
 		vm.setGlyph( 'c5', '?!' );
 		expect( mockBoard.setGlyph ).toHaveBeenCalledWith( 'c5', '?!' );
+
+		vm.drawCircle( 'e4', 'green' );
+		expect( mockBoard.drawCircle ).toHaveBeenCalledWith( 'e4', 'green' );
 
 		vm.clearGlyphs();
 		expect( mockBoard.clearGlyphs ).toHaveBeenCalled();

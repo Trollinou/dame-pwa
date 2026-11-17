@@ -352,7 +352,6 @@ export function usePlayGame() {
 				}
 			}
 		} else {
-			api.newGame();
 			resetGameStartTime();
 			boardConfig.viewOnly = false;
 		}

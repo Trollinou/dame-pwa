@@ -449,6 +449,7 @@ defineExpose({
   getGlyphs: () => boardApi.value?.getGlyphs() ?? new Map(),
   drawMoves: (moves: Array<{ from: Key | string; to: Key | string; brush?: string }>, append = true) =>
     boardApi.value?.drawMoves(moves, append),
+  drawCircle: (square: Key | string, brush: string) => boardApi.value?.drawCircle(square, brush),
   getLastHints: () => boardApi.value?.getLastHints() ?? [],
   getLastEvaluations: () => boardApi.value?.getLastEvaluations() ?? []
 });

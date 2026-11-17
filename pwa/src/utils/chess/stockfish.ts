@@ -3,6 +3,7 @@ import {
 	computeEvalBarPercentage,
 	validateFen,
 	normalizePgn,
+	normalizeCastlingUci,
 	type StockfishEvaluation,
 	type EngineStatus,
 } from 'eg-chessboard';
@@ -122,21 +123,24 @@ export function normalizeCastlingMoves( api: unknown ): void {
 					continue;
 				}
 				const move = item as HistoryMoveVerbose;
-				if ( ! move.san ) {
+				if ( ! move.san && ( ! move.from || ! move.to ) ) {
 					continue;
 				}
-				const san = move.san.trim();
-				const isWhite =
+				const uci = `${ move.from ?? '' }${ move.to ?? '' }`;
+				const color =
 					move.color === 'w' ||
+					move.color === 'b' ||
 					move.color === 'white' ||
-					move.from === 'e1';
-				if ( san.startsWith( 'O-O-O' ) || san.startsWith( '0-0-0' ) ) {
-					move.to = isWhite ? 'c1' : 'c8';
-				} else if (
-					san.startsWith( 'O-O' ) ||
-					san.startsWith( '0-0' )
-				) {
-					move.to = isWhite ? 'g1' : 'g8';
+					move.color === 'black'
+						? move.color
+						: undefined;
+				const normalized = normalizeCastlingUci(
+					uci,
+					move.san,
+					color
+				);
+				if ( normalized.length >= 4 ) {
+					move.to = normalized.substring( 2, 4 );
 				}
 			}
 		}
@@ -150,6 +154,7 @@ export {
 	computeEvalBarPercentage,
 	validateFen,
 	normalizePgn,
+	normalizeCastlingUci,
 	type StockfishEvaluation,
 	type EngineStatus,
 };
