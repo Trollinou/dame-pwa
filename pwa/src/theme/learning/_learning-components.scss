@@ -1236,6 +1236,7 @@ cg-board.piece-icon-box {
    ========================================================================== */
 
 .roi-bloc-fen,
+.roi-bloc-diagramme,
 .roi-bloc-pgn {
   margin: 16px auto;
   display: block;
@@ -1428,7 +1429,9 @@ cg-board.piece-icon-box {
    9. Spécificités CapOuPasCap & Vision Viewers
    ========================================================================== */
 
-.cap-ou-pas-cap-viewer-wrapper {
+.cap-ou-pas-cap-viewer-wrapper,
+.placement-viewer-wrapper,
+.abcdaire-viewer-wrapper {
   width: 100%;
 }
 

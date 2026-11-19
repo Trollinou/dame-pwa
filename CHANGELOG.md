@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Alignement des largeurs d'échiquiers et viewers (`_learning-layout.scss`, `_learning-components.scss`)** :
+  - Alignement de `.diagram-viewer-container` sur `max-width: min(100%, 38dvh, 440px)` (identique à `.chessboard-container`) pour uniformiser l'affichage des diagrammes FEN et PGN dans les leçons.
+  - Ajout de `width: 100%` sur `.placement-viewer-wrapper` et `.abcdaire-viewer-wrapper` afin d'éviter leur contraction dans `.exercise-stage`.
+
 - **Nettoyage du balisage SSR WordPress dans `LeconReader.vue`** :
   - Appel à `htmlEl.replaceChildren()` avant `render(vnode, htmlEl)` lors de l'hydratation des blocs `.roi-bloc-fen` et `.roi-bloc-pgn` afin de supprimer le squelette SSR WordPress (`.main-wrap` / `.main-board` / `.pgn-navigation-bar`) qui provoquait un grand espace vide et des contrôles en double au-dessus du `PgnViewer`.
 
