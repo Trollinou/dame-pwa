@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Correctif d'affichage des mini-échiquiers (`_learning-components.scss`)** :
+  - Ajout des dimensions `width: 100%; height: 100%; max-width: none; margin: 0;` sur `.diagram-viewer-container` à l'intérieur de `.chessboard-container--mini` afin d'éviter l'effondrement à `0px` de hauteur des diagrammes dans les grilles multi-échiquiers (`TypeMarcheHeros.vue`, `OrderViewer.vue`).
+
 - **Socle Unifié des Exercices : En-tête, Feedback à 2 niveaux & Nettoyage `PgnViewer` (`ContenuPage.vue`, `useExerciseHeader.ts`, `useExerciseFeedback.ts`, `PgnViewer.vue`, tests & `README.md`)** :
   - **Centralisation de `<ContentHeader>` (`useExerciseHeader.ts`, `ContenuPage.vue`)** : Ajout du composable `provideExerciseHeader()` / `useExerciseHeader()` permettant de piloter dynamiquement `consigne`, `stepBadgeText` et `hideSubPanel` depuis les exercices sans dupliquer `<ContentHeader>`, avec activation progressive via `isManagedByShell`.
   - **Feedback Pédagogique à 2 Niveaux (`useExerciseFeedback.ts`, `ContenuPage.vue`)** : Ajout du composable `provideExerciseFeedback()` / `useExerciseFeedback()` pour afficher les explications détaillées de l'entraîneur dans un `<LearningFeedbackCallout>` unique sous l'exercice (zone scrollable), tout en gardant `SeriesCardFooter` sur une ligne fixe.
