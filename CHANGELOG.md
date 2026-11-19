@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.9] - 2026-11-19
+
 - **Unification complète du `ContentHeader` et `SeriesCardFooter` sur les 16 types d'exercices (Phases 2 & 3)** :
   - **Migration des 4 types restants vers `SeriesCardFooter` et `useExerciseHeader`** : `EvalViewer.vue` (Type 10), `OrderViewer.vue` (Type 11), `JugementFinalViewer.vue` (Type 15) et `TextOrderViewer.vue` (Type 16) pilotent désormais l'en-tête via `useExerciseHeader()` et utilisent le footer unifié `<SeriesCardFooter>` (suppression des boutons inline et des `<ion-card>` de consigne redondants).
   - **Déduplication complète de `<ContentHeader>`** : Migration des 12 autres types/viewers (`Type100Commandements`, `TypeParcours`, `TypePartieHeros`, `TypeMarcheHeros`, `TypeAssociPlan`, `TypePosiPlan`, `PlacementViewer`, `VisionViewer`, `ABCDaireTactiqueViewer`, `QuiSuisJeViewer`, `OuvreBoiteViewer`, `CapOuPasCapViewer`) vers `useExerciseHeader()`.
