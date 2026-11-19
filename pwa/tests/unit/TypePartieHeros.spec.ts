@@ -1,11 +1,12 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypePartieHeros from '@/views/learning/types/TypePartieHeros.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/learning/useExerciseNavigation';
+import { EXERCISE_HEADER_KEY, type ExerciseHeaderState } from '@/composables/learning/useExerciseHeader';
 
 const fireCelebrationMock = vi.fn();
 vi.mock( '@/composables/learning/useCelebration', () => ( {
@@ -56,6 +57,7 @@ describe( 'TypePartieHeros.vue', () => {
 	};
 
 	test( 'affiche les contrôles de navigation PGN sans le bouton Fin', () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypePartieHeros, {
 			props: {
 				config: sampleConfig,
@@ -63,11 +65,24 @@ describe( 'TypePartieHeros.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 		} );
 
-		// Vérifie l'en-tête
-		expect( wrapper.text() ).toContain( 'Partie Héros Test' );
+		// Vérifie l'en-tête via useExerciseHeader
+		expect( headerState.value.consigne ).toBe(
+			'Revivez la partie du héros et trouvez le bon coup.'
+		);
+		expect( headerState.value.stepBadgeText ).toBe( 'Étape 1 / 3' );
 
 		// Vérifie la présence des boutons Début, Précédent, Suivant
 		const debutBtn = wrapper.find( 'ion-button[title="Début"]' );

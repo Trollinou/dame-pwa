@@ -117,8 +117,8 @@ const checkScrollProgress = () => {
 const hydraterBlocs = () => {
   if (!contentRef.value) return;
 
-  // 1. Hydrater les FEN
-  const fenElements = contentRef.value.querySelectorAll('.roi-bloc-fen');
+  // 1. Hydrater les FEN / Diagrammes
+  const fenElements = contentRef.value.querySelectorAll('.roi-bloc-fen, .roi-bloc-diagramme');
   fenElements.forEach((el) => {
     const htmlEl = el as HTMLElement;
     const fen = htmlEl.dataset.fen || '';

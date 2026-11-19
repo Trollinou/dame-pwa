@@ -3,9 +3,6 @@
     <PlacementViewer
       :consigne="config.consigne"
       :diagrammes="(config as any).diagrammes"
-      :metaTitre="(config as any).metaTitre"
-      :metaTypeLabel="(config as any).metaTypeLabel"
-      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       @success="gererSucces"
     />
   </div>

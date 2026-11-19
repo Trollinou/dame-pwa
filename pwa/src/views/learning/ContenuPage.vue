@@ -73,13 +73,7 @@
             <component 
               v-if="contenuActuel.type !== undefined && getComposantExercice(contenuActuel.type)"
               :is="getComposantExercice(contenuActuel.type)" 
-              :config="({
-                ...contenuActuel.config,
-                id: contenuActuel.id,
-                metaTitre: decodeHtmlEntities(contenuActuel.titre),
-                metaTypeLabel: getContenuTypeLabel(contenuActuel),
-                metaChapitreNiveauLabel: formatChapitreNiveauLabel(contenuActuel.chapitre_nom, contenuActuel.niveau)
-              } as any)"
+              :config="contenuActuel.config"
               :id="contenuActuel.id"
               :key="contenuActuel.id"
               @success="onSuccess"
@@ -216,14 +210,12 @@ const isPageLoading = computed(() => isLoading.value || apprentissageStore.isCon
 const estReussi = ref(false);
 const contenuActuel = computed<ContenuResponse | null>(() => apprentissageStore.contenuActuel);
 
-const TYPES_AVEC_SERIES_FOOTER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14];
-
 const aSeriesFooter = computed(() => {
-  if (contenuActuel.value?.post_type === 'roi_video' || contenuActuel.value?.post_type === 'roi_lecon') {
-    return true;
-  }
-  return contenuActuel.value?.post_type === 'roi_exercice' &&
-    TYPES_AVEC_SERIES_FOOTER.includes(contenuActuel.value.type ?? 0);
+  return (
+    contenuActuel.value?.post_type === 'roi_video' ||
+    contenuActuel.value?.post_type === 'roi_lecon' ||
+    contenuActuel.value?.post_type === 'roi_exercice'
+  );
 });
 
 const footerPortalRef = ref<HTMLElement | null>(null);

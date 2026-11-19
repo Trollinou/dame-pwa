@@ -1,11 +1,12 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypePosiPlan from '@/views/learning/types/TypePosiPlan.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/learning/useExerciseNavigation';
+import { EXERCISE_HEADER_KEY, type ExerciseHeaderState } from '@/composables/learning/useExerciseHeader';
 
 const fireCelebrationMock = vi.fn();
 vi.mock( '@/composables/learning/useCelebration', () => ( {
@@ -56,6 +57,7 @@ describe( 'TypePosiPlan.vue', () => {
 	};
 
 	test( 'affiche ContentHeader et SeriesCardFooter avec le choix initial à 3 branches', () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypePosiPlan, {
 			props: {
 				config: sampleConfig,
@@ -63,11 +65,24 @@ describe( 'TypePosiPlan.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 		} );
 
-		// Vérifie l'en-tête ContentHeader
-		expect( wrapper.text() ).toContain( 'PosiPlan Test' );
+		// Vérifie l'en-tête piloté via useExerciseHeader
+		expect( headerState.value.consigne ).toBe(
+			'Évaluez la position et choisissez le meilleur plan.'
+		);
+		expect( headerState.value.stepBadgeText ).toBe( 'Étape 1 / 4' );
 		expect( wrapper.text() ).toContain( 'Étape 1 / 4' );
 
 		// Vérifie la présence des 3 boutons de choix initial

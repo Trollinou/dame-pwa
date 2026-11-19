@@ -4,9 +4,6 @@
       :consigne="config.consigne"
       :variante="config.variante"
       :series="(config as any).series"
-      :metaTitre="(config as any).metaTitre"
-      :metaTypeLabel="(config as any).metaTypeLabel"
-      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       @success="$emit('success')"
     />
   </div>

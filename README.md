@@ -22,7 +22,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
     - `src/views/auth/` : `LoginPage.vue`, `RegisterPage.vue`, `SelectPersonPage.vue`, `ProfilePage.vue`.
     - `src/views/layout/` : `TabsPage.vue`, `AdminLayout.vue`, `GenericPage.vue`.
   - `src/components/` : Composants modulaires organisés par piliers :
-    - `src/components/learning/` : `LeconReader.vue`, `VideoReader.vue`, `ContentHeader.vue`, `ExerciseHeader.vue`, `LearningFeedbackCallout.vue`, `SeriesCardFooter.vue`, sous-dossier `play/` et sous-dossier `viewers/` (les 17 viewers d'exercices interactifs).
+    - `src/components/learning/` : `LeconReader.vue`, `VideoReader.vue`, `ContentHeader.vue`, `LearningFeedbackCallout.vue`, `SeriesCardFooter.vue`, sous-dossier `play/` et sous-dossier `viewers/` (les 17 viewers d'exercices interactifs).
     - `src/components/public/` : Composants de la vitrine club (`agenda/`, `preinscription/`).
     - `src/components/auth/` : Personnalisation et profil (`profile/ChessThemeCustomizer.vue`).
     - `src/components/shared/` : Briques UI génériques pures (`Chessboard/`, `DataTable/`, `SplitMasterDetail.vue`, `SignaturePad.vue`, `MediaViewer/EgMediaViewer.vue`, `WpContent/WpContentRenderer.vue`).
@@ -78,7 +78,7 @@ L'application suit un principe de découplage strict :
   - Déroulement en série de 6 devinettes pour Qui-suis-je ? (Type 12) : support des variantes `pieces` (indices textuels multilignes + palette des 6 pièces blanches en notation française) et `cases` (indices textuels multilignes + échiquier interactif avec révélation par cercle vert), enchaînement fluide avec `ContentHeader` et `SeriesCardFooter`.
   - Déroulement par cartes pour 100 Commandements (Type 1), Pop'Echecs (Type 2) et ABCDaire Tactique (Type 3) : prise en charge des consignes globales et surcharges par diagramme/Mini-PGN, indicateur visuel de la pièce à placer (`ion-chip` avec `ion-avatar` SVG et concordance grammaticale de genre en français pour Pop'Echecs).
   - Masquage initial des `shapes` de solution pendant la recherche, avec **maintien visible du cercle jaune (`brush: 'yellow'`)** pour mettre en évidence la pièce d'étude (Types 2 Pop'Echecs, 3 ABCDaire Tactique et 14 Cap ou pas Cap ? dans toutes les variantes), puis révélation complète des annotations dès la réussite.
-  - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
+  - Gestion des séries multi-diagrammes et étapes avec `ContentHeader` (`useExerciseHeader`) et `SeriesCardFooter`.
   - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec mode plein écran universel (hybride Fullscreen natif Android/Desktop + Pseudo-Fullscreen CSS iOS sans blocage), bascule automatique en immersion lors de la rotation paysage sur mobile et validation de progression au seuil de 95%.
 
 ## Composants & Composables Partagés (PWA Frontend)
@@ -163,8 +163,7 @@ const { currentCard, isSolved, next, markSolved } = useCardNavigation(
 Composant d'en-tête standardisé et générique pour l'ensemble des contenus pédagogiques (Exercices, Vidéos, Leçons) :
 - **Panneau 1 (Métadonnées Compactes)** : Affiche le titre (`title`), son type adapté (`typeLabel`, ex: "Exercice", "Vidéo", "Leçon", "Vision'checs", etc.) et le chapitre/niveau associé (`chapitreNiveauLabel`).
 - **Panneau 2 (Consigne & Badge d'étape - Optionnel / Masquable)** : Affiche optionnellement le texte de la consigne (`consigne`) et le badge d'étape interactive (`stepBadgeText`, supportant les retours à la ligne `\n` pour découper série et sous-étape sur deux lignes compactes et préserver la largeur de la consigne). Grâce à la prop `hideSubPanel: true` (ou en l'absence de consigne/badge), ce deuxième panneau est totalement masqué pour les Vidéos et les Leçons, allégeant la vue.
-- **Orchestration centralisée (`useExerciseHeader`)** : `ContenuPage.vue` expose `provideExerciseHeader()` (`src/composables/learning/useExerciseHeader.ts`) permettant aux exercices de piloter dynamiquement `consigne`, `stepBadgeText` et `hideSubPanel` via `setHeaderState()` sans dupliquer `<ContentHeader>`.
-- **Rétrocompatibilité** : `<ExerciseHeader>` est conservé comme wrapper typé vers `<ContentHeader>`.
+- **Orchestration centralisée (`useExerciseHeader`)** : `ContenuPage.vue` expose `provideExerciseHeader()` (`src/composables/learning/useExerciseHeader.ts`) et rend l'unique `<ContentHeader>` pour les 16 types d'exercices ; chaque exercice/viewer pilote dynamiquement `consigne`, `stepBadgeText` et `hideSubPanel` via `setHeaderState()`.
 
 ```vue
 <template>

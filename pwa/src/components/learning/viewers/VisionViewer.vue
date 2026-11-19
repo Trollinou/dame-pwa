@@ -1,14 +1,5 @@
 <template>
   <div class="vision-viewer-wrapper">
-    <!-- En-tête Unifié 2 Panels -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneTexte"
-      :stepBadgeText="`Carte ${indexCourant + 1} / ${diagrammesListe.length}`"
-    />
-
     <!-- Main Dual Panel Layout -->
     <div class="vision-main-layout">
       <!-- Description Panel: Pièces & Positions (4 colonnes sur mobile) -->
@@ -64,10 +55,11 @@ import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 import { parseFenPieces, getActiveColorFromFen } from '@/utils/chess/fenUtils';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
 
 const chessPreferences = useChessPreferencesStore();
+const exerciseHeader = useExerciseHeader();
 
 export interface DiagrammeConfig {
   fen: string;
@@ -103,14 +95,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'success'): void;
 }>();
-
-const headerMeta = computed(() => {
-  return {
-    title: props.metaTitre || props.legacyConfig?.metaTitre || "T8 - Vision'checs",
-    typeLabel: props.metaTypeLabel || props.legacyConfig?.metaTypeLabel || "Vision'checs",
-    chapitreNiveauLabel: props.metaChapitreNiveauLabel || props.legacyConfig?.metaChapitreNiveauLabel || '',
-  };
-});
 
 const indexCourant = ref<number>(0);
 const etapeJeu = ref<'reflexion' | 'revelation'>('reflexion');
@@ -151,6 +135,17 @@ const diagrammesListe = computed<DiagrammeConfig[]>(() => {
 const consigneTexte = computed<string>(() => {
   return props.consigne || props.legacyConfig?.description || 'Observez les 4 diagrammes ci-dessous.';
 });
+
+watch(
+  [consigneTexte, indexCourant, () => diagrammesListe.value.length],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Carte ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 const diagrammeCourant = computed<DiagrammeConfig>(() => {
   return diagrammesListe.value[indexCourant.value] || diagrammesListe.value[0];

@@ -1,9 +1,11 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import Type100Commandements from '@/views/learning/types/Type100Commandements.vue';
+import { EXERCISE_HEADER_KEY, type ExerciseHeaderState } from '@/composables/learning/useExerciseHeader';
 
 // Mock QcmViewer to easily trigger success emit
 vi.mock( '@/components/learning/viewers/QcmViewer.vue', () => ( {
@@ -32,9 +34,20 @@ describe( 'Type100Commandements.vue', () => {
 	} );
 
 	test( 'handles legacy single QCM format correctly', async () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( Type100Commandements, {
 			global: {
 				plugins: [ [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 			props: {
 				id: 101,
@@ -50,10 +63,10 @@ describe( 'Type100Commandements.vue', () => {
 			},
 		} );
 
-		expect( wrapper.find( '.consigne-text' ).text() ).toBe(
+		expect( headerState.value.consigne ).toBe(
 			'Quel est le premier réflexe ?'
 		);
-		expect( wrapper.find( '.step-badge' ).text() ).toContain(
+		expect( headerState.value.stepBadgeText ).toContain(
 			'Question 1 / 1'
 		);
 
@@ -62,9 +75,20 @@ describe( 'Type100Commandements.vue', () => {
 	} );
 
 	test( 'handles series of QCMs correctly (qcms array)', async () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( Type100Commandements, {
 			global: {
 				plugins: [ [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 			props: {
 				id: 102,
@@ -86,20 +110,20 @@ describe( 'Type100Commandements.vue', () => {
 		} );
 
 		// QCM 1
-		expect( wrapper.find( '.step-badge' ).text() ).toContain(
+		expect( headerState.value.stepBadgeText ).toContain(
 			'Question 1 / 2'
 		);
-		expect( wrapper.find( '.consigne-text' ).text() ).toBe( 'Question 1' );
+		expect( headerState.value.consigne ).toBe( 'Question 1' );
 
 		// Click validate QCM 1 -> should advance to QCM 2 without emitting success yet
 		await wrapper.find( '.mock-success-btn' ).trigger( 'click' );
 		expect( wrapper.emitted( 'success' ) ).toBeFalsy();
 
 		// QCM 2
-		expect( wrapper.find( '.step-badge' ).text() ).toContain(
+		expect( headerState.value.stepBadgeText ).toContain(
 			'Question 2 / 2'
 		);
-		expect( wrapper.find( '.consigne-text' ).text() ).toBe( 'Question 2' );
+		expect( headerState.value.consigne ).toBe( 'Question 2' );
 
 		// Click validate QCM 2 -> last QCM, should emit success
 		await wrapper.find( '.mock-success-btn' ).trigger( 'click' );

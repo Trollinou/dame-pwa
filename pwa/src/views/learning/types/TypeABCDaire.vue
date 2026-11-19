@@ -3,9 +3,6 @@
     <ABCDaireTactiqueViewer
       :consigne="config.consigne"
       :exercices="(config as any).exercices"
-      :metaTitre="(config as any).metaTitre"
-      :metaTypeLabel="(config as any).metaTypeLabel"
-      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       :fen="config.fen"
       :solution="(config as any).solution"
       :couleurJoueur="(config as any).couleur_joueur"

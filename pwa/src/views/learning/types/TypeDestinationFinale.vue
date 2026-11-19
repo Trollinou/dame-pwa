@@ -12,11 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { useApprentissageStore } from '@/stores/apprentissage';
 import TextOrderViewer from '@/components/learning/viewers/TextOrderViewer.vue';
 import type { ExerciseType16Config } from '@/types/roi';
 
-const props = defineProps<{
+defineProps<{
   config: ExerciseType16Config;
   id: number;
 }>();
