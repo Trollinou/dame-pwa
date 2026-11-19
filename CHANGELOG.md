@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Socle Unifié des Exercices : En-tête, Feedback à 2 niveaux & Nettoyage `PgnViewer` (`ContenuPage.vue`, `useExerciseHeader.ts`, `useExerciseFeedback.ts`, `PgnViewer.vue`, tests & `README.md`)** :
+  - **Centralisation de `<ContentHeader>` (`useExerciseHeader.ts`, `ContenuPage.vue`)** : Ajout du composable `provideExerciseHeader()` / `useExerciseHeader()` permettant de piloter dynamiquement `consigne`, `stepBadgeText` et `hideSubPanel` depuis les exercices sans dupliquer `<ContentHeader>`, avec activation progressive via `isManagedByShell`.
+  - **Feedback Pédagogique à 2 Niveaux (`useExerciseFeedback.ts`, `ContenuPage.vue`)** : Ajout du composable `provideExerciseFeedback()` / `useExerciseFeedback()` pour afficher les explications détaillées de l'entraîneur dans un `<LearningFeedbackCallout>` unique sous l'exercice (zone scrollable), tout en gardant `SeriesCardFooter` sur une ligne fixe.
+  - **Simplification de `ContenuPage.vue` & `PgnViewer.vue`** : Remplacement des 16 `if` de sélection d'exercice par le dictionnaire typé `EXERCISE_COMPONENTS: Record<number, Component>`, réinitialisation automatique du header et du feedback dans `loadContenu()`, et suppression du `<SeriesCardFooter>` interne inutilisé dans `PgnViewer.vue` (ainsi que des props `currentCard` / `totalCards`).
+  - **Tests & Documentation** : Ajout de tests unitaires (`useExerciseHeader.spec.ts`, `useExerciseFeedback.spec.ts`), mise à jour de `PgnViewer.spec.ts` et de `README.md`.
+
 ## [1.13.8] - 2026-11-17
 
 - **Intégration `eg-chessboard` v1.8.5 (`stockfish.ts`, `Chessboard/types.ts`, `Chessboard.vue`, `usePlayGame.ts`, `PlayPage.vue`, tests & documentation)** :
