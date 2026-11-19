@@ -61,6 +61,15 @@
 
           <!-- Rendu d'un exercice -->
           <div v-else-if="contenuActuel.post_type === 'roi_exercice'">
+            <ContentHeader
+              v-if="isHeaderManagedByShell"
+              :title="decodeHtmlEntities(contenuActuel.titre)"
+              :typeLabel="getContenuTypeLabel(contenuActuel) || 'Exercice'"
+              :chapitreNiveauLabel="formatChapitreNiveauLabel(contenuActuel.chapitre_nom, contenuActuel.niveau)"
+              :consigne="headerState.consigne"
+              :stepBadgeText="headerState.stepBadgeText"
+              :hideSubPanel="headerState.hideSubPanel"
+            />
             <component 
               v-if="contenuActuel.type !== undefined && getComposantExercice(contenuActuel.type)"
               :is="getComposantExercice(contenuActuel.type)" 
@@ -79,6 +88,16 @@
               <p>Type d'exercice non supporté (Type {{ contenuActuel.type }}).</p>
             </div>
           </div>
+
+          <!-- Feedback pédagogique détaillé de l'entraîneur (centralisé) -->
+          <LearningFeedbackCallout
+            v-if="coachFeedback"
+            :type="coachFeedback.type"
+            :title="coachFeedback.title"
+            :text="coachFeedback.text"
+            :icon="coachFeedback.icon"
+            class="ion-margin-top"
+          />
 
           <!-- Success Card (pour les leçons, vidéos et types d'exercices n'utilisant pas SeriesCardFooter) -->
           <transition name="fade">
@@ -157,11 +176,15 @@ import {
   IonFooter
 } from '@ionic/vue';
 import { ref, computed, watch, onUnmounted, provide, nextTick, defineAsyncComponent } from 'vue';
-import type { ComponentPublicInstance } from 'vue';
+import type { Component, ComponentPublicInstance } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/learning/useExerciseNavigation';
+import { provideExerciseHeader } from '@/composables/learning/useExerciseHeader';
+import { provideExerciseFeedback } from '@/composables/learning/useExerciseFeedback';
 import { fireExerciseCelebration } from '@/composables/learning/useCelebration';
+import ContentHeader from '@/components/learning/ContentHeader.vue';
+import LearningFeedbackCallout from '@/components/learning/LearningFeedbackCallout.vue';
 
 const TypeABCDaire = defineAsyncComponent(() => import('./types/TypeABCDaire.vue'));
 const Type100Commandements = defineAsyncComponent(() => import('./types/Type100Commandements.vue'));
@@ -207,6 +230,12 @@ const footerPortalRef = ref<HTMLElement | null>(null);
 const ionContentRef = ref<ComponentPublicInstance | null>(null);
 
 provide('exerciseFooterPortal', footerPortalRef);
+const {
+  state: headerState,
+  isManagedByShell: isHeaderManagedByShell,
+  resetHeaderState
+} = provideExerciseHeader();
+const { coachFeedback, clearCoachFeedback } = provideExerciseFeedback();
 
 const coursParentInfo = computed<{ cours: CoursItem; idx: number } | null>(() => {
   if (!contenuActuel.value || apprentissageStore.parcours.length === 0) {
@@ -231,56 +260,27 @@ const prochainElement = computed<PlaylistItem | null>(() => {
   return null;
 });
 
-const getComposantExercice = (type: number) => {
-  if (type === 1) {
-    return Type100Commandements;
-  }
-  if (type === 2) {
-    return TypePopEchecs;
-  }
-  if (type === 3) {
-    return TypeABCDaire;
-  }
-  if (type === 4) {
-    return TypePartieHeros;
-  }
-  if (type === 5) {
-    return TypePosiPlan;
-  }
-  if (type === 6) {
-    return TypeAssociPlan;
-  }
-  if (type === 7) {
-    return TypeMarcheHeros;
-  }
-  if (type === 8) {
-    return TypeVisionChecs;
-  }
-  if (type === 9) {
-    return TypeParcours;
-  }
-  if (type === 10) {
-    return TypeEchecEval;
-  }
-  if (type === 11) {
-    return TypeClassEchecs;
-  }
-  if (type === 12) {
-    return TypeQuiSuisJe;
-  }
-  if (type === 13) {
-    return TypeOuvreBoite;
-  }
-  if (type === 14) {
-    return TypeCapOuPasCap;
-  }
-  if (type === 15) {
-    return TypeJugementFinal;
-  }
-  if (type === 16) {
-    return TypeDestinationFinale;
-  }
-  return null;
+const EXERCISE_COMPONENTS: Record<number, Component> = {
+  1: Type100Commandements,
+  2: TypePopEchecs,
+  3: TypeABCDaire,
+  4: TypePartieHeros,
+  5: TypePosiPlan,
+  6: TypeAssociPlan,
+  7: TypeMarcheHeros,
+  8: TypeVisionChecs,
+  9: TypeParcours,
+  10: TypeEchecEval,
+  11: TypeClassEchecs,
+  12: TypeQuiSuisJe,
+  13: TypeOuvreBoite,
+  14: TypeCapOuPasCap,
+  15: TypeJugementFinal,
+  16: TypeDestinationFinale,
+};
+
+const getComposantExercice = (type: number): Component | null => {
+  return EXERCISE_COMPONENTS[type] ?? null;
 };
 
 const startTime = ref<number>(Date.now());
@@ -386,6 +386,8 @@ const loadContenu = async (idVal: string | string[] | number) => {
   isLoading.value = true;
   estReussi.value = false;
   currentValidationPromise = null;
+  resetHeaderState();
+  clearCoachFeedback();
   startTime.value = Date.now();
   const id = typeof idVal === 'number' ? idVal : parseInt(Array.isArray(idVal) ? idVal[0] : idVal, 10);
   if (!isNaN(id)) {

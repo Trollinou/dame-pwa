@@ -60,16 +60,6 @@
         {{ currentComment ? '💬 ' + currentComment : '' }}
       </p>
     </div>
-
-    <!-- Footer de Navigation par Carte (optionnel si en série) -->
-    <SeriesCardFooter
-      v-if="props.totalCards && props.currentCard"
-      :currentCard="props.currentCard"
-      :totalCards="props.totalCards"
-      :isSolved="isCompleted"
-      pendingHint="Visionnez tous les coups du PGN pour continuer"
-      @next="emit('finished')"
-    />
   </div>
 </template>
 
@@ -84,15 +74,12 @@ import {
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore } from 'eg-chessboard';
-import SeriesCardFooter from '@/components/learning/SeriesCardFooter.vue';
 
 const props = defineProps<{
   pgnString?: string;
   pgn?: string;
   orientation?: 'white' | 'black' | string;
   autoCompleteDelay?: number;
-  currentCard?: number;
-  totalCards?: number;
   hideEndButton?: boolean;
 }>();
 
@@ -144,11 +131,11 @@ const syncNavState = () => {
 };
 
 const notifyFinishedIfEnd = () => {
-  if (!props.totalCards && props.autoCompleteDelay && props.autoCompleteDelay > 0) {
+  if (props.autoCompleteDelay && props.autoCompleteDelay > 0) {
     setTimeout(() => {
       emit('finished');
     }, props.autoCompleteDelay);
-  } else if (!props.totalCards) {
+  } else {
     emit('finished');
   }
 };
