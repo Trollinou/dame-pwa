@@ -133,6 +133,7 @@ const hydraterBlocs = () => {
       }
     }
 
+    htmlEl.replaceChildren();
     const vnode = createVNode(DiagramViewer, { fen, orientation, shapes });
     render(vnode, htmlEl);
     mountedVNodes.push(htmlEl);
@@ -143,6 +144,7 @@ const hydraterBlocs = () => {
   pgnElements.forEach((el) => {
     const htmlEl = el as HTMLElement;
     const pgn = htmlEl.dataset.pgn || '';
+    htmlEl.replaceChildren();
     const vnode = createVNode(PgnViewer, { pgnString: pgn });
     render(vnode, htmlEl);
     mountedVNodes.push(htmlEl);

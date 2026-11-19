@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Nettoyage du balisage SSR WordPress dans `LeconReader.vue`** :
+  - Appel à `htmlEl.replaceChildren()` avant `render(vnode, htmlEl)` lors de l'hydratation des blocs `.roi-bloc-fen` et `.roi-bloc-pgn` afin de supprimer le squelette SSR WordPress (`.main-wrap` / `.main-board` / `.pgn-navigation-bar`) qui provoquait un grand espace vide et des contrôles en double au-dessus du `PgnViewer`.
+
 - **Correctif d'affichage des mini-échiquiers (`_learning-components.scss`)** :
   - Ajout des dimensions `width: 100%; height: 100%; max-width: none; margin: 0;` sur `.diagram-viewer-container` à l'intérieur de `.chessboard-container--mini` afin d'éviter l'effondrement à `0px` de hauteur des diagrammes dans les grilles multi-échiquiers (`TypeMarcheHeros.vue`, `OrderViewer.vue`).
 
