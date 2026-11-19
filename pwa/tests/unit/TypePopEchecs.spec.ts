@@ -152,9 +152,7 @@ describe( 'TypePopEchecs.vue', () => {
 
 		// Carte 1
 		expect( wrapper.text() ).toContain( 'Carte 1 / 4' );
-		expect( wrapper.text() ).toContain(
-			'Placez le Cavalier blanc sur f3.'
-		);
+		expect( wrapper.text() ).toContain( 'Pièce à placer : Cavalier blanc' );
 
 		const buttons = wrapper.findAll( '.mock-square-btn' );
 		const btnF3 = buttons.find( ( b ) => b.text().includes( 'f3' ) );
@@ -175,7 +173,7 @@ describe( 'TypePopEchecs.vue', () => {
 
 		// Carte 2
 		expect( wrapper.text() ).toContain( 'Carte 2 / 4' );
-		expect( wrapper.text() ).toContain( 'Placez le Pion noir sur e4.' );
+		expect( wrapper.text() ).toContain( 'Pièce à placer : Pion noir' );
 
 		await btnE4?.trigger( 'click' );
 		expect( wrapper.text() ).toContain( 'Parfait !' );

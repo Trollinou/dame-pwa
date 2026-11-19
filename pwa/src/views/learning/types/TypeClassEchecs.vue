@@ -1,12 +1,9 @@
 <template>
   <div class="exercise-stage">
-    <div v-if="config.consigne" class="learning-callout learning-callout--info ion-text-center">
-      <span>{{ config.consigne }}</span>
-    </div>
-
     <OrderViewer
       v-if="itemsAOrdonner && itemsAOrdonner.length > 0"
       :correct-items="itemsAOrdonner"
+      :consigne="config.consigne"
       @success="$emit('success')"
     />
   </div>

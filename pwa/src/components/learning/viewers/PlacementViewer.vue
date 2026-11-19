@@ -1,14 +1,5 @@
 <template>
   <div class="placement-viewer-wrapper">
-    <!-- En-tête Unifié de l'exercice avec la consigne du diagramme courant -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneCourante"
-      :stepBadgeText="`Carte ${indexCourant + 1} / ${diagrammesListe.length}`"
-    />
-
     <!-- Échiquier -->
     <div class="chessboard-panel">
       <div class="chessboard-container">
@@ -61,10 +52,11 @@ import {
   filterYellowShapes
 } from '@/utils/chess/fenUtils';
 import { CHAR_TO_ROLE, getPieceDisplayName } from '@/utils/chess/chessNotation';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 
 const chessPreferences = useChessPreferencesStore();
+const exerciseHeader = useExerciseHeader();
 
 export interface DiagrammePopEchecs {
   consigne?: string;
@@ -84,14 +76,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'success'): void;
 }>();
-
-const headerMeta = computed(() => {
-  return {
-    title: props.metaTitre || "T2 - Pop'Echecs",
-    typeLabel: props.metaTypeLabel || "Pop'Echecs",
-    chapitreNiveauLabel: props.metaChapitreNiveauLabel || '',
-  };
-});
 
 const indexCourant = ref(0);
 const isSolved = ref(false);
@@ -119,6 +103,17 @@ const diagrammeCourant = computed<DiagrammePopEchecs>(() => {
 const consigneCourante = computed<string>(() => {
   return diagrammeCourant.value.consigne || props.consigne || 'Place la pièce sur la meilleure case.';
 });
+
+watch(
+  [consigneCourante, indexCourant, () => diagrammesListe.value.length],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Carte ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 const couleurJoueur = computed<'white' | 'black'>(() => {
   return getActiveColorFromFen(diagrammeCourant.value.fen);

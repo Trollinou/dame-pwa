@@ -36,7 +36,6 @@
 
     <!-- Phase 2 : Tactique -->
     <div v-else-if="phase === 'tactique'" class="exercise-stage">
-      <h3 class="phase-title">À vous de jouer ! Trouvez la séquence.</h3>
       <PuzzleViewer
         :couleurJoueur="couleurJoueur"
         :fen="fenDepart"
@@ -52,25 +51,33 @@
         :orientation="couleurJoueur"
         :pgn="pgnExplication"
       />
-      <div class="finish-container">
-        <ion-button expand="block" color="success" class="exercise-action-btn" @click="$emit('success')">
-          Terminer l'exercice
-        </ion-button>
-      </div>
     </div>
+
+    <SeriesCardFooter
+      :currentCard="currentStepNumber"
+      :totalCards="3"
+      :isSolved="phase === 'solution'"
+      :feedback="footerFeedback"
+      :finishText="'Terminer l\'exercice'"
+      badgePrefix="Étape"
+      @next="emit('success')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useFeedback } from '@/composables/core/useFeedback';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import type { DrawShape } from 'eg-chessboard';
 import PuzzleViewer from './PuzzleViewer.vue';
 import PgnViewer from './PgnViewer.vue';
 
 const { showSuccess, showError } = useFeedback();
+const exerciseHeader = useExerciseHeader();
 
 export interface QuestionEval {
   texte: string;
@@ -94,14 +101,40 @@ const props = withDefaults(
   }
 );
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
 const phase = ref<'questions' | 'tactique' | 'solution'>('questions');
 const questionIndex = ref(0);
+const footerFeedback = ref<CardFeedback | null>(null);
 
 const questionActuelle = computed(() => props.questions[questionIndex.value]);
+const currentStepNumber = computed(() => (phase.value === 'questions' ? 1 : phase.value === 'tactique' ? 2 : 3));
+
+watch(
+  [phase, questionIndex, () => props.questions, () => props.theme],
+  () => {
+    if (phase.value === 'questions') {
+      exerciseHeader?.setHeaderState({
+        consigne: questionActuelle.value?.texte || `Évaluez la position (${props.theme || 'Échec & Éval'})`,
+        stepBadgeText: `Question ${questionIndex.value + 1} / ${Math.max(1, props.questions.length)}`
+      });
+    } else if (phase.value === 'tactique') {
+      exerciseHeader?.setHeaderState({
+        consigne: 'À vous de jouer ! Trouvez la séquence.',
+        stepBadgeText: 'Tactique'
+      });
+    } else {
+      exerciseHeader?.setHeaderState({
+        consigne: 'Explication',
+        stepBadgeText: 'Solution'
+      });
+      footerFeedback.value = { type: 'success', message: 'Séquence résolue !' };
+    }
+  },
+  { immediate: true }
+);
 
 const repondre = async (valeur: string) => {
   if (!questionActuelle.value) return;

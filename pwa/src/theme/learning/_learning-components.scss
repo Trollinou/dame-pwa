@@ -47,6 +47,13 @@
   flex-shrink: 0;
   box-sizing: border-box;
 
+  .diagram-viewer-container {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
   .main-wrap {
     width: 100% !important;
     height: 100% !important;
@@ -1229,6 +1236,7 @@ cg-board.piece-icon-box {
    ========================================================================== */
 
 .roi-bloc-fen,
+.roi-bloc-diagramme,
 .roi-bloc-pgn {
   margin: 16px auto;
   display: block;
@@ -1421,7 +1429,9 @@ cg-board.piece-icon-box {
    9. Spécificités CapOuPasCap & Vision Viewers
    ========================================================================== */
 
-.cap-ou-pas-cap-viewer-wrapper {
+.cap-ou-pas-cap-viewer-wrapper,
+.placement-viewer-wrapper,
+.abcdaire-viewer-wrapper {
   width: 100%;
 }
 

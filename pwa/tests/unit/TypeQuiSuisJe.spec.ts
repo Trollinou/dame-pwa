@@ -1,9 +1,11 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypeQuiSuisJe from '@/views/learning/types/TypeQuiSuisJe.vue';
+import { EXERCISE_HEADER_KEY, type ExerciseHeaderState } from '@/composables/learning/useExerciseHeader';
 
 const fireCelebrationMock = vi.fn();
 vi.mock( '@/composables/learning/useCelebration', () => ( {
@@ -66,6 +68,7 @@ describe( 'TypeQuiSuisJe.vue', () => {
 			metaChapitreNiveauLabel: 'Niveau 1 - Les Pièces',
 		};
 
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypeQuiSuisJe, {
 			props: {
 				config,
@@ -73,11 +76,21 @@ describe( 'TypeQuiSuisJe.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 		} );
 
-		expect( wrapper.text() ).toContain( 'Exercice Qui-suis-je 1' );
-		expect( wrapper.text() ).toContain( 'Trouvez la pièce mystère' );
+		expect( headerState.value.consigne ).toBe( 'Trouvez la pièce mystère' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Carte 1 / 6' );
 		expect( wrapper.text() ).toContain( 'Carte 1 / 6' );
 		expect( wrapper.text() ).toContain( 'Indice 1' );
 		expect( wrapper.text() ).toContain( 'Indice 2' );

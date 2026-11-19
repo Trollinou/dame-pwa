@@ -117,8 +117,8 @@ const checkScrollProgress = () => {
 const hydraterBlocs = () => {
   if (!contentRef.value) return;
 
-  // 1. Hydrater les FEN
-  const fenElements = contentRef.value.querySelectorAll('.roi-bloc-fen');
+  // 1. Hydrater les FEN / Diagrammes
+  const fenElements = contentRef.value.querySelectorAll('.roi-bloc-fen, .roi-bloc-diagramme');
   fenElements.forEach((el) => {
     const htmlEl = el as HTMLElement;
     const fen = htmlEl.dataset.fen || '';
@@ -133,6 +133,7 @@ const hydraterBlocs = () => {
       }
     }
 
+    htmlEl.replaceChildren();
     const vnode = createVNode(DiagramViewer, { fen, orientation, shapes });
     render(vnode, htmlEl);
     mountedVNodes.push(htmlEl);
@@ -143,6 +144,7 @@ const hydraterBlocs = () => {
   pgnElements.forEach((el) => {
     const htmlEl = el as HTMLElement;
     const pgn = htmlEl.dataset.pgn || '';
+    htmlEl.replaceChildren();
     const vnode = createVNode(PgnViewer, { pgnString: pgn });
     render(vnode, htmlEl);
     mountedVNodes.push(htmlEl);

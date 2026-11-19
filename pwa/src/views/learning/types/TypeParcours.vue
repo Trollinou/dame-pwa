@@ -1,13 +1,5 @@
 <template>
   <div class="exercice-type-parcours">
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneCourante"
-      :stepBadgeText="`Parcours ${indexCourant + 1} / ${totalParcours}`"
-    />
-
     <ParcoursViewer
       ref="viewerRef"
       :key="indexCourant"
@@ -36,9 +28,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import ParcoursViewer from '@/components/learning/viewers/ParcoursViewer.vue';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { getParcoursVariant } from '@/utils/parsers/parcoursVariants';
 import type { DrawShape } from 'eg-chessboard';
@@ -123,13 +115,18 @@ const pendingHint = computed(() => {
   );
 });
 
-const headerMeta = computed(() => {
-  return {
-    title: (props.config as any)?.metaTitre || 'T9 - Parcours',
-    typeLabel: (props.config as any)?.metaTypeLabel || 'Parcours',
-    chapitreNiveauLabel: (props.config as any)?.metaChapitreNiveauLabel || '',
-  };
-});
+const exerciseHeader = useExerciseHeader();
+
+watch(
+  [consigneCourante, indexCourant, totalParcours],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Parcours ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 const computedShapes = computed<DrawShape[]>(() => {
   const baseShapes: DrawShape[] = currentParcours.value.shapes ? [...currentParcours.value.shapes] : [];

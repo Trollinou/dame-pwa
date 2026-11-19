@@ -1,14 +1,5 @@
 <template>
   <div class="exercice-type-partie-heros">
-    <!-- En-tête Unifié de l'exercice -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneActuelle"
-      :stepBadgeText="`Étape ${etapeCouranteIndex + 1} / ${totalEtapes}`"
-    />
-
     <div class="etape-container">
       <!-- 1. Étape de Défilement / Visionnage PGN -->
       <div v-if="etapeActuelle.type === 'pgn'" class="stage-pgn-wrapper animate-fade-in">
@@ -138,7 +129,7 @@ import {
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import {
@@ -190,12 +181,7 @@ const normalizedConfig = computed<Record<string, any>>(() => {
   return (cfg && typeof cfg === 'object') ? cfg : {};
 });
 
-const headerMeta = computed(() => ({
-  title: normalizedConfig.value.metaTitre || 'T4 - Partie du Héros',
-  typeLabel: normalizedConfig.value.metaTypeLabel || 'Partie du Héros',
-  chapitreNiveauLabel: normalizedConfig.value.metaChapitreNiveauLabel || '',
-}));
-
+const exerciseHeader = useExerciseHeader();
 const etapeCouranteIndex = ref(0);
 
 const rawPgn = computed<string>(() => {
@@ -279,6 +265,17 @@ const consigneActuelle = computed<string>(() => {
   }
   return props.config?.consigne || 'Revivez la partie du héros et trouvez le bon coup.';
 });
+
+watch(
+  [consigneActuelle, etapeCouranteIndex, totalEtapes],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Étape ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 // ==========================================
 // 1. ÉTAT & CONTRÔLE DE L'ÉTAPE PGN

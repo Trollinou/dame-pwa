@@ -1,14 +1,5 @@
 <template>
   <div class="exercise-stage">
-    <!-- En-tête Unifié de l'exercice -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneActuelle"
-      :stepBadgeText="stepBadgeText"
-    />
-
     <div class="etape-container">
       <!-- 1. ÉTAPE DE CHOIX INITIAL (3 Branches : 1 Principale + 2 Variantes) -->
       <div v-if="currentMode === 'initial_choice'" class="stage-qcm-wrapper animate-fade-in">
@@ -264,7 +255,7 @@ import {
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape } from 'eg-chessboard';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import {
   parsePosiPlanPgn,
@@ -315,11 +306,7 @@ const normalizedConfig = computed<Record<string, any>>(() => {
   return (cfg && typeof cfg === 'object') ? cfg : {};
 });
 
-const headerMeta = computed(() => ({
-  title: normalizedConfig.value.metaTitre || 'T5 - Posi\'Plan',
-  typeLabel: normalizedConfig.value.metaTypeLabel || 'Posi\'Plan',
-  chapitreNiveauLabel: normalizedConfig.value.metaChapitreNiveauLabel || '',
-}));
+const exerciseHeader = useExerciseHeader();
 
 const rawPgn = computed<string>(() => {
   const cfg = normalizedConfig.value;
@@ -764,6 +751,17 @@ const consigneActuelle = computed<string>(() => {
   }
   return props.config?.consigne || 'Évaluez la position et choisissez le meilleur plan.';
 });
+
+watch(
+  [consigneActuelle, stepBadgeText],
+  ([consigne, badge]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: badge,
+    });
+  },
+  { immediate: true }
+);
 
 const isFooterSolved = computed<boolean>(() => {
   if (currentMode.value === 'initial_choice') {

@@ -1,9 +1,11 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypeParcours from '@/views/learning/types/TypeParcours.vue';
+import { EXERCISE_HEADER_KEY, type ExerciseHeaderState } from '@/composables/learning/useExerciseHeader';
 import {
 	getParcoursVariant,
 	registerParcoursVariant,
@@ -402,9 +404,20 @@ describe( 'TypeParcours.vue', () => {
 	};
 
 	test( 'renders 3 parcours series and advances step by step until final success', async () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypeParcours, {
 			global: {
 				plugins: [ [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 			props: {
 				id: 901,
@@ -415,8 +428,8 @@ describe( 'TypeParcours.vue', () => {
 		// ==========================================
 		// PARCOURS 1 / 3
 		// ==========================================
-		expect( wrapper.text() ).toContain( 'Parcours 1 / 3' );
-		expect( wrapper.text() ).toContain(
+		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 1 / 3' );
+		expect( headerState.value.consigne ).toBe(
 			'Parcours 1 : Rejoignez la case e4.'
 		);
 
@@ -439,8 +452,8 @@ describe( 'TypeParcours.vue', () => {
 		// ==========================================
 		// PARCOURS 2 / 3
 		// ==========================================
-		expect( wrapper.text() ).toContain( 'Parcours 2 / 3' );
-		expect( wrapper.text() ).toContain(
+		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 2 / 3' );
+		expect( headerState.value.consigne ).toBe(
 			'Parcours 2 : Mangez tout avant c6.'
 		);
 
@@ -455,8 +468,8 @@ describe( 'TypeParcours.vue', () => {
 		// ==========================================
 		// PARCOURS 3 / 3
 		// ==========================================
-		expect( wrapper.text() ).toContain( 'Parcours 3 / 3' );
-		expect( wrapper.text() ).toContain( 'Parcours 3 : Infiltrez h8.' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 3 / 3' );
+		expect( headerState.value.consigne ).toBe( 'Parcours 3 : Infiltrez h8.' );
 
 		const btnH8 = wrapper.find( '.mock-move-btn-h8' );
 		await btnH8.trigger( 'click' );
@@ -495,9 +508,20 @@ describe( 'TypeParcours.vue', () => {
 			],
 		};
 
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypeParcours, {
 			global: {
 				plugins: [ [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 			props: {
 				id: 902,
@@ -505,8 +529,8 @@ describe( 'TypeParcours.vue', () => {
 			},
 		} );
 
-		expect( wrapper.text() ).toContain( 'Parcours 1 / 1' );
-		expect( wrapper.text() ).toContain(
+		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 1 / 1' );
+		expect( headerState.value.consigne ).toBe(
 			'Olalala, mais qui a bien pu laisser ces traces ? Gardes !'
 		);
 

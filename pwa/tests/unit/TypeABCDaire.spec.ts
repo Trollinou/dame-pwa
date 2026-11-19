@@ -1,11 +1,12 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypeABCDaire from '@/views/learning/types/TypeABCDaire.vue';
 import { EXERCISE_NAVIGATION_KEY } from '@/composables/learning/useExerciseNavigation';
+import { EXERCISE_HEADER_KEY, type ExerciseHeaderState } from '@/composables/learning/useExerciseHeader';
 
 const fireCelebrationMock = vi.fn();
 vi.mock( '@/composables/learning/useCelebration', () => ( {
@@ -84,6 +85,7 @@ describe( 'TypeABCDaire.vue', () => {
 	};
 
 	test( 'affiche correctement l’en-tête et le badge Carte 1 / 4', () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypeABCDaire, {
 			props: {
 				config: sampleConfig,
@@ -91,11 +93,21 @@ describe( 'TypeABCDaire.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 		} );
 
-		expect( wrapper.text() ).toContain( 'Exercice ABCDaire 1' );
-		expect( wrapper.text() ).toContain( 'Trouver le meilleur coup.' );
+		expect( headerState.value.consigne ).toBe( 'Trouver le meilleur coup.' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Carte 1 / 4' );
 		expect( wrapper.text() ).toContain( 'Carte 1 / 4' );
 	} );
 
@@ -140,6 +152,7 @@ describe( 'TypeABCDaire.vue', () => {
 	} );
 
 	test( 'gère le format de rétrocompatibilité (fen + solution)', async () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const legacyConfig = {
 			fen: 'r4rk1/ppp2ppp/3qpn1Q/3p4/3P4/3B2RP/PPP2PP1/R5K1 w - - 0 1',
 			solution: [ 'Qxg7#' ],
@@ -154,10 +167,21 @@ describe( 'TypeABCDaire.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 		} );
 
-		expect( wrapper.text() ).toContain( 'Trouver le meilleur coup.' );
+		expect( headerState.value.consigne ).toBe( 'Trouver le meilleur coup.' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Carte 1 / 1' );
 		expect( wrapper.text() ).toContain( 'Carte 1 / 1' );
 	} );
 

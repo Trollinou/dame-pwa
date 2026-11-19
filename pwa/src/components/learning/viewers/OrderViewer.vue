@@ -61,24 +61,31 @@
       </div>
     </div>
 
-    <!-- Bouton d'action 44px -->
-    <div class="exercise-action-wrapper">
-      <ion-button expand="block" class="choice-btn" @click="validerOrdre" :disabled="bank.length > 0">
-        Valider l'ordre
-      </ion-button>
-    </div>
+    <SeriesCardFooter
+      :currentCard="1"
+      :totalCards="1"
+      :isSolved="isSolved"
+      :disabled="!isSolved && bank.length > 0"
+      :feedback="footerFeedback"
+      :showActionButtonWhenUnsolved="true"
+      actionButtonText="Valider l'ordre"
+      badgePrefix="Étape"
+      :finishText="'Terminer l\'exercice'"
+      @action="validerOrdre"
+      @next="emit('success')"
+    />
 
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { IonButton } from '@ionic/vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
-import { useFeedback } from '@/composables/core/useFeedback';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { shuffleArray } from '@/utils/chess/chessNotation';
 
-const { showError } = useFeedback();
+const exerciseHeader = useExerciseHeader();
 
 interface OrderItem {
   id: string | number;
@@ -89,6 +96,7 @@ interface OrderItem {
 
 const props = defineProps<{
   correctItems: OrderItem[]; // Le tableau des éléments dans l'ordre EXACT attendu
+  consigne?: string;
 }>();
 
 const emit = defineEmits<{
@@ -99,6 +107,21 @@ const bank = ref<OrderItem[]>([]);
 const slots = ref<(OrderItem | null)[]>([]);
 const selectionBank = ref<number | null>(null);
 const selectionSlot = ref<number | null>(null);
+const isSolved = ref(false);
+const footerFeedback = ref<CardFeedback | null>(null);
+
+const placedCount = computed(() => slots.value.filter(Boolean).length);
+
+watch(
+  [placedCount, () => props.correctItems.length, () => props.consigne],
+  () => {
+    exerciseHeader?.setHeaderState({
+      consigne: props.consigne || 'Classez les positions dans l\'ordre demandé.',
+      stepBadgeText: `${placedCount.value} / ${props.correctItems.length}`
+    });
+  },
+  { immediate: true }
+);
 
 // Initialisation et mélange
 const initOrder = () => {
@@ -107,6 +130,8 @@ const initOrder = () => {
   slots.value = Array(props.correctItems.length).fill(null);
   selectionBank.value = null;
   selectionSlot.value = null;
+  isSolved.value = false;
+  footerFeedback.value = null;
 };
 
 onMounted(() => { initOrder(); });
@@ -152,9 +177,16 @@ const validerOrdre = async () => {
   }
 
   if (hasError) {
-    await showError('L\'ordre est incorrect. Observez bien les positions !', 3000);
+    footerFeedback.value = {
+      type: 'danger',
+      message: 'L\'ordre est incorrect. Observez bien les positions !'
+    };
   } else {
-    emit('success');
+    isSolved.value = true;
+    footerFeedback.value = {
+      type: 'success',
+      message: 'Bravo ! L\'ordre est exact.'
+    };
   }
 };
 </script>

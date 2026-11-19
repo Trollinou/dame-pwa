@@ -1,14 +1,5 @@
 <template>
   <div class="exercice-type-associ-plan">
-    <!-- Header unifié avec métadonnées et consigne contextuelle -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneActuelle"
-      :stepBadgeText="`Carte ${carteCourante} / 5`"
-    />
-
     <!-- Carte 1 : Phase de matching (Association) -->
     <div v-if="carteCourante === 1" class="phase-container matching-phase">
       <MatchingViewer
@@ -57,7 +48,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import MatchingViewer from '@/components/learning/viewers/MatchingViewer.vue';
 import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
@@ -109,12 +100,7 @@ const paireActive = computed<AssociPlanPaire | null>(() => {
   return paires.value[index] || null;
 });
 
-// Métadonnées du ContentHeader
-const headerMeta = computed(() => ({
-  title: (props.config as any)?.metaTitre || 'T6 - Associ\'Plan',
-  typeLabel: (props.config as any)?.metaTypeLabel || 'Associ\'Plan',
-  chapitreNiveauLabel: (props.config as any)?.metaChapitreNiveauLabel || '',
-}));
+const exerciseHeader = useExerciseHeader();
 
 // Consigne contextuelle dynamique selon la carte
 const consigneActuelle = computed(() => {
@@ -124,6 +110,17 @@ const consigneActuelle = computed(() => {
   const planNum = carteCourante.value - 1;
   return `Plan ${planNum}`;
 });
+
+watch(
+  [consigneActuelle, carteCourante],
+  ([consigne, carte]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Carte ${carte} / 5`,
+    });
+  },
+  { immediate: true }
+);
 
 // Gestion du succès du matching (Carte 1)
 const onMatchingSuccess = () => {

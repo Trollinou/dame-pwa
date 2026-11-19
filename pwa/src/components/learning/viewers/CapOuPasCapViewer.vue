@@ -1,14 +1,5 @@
 <template>
   <div class="cap-ou-pas-cap-viewer-wrapper">
-    <!-- En-tête Unifié de l'exercice avec la consigne de la série -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneTexte"
-      :stepBadgeText="`Carte ${indexCourant + 1} / ${exercicesListe.length}`"
-    />
-
     <!-- Échiquier -->
     <div class="chessboard-panel">
       <div class="chessboard-container">
@@ -295,7 +286,7 @@ import { ref, computed, watch, nextTick, onUnmounted } from 'vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
 import { getActiveColorFromFen, parseFenPieces, filterYellowShapes, type PieceInfo } from '@/utils/chess/fenUtils';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import LearningFeedbackCallout from '@/components/learning/LearningFeedbackCallout.vue';
 import { parsePgn } from 'chessops/pgn';
@@ -357,12 +348,7 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-const headerMeta = computed(() => ({
-  title: props.metaTitre || 'T14 - Cap ou pas Cap ?',
-  typeLabel: props.metaTypeLabel || 'Cap ou pas Cap ?',
-  chapitreNiveauLabel: props.metaChapitreNiveauLabel || '',
-}));
-
+const exerciseHeader = useExerciseHeader();
 const indexCourant = ref(0);
 const isCardSolved = ref(false);
 const boardApi = ref<BoardCore | null>(null);
@@ -525,6 +511,17 @@ const exercicesListe = computed<ExerciceCapOuPasCap[]>(() => {
 const exerciceCourant = computed<ExerciceCapOuPasCap>(() => {
   return exercicesListe.value[indexCourant.value] || exercicesListe.value[0];
 });
+
+watch(
+  [consigneTexte, indexCourant, () => exercicesListe.value.length],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Carte ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 const pendingHintTexte = computed<string>(() => {
   if (resolvedVariante.value === 'move') {

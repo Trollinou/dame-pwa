@@ -1,12 +1,5 @@
 <template>
   <div class="exercise-viewer-layout">
-    <!-- Card Consigne -->
-    <ion-card v-if="consigne" class="exercise-card">
-      <ion-card-header>
-        <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
-      </ion-card-header>
-    </ion-card>
-
     <!-- PHASE 1 : OBSERVATION -->
     <div v-if="phase === 'observation'" class="observation-stage">
       <!-- Grande FEN de départ -->
@@ -51,40 +44,31 @@
 
     <!-- PHASE 2 : EXPLICATION -->
     <div v-else-if="phase === 'explication'" class="exercise-stage">
-      <ion-card class="exercise-card">
-        <ion-card-header>
-          <ion-card-title class="exercise-card-header">💡 Explication du plan gagnant</ion-card-title>
-        </ion-card-header>
-      </ion-card>
-
       <PgnViewer
         :pgnString="pgnExplication"
         :autoCompleteDelay="0"
         @finished="onSuccess"
       />
-
-      <ion-button
-        expand="block"
-        color="success"
-        class="exercise-action-btn"
-        @click="onSuccess"
-      >
-        Terminer l'exercice
-      </ion-button>
     </div>
+
+    <SeriesCardFooter
+      :currentCard="phase === 'observation' ? 1 : 2"
+      :totalCards="2"
+      :isSolved="phase === 'explication'"
+      :feedback="footerFeedback"
+      badgePrefix="Étape"
+      :finishText="'Terminer l\'exercice'"
+      @next="onSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, shallowRef, computed, watch, onBeforeUnmount } from 'vue';
-import {
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonButton
-} from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useFeedback } from '@/composables/core/useFeedback';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import type { BoardCore } from 'eg-chessboard';
 import { Chess } from 'chessops';
 import { parseFen } from 'chessops/fen';
@@ -93,6 +77,7 @@ import { parsePgn } from 'chessops/pgn';
 import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 
 const { showSuccess, showError } = useFeedback();
+const exerciseHeader = useExerciseHeader();
 
 export interface ScenarioJugementFinal {
   pgn: string;
@@ -121,9 +106,32 @@ const emit = defineEmits<{
 }>();
 
 const phase = ref<'observation' | 'explication'>('observation');
+const footerFeedback = ref<CardFeedback | null>(null);
 const mainBoardApi = shallowRef<BoardCore | null>(null);
 const boardApis = shallowRef<Map<number, BoardCore>>(new Map());
 const playbackTimers = ref<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+watch(
+  [phase, () => props.consigne],
+  () => {
+    if (phase.value === 'observation') {
+      exerciseHeader?.setHeaderState({
+        consigne: props.consigne || 'Observez les différents plans et choisissez le meilleur.',
+        stepBadgeText: 'Étape 1 / 2\nObservation'
+      });
+    } else {
+      exerciseHeader?.setHeaderState({
+        consigne: 'Explication du plan gagnant',
+        stepBadgeText: 'Étape 2 / 2\nExplication'
+      });
+      footerFeedback.value = {
+        type: 'success',
+        message: 'Excellente analyse !'
+      };
+    }
+  },
+  { immediate: true }
+);
 
 const playerColorTyped = computed<'white' | 'black'>(() => {
   return props.couleurJoueur === 'black' ? 'black' : 'white';

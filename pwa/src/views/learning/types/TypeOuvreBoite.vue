@@ -4,9 +4,6 @@
       :consigne="config.consigne"
       :exercices="(config as any).exercices"
       :pgn="(config as any).pgn"
-      :metaTitre="(config as any).metaTitre"
-      :metaTypeLabel="(config as any).metaTypeLabel"
-      :metaChapitreNiveauLabel="(config as any).metaChapitreNiveauLabel"
       @success="onSuccess"
     />
   </div>

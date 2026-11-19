@@ -1,14 +1,5 @@
 <template>
   <div class="exercise-stage">
-    <!-- En-tête Unifié ContentHeader -->
-    <ContentHeader
-      :title="metaTitre || 'Ouvre-Boîte'"
-      :typeLabel="metaTypeLabel || 'Ouvre-Boîte'"
-      :chapitreNiveauLabel="metaChapitreNiveauLabel || ''"
-      :consigne="consigneAffichee"
-      :stepBadgeText="`Carte ${carteIndex + 1} / ${totalCartes}`"
-    />
-
     <template v-if="carteActuelle">
       <!-- Échiquier avec FEN de départ, flèches [%cal] et déplacement interactif -->
       <div class="chessboard-container">
@@ -106,7 +97,7 @@ import {
   closeCircleOutline
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import LearningFeedbackCallout from '@/components/learning/LearningFeedbackCallout.vue';
 import {
@@ -144,6 +135,7 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
+const exerciseHeader = useExerciseHeader();
 const boardApi = shallowRef<BoardCore | null>(null);
 const carteIndex = ref(0);
 const selectedChoixId = ref<number | null>(null);
@@ -184,6 +176,17 @@ const carteActuelle = computed<CarteOuvreBoite | null>(() => {
 const consigneAffichee = computed(() => {
   return props.consigne || 'Trouvez le bon coup d’ouverture.';
 });
+
+watch(
+  [consigneAffichee, carteIndex, totalCartes],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Carte ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;

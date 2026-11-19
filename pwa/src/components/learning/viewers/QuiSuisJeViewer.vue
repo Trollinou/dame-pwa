@@ -1,14 +1,5 @@
 <template>
   <div class="exercise-stage">
-    <!-- En-tête Unifié de l'exercice avec consigne et badge d'étape -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneTexte"
-      :stepBadgeText="`Carte ${indexCourant + 1} / ${seriesListe.length}`"
-    />
-
     <!-- Zone des Indices (Multiligne) -->
     <div class="animate-fade-in learning-full-width">
       <div class="learning-callout learning-callout--info">
@@ -79,11 +70,12 @@ import { IonIcon } from '@ionic/vue';
 import { helpCircleOutline } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { DrawShape } from 'eg-chessboard';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { useChessPreferencesStore } from '@/stores/chessPreferences';
 
 const chessPreferences = useChessPreferencesStore();
+const exerciseHeader = useExerciseHeader();
 
 export interface SerieQuiSuisJe {
   indices?: string;
@@ -117,12 +109,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'success'): void;
 }>();
-
-const headerMeta = computed(() => ({
-  title: props.metaTitre || 'T12 - Qui suis-je ?',
-  typeLabel: props.metaTypeLabel || 'Qui suis-je ?',
-  chapitreNiveauLabel: props.metaChapitreNiveauLabel || '',
-}));
 
 const whitePieces = [
   { code: 'R', role: 'k', frCode: 'R', cgClass: 'king', label: 'Roi', article: 'le' },
@@ -173,6 +159,17 @@ const consigneTexte = computed<string>(() => {
     ? 'Devinez la pièce mystère d\'après les indices.'
     : 'Trouvez la case mystère sur l\'échiquier d\'après les indices.';
 });
+
+watch(
+  [consigneTexte, indexCourant, () => seriesListe.value.length],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Carte ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 const pendingHintTexte = computed<string>(() => {
   return resolvedVariante.value === 'pieces'

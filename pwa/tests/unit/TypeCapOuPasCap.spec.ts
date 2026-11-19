@@ -1,9 +1,11 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { queryClient } from '@/queryClient';
 import TypeCapOuPasCap from '@/views/learning/types/TypeCapOuPasCap.vue';
+import { EXERCISE_HEADER_KEY, type ExerciseHeaderState } from '@/composables/learning/useExerciseHeader';
 
 const fireCelebrationMock = vi.fn();
 vi.mock( '@/composables/learning/useCelebration', () => ( {
@@ -73,6 +75,7 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			metaChapitreNiveauLabel: 'Niveau 1 - Les Roques',
 		};
 
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypeCapOuPasCap, {
 			props: {
 				config,
@@ -80,11 +83,21 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 		} );
 
-		expect( wrapper.text() ).toContain( 'Exercice Cap ou pas Cap 1' );
-		expect( wrapper.text() ).toContain( 'Cap ou pas cap de roquer ?' );
+		expect( headerState.value.consigne ).toBe( 'Cap ou pas cap de roquer ?' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Carte 1 / 5' );
 		expect( wrapper.text() ).toContain( 'Carte 1 / 5' );
 		expect( wrapper.text() ).toContain( 'Le roque est-il possible ?' );
 	} );
@@ -432,6 +445,7 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			],
 		};
 
+		const headerState = ref<ExerciseHeaderState>( {} );
 		const wrapper = mount( TypeCapOuPasCap, {
 			props: {
 				config,
@@ -439,10 +453,20 @@ describe( 'TypeCapOuPasCap.vue', () => {
 			},
 			global: {
 				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
 			},
 		} );
 
-		expect( wrapper.text() ).toContain(
+		expect( headerState.value.consigne ).toContain(
 			'Indiquez la position de chaque pièce'
 		);
 

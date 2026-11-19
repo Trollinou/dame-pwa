@@ -1,14 +1,5 @@
 <template>
   <div class="abcdaire-viewer-wrapper">
-    <!-- En-tête Unifié de l'exercice -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneTexte"
-      :stepBadgeText="`Carte ${indexCourant + 1} / ${exercicesListe.length}`"
-    />
-
     <!-- Phase 1 : Jeu interactif du coup -->
     <div v-if="etapeJeu === 'playing'" class="chessboard-panel">
       <div class="chessboard-container">
@@ -59,7 +50,7 @@ import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 import type { BoardCore, DrawShape, Move, Key } from 'eg-chessboard';
 import { getActiveColorFromFen, filterYellowShapes } from '@/utils/chess/fenUtils';
 import { extractShapesAndComment } from '@/utils/chess/chessNotation';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { parsePgn } from 'chessops/pgn';
 import { parseFen } from 'chessops/fen';
@@ -88,12 +79,7 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-const headerMeta = computed(() => ({
-  title: props.metaTitre || 'T3 - ABCDaire Tactique',
-  typeLabel: props.metaTypeLabel || 'ABCDaire Tactique',
-  chapitreNiveauLabel: props.metaChapitreNiveauLabel || '',
-}));
-
+const exerciseHeader = useExerciseHeader();
 const indexCourant = ref(0);
 const etapeJeu = ref<'playing' | 'recap'>('playing');
 const isCardSolved = ref(false);
@@ -130,6 +116,17 @@ const exerciceCourant = computed<ExerciceABCDaire>(() => {
 const consigneTexte = computed<string>(() => {
   return exerciceCourant.value?.consigne || props.consigne || 'Trouve le meilleur coup.';
 });
+
+watch(
+  [consigneTexte, indexCourant, () => exercicesListe.value.length],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Carte ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 const currentPgnForViewer = computed<string>(() => {
   const pgn = (exerciceCourant.value?.pgn || '').trim();

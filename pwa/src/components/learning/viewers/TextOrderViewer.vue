@@ -2,13 +2,6 @@
   <div class="exercise-viewer-layout">
     <!-- PHASE 1 : ORDER -->
     <div v-if="phase === 'order'" class="exercise-stage">
-      <!-- Card Consigne -->
-      <ion-card v-if="consigne" class="exercise-card">
-        <ion-card-header>
-          <ion-card-title class="exercise-card-header">{{ consigne }}</ion-card-title>
-        </ion-card-header>
-      </ion-card>
-
       <!-- Échiquier de départ -->
       <div class="chessboard-container">
         <Chessboard
@@ -30,41 +23,29 @@
           </ion-reorder-group>
         </ion-list>
       </ion-card>
-
-      <!-- Bouton de validation -->
-      <ion-button
-        expand="block"
-        color="primary"
-        class="exercise-action-btn ion-margin-top"
-        @click="validerOrdre"
-      >
-        Valider l'ordre
-      </ion-button>
     </div>
 
     <!-- PHASE 2 : SOLUTION -->
     <div v-else-if="phase === 'solution'" class="exercise-stage">
-      <ion-card class="exercise-card">
-        <ion-card-header>
-          <ion-card-title class="exercise-card-header">💡 Explication détaillée</ion-card-title>
-        </ion-card-header>
-      </ion-card>
-
       <PgnViewer
         :orientation="couleurJoueurTyped"
         :pgn="pgnExplication"
         :pgnString="pgnExplication"
       />
-
-      <ion-button
-        expand="block"
-        color="success"
-        class="exercise-action-btn ion-margin-top"
-        @click="finishExercise"
-      >
-        Terminer l'exercice
-      </ion-button>
     </div>
+
+    <SeriesCardFooter
+      :currentCard="phase === 'order' ? 1 : 2"
+      :totalCards="2"
+      :isSolved="phase === 'solution'"
+      :showActionButtonWhenUnsolved="phase === 'order'"
+      actionButtonText="Valider l'ordre"
+      :feedback="footerFeedback"
+      badgePrefix="Étape"
+      :finishText="'Terminer l\'exercice'"
+      @action="validerOrdre"
+      @next="finishExercise"
+    />
   </div>
 </template>
 
@@ -72,22 +53,22 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import {
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonList,
   IonReorderGroup,
   IonItem,
   IonLabel,
   IonReorder,
-  IonButton,
   type ItemReorderCustomEvent
 } from '@ionic/vue';
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useFeedback } from '@/composables/core/useFeedback';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
+import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { shuffleArray } from '@/utils/chess/chessNotation';
 import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
 
 const { showSuccess, showError } = useFeedback();
+const exerciseHeader = useExerciseHeader();
 
 export interface EtapeTexte {
   id: number;
@@ -116,7 +97,30 @@ const emit = defineEmits<{
 }>();
 
 const phase = ref<'order' | 'solution'>('order');
+const footerFeedback = ref<CardFeedback | null>(null);
 const shuffledEtapes = ref<EtapeTexte[]>([]);
+
+watch(
+  [phase, () => props.consigne],
+  () => {
+    if (phase.value === 'order') {
+      exerciseHeader?.setHeaderState({
+        consigne: props.consigne || 'Remettez les étapes dans le bon ordre.',
+        stepBadgeText: 'Étape 1 / 2\nClassement'
+      });
+    } else {
+      exerciseHeader?.setHeaderState({
+        consigne: 'Explication détaillée',
+        stepBadgeText: 'Étape 2 / 2\nSolution'
+      });
+      footerFeedback.value = {
+        type: 'success',
+        message: 'Ordre des étapes validé !'
+      };
+    }
+  },
+  { immediate: true }
+);
 
 const couleurJoueurTyped = computed<'white' | 'black'>(() => {
   return props.couleurJoueur === 'black' ? 'black' : 'white';

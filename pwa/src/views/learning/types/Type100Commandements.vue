@@ -1,13 +1,5 @@
 <template>
   <div class="exercice-type-100commandements">
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneActive"
-      :stepBadgeText="`Question ${qcmIndex + 1} / ${qcmsList.length}`"
-    />
-
     <QcmViewer
       v-if="qcmActuel"
       :key="qcmIndex"
@@ -27,7 +19,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import QcmViewer from '@/components/learning/viewers/QcmViewer.vue';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import { useApprentissageStore } from '@/stores/apprentissage';
 import type { ExerciseType1Config, QcmItem } from '@/types/roi';
 
@@ -40,14 +32,7 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-const headerMeta = computed(() => {
-  const cfg = props.config as Record<string, any>;
-  return {
-    title: (cfg?.metaTitre as string) || 'T1 - 100 Commandements',
-    typeLabel: (cfg?.metaTypeLabel as string) || '100 Commandements',
-    chapitreNiveauLabel: (cfg?.metaChapitreNiveauLabel as string) || '',
-  };
-});
+const exerciseHeader = useExerciseHeader();
 
 const store = useApprentissageStore();
 const qcmIndex = ref(0);
@@ -88,6 +73,17 @@ const consigneActive = computed<string>(() => {
 const estDernierQcm = computed(() => {
   return qcmIndex.value >= qcmsList.value.length - 1;
 });
+
+watch(
+  [() => consigneActive.value, qcmIndex, () => qcmsList.value.length],
+  ([consigne, idx, total]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Question ${idx + 1} / ${total}`,
+    });
+  },
+  { immediate: true }
+);
 
 watch(
   () => props.config,

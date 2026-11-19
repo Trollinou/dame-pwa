@@ -6,6 +6,28 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Unification complète du `ContentHeader` et `SeriesCardFooter` sur les 16 types d'exercices (Phases 2 & 3)** :
+  - **Migration des 4 types restants vers `SeriesCardFooter` et `useExerciseHeader`** : `EvalViewer.vue` (Type 10), `OrderViewer.vue` (Type 11), `JugementFinalViewer.vue` (Type 15) et `TextOrderViewer.vue` (Type 16) pilotent désormais l'en-tête via `useExerciseHeader()` et utilisent le footer unifié `<SeriesCardFooter>` (suppression des boutons inline et des `<ion-card>` de consigne redondants).
+  - **Déduplication complète de `<ContentHeader>`** : Migration des 12 autres types/viewers (`Type100Commandements`, `TypeParcours`, `TypePartieHeros`, `TypeMarcheHeros`, `TypeAssociPlan`, `TypePosiPlan`, `PlacementViewer`, `VisionViewer`, `ABCDaireTactiqueViewer`, `QuiSuisJeViewer`, `OuvreBoiteViewer`, `CapOuPasCapViewer`) vers `useExerciseHeader()`.
+  - **Nettoyage de `ContenuPage.vue` & Code mort** : Suppression de `TYPES_AVEC_SERIES_FOOTER`, suppression de l'injection `metaTitre`/`metaTypeLabel`/`metaChapitreNiveauLabel` (et du cast `as any`), et suppression de `ExerciseHeader.vue` (et `ExerciseHeader.spec.ts`) devenu obsolète.
+  - **Tests & Documentation** : Mise à jour des 8 suites de tests unitaires pour vérifier `EXERCISE_HEADER_KEY` (289/289 tests passants) et mise à jour de `README.md`.
+
+- **Alignement des largeurs d'échiquiers et viewers (`_learning-layout.scss`, `_learning-components.scss`)** :
+  - Alignement de `.diagram-viewer-container` sur `max-width: min(100%, 38dvh, 440px)` (identique à `.chessboard-container`) pour uniformiser l'affichage des diagrammes FEN et PGN dans les leçons.
+  - Ajout de `width: 100%` sur `.placement-viewer-wrapper` et `.abcdaire-viewer-wrapper` afin d'éviter leur contraction dans `.exercise-stage`.
+
+- **Nettoyage du balisage SSR WordPress dans `LeconReader.vue`** :
+  - Appel à `htmlEl.replaceChildren()` avant `render(vnode, htmlEl)` lors de l'hydratation des blocs `.roi-bloc-fen` et `.roi-bloc-pgn` afin de supprimer le squelette SSR WordPress (`.main-wrap` / `.main-board` / `.pgn-navigation-bar`) qui provoquait un grand espace vide et des contrôles en double au-dessus du `PgnViewer`.
+
+- **Correctif d'affichage des mini-échiquiers (`_learning-components.scss`)** :
+  - Ajout des dimensions `width: 100%; height: 100%; max-width: none; margin: 0;` sur `.diagram-viewer-container` à l'intérieur de `.chessboard-container--mini` afin d'éviter l'effondrement à `0px` de hauteur des diagrammes dans les grilles multi-échiquiers (`TypeMarcheHeros.vue`, `OrderViewer.vue`).
+
+- **Socle Unifié des Exercices : En-tête, Feedback à 2 niveaux & Nettoyage `PgnViewer` (`ContenuPage.vue`, `useExerciseHeader.ts`, `useExerciseFeedback.ts`, `PgnViewer.vue`, tests & `README.md`)** :
+  - **Centralisation de `<ContentHeader>` (`useExerciseHeader.ts`, `ContenuPage.vue`)** : Ajout du composable `provideExerciseHeader()` / `useExerciseHeader()` permettant de piloter dynamiquement `consigne`, `stepBadgeText` et `hideSubPanel` depuis les exercices sans dupliquer `<ContentHeader>`, avec activation progressive via `isManagedByShell`.
+  - **Feedback Pédagogique à 2 Niveaux (`useExerciseFeedback.ts`, `ContenuPage.vue`)** : Ajout du composable `provideExerciseFeedback()` / `useExerciseFeedback()` pour afficher les explications détaillées de l'entraîneur dans un `<LearningFeedbackCallout>` unique sous l'exercice (zone scrollable), tout en gardant `SeriesCardFooter` sur une ligne fixe.
+  - **Simplification de `ContenuPage.vue` & `PgnViewer.vue`** : Remplacement des 16 `if` de sélection d'exercice par le dictionnaire typé `EXERCISE_COMPONENTS: Record<number, Component>`, réinitialisation automatique du header et du feedback dans `loadContenu()`, et suppression du `<SeriesCardFooter>` interne inutilisé dans `PgnViewer.vue` (ainsi que des props `currentCard` / `totalCards`).
+  - **Tests & Documentation** : Ajout de tests unitaires (`useExerciseHeader.spec.ts`, `useExerciseFeedback.spec.ts`), mise à jour de `PgnViewer.spec.ts` et de `README.md`.
+
 ## [1.13.8] - 2026-11-17
 
 - **Intégration `eg-chessboard` v1.8.5 (`stockfish.ts`, `Chessboard/types.ts`, `Chessboard.vue`, `usePlayGame.ts`, `PlayPage.vue`, tests & documentation)** :

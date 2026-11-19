@@ -1,15 +1,6 @@
 <!-- src/views/types/TypeMarcheHeros.vue -->
 <template>
   <div class="exercise-stage">
-    <!-- En-tête Unifié -->
-    <ContentHeader
-      :title="headerMeta.title"
-      :typeLabel="headerMeta.typeLabel"
-      :chapitreNiveauLabel="headerMeta.chapitreNiveauLabel"
-      :consigne="consigneCourante"
-      :stepBadgeText="`Série ${serieCouranteIndex + 1} / ${nbSeries}\n${sousEtapeBadge}`"
-    />
-
     <!-- SOUS-ÉTAPE 1 : Sélection / Tri de la série en grille 2 colonnes -->
     <div v-if="sousEtape === 'selection'" class="learning-board-grid-2col animate-fade-in">
       <div
@@ -94,7 +85,7 @@ import { parsePgn } from 'chessops/pgn';
 import { isNormal } from 'chessops/types';
 import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import PuzzleViewer from '@/components/learning/viewers/PuzzleViewer.vue';
-import ContentHeader from '@/components/learning/ContentHeader.vue';
+import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { shuffleArray } from '@/utils/chess/chessNotation';
 
@@ -145,11 +136,7 @@ const normalizedConfig = computed<Record<string, any>>(() => {
   return (cfg && typeof cfg === 'object') ? cfg : {};
 });
 
-const headerMeta = computed(() => ({
-  title: normalizedConfig.value.metaTitre || 'T7 - Marche du Héros',
-  typeLabel: normalizedConfig.value.metaTypeLabel || 'Marche du Héros',
-  chapitreNiveauLabel: normalizedConfig.value.metaChapitreNiveauLabel || '',
-}));
+const exerciseHeader = useExerciseHeader();
 
 // Configuration des séries
 const nbSeries = ref(3);
@@ -193,6 +180,17 @@ const sousEtapeBadge = computed(() => {
   if (sousEtape.value === 'ordonnancement') return 'Étape 2 : Ordre chronologique';
   return 'Étape 3 : Coup suivant';
 });
+
+watch(
+  [consigneCourante, serieCouranteIndex, nbSeries, sousEtapeBadge],
+  ([consigne, idx, total, badge]) => {
+    exerciseHeader?.setHeaderState({
+      consigne,
+      stepBadgeText: `Série ${idx + 1} / ${total}\n${badge}`,
+    });
+  },
+  { immediate: true }
+);
 
 // ==========================================
 // VALIDATION TEMPS-RÉEL DE L'ÉTAPE COURANTE

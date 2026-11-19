@@ -22,7 +22,7 @@ Extension WordPress et Application Web Progressive (PWA) Ionic/Vue pour l'associ
     - `src/views/auth/` : `LoginPage.vue`, `RegisterPage.vue`, `SelectPersonPage.vue`, `ProfilePage.vue`.
     - `src/views/layout/` : `TabsPage.vue`, `AdminLayout.vue`, `GenericPage.vue`.
   - `src/components/` : Composants modulaires organisés par piliers :
-    - `src/components/learning/` : `LeconReader.vue`, `VideoReader.vue`, `ContentHeader.vue`, `ExerciseHeader.vue`, `LearningFeedbackCallout.vue`, `SeriesCardFooter.vue`, sous-dossier `play/` et sous-dossier `viewers/` (les 17 viewers d'exercices interactifs).
+    - `src/components/learning/` : `LeconReader.vue`, `VideoReader.vue`, `ContentHeader.vue`, `LearningFeedbackCallout.vue`, `SeriesCardFooter.vue`, sous-dossier `play/` et sous-dossier `viewers/` (les 17 viewers d'exercices interactifs).
     - `src/components/public/` : Composants de la vitrine club (`agenda/`, `preinscription/`).
     - `src/components/auth/` : Personnalisation et profil (`profile/ChessThemeCustomizer.vue`).
     - `src/components/shared/` : Briques UI génériques pures (`Chessboard/`, `DataTable/`, `SplitMasterDetail.vue`, `SignaturePad.vue`, `MediaViewer/EgMediaViewer.vue`, `WpContent/WpContentRenderer.vue`).
@@ -78,7 +78,7 @@ L'application suit un principe de découplage strict :
   - Déroulement en série de 6 devinettes pour Qui-suis-je ? (Type 12) : support des variantes `pieces` (indices textuels multilignes + palette des 6 pièces blanches en notation française) et `cases` (indices textuels multilignes + échiquier interactif avec révélation par cercle vert), enchaînement fluide avec `ContentHeader` et `SeriesCardFooter`.
   - Déroulement par cartes pour 100 Commandements (Type 1), Pop'Echecs (Type 2) et ABCDaire Tactique (Type 3) : prise en charge des consignes globales et surcharges par diagramme/Mini-PGN, indicateur visuel de la pièce à placer (`ion-chip` avec `ion-avatar` SVG et concordance grammaticale de genre en français pour Pop'Echecs).
   - Masquage initial des `shapes` de solution pendant la recherche, avec **maintien visible du cercle jaune (`brush: 'yellow'`)** pour mettre en évidence la pièce d'étude (Types 2 Pop'Echecs, 3 ABCDaire Tactique et 14 Cap ou pas Cap ? dans toutes les variantes), puis révélation complète des annotations dès la réussite.
-  - Gestion des séries multi-diagrammes et étapes avec `ExerciseHeader` et `SeriesCardFooter`.
+  - Gestion des séries multi-diagrammes et étapes avec `ContentHeader` (`useExerciseHeader`) et `SeriesCardFooter`.
   - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec mode plein écran universel (hybride Fullscreen natif Android/Desktop + Pseudo-Fullscreen CSS iOS sans blocage), bascule automatique en immersion lors de la rotation paysage sur mobile et validation de progression au seuil de 95%.
 
 ## Composants & Composables Partagés (PWA Frontend)
@@ -163,7 +163,7 @@ const { currentCard, isSolved, next, markSolved } = useCardNavigation(
 Composant d'en-tête standardisé et générique pour l'ensemble des contenus pédagogiques (Exercices, Vidéos, Leçons) :
 - **Panneau 1 (Métadonnées Compactes)** : Affiche le titre (`title`), son type adapté (`typeLabel`, ex: "Exercice", "Vidéo", "Leçon", "Vision'checs", etc.) et le chapitre/niveau associé (`chapitreNiveauLabel`).
 - **Panneau 2 (Consigne & Badge d'étape - Optionnel / Masquable)** : Affiche optionnellement le texte de la consigne (`consigne`) et le badge d'étape interactive (`stepBadgeText`, supportant les retours à la ligne `\n` pour découper série et sous-étape sur deux lignes compactes et préserver la largeur de la consigne). Grâce à la prop `hideSubPanel: true` (ou en l'absence de consigne/badge), ce deuxième panneau est totalement masqué pour les Vidéos et les Leçons, allégeant la vue.
-- **Rétrocompatibilité** : `<ExerciseHeader>` est conservé comme wrapper typé vers `<ContentHeader>`.
+- **Orchestration centralisée (`useExerciseHeader`)** : `ContenuPage.vue` expose `provideExerciseHeader()` (`src/composables/learning/useExerciseHeader.ts`) et rend l'unique `<ContentHeader>` pour les 16 types d'exercices ; chaque exercice/viewer pilote dynamiquement `consigne`, `stepBadgeText` et `hideSubPanel` via `setHeaderState()`.
 
 ```vue
 <template>
@@ -204,7 +204,7 @@ Pour garantir une expérience graphique et tactile fluide sans dispersion de cod
 > Toute nouvelle vue s'assemble exclusivement à l'aide des **briques Lego communes** :
 > 1. **Conteneur de stage** : `<div class="exercise-stage">` ou `<div class="exercise-viewer-layout">`.
 > 2. **Échiquier** : `<div class="chessboard-container">` (solo 1:1 sans coins arrondis pour alignement parfait des pièces) ou `<div class="learning-board-grid-2col">` avec `<div class="learning-board-card">` (grille 2 par ligne).
-> 3. **Encart pédagogique d'explication** : `<LearningFeedbackCallout type="success|error|info|tip|quote|warning" :text="..." />` ou `<div class="learning-callout learning-callout--info|--tip|--quote|--success|--error|--warning">` (bordure latérale gauche colorée pour conseils/citations/explications).
+> 3. **Encart pédagogique d'explication** : `<LearningFeedbackCallout type="success|error|info|tip|quote|warning" :text="..." />` ou `<div class="learning-callout learning-callout--info|--tip|--quote|--success|--error|--warning">` (bordure latérale gauche colorée pour conseils/citations/explications). Pour les explications détaillées de l'entraîneur sous l'exercice, `ContenuPage.vue` fournit le composable centralisé `useExerciseFeedback()` (`src/composables/learning/useExerciseFeedback.ts`) via `setCoachFeedback()` / `clearCoachFeedback()`, rendant un `<LearningFeedbackCallout>` unique dans la zone scrollable au-dessus du footer fixe.
 > 4. **Bandeau d'instruction / action sous échiquier** : `<div class="learning-instruction-bar">` (bandeau centré neutre avec bordure 1px subtile, sans barre latérale).
 > 5. **Boutons de choix / QCM** : `<div class="qcm-choices">` avec `<ion-button class="choice-btn">` (hauteur compacte ergonomique **38px**, `--border-radius: 6px`).
 > 6. **Boutons bascules OUI / NON** : `.neutral-toggle` / `.neutral-toggle--large` avec `.toggle-btn` (32px / 36px).
@@ -278,7 +278,7 @@ Composant de lecture et relecture pas-à-pas de séquences PGN commentées avec 
   - Au dernier coup (`currentPly >= totalPly`) : les boutons Suivant et Fin sont automatiquement désactivés (`disabled`).
   - Sur un PGN sans coup (`totalPly === 0`) : l'ensemble des boutons de navigation est désactivé.
 - **Support des formes et commentaires** : Restitution en temps réel des commentaires pédagogiques (`currentComment`) et des flèches/cases colorées (`setShapes`).
-- **Événement `@finished`** : Émis dès que l'apprenant atteint le dernier coup de la séquence (ou immédiatement si 0 coup).
+- **Événement `@finished`** : Émis dès que l'apprenant atteint le dernier coup de la séquence (ou immédiatement si 0 coup). Composant pur de lecture PGN sans footer interne : l'exercice parent conserve le pilotage unique de `<SeriesCardFooter>`.
 
 ### 7. Styles & Classes Partagées (`src/theme/shared-components.scss`)
 Nomenclature canonique standardisée à utiliser systématiquement par les développeurs selon les familles d'éléments :
