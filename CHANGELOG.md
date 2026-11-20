@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.10] - 2026-11-20
+
 - **Rafraîchissement forcé de la liste des exercices d'un cours (`apprentissage.ts`, `CoursPage.vue`, `ApprentissageCoursListPage.vue`)** :
   - Ajout du paramètre `force = false` à `fetchParcours(force)` et `fetchProgression(force)` dans le store `apprentissage` afin d'invalider le cache TanStack Query (`queryClient.invalidateQueries`) lors d'un tirage vers le bas (*pull-to-refresh*) dans `CoursPage.vue` et `ApprentissageCoursListPage.vue`.
   - Ajout de `cache: 'no-store'` sur les requêtes `GET` `/roi/v1/parcours`, `/roi/v1/progression` et `/roi/v1/contenu/{id}` afin d'éviter la réutilisation d'une réponse HTTP mise en cache par le navigateur ou la WebView.
