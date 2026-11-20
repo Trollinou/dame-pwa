@@ -56,7 +56,11 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 			const apiUrl = import.meta.env.VITE_API_BASE_URL;
 			const response = await safeFetch(
 				`${ apiUrl }/roi/v1/parcours`,
-				{ method: 'GET', headers: getAuthHeaders() },
+				{
+					method: 'GET',
+					headers: getAuthHeaders(),
+					cache: 'no-store',
+				},
 				5000
 			);
 
@@ -80,7 +84,11 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 			const apiUrl = import.meta.env.VITE_API_BASE_URL;
 			const response = await safeFetch(
 				`${ apiUrl }/roi/v1/progression`,
-				{ method: 'GET', headers: getAuthHeaders() },
+				{
+					method: 'GET',
+					headers: getAuthHeaders(),
+					cache: 'no-store',
+				},
 				5000
 			);
 
@@ -108,7 +116,11 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 				const apiUrl = import.meta.env.VITE_API_BASE_URL;
 				const response = await safeFetch(
 					`${ apiUrl }/roi/v1/contenu/${ contenuActuelId.value }`,
-					{ method: 'GET', headers: getAuthHeaders() },
+					{
+						method: 'GET',
+						headers: getAuthHeaders(),
+						cache: 'no-store',
+					},
 					5000
 				);
 
@@ -248,12 +260,24 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 	);
 
 	// Actions
-	const fetchParcours = async (): Promise< void > => {
-		await refetchParcours();
+	const fetchParcours = async ( force = false ): Promise< void > => {
+		if ( force ) {
+			await queryClient.invalidateQueries( {
+				queryKey: [ 'parcours' ],
+			} );
+		} else {
+			await refetchParcours();
+		}
 	};
 
-	const fetchProgression = async (): Promise< void > => {
-		await refetchProgression();
+	const fetchProgression = async ( force = false ): Promise< void > => {
+		if ( force ) {
+			await queryClient.invalidateQueries( {
+				queryKey: [ 'progression' ],
+			} );
+		} else {
+			await refetchProgression();
+		}
 	};
 
 	const fetchContenu = async (
@@ -296,7 +320,11 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 				const apiUrl = import.meta.env.VITE_API_BASE_URL;
 				const response = await safeFetch(
 					`${ apiUrl }/roi/v1/contenu/${ id }`,
-					{ method: 'GET', headers: getAuthHeaders() },
+					{
+						method: 'GET',
+						headers: getAuthHeaders(),
+						cache: 'no-store',
+					},
 					5000
 				);
 
@@ -404,7 +432,11 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 				queryFn: async () => {
 					const response = await safeFetch(
 						`${ apiUrl }/roi/v1/contenu/${ item.id }`,
-						{ method: 'GET', headers: getAuthHeaders() },
+						{
+							method: 'GET',
+							headers: getAuthHeaders(),
+							cache: 'no-store',
+						},
 						5000
 					);
 					if ( ! response.ok ) {

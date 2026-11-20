@@ -164,8 +164,8 @@ const isValidated = (itemId: number): boolean => {
 
 const handleRefresh = async (event: RefresherCustomEvent) => {
   await Promise.all([
-    apprentissageStore.fetchParcours(),
-    apprentissageStore.fetchProgression()
+    apprentissageStore.fetchParcours(true),
+    apprentissageStore.fetchProgression(true)
   ]);
   if (coursId.value) {
     apprentissageStore.prefetchCoursContenus(coursId.value);

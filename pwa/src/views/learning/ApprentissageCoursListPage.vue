@@ -174,17 +174,17 @@ const isCourseUnlocked = (cours: CoursItem): boolean => {
   return apprentissageStore.isCoursUnlocked(idx);
 };
 
-const loadData = async () => {
+const loadData = async (force = false) => {
   if (authStore.isAuthenticated && authStore.canAccessApprentissage) {
     await Promise.all([
-      apprentissageStore.fetchParcours(),
-      apprentissageStore.fetchProgression()
+      apprentissageStore.fetchParcours(force),
+      apprentissageStore.fetchProgression(force)
     ]);
   }
 };
 
 const handleRefresh = async (event: RefresherCustomEvent) => {
-  await loadData();
+  await loadData(true);
   event.target.complete();
 };
 

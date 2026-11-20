@@ -119,4 +119,63 @@ describe( 'apprentissageStore - selective sync & modified timestamp', () => {
 			);
 		} );
 	} );
+
+	it( 'fetchParcours(true) and fetchProgression(true) invalidate queries and refetch with cache: no-store', async () => {
+		await app.runWithContext( async () => {
+			const { useAuthStore } = await import( '@/stores/auth' );
+			const authStore = useAuthStore();
+			authStore.token = 'fake-jwt-token';
+
+			const store = useApprentissageStore();
+			const { safeFetch } = await import( '@/utils/safeFetch' );
+			const mockSafeFetch = vi.mocked( safeFetch );
+
+			mockSafeFetch.mockImplementation( async ( url ) => {
+				if ( String( url ).includes( '/roi/v1/parcours' ) ) {
+					return {
+						ok: true,
+						json: async () => [
+							{
+								id: 1,
+								titre: 'Cours Mis à Jour',
+								niveau: 1,
+								playlist: [
+									{
+										id: 201,
+										type: 'roi_exercice',
+										titre: 'Nouvel Exercice',
+										modified: '2026-11-20 12:00:00',
+									},
+								],
+							},
+						],
+					} as unknown as Response;
+				}
+				return {
+					ok: true,
+					json: async () => [ 201 ],
+				} as unknown as Response;
+			} );
+
+			await Promise.all( [
+				store.fetchParcours( true ),
+				store.fetchProgression( true ),
+			] );
+
+			expect( store.parcours ).toHaveLength( 1 );
+			expect( store.parcours[ 0 ].playlist ).toHaveLength( 1 );
+			expect( store.parcours[ 0 ].playlist[ 0 ].id ).toBe( 201 );
+			expect( store.elementsValides ).toEqual( [ 201 ] );
+
+			const parcoursCall = mockSafeFetch.mock.calls.find( ( c ) =>
+				String( c[ 0 ] ).includes( '/roi/v1/parcours' )
+			);
+			const progressionCall = mockSafeFetch.mock.calls.find( ( c ) =>
+				String( c[ 0 ] ).includes( '/roi/v1/progression' )
+			);
+
+			expect( parcoursCall?.[ 1 ]?.cache ).toBe( 'no-store' );
+			expect( progressionCall?.[ 1 ]?.cache ).toBe( 'no-store' );
+		} );
+	} );
 } );
