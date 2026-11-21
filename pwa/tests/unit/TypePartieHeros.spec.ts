@@ -46,7 +46,7 @@ describe( 'TypePartieHeros.vue', () => {
 [SetUp "1"]
 
 { Position de départ }
-1. Bb5 a6 (1... Nf6 2. O-O { Berlin }) 2. Ba4 Nf6 *`;
+1. Bb5 { [%cal Ga7a6,Rg8f6,Yd7d6] } a6 (1... Nf6 2. O-O { Berlin }) 2. Ba4 Nf6 *`;
 
 	const sampleConfig = {
 		consigne: 'Revivez la partie du héros et trouvez le bon coup.',

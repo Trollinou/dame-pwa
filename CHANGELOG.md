@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Validation stricte des embranchements QCM du Type 4 (`partieHerosParser.ts`, `partieHerosParser.spec.ts`, `TypePartieHeros.spec.ts`)** :
+  - Ajout de `hasValidQcmArrows()` afin de n'ouvrir une étape QCM que lorsque le nœud possède à la fois plusieurs variantes (`node.children.length > 1`) et au moins 3 flèches `[%cal ...]` de couleurs distinctes partant chacune d'une case occupée par une pièce.
+  - Évite le basculement intempestif en QCM sur les variantes explicatives sans flèches (ex. coup 16 de Morphy–De Rivière 1863) ou les flèches illustratives ne respectant pas ces critères (ex. coup 20).
+
 ## [1.13.10] - 2026-11-20
 
 - **Rafraîchissement forcé de la liste des exercices d'un cours (`apprentissage.ts`, `CoursPage.vue`, `ApprentissageCoursListPage.vue`)** :

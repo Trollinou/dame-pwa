@@ -1,4 +1,4 @@
-import { Chess } from 'chessops';
+import { Chess, parseSquare } from 'chessops';
 import { parseFen, makeFen } from 'chessops/fen';
 import { parseSan, makeSanAndPlay } from 'chessops/san';
 import {
@@ -63,6 +63,34 @@ export {
  * Mélange aléatoirement les choix d'un QCM (alias vers shuffleArray).
  */
 export const shuffleChoices = shuffleArray;
+
+/**
+ * Vérifie si les annotations graphiques d'une position caractérisent un véritable choix QCM :
+ * au moins 3 flèches de couleurs distinctes, chacune partant d'une case occupée par une pièce.
+ * @param shapes
+ * @param pos
+ */
+function hasValidQcmArrows( shapes: DrawShape[], pos: Chess ): boolean {
+	const arrows = shapes.filter(
+		( s ) => Boolean( s.orig && s.dest && s.orig !== s.dest )
+	);
+	if ( arrows.length < 3 ) {
+		return false;
+	}
+
+	const allHaveOriginPiece = arrows.every( ( arrow ) => {
+		const sq = parseSquare( arrow.orig );
+		return sq !== undefined && pos.board.get( sq ) !== undefined;
+	} );
+	if ( ! allHaveOriginPiece ) {
+		return false;
+	}
+
+	const distinctColors = new Set(
+		arrows.map( ( arrow ) => arrow.brush || 'green' )
+	);
+	return distinctColors.size >= 3;
+}
 
 /**
  * Analyse une étude PGN complète et la découpe en étapes séquentielles
@@ -187,7 +215,17 @@ export function parsePartieHerosPgn(
 			break;
 		}
 
-		if ( node.children.length > 1 ) {
+		const nodeComments = isChildNode( node )
+			? node.data?.comments
+			: undefined;
+		const parentParsed = isChildNode( node )
+			? extractShapesAndComment( nodeComments )
+			: { comment: initialStartingComment, shapes: initialStartingShapes };
+		const isQcmBranch =
+			node.children.length > 1 &&
+			hasValidQcmArrows( parentParsed.shapes, currentPos );
+
+		if ( isQcmBranch ) {
 			// Clôture de la séquence PGN précédente
 			if ( currentPgnMoves.length > 0 ) {
 				stages.push( {
@@ -203,10 +241,6 @@ export function parsePartieHerosPgn(
 				initialStartingShapes = [];
 			}
 
-			const nodeComments = isChildNode( node )
-				? node.data?.comments
-				: undefined;
-			const parentParsed = extractShapesAndComment( nodeComments );
 			const mainChild: ChildNode< PgnNodeData > = node.children[ 0 ];
 			const mainParsed = extractShapesAndComment(
 				mainChild.data?.comments

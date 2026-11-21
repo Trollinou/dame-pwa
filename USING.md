@@ -128,7 +128,7 @@ L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
       - **Exercices La Partie dont tu es le Héros (Type 4)** :
         - Saisie simplifiée d'une étude PGN complète dans le CMS auteur (partie commentée avec flèches et variantes).
         - Découpage dynamique côté client en étapes séquentielles : défilement PGN commenté pas-à-pas (boutons Début, Précédent, Suivant avec désactivation contextuelle au début et à la fin de la séquence, sans saut direct à la fin pour garantir l'assimilation des coups et commentaires) et embranchements QCM interactifs.
-        - Moments de choix QCM identifiés par les 3 flèches indicatrices `[%cal ...]` et les 2 variantes associées au coup principal.
+        - Moments de choix QCM identifiés par la présence de variantes PGN **et** d'au moins 3 flèches indicatrices `[%cal ...]` de couleurs distinctes ayant chacune une pièce sur leur case d'origine (les variantes explicatives sans flèches valides restent en défilement PGN normal).
         - Barre de consigne fixe insérée entre l'échiquier et les choix : *« Trouve le coup suivant »*.
         - Choix QCM présentés sous forme descriptive complète en français suivie de la notation SAN française entre parenthèses (ex : *« Fou f1 en c4 (Fc4) »*, *« Pion e2 en e4 (e4) »*, *« Petit roque (O-O) »*), avec mélange aléatoire (Fisher-Yates) des options garantissant que le bon coup n'apparaît pas systématiquement en première position.
         - Sélection interactive d'un coup parmi les 3 choix :
