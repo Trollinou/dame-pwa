@@ -206,7 +206,7 @@ Pour garantir une expérience graphique et tactile fluide sans dispersion de cod
 > 2. **Échiquier** : `<div class="chessboard-container">` (solo 1:1 sans coins arrondis pour alignement parfait des pièces) ou `<div class="learning-board-grid-2col">` avec `<div class="learning-board-card">` (grille 2 par ligne).
 > 3. **Encart pédagogique d'explication** : `<LearningFeedbackCallout type="success|error|info|tip|quote|warning" :text="..." />` ou `<div class="learning-callout learning-callout--info|--tip|--quote|--success|--error|--warning">` (bordure latérale gauche colorée pour conseils/citations/explications). Pour les explications détaillées de l'entraîneur sous l'exercice, `ContenuPage.vue` fournit le composable centralisé `useExerciseFeedback()` (`src/composables/learning/useExerciseFeedback.ts`) via `setCoachFeedback()` / `clearCoachFeedback()`, rendant un `<LearningFeedbackCallout>` unique dans la zone scrollable au-dessus du footer fixe.
 > 4. **Bandeau d'instruction / action sous échiquier** : `<div class="learning-instruction-bar">` (bandeau centré neutre avec bordure 1px subtile, sans barre latérale).
-> 5. **Boutons de choix / QCM** : `<div class="qcm-choices">` avec `<ion-button class="choice-btn">` (hauteur compacte ergonomique **38px**, `--border-radius: 6px`).
+> 5. **Boutons de choix / QCM** : `<div class="qcm-choices">` avec `<ion-button class="choice-btn">` (`min-height: 38px`, `height: auto` multi-lignes, `--border-radius: 6px`).
 > 6. **Boutons bascules OUI / NON** : `.neutral-toggle` / `.neutral-toggle--large` avec `.toggle-btn` (32px / 36px).
 > 7. **Palettes tactiles & PGN** : `<div class="learning-piece-palette">` (6 colonnes), `<div class="setup-palette-grid">` (7 colonnes x 2 lignes pour 12 pièces + gomme), `.navigation-controls` / `.nav-btn` et `.comment-container` avec `.comment-empty`.
 
@@ -293,7 +293,7 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 | **Cartes & En-têtes** | `.exercise-card` | Carte standard pour consignes, questions et contenus (bord arrondi 8px, padding interne `8px 10px`, ombre légère). |
 | | `.exercise-card-header` | Titre centré de consigne ou de question (1.15rem, semi-bold). |
 | **Choix & QCM** | `.qcm-choices` | Conteneur vertical de boutons de choix compact (gap 6px, max 500px). |
-| | `.choice-btn` | Bouton de choix compact (`min-height: 38px`, padding `6px 12px`, texte centré, retour à la ligne natif Ionic). |
+| | `.choice-btn` | Bouton de choix adaptatif (`min-height: 38px`, `height: auto`, padding `8px 12px`, `line-height: 1.35`, texte centré, retour à la ligne multi-lignes). |
 | | `.choice-btn--centered` | Variante du bouton de choix avec texte centré. |
 | **Palettes & Pièces** | `.piece-palette` | Grille 2x6 ou 6x2 pour sélection interactive de pièces. |
 | | `.piece-btn` | Bouton carré de pièce avec effet hover/scale. |

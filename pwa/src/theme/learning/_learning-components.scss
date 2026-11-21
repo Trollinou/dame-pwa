@@ -565,22 +565,24 @@
 
 .choice-btn {
   --border-radius: 6px;
-  --padding-top: 6px;
-  --padding-bottom: 6px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
   min-height: 38px;
-  height: 38px;
+  height: auto;
   text-transform: none;
   font-size: 0.92rem;
   font-weight: 600;
+  line-height: 1.35;
   margin: 0;
   white-space: normal;
 
   &::part(native) {
     white-space: normal;
     text-align: center;
-    padding: 0 12px;
+    padding: 8px 12px;
     min-height: 38px;
-    height: 38px;
+    height: auto;
+    line-height: 1.35;
   }
 }
 

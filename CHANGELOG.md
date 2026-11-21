@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.11] - 2026-11-21
+
+- **Adaptation automatique en hauteur des boutons QCM multi-lignes (`_learning-components.scss`)** :
+  - Remplacement de `height: 38px` par `height: auto` (avec `min-height: 38px`, `padding: 8px 12px` et `line-height: 1.35`) sur `.choice-btn` et `&::part(native)` afin d'éviter la troncature verticale des libellés dépassant 2 lignes (notamment dans les exercices de Type 1 / `QcmViewer.vue`).
+
 - **Validation stricte des embranchements QCM du Type 4 (`partieHerosParser.ts`, `partieHerosParser.spec.ts`, `TypePartieHeros.spec.ts`)** :
   - Ajout de `hasValidQcmArrows()` afin de n'ouvrir une étape QCM que lorsque le nœud possède à la fois plusieurs variantes (`node.children.length > 1`) et au moins 3 flèches `[%cal ...]` de couleurs distinctes partant chacune d'une case occupée par une pièce.
   - Évite le basculement intempestif en QCM sur les variantes explicatives sans flèches (ex. coup 16 de Morphy–De Rivière 1863) ou les flèches illustratives ne respectant pas ces critères (ex. coup 20).
