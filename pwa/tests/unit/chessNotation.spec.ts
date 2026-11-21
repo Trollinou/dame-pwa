@@ -11,6 +11,7 @@ import {
 	formatMoveWithFrenchSan,
 	extractShapesAndComment,
 	shuffleArray,
+	shuffleNonSorted,
 } from '@/utils/chess/chessNotation';
 
 describe( 'chessNotation.ts', () => {
@@ -110,5 +111,17 @@ describe( 'chessNotation.ts', () => {
 
 		expect( shuffled ).toEqual( [ 2, 3, 4, 5, 1 ] );
 		expect( arr ).toEqual( [ 1, 2, 3, 4, 5 ] );
+	} );
+
+	test( 'shuffleNonSorted garantit que le tableau mélangé n’est jamais déjà trié', () => {
+		const arr = [ 0, 1, 2, 3, 4 ];
+		// rng = 0.9999 produit l’identité [0, 1, 2, 3, 4] avec Fisher-Yates
+		const identityRng = () => 0.9999;
+		const isSorted = ( items: number[] ) =>
+			items.every( ( v, idx ) => v === idx );
+
+		const shuffled = shuffleNonSorted( arr, isSorted, identityRng );
+		expect( isSorted( shuffled ) ).toBe( false );
+		expect( [ ...shuffled ].sort() ).toEqual( arr );
 	} );
 } );

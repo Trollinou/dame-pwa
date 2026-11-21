@@ -1,62 +1,72 @@
-<!-- src/components/shared/OrderViewer.vue -->
+<!-- src/components/learning/viewers/OrderViewer.vue -->
 <template>
   <div class="exercise-stage">
-    
-    <div class="columns-layout">
-      <!-- Colonne Gauche : La Banque (À classer) -->
-      <div class="column bank-column">
-        <div class="column-header">
-          <h3 class="column-title">À trier</h3>
-          <span class="column-subtitle">Toucher pour sélectionner</span>
-        </div>
-        
-        <div class="column-content">
-          <div 
-            v-for="(item, index) in bank" 
-            :key="'bank-' + item.id"
-            class="learning-board-card"
-            :class="{ 'is-selected': selectionBank === index }"
-            @click="selectBank(index)"
-          >
-            <div class="chessboard-container chessboard-container--mini">
-              <DiagramViewer :fen="item.fen" :orientation="item.orientation" />
-            </div>
+    <!-- Phase d'ordonnancement (Tap & Swap sur grille 2 colonnes, alignée sur TypeMarcheHeros) -->
+    <template v-if="!isSolved">
+      <div class="learning-callout learning-callout--info ion-text-center">
+        <span>Touchez deux cartes pour permuter leur position.</span>
+      </div>
+
+      <div class="learning-board-grid-2col">
+        <div
+          v-for="(item, index) in orderedItems"
+          :key="'order-' + item.id"
+          class="learning-board-card"
+          :class="{ 'is-swap-selected': selectedSwapIndex === index }"
+          @click="handleCardClickSwap(index)"
+        >
+          <div class="learning-board-card__header">
+            <div class="learning-board-card__badge">{{ index + 1 }}</div>
           </div>
 
-          <div v-if="bank.length === 0" class="learning-callout learning-callout--success ion-text-center">
-            <span class="empty-icon">✓</span>
-            <p><strong>Tout est placé</strong></p>
+          <div class="chessboard-container chessboard-container--mini">
+            <DiagramViewer :fen="item.fen" :orientation="item.orientation" :shapes="item.shapes" />
           </div>
         </div>
       </div>
+    </template>
 
-      <!-- Colonne Droite : Les Emplacements (Ordre) -->
-      <div class="column slots-column">
-        <div class="column-header">
-          <h3 class="column-title">Classement final</h3>
-          <span class="column-subtitle">De 1 à {{ correctItems.length }}</span>
-        </div>
-        
-        <div class="column-content">
-          <div 
-            v-for="(slot, index) in slots" 
-            :key="'slot-' + index"
-            class="learning-board-card"
-            :class="{ 'is-selected': selectionSlot === index, 'is-linked': !!slot }"
-            @click="selectSlot(index)"
-          >
-            <!-- Badge de numérotation universel (Ordre ou Force) -->
+    <!-- Phase post-validation : affichage des commentaires en regard de chaque position -->
+    <div v-else-if="hasAnyComment" class="order-validated-list animate-fade-in">
+      <div
+        v-for="(item, index) in orderedItems"
+        :key="'validated-' + item.id"
+        class="order-validated-row"
+      >
+        <div class="board-column">
+          <div class="learning-board-card is-valid is-disabled">
+            <div class="learning-board-card__header">
             <div class="learning-board-card__badge">{{ index + 1 }}</div>
-
-            <template v-if="slot">
-              <div class="chessboard-container chessboard-container--mini">
-                <DiagramViewer :fen="slot.fen" :orientation="slot.orientation" />
-              </div>
-            </template>
-            <div v-else class="empty-placeholder">
-              <span>Libre</span>
+          </div>
+            <div class="chessboard-container chessboard-container--mini">
+              <DiagramViewer :fen="item.fen" :orientation="item.orientation" :shapes="item.shapes" />
             </div>
           </div>
+        </div>
+
+        <div class="desc-column">
+          <div
+            v-if="item.commentaire && item.commentaire.trim().length > 0"
+            class="learning-callout learning-callout--info order-comment-box"
+          >
+            {{ item.commentaire }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase post-validation sans commentaires : grille verrouillée en état valide -->
+    <div v-else class="learning-board-grid-2col animate-fade-in">
+      <div
+        v-for="(item, index) in orderedItems"
+        :key="'validated-grid-' + item.id"
+        class="learning-board-card is-valid is-disabled"
+      >
+        <div class="learning-board-card__header">
+          <div class="learning-board-card__badge">{{ index + 1 }}</div>
+        </div>
+        <div class="chessboard-container chessboard-container--mini">
+          <DiagramViewer :fen="item.fen" :orientation="item.orientation" :shapes="item.shapes" />
         </div>
       </div>
     </div>
@@ -65,32 +75,31 @@
       :currentCard="1"
       :totalCards="1"
       :isSolved="isSolved"
-      :disabled="!isSolved && bank.length > 0"
       :feedback="footerFeedback"
-      :showActionButtonWhenUnsolved="true"
-      actionButtonText="Valider l'ordre"
+      :pendingHint="pendingHint"
       badgePrefix="Étape"
       :finishText="'Terminer l\'exercice'"
-      @action="validerOrdre"
       @next="emit('success')"
     />
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
+import type { DrawShape } from 'eg-chessboard';
 import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
-import { shuffleArray } from '@/utils/chess/chessNotation';
+import { shuffleNonSorted } from '@/utils/chess/chessNotation';
 
 const exerciseHeader = useExerciseHeader();
 
-interface OrderItem {
+export interface OrderItem {
   id: string | number;
   fen: string;
   orientation: 'white' | 'black';
+  shapes?: DrawShape[];
+  commentaire?: string;
   [key: string]: unknown;
 }
 
@@ -103,90 +112,74 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-const bank = ref<OrderItem[]>([]);
-const slots = ref<(OrderItem | null)[]>([]);
-const selectionBank = ref<number | null>(null);
-const selectionSlot = ref<number | null>(null);
-const isSolved = ref(false);
-const footerFeedback = ref<CardFeedback | null>(null);
+const orderedItems = ref<OrderItem[]>([]);
+const selectedSwapIndex = ref<number | null>(null);
 
-const placedCount = computed(() => slots.value.filter(Boolean).length);
+const isSolved = computed(() => {
+  if (orderedItems.value.length === 0 || orderedItems.value.length !== props.correctItems.length) {
+    return false;
+  }
+  return orderedItems.value.every((item, idx) => item.id === props.correctItems[idx].id);
+});
+
+const hasAnyComment = computed(() =>
+  orderedItems.value.some((item) => typeof item.commentaire === 'string' && item.commentaire.trim().length > 0)
+);
+
+const footerFeedback = computed<CardFeedback | null>(() => {
+  if (isSolved.value) {
+    return {
+      type: 'success',
+      message: 'Bravo ! L\'ordre est exact.'
+    };
+  }
+  return null;
+});
+
+const pendingHint = computed(() => {
+  if (selectedSwapIndex.value !== null) {
+    return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touchez une autre position pour permuter.`;
+  }
+  return 'Touchez 2 cartes pour permuter leur ordre';
+});
 
 watch(
-  [placedCount, () => props.correctItems.length, () => props.consigne],
+  [isSolved, () => props.correctItems.length, () => props.consigne],
   () => {
     exerciseHeader?.setHeaderState({
       consigne: props.consigne || 'Classez les positions dans l\'ordre demandé.',
-      stepBadgeText: `${placedCount.value} / ${props.correctItems.length}`
+      stepBadgeText: `${isSolved.value ? props.correctItems.length : 0} / ${props.correctItems.length}`
     });
   },
   { immediate: true }
 );
 
-// Initialisation et mélange
+// Initialisation et mélange (en évitant un tirage déjà résolu si > 1 carte)
 const initOrder = () => {
-  bank.value = shuffleArray(props.correctItems);
-  // Génère dynamiquement le bon nombre de cases vides (3 ou 5)
-  slots.value = Array(props.correctItems.length).fill(null);
-  selectionBank.value = null;
-  selectionSlot.value = null;
-  isSolved.value = false;
-  footerFeedback.value = null;
+  orderedItems.value = shuffleNonSorted(
+    props.correctItems,
+    (items) => items.every((item, idx) => item.id === props.correctItems[idx].id)
+  );
+  selectedSwapIndex.value = null;
 };
 
-onMounted(() => { initOrder(); });
-watch(() => props.correctItems, () => { initOrder(); }, { deep: true });
+watch(() => props.correctItems, () => { initOrder(); }, { deep: true, immediate: true });
 
-// Logique Tap & Tap
-const selectBank = (index: number) => {
-  selectionSlot.value = null;
-  selectionBank.value = selectionBank.value === index ? null : index;
-};
-
-const selectSlot = (index: number) => {
-  const currentContent = slots.value[index];
-
-  if (!currentContent && selectionBank.value !== null) {
-    // Placement depuis la banque vers la case
-    slots.value[index] = bank.value[selectionBank.value];
-    bank.value.splice(selectionBank.value, 1);
-    selectionBank.value = null;
-  } else if (currentContent) {
-    // Retour de la case vers la banque
-    bank.value.push(currentContent);
-    slots.value[index] = null;
-    selectionBank.value = null;
-    selectionSlot.value = null;
+// Clic pour permuter (Tap & Swap)
+const handleCardClickSwap = (index: number) => {
+  if (isSolved.value) {
+    return;
   }
-};
-
-// Validation
-const validerOrdre = async () => {
-  let hasError = false;
-
-  for (let i = 0; i < slots.value.length; i++) {
-    const slot = slots.value[i];
-    // On compare l'ID de l'élément placé avec l'ID de l'élément correct attendu à cet index
-    if (!slot || slot.id !== props.correctItems[i].id) {
-      hasError = true;
-      if (slot) {
-        bank.value.push(slot); // Renvoie automatiquement l'erreur dans la banque
-        slots.value[i] = null;
-      }
-    }
-  }
-
-  if (hasError) {
-    footerFeedback.value = {
-      type: 'danger',
-      message: 'L\'ordre est incorrect. Observez bien les positions !'
-    };
+  if (selectedSwapIndex.value === null) {
+    selectedSwapIndex.value = index;
+  } else if (selectedSwapIndex.value === index) {
+    selectedSwapIndex.value = null;
   } else {
-    isSolved.value = true;
-    footerFeedback.value = {
-      type: 'success',
-      message: 'Bravo ! L\'ordre est exact.'
-    };
+    const prev = selectedSwapIndex.value;
+    const temp = orderedItems.value[prev];
+    orderedItems.value[prev] = orderedItems.value[index];
+    orderedItems.value[index] = temp;
+    selectedSwapIndex.value = null;
   }
 };
 </script>

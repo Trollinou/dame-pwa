@@ -13,13 +13,7 @@
 import { computed } from 'vue';
 import OrderViewer from '@/components/learning/viewers/OrderViewer.vue';
 import type { DrawShape } from 'eg-chessboard';
-import type { ExerciseType11Config } from '@/types/roi';
-
-interface PositionItem {
-  fen: string;
-  couleur_joueur: 'white' | 'black';
-  shapes?: DrawShape[];
-}
+import type { ClassEchecsPositionItem, ExerciseType11Config } from '@/types/roi';
 
 const props = defineProps<{
   config: ExerciseType11Config;
@@ -31,15 +25,16 @@ defineEmits<{
 }>();
 
 const itemsAOrdonner = computed(() => {
-  const positions = (props.config as any)?.positions;
+  const positions = props.config?.positions;
   if (!positions || !Array.isArray(positions)) {
     return [];
   }
-  return (positions as PositionItem[]).map((pos, index) => ({
+  return positions.map((pos: ClassEchecsPositionItem, index: number) => ({
     id: index,
     fen: pos.fen,
-    orientation: pos.couleur_joueur,
-    shapes: pos.shapes || []
+    orientation: pos.couleur_joueur || 'white',
+    shapes: (pos.shapes as DrawShape[]) || [],
+    commentaire: pos.commentaire,
   }));
 });
 </script>

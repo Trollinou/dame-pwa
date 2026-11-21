@@ -146,10 +146,23 @@
   }
 }
 
+.order-comment-box {
+  margin: 0;
+  white-space: pre-line;
+  text-align: left;
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+
+.learning-board-card__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 4px;
+}
+
 .learning-board-card__badge {
-  position: absolute;
-  top: 6px;
-  left: 6px;
   background: var(--ion-color-primary, #3880ff);
   color: #ffffff;
   width: 24px;
@@ -160,15 +173,13 @@
   justify-content: center;
   font-weight: 700;
   font-size: 0.82rem;
-  z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .learning-board-card__indicator {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  z-index: 10;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
 
   .check-mark {
     display: flex;

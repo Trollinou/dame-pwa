@@ -6,6 +6,22 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte Type 11 (`Class'échecs`) & commentaires post-validation (`TypeClassEchecs.vue`, `OrderViewer.vue`, `TypeClassEchecs.spec.ts`, `_learning-layout.scss`, `_learning-components.scss`)** :
+  - Alignement de `OrderViewer.vue` sur le mode **Tap & Swap** en grille 2 colonnes (`.learning-board-grid-2col`) utilisé dans `TypeMarcheHeros.vue`, avec validation temps-réel, orientation pilotée par `couleur_joueur` et transmission des `shapes` à `<DiagramViewer>`.
+  - Consommation directe des types `ClassEchecsPositionItem` et `ExerciceType11Config` depuis `roi-types` dans `TypeClassEchecs.vue`.
+  - Masquage de `position.commentaire` pendant le tri, puis affichage en regard de chaque diagramme correspondant (`.order-validated-list` / `.order-validated-row` / `.order-comment-box`) une fois l'ordre validé.
+  - Ajout de la suite de tests unitaires `TypeClassEchecs.spec.ts`.
+
+- **Mélange non déjà trié & barre d'en-tête sur les cartes d'échiquier (`chessNotation.ts`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `_learning-components.scss`, `chessNotation.spec.ts`)** :
+  - Ajout de `shuffleNonSorted()` dans `chessNotation.ts` (utilisé par `TypeMarcheHeros.vue` et `OrderViewer.vue`) pour garantir qu'un mélange aléatoire ne retourne jamais la position déjà ordonnée.
+  - Ajout de `.learning-board-card__header` au-dessus de `.chessboard-container--mini` (suppression du `position: absolute` sur `.learning-board-card__badge` et `.learning-board-card__indicator`) afin d'éviter le masquage des cases d'angle (`a8`/`h8`) sur les exercices de type 7 et type 11.
+
+- **Nouvelle variante `developpement` pour les exercices Parcours / Type 9 (`parcoursVariants.ts`, `TypeParcours.vue`, `ParcoursViewer.vue`, `TypeParcours.spec.ts`)** :
+  - Ajout de la variante `developpement` (dérivée de `stealth` à destination cachée) : interdiction de s'arrêter sur une case rouge ou attaquée par l'adversaire (`validateStealthConstraints`), et validation dès l'atteinte de la case cible par n'importe quel chemin légal sûr.
+  - Double prise en charge des annotations PGN via `extractDeveloppementTargetSquare()` : format standard Type 9 (cercle bleu de départ + cercle vert d'arrivée / `case_arrivee`) et format alternatif (cercle bleu cible seul, ex. `[%csl Bc6][%cal Be1d3,Bd3b4,Bb4c6]`).
+  - Masquage initial de la case cible et des flèches avant résolution, puis révélation complète des `shapes` à la réussite.
+  - Mise à jour de la documentation (`README.md`, `USING.md` et `docs/TDD-exercices-et-formats-fen-pgn.md` v1.1.0).
+
 ## [1.13.11] - 2026-11-21
 
 - **Adaptation automatique en hauteur des boutons QCM multi-lignes (`_learning-components.scss`)** :

@@ -366,3 +366,29 @@ export function shuffleArray< T >(
 	}
 	return copy;
 }
+
+/**
+ * Mélange un tableau avec Fisher-Yates en garantissant que le résultat
+ * ne correspond pas déjà à l'ordre validé (si au moins 2 éléments).
+ *
+ * @param array    Tableau source à mélanger.
+ * @param isSorted Prédicat indiquant si un ordre est déjà résolu.
+ * @param rng      Générateur pseudo-aléatoire optionnel.
+ */
+export function shuffleNonSorted< T >(
+	array: T[],
+	isSorted: ( _items: T[] ) => boolean,
+	rng: () => number = Math.random
+): T[] {
+	if ( array.length <= 1 ) {
+		return [ ...array ];
+	}
+	let shuffled = shuffleArray( array, rng );
+	for ( let attempt = 0; attempt < 5 && isSorted( shuffled ); attempt++ ) {
+		shuffled = shuffleArray( array, rng );
+	}
+	if ( isSorted( shuffled ) ) {
+		[ shuffled[ 0 ], shuffled[ 1 ] ] = [ shuffled[ 1 ], shuffled[ 0 ] ];
+	}
+	return shuffled;
+}

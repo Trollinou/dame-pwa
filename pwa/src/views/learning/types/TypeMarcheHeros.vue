@@ -10,9 +10,11 @@
         :class="{ 'is-selected': isItemSelected(item.id) }"
         @click="toggleSelection(item)"
       >
-        <div class="learning-board-card__indicator">
-          <span v-if="isItemSelected(item.id)" class="check-mark">✓</span>
-          <span v-else class="empty-circle"></span>
+        <div class="learning-board-card__header">
+          <div class="learning-board-card__indicator">
+            <span v-if="isItemSelected(item.id)" class="check-mark">✓</span>
+            <span v-else class="empty-circle"></span>
+          </div>
         </div>
         <div class="chessboard-container chessboard-container--mini">
           <DiagramViewer :fen="item.fen" :orientation="item.orientation" />
@@ -34,8 +36,10 @@
           :class="{ 'is-swap-selected': selectedSwapIndex === index }"
           @click="handleCardClickSwap(index)"
         >
-          <div class="learning-board-card__badge">
-            {{ index + 1 }}
+          <div class="learning-board-card__header">
+            <div class="learning-board-card__badge">
+              {{ index + 1 }}
+            </div>
           </div>
 
           <div class="chessboard-container chessboard-container--mini">
@@ -87,7 +91,7 @@ import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import PuzzleViewer from '@/components/learning/viewers/PuzzleViewer.vue';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
-import { shuffleArray } from '@/utils/chess/chessNotation';
+import { shuffleArray, shuffleNonSorted } from '@/utils/chess/chessNotation';
 
 import type { Key, DrawShape } from 'eg-chessboard';
 import type { ExerciseType7Config } from '@/types/roi';
@@ -373,8 +377,11 @@ const passerEtapeSuivante = () => {
     const idsToRemove = new Set(itemsSelectionnes.value.map(i => i.id));
     diagrammesBank.value = diagrammesBank.value.filter(i => !idsToRemove.has(i.id));
 
-    // Préparer les cartes mélangées pour l'étape d'ordonnancement
-    itemsEnCoursOrdonnancement.value = shuffleArray(itemsSelectionnes.value);
+    // Préparer les cartes mélangées pour l'étape d'ordonnancement (jamais déjà triées)
+    itemsEnCoursOrdonnancement.value = shuffleNonSorted(
+      itemsSelectionnes.value,
+      (items) => items.every((item, idx) => item.ordre === idx)
+    );
     itemsSelectionnes.value = [];
     sousEtape.value = 'ordonnancement';
     return;
@@ -396,8 +403,11 @@ const passerEtapeSuivante = () => {
 
       // Pour la dernière série, si les cartes restantes correspondent exactement à la dernière série
       if (serieCouranteIndex.value === nbSeries.value - 1) {
-        // Passer directement à l'étape d'ordonnancement !
-        itemsEnCoursOrdonnancement.value = shuffleArray(diagrammesBank.value);
+        // Passer directement à l'étape d'ordonnancement (jamais déjà triées) !
+        itemsEnCoursOrdonnancement.value = shuffleNonSorted(
+          diagrammesBank.value,
+          (items) => items.every((item, idx) => item.ordre === idx)
+        );
         diagrammesBank.value = [];
         sousEtape.value = 'ordonnancement';
       } else {

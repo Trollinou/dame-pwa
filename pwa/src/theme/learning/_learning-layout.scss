@@ -220,6 +220,27 @@
   gap: 8px;
 }
 
+/* Order Viewer Validated Layout (diagramme + commentaire en regard) */
+.order-validated-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin: 6px 0;
+}
+
+.order-validated-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+    align-items: flex-start;
+  }
+}
+
 /* Vision Viewer Layout */
 .vision-viewer-wrapper {
   width: 100%;
