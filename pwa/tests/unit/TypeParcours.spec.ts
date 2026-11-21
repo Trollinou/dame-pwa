@@ -10,6 +10,7 @@ import {
 	getParcoursVariant,
 	registerParcoursVariant,
 	extractPieceTypeFromFen,
+	extractDeveloppementTargetSquare,
 	getPieceRoleLabel,
 	removePieceFromSquareInFen,
 	type ParcoursBoardApi,
@@ -48,6 +49,7 @@ vi.mock( 'eg-chessboard/vue', () => ( {
 		template: `
       <div class="mock-eg-chessboard">
         <span class="mock-fen">{{ diagram ? diagram.fen : '' }}</span>
+        <span class="mock-shapes">{{ diagram && diagram.shapes ? JSON.stringify(diagram.shapes) : '[]' }}</span>
         <button
           class="mock-move-btn-target"
           @click="$emit('move', { san: 'Ne4', from: 'c3', to: 'e4', lan: 'c3e4' })"
@@ -623,5 +625,161 @@ describe( 'TypeParcours.vue', () => {
 		expect( wrapper.find( '.mock-fen' ).text() ).toBe(
 			'8/8/8/8/4Q3/2N5/8/8 w - - 0 1'
 		);
+	} );
+
+	test( 'developpement variant extracts target from both formats and enforces stealth rules', () => {
+		const dev = getParcoursVariant( 'developpement' );
+		expect( dev.id ).toBe( 'developpement' );
+
+		// 1. Format alternatif : cercle bleu seul (Bc6) + flèches
+		const altShapes = [
+			{ orig: 'c6' as Key, brush: 'blue' },
+			{ orig: 'e1' as Key, dest: 'd3' as Key, brush: 'blue' },
+			{ orig: 'd3' as Key, dest: 'b4' as Key, brush: 'blue' },
+			{ orig: 'b4' as Key, dest: 'c6' as Key, brush: 'blue' },
+		];
+		expect( extractDeveloppementTargetSquare( altShapes ) ).toBe( 'c6' );
+
+		// 2. Format standard : cercle bleu départ (Be1) + cercle vert arrivée (Gc6)
+		const stdShapes = [
+			{ orig: 'e1' as Key, brush: 'blue' },
+			{ orig: 'c6' as Key, brush: 'green' },
+		];
+		expect( extractDeveloppementTargetSquare( stdShapes, 'e1' ) ).toBe(
+			'c6'
+		);
+
+		const mockBoardAttacked: ParcoursBoardApi = {
+			getPieces: () => [],
+			isSquareAttacked: ( sq: string, col: string ) =>
+				sq === 'c5' && col === 'black',
+		};
+
+		// Case attaquée rejetée
+		const attackedRes = dev.validateMove( {
+			from: 'd3',
+			to: 'c5',
+			fenDepart:
+				'8/p3pp1p/1p1p2p1/3P4/4P3/1P5P/P4PP1/4N3 w - - 0 1',
+			couleurJoueur: 'white',
+			caseDepart: 'e1',
+			caseArrivee: '',
+			shapes: altShapes,
+			boardApi: mockBoardAttacked,
+		} );
+		expect( attackedRes.valid ).toBe( false );
+		expect( attackedRes.errorMessage ).toBe( 'Vous avez été repéré !' );
+
+		// Case rouge rejetée
+		const redRes = dev.validateMove( {
+			from: 'e1',
+			to: 'd5',
+			fenDepart:
+				'8/p3pp1p/1p1p2p1/3P4/4P3/1P5P/P4PP1/4N3 w - - 0 1',
+			couleurJoueur: 'white',
+			caseDepart: 'e1',
+			caseArrivee: '',
+			shapes: [ ...altShapes, { orig: 'd5', brush: 'red' } ],
+			boardApi: mockBoardAttacked,
+		} );
+		expect( redRes.valid ).toBe( false );
+		expect( redRes.errorMessage ).toBe( 'Case interdite !' );
+
+		// Coup intermédiaire sûr accepté
+		const safeStepRes = dev.validateMove( {
+			from: 'e1',
+			to: 'd3',
+			fenDepart:
+				'8/p3pp1p/1p1p2p1/3P4/4P3/1P5P/P4PP1/4N3 w - - 0 1',
+			couleurJoueur: 'white',
+			caseDepart: 'e1',
+			caseArrivee: '',
+			shapes: altShapes,
+			boardApi: mockBoardAttacked,
+		} );
+		expect( safeStepRes.valid ).toBe( true );
+		expect( safeStepRes.isFinished ).toBe( false );
+
+		// Arrivée sur c6 validée
+		const finishRes = dev.validateMove( {
+			from: 'b4',
+			to: 'c6',
+			fenDepart:
+				'8/p3pp1p/1p1p2p1/3P4/4P3/1P5P/P4PP1/4N3 w - - 0 1',
+			couleurJoueur: 'white',
+			caseDepart: 'e1',
+			caseArrivee: '',
+			shapes: altShapes,
+			boardApi: mockBoardAttacked,
+		} );
+		expect( finishRes.valid ).toBe( true );
+		expect( finishRes.isFinished ).toBe( true );
+	} );
+
+	test( 'TypeParcours renders developpement variant hiding target/arrows initially and revealing on solve', async () => {
+		const devConfig = {
+			consigne: 'Trouvez la case de développement.',
+			series: [
+				{
+					variante: 'developpement',
+					description:
+						"Ton Cavalier n'est pas bien placé... Quelle est la case à atteindre ? Comment ?",
+					fen_depart:
+						'8/p3pp1p/1p1p2p1/3P4/4P3/1P5P/P4PP1/4N3 w - - 0 1',
+					couleur_joueur: 'white' as const,
+					shapes: [
+						{ orig: 'c6', brush: 'blue' },
+						{ orig: 'e1', dest: 'd3', brush: 'blue' },
+						{ orig: 'd3', dest: 'b4', brush: 'blue' },
+						{ orig: 'b4', dest: 'c6', brush: 'blue' },
+					],
+				},
+			],
+		};
+
+		const headerState = ref<ExerciseHeaderState>( {} );
+		const wrapper = mount( TypeParcours, {
+			global: {
+				plugins: [ [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
+			},
+			props: {
+				id: 904,
+				config: devConfig,
+			},
+		} );
+
+		expect( headerState.value.consigne ).toBe(
+			"Ton Cavalier n'est pas bien placé... Quelle est la case à atteindre ? Comment ?"
+		);
+
+		// Avant résolution : ni cercle bleu c6 ni flèches bleues ne doivent être affichés
+		const initialShapes = JSON.parse(
+			wrapper.find( '.mock-shapes' ).text()
+		);
+		expect( initialShapes ).toEqual( [] );
+
+		// Déplacement sur la case cible c6
+		await wrapper.find( '.mock-move-btn-c6' ).trigger( 'click' );
+		await wrapper.vm.$nextTick();
+
+		expect( wrapper.text() ).toContain(
+			'Bravo ! Vous avez trouvé la bonne case de développement.'
+		);
+
+		// Après résolution : le cercle bleu c6 et toutes les flèches sont révélés
+		const solvedShapes = JSON.parse(
+			wrapper.find( '.mock-shapes' ).text()
+		);
+		expect( solvedShapes ).toHaveLength( 4 );
 	} );
 } );

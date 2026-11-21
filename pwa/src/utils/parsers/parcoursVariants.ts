@@ -55,6 +55,57 @@ function isRedSquare( square: string, shapes: DrawShape[] ): boolean {
 	);
 }
 
+function validateStealthConstraints(
+	ctx: ParcoursMoveContext
+): ParcoursMoveResult | null {
+	if ( isRedSquare( ctx.to, ctx.shapes ) ) {
+		return {
+			valid: false,
+			isFinished: false,
+			errorMessage: 'Case interdite !',
+		};
+	}
+
+	const oppColor = ctx.couleurJoueur === 'white' ? 'black' : 'white';
+	if ( ctx.boardApi.isSquareAttacked( ctx.to, oppColor ) ) {
+		return {
+			valid: false,
+			isFinished: false,
+			errorMessage: 'Vous avez été repéré !',
+		};
+	}
+
+	return null;
+}
+
+export function extractDeveloppementTargetSquare(
+	shapes: DrawShape[],
+	caseDepart?: string,
+	caseArrivee?: string
+): string | undefined {
+	if ( caseArrivee && caseArrivee.trim() !== '' ) {
+		return caseArrivee.trim();
+	}
+
+	const greenCircle = shapes.find(
+		( s ) =>
+			( s.brush === 'green' || s.brush === 'g' ) &&
+			( ! s.dest || s.dest.toLowerCase() === s.orig.toLowerCase() )
+	);
+	if ( greenCircle?.orig ) {
+		return greenCircle.orig;
+	}
+
+	const dep = caseDepart?.toLowerCase().trim();
+	const blueCircle = shapes.find(
+		( s ) =>
+			( s.brush === 'blue' || s.brush === 'b' ) &&
+			( ! s.dest || s.dest.toLowerCase() === s.orig.toLowerCase() ) &&
+			( ! dep || s.orig.toLowerCase() !== dep )
+	);
+	return blueCircle?.orig;
+}
+
 const standardVariant: ParcoursVariant = {
 	id: 'standard',
 	name: 'Parcours classique',
@@ -161,21 +212,9 @@ const stealthVariant: ParcoursVariant = {
 			? 'Contournez la pièce adverse en restant hors de sa portée pour revenir à votre case de départ.'
 			: `Évitez les cases surveillées par les pièces adverses pour atteindre ${ caseArrivee.toUpperCase() }.`,
 	validateMove: ( ctx ) => {
-		if ( isRedSquare( ctx.to, ctx.shapes ) ) {
-			return {
-				valid: false,
-				isFinished: false,
-				errorMessage: 'Case interdite !',
-			};
-		}
-
-		const oppColor = ctx.couleurJoueur === 'white' ? 'black' : 'white';
-		if ( ctx.boardApi.isSquareAttacked( ctx.to, oppColor ) ) {
-			return {
-				valid: false,
-				isFinished: false,
-				errorMessage: 'Vous avez été repéré !',
-			};
+		const constraintError = validateStealthConstraints( ctx );
+		if ( constraintError ) {
+			return constraintError;
 		}
 
 		if ( ctx.isLoop && ctx.loopTracker ) {
@@ -223,6 +262,44 @@ const tracesVariant: ParcoursVariant = {
 		isFinished: true,
 		successMessage: 'Bravo ! Vous avez identifié la bonne pièce.',
 	} ),
+};
+
+const developpementVariant: ParcoursVariant = {
+	id: 'developpement',
+	name: 'Développement (Destination cachée)',
+	getDefaultConsigne: () =>
+		'Trouvez la bonne case de développement sans vous faire prendre.',
+	getPendingHint: () =>
+		'Déplacez votre pièce vers la bonne case de développement sans passer par une case attaquée.',
+	validateMove: ( ctx ) => {
+		const constraintError = validateStealthConstraints( ctx );
+		if ( constraintError ) {
+			return constraintError;
+		}
+
+		const targetSquare = extractDeveloppementTargetSquare(
+			ctx.shapes,
+			ctx.caseDepart,
+			ctx.caseArrivee
+		);
+
+		if (
+			targetSquare &&
+			ctx.to.toLowerCase() === targetSquare.toLowerCase()
+		) {
+			return {
+				valid: true,
+				isFinished: true,
+				successMessage:
+					'Bravo ! Vous avez trouvé la bonne case de développement.',
+			};
+		}
+
+		return {
+			valid: true,
+			isFinished: false,
+		};
+	},
 };
 
 export function removePieceFromSquareInFen(
@@ -332,6 +409,7 @@ variantRegistry.set( 'standard', standardVariant );
 variantRegistry.set( 'pacman', pacmanVariant );
 variantRegistry.set( 'stealth', stealthVariant );
 variantRegistry.set( 'traces', tracesVariant );
+variantRegistry.set( 'developpement', developpementVariant );
 
 export function registerParcoursVariant( variant: ParcoursVariant ): void {
 	variantRegistry.set( variant.id, variant );

@@ -84,7 +84,14 @@ const currentParcours = computed<ParcoursItemConfig>(() => {
   return seriesList.value[indexCourant.value] || seriesList.value[0];
 });
 
+const isDeveloppementVariant = computed(() => {
+  return currentParcours.value.variante === 'developpement';
+});
+
 const isCurrentLoop = computed(() => {
+  if (isDeveloppementVariant.value) {
+    return false;
+  }
   return (
     !!currentParcours.value.case_depart &&
     (!currentParcours.value.case_arrivee ||
@@ -144,7 +151,7 @@ const computedShapes = computed<DrawShape[]>(() => {
     }
   }
 
-  if (currentParcours.value.case_arrivee && !isCurrentLoop.value) {
+  if (currentParcours.value.case_arrivee && !isCurrentLoop.value && !isDeveloppementVariant.value) {
     const arr = currentParcours.value.case_arrivee.toLowerCase() as DrawShape['orig'];
     const alreadyArr = baseShapes.some((s) => s.orig === arr && !s.dest);
     if (!alreadyArr) {

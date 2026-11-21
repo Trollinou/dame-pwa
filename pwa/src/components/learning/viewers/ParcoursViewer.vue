@@ -44,6 +44,7 @@ import type { DrawShape, Move, Key } from 'eg-chessboard';
 import {
   getParcoursVariant,
   extractPieceTypeFromFen,
+  extractDeveloppementTargetSquare,
   getPieceRoleLabel,
   removePieceFromSquareInFen,
   type ParcoursBoardApi
@@ -86,8 +87,12 @@ const tracesPieces = [
 ];
 
 const isTracesVariant = computed(() => props.variante === 'traces');
+const isDeveloppementVariant = computed(() => props.variante === 'developpement');
 
 const isLoop = computed(() => {
+  if (isDeveloppementVariant.value) {
+    return false;
+  }
   if (
     props.caseDepart &&
     (!props.caseArrivee ||
@@ -120,9 +125,42 @@ const targetGreenSquare = computed(() => {
   return greenShape?.orig;
 });
 
+const resolvedDeveloppementTarget = computed(() => {
+  if (!isDeveloppementVariant.value) {
+    return props.caseArrivee;
+  }
+  return extractDeveloppementTargetSquare(
+    props.shapes || [],
+    props.caseDepart,
+    props.caseArrivee
+  );
+});
+
 const effectiveShapes = computed<DrawShape[]>(() => {
   if (props.isSolved) {
     return props.shapes || [];
+  }
+  if (isDeveloppementVariant.value) {
+    const targetLower = resolvedDeveloppementTarget.value?.toLowerCase();
+    return (props.shapes || []).filter((s) => {
+      // Masquer toutes les flèches
+      if (s.dest && s.dest.toLowerCase() !== s.orig.toLowerCase()) {
+        return false;
+      }
+      // Masquer les cercles verts de destination
+      if (s.brush === 'green' || s.brush === 'g') {
+        return false;
+      }
+      // Masquer le cercle bleu cible (format alternatif sans cercle vert)
+      if (
+        (s.brush === 'blue' || s.brush === 'b') &&
+        targetLower &&
+        s.orig.toLowerCase() === targetLower
+      ) {
+        return false;
+      }
+      return true;
+    });
   }
   if (props.variante === 'standard' || props.variante === 'stealth') {
     // Ne pas afficher les flèches lors de l'affichage initial
@@ -239,7 +277,10 @@ const handleMove = (move: Move) => {
     fenDepart: props.fenDepart,
     couleurJoueur: props.couleurJoueur,
     caseDepart: props.caseDepart || '',
-    caseArrivee: props.caseArrivee || '',
+    caseArrivee:
+      (isDeveloppementVariant.value
+        ? resolvedDeveloppementTarget.value
+        : props.caseArrivee) || '',
     shapes: props.shapes || [],
     boardApi: boardApi.value,
     isLoop: isLoop.value,
