@@ -1,6 +1,6 @@
 # TDD & Guide Entraîneur — Module Exercices (Types 1 à 16)
 
-> **Version du document** : `1.1.0` | **Version DAME-PWA** : `1.13.11` | **Dernière mise à jour** : `2026-11-21`
+> **Version du document** : `1.2.0` | **Version DAME-PWA** : `1.13.12` | **Dernière mise à jour** : `2026-11-21`
 
 Ce document consigne la logique complète du module d'exercices de **DAME-PWA** (`pwa/src/views/learning/ContenuPage.vue`, `types/Type*.vue`, `viewers/*.vue` et `utils/parsers/*.ts`).  
 Il sert à la fois de **spécification technique de vérification (TDD)** pour le développement et de **guide de rédaction FEN / PGN** pour les entraîneurs.
@@ -177,8 +177,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Les diagrammes suivants sont capturés tous les **2 demi-coups** (un tour complet).
   - Le dernier coup restant constitue le puzzle final (`solution: [dernierCoup]`) avec `lastMoveHighlight` sur le coup précédent.
 - **Position initiale affichée & Affiché vs Caché selon les 3 sous-étapes** :
-  1. **`selection`** : Grille 2 colonnes de tous les mini-diagrammes restants dans la banque (mélangés), avec coche de sélection.
-  2. **`ordonnancement`** : Grille 2 colonnes des 3 ou 5 diagrammes de la série choisie (mélangés), numérotés `1..N`, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
+  1. **`selection`** : Grille 2 colonnes de tous les mini-diagrammes restants dans la banque (mélangés), avec coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
+  2. **`ordonnancement`** : Grille 2 colonnes des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
   3. **`resolution`** : Grand échiquier `PuzzleViewer` sur la position finale de la série (avec `shapes` et `lastMoveHighlight`).
 - **Changement de vue** :
   - `selection` → `ordonnancement` : Lorsque les N cartes sélectionnées appartiennent toutes à la même partie, clic sur `Classer la série` dans `SeriesCardFooter`.
@@ -273,18 +273,18 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 ### Type 11 — Class'Échecs (`TypeClassEchecs.vue` → `OrderViewer.vue`)
 
-- **Rôle** : Classer une liste de diagrammes (3 ou 5) dans l'ordre exact attendu (ex. du plus faible au plus fort).
+- **Rôle** : Classer une liste de diagrammes (3 ou 5) dans l'ordre exact attendu (de la position la plus forte à la moins forte).
 - **Position initiale affichée** :
-  - Colonne gauche `"À trier"` : tous les diagrammes mélangés (`shuffleArray`), rendus par `DiagramViewer` (`view-only`).
-  - Colonne droite `"Classement final"` : emplacements vides numérotés `1..N`.
-- **Affiché vs Caché** : Aucune flèche/shape particulière, uniquement les positions FEN et leur orientation.
-- **Changement de vue** : Aucun changement de vue ; interaction *Tap & Tap* (clic banque → clic emplacement pour placer ; clic emplacement occupé → retour en banque).
+  - Grille 2 colonnes (`.learning-board-grid-2col`) affichant tous les diagrammes mélangés via `shuffleNonSorted()` (garantissant qu'une position déjà triée n'est jamais présentée au départ), rendus par `DiagramViewer` (`view-only`).
+  - Chaque carte affiche son rang `1..N` dans `.learning-board-card__header` au-dessus de l'échiquier (sans masquer les cases d'angle), orienté selon `position.couleur_joueur` (`'white' | 'black'`) avec ses `shapes`.
+- **Affiché vs Caché** :
+  - **Pendant le tri (`!isSolved`)** : `position.commentaire` est **masqué** ; seules les positions, leur orientation (`couleur_joueur`) et leurs `shapes` sont visibles.
+  - **Une fois validé (`isSolved = true`)** : si au moins une position possède un `commentaire` non vide, bascule vers la vue en lignes (`.order-validated-list` / `.order-validated-row`) affichant chaque diagramme verrouillé (`.is-valid.is-disabled`) avec son `commentaire` explicatif en regard (`.order-comment-box`). Si aucun commentaire n'est fourni, la grille reste affichée en état verrouillé `.is-valid.is-disabled`.
+- **Changement de vue & Interaction** : Mode **Tap & Swap** aligné sur l'étape 2 du Type 7 (clic sur une 1re carte → `.is-swap-selected`, clic sur la même carte → désélection, clic sur une 2e carte → permutation immédiate).
 - **Après une réponse** :
-  - Clic sur `"Valider l'ordre"` (dans `SeriesCardFooter`, actif dès que la banque est vide) :
-    - **Erreur** : Tous les diagrammes mal placés sont **renvoyés automatiquement dans la banque** ; les bien placés restent en place. Feedback rouge `"L'ordre est incorrect. Observez bien les positions !"`.
-    - **Succès** : Feedback vert `"Bravo ! L'ordre est exact."`, `isSolved = true`, bouton `Terminer l'exercice`.
+  - Validation **temps-réel** : dès que l'ordre `0..N-1` est exact, `isSolved` passe à `true`, les permutations sont verrouillées, les commentaires éventuels apparaissent en regard de chaque diagramme correspondant, feedback vert `"Bravo ! L'ordre est exact."` et bouton `Terminer l'exercice` dans `SeriesCardFooter`.
 - **Rédaction Entraîneur** :
-  - Fournir `positions[]` **dans l'ordre exact attendu** (le composant mélange automatiquement au chargement) avec `fen`, `couleur_joueur`, `shapes`.
+  - Fournir `positions[]` (`ClassEchecsPositionItem[]` de `roi-types`) **dans l'ordre exact attendu** (index `0` = plus forte) avec `fen`, `couleur_joueur` (`'white' | 'black'`, prioritaire sur le trait de la FEN), `shapes?` et `commentaire?` (optionnel, masqué jusqu'à validation).
 
 ---
 

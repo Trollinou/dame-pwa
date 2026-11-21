@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.12] - 2026-11-21
+
 - **Refonte Type 11 (`Class'échecs`) & commentaires post-validation (`TypeClassEchecs.vue`, `OrderViewer.vue`, `TypeClassEchecs.spec.ts`, `_learning-layout.scss`, `_learning-components.scss`)** :
   - Alignement de `OrderViewer.vue` sur le mode **Tap & Swap** en grille 2 colonnes (`.learning-board-grid-2col`) utilisé dans `TypeMarcheHeros.vue`, avec validation temps-réel, orientation pilotée par `couleur_joueur` et transmission des `shapes` à `<DiagramViewer>`.
   - Consommation directe des types `ClassEchecsPositionItem` et `ExerciceType11Config` depuis `roi-types` dans `TypeClassEchecs.vue`.
