@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-11-22
+
 - **Type 9 (`stealth` & `developpement`) — Masquage initial et désactivation du piège sur les cercles rouges (`parcoursVariants.ts`, `ParcoursViewer.vue`, `TypeParcours.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Suppression de la vérification `isRedSquare()` dans `validateStealthConstraints()` afin que les cercles rouges ne soient pas considérés comme des cases piégées pour les variantes `stealth` et `developpement` (uniquement les cases attaquées par l'adversaire).
   - Masquage des cercles rouges (`red`/`r`) dans `effectiveShapes` de `ParcoursViewer.vue` avant résolution pour `stealth` et `developpement`, puis révélation complète de toutes les `shapes` une fois l'exercice résolu.
