@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.13.13] - 2026-11-22
+
+- **Correction des shapes sur erreur & replay automatique post-résolution pour La Marche du Héros / Type 7 (`TypeMarcheHeros.vue`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Suppression de l'injection de `serie.shapes` dans `<PuzzleViewer>` (`:shapes="[]"`) afin qu'aucune shape ne soit affichée au départ ni réinjectée lors d'un mauvais coup.
+  - Extraction des shapes de chaque ply du mini-PGN complet via `extractShapesAndComment()` (`game.comments` / `child.data?.comments`, avec repli sur `serie.shapes` au ply 0).
+  - Bascule automatique en mode lecture seule `600 ms` après la trouvaille du coup décisif pour rejouer le mini-PGN complet à raison d'un ply par seconde (`1000 ms`) avec les shapes de chaque ply (boucle avec pause de `2500 ms` en fin de séquence).
+  - Maintien du verrouillage de `isCurrentStepSolved` jusqu'à la fin du premier passage complet de l'animation, empêchant le passage anticipé à la série suivante et retardant les confettis sur la dernière série jusqu'à la fin du premier visionnage.
+
 ## [1.13.12] - 2026-11-21
 
 - **Refonte Type 11 (`Class'échecs`) & commentaires post-validation (`TypeClassEchecs.vue`, `OrderViewer.vue`, `TypeClassEchecs.spec.ts`, `_learning-layout.scss`, `_learning-components.scss`)** :
