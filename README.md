@@ -327,8 +327,8 @@ Centralise et standardise toutes les opérations sur la notation échiquéenne f
   - `cleanNotation(raw)` : Nettoyage et normalisation de saisies textuelles de coups (ex: `' ta1 '` $\rightarrow$ `'Ta1'`).
   - `toFrenchNotation(san)` : Conversion SAN international vers français (ex: `'Nf3'` $\rightarrow$ `'Cf3'`).
   - `toInternationalNotation(san)` : Conversion SAN français vers international (ex: `'Cf3'` $\rightarrow$ `'Nf3'`).
-  - `formatMoveInFrench(pos, san)` : Traduit un coup sur une position en libellé d'action clair (ex: `'Fou f1 en c4'`).
-  - `formatMoveWithFrenchSan(pos, san)` : Libellé complet avec rappel SAN (ex: `'Fou f1 en c4 (Fc4)'`).
+  - `formatMoveInFrench(pos, san)` : Traduit un coup sur une position en libellé d'action clair (ex: `'Fou f1 en c4'`, `'Tour f1 en e1'`), en essayant d'abord la notation internationale standard puis française.
+  - `formatMoveWithFrenchSan(pos, san)` : Libellé complet avec rappel SAN français sans symbole de mat `#` (ex: `'Fou f1 en c4 (Fc4)'`, `'Fou g7 en f6 (Ff6)'`).
 - **Extraction des Annotations PGN (`[%csl]`, `[%cal]`)** :
   - `extractShapesAndComment(comments)` / `extractShapesAndText(comments)` : Analyse les balises de cercles/flèches Lichess/ChessBase, applique la palette `PGN_BRUSH_MAP` et renvoie `{ comment, shapes }`.
 - **Algorithme de Mélange Aléatoire** :

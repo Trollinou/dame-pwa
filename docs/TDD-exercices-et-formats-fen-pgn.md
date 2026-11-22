@@ -104,7 +104,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Orientation : déduite du trait de la FEN initiale de la partie.
 - **Affiché vs Caché** :
   - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` (pas de bouton Fin), zone de commentaire sous l'échiquier (`💬 ...`), et shapes du coup courant (ou `startingShapes` au départ).
-  - **Étape `qcm`** : Échiquier en lecture seule avec les **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
+  - **Étape `qcm`** : Échiquier en lecture seule avec les **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`) formatés via `formatMoveWithFrenchSan` (libellé français + SAN française entre parenthèses sans le symbole `#` pour ne pas révéler le mat). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
 - **Condition stricte de création d'une étape QCM (`hasValidQcmArrows`)** :
   - Le parser ne crée un embranchement `qcm` que si **les 2 conditions** sont réunies sur le nœud :
     1. Le nœud possède **plus d'un coup enfant** (`node.children.length > 1` : ligne principale + variantes).

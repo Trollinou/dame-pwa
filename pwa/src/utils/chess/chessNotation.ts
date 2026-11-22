@@ -205,9 +205,11 @@ export function formatMoveInFrench(
 	san: string
 ): { texte: string; orig: string; dest: string } {
 	const trimmedSan = san.trim();
+	const sanWithoutNags = trimmedSan.replace( /[!?]+$/g, '' );
+	const cleanSanForCastle = sanWithoutNags.replace( /[+#]+$/g, '' );
 
 	// Gestion des roques
-	if ( trimmedSan === 'O-O' || trimmedSan === '0-0' ) {
+	if ( cleanSanForCastle === 'O-O' || cleanSanForCastle === '0-0' ) {
 		const rank = pos.turn === 'white' ? '1' : '8';
 		return {
 			texte: 'Petit roque (O-O)',
@@ -215,7 +217,7 @@ export function formatMoveInFrench(
 			dest: `g${ rank }`,
 		};
 	}
-	if ( trimmedSan === 'O-O-O' || trimmedSan === '0-0-0' ) {
+	if ( cleanSanForCastle === 'O-O-O' || cleanSanForCastle === '0-0-0' ) {
 		const rank = pos.turn === 'white' ? '1' : '8';
 		return {
 			texte: 'Grand roque (O-O-O)',
@@ -224,9 +226,11 @@ export function formatMoveInFrench(
 		};
 	}
 
-	const standardSan = toInternationalNotation( trimmedSan );
-
-	const parsedMove = parseSan( pos, standardSan );
+	// Essayer d'abord en notation internationale (standard PGN), puis convertir depuis le français si besoin
+	// pour éviter qu'un coup de Tour ('R...') ne soit altéré en Roi ('K...') par toInternationalNotation.
+	const parsedMove =
+		parseSan( pos, sanWithoutNags ) ??
+		parseSan( pos, toInternationalNotation( sanWithoutNags ) );
 	if ( ! parsedMove || ! ( 'from' in parsedMove ) ) {
 		return {
 			texte: san,
@@ -256,13 +260,14 @@ export function formatMoveInFrench(
 
 /**
  * Formate un coup complet avec description française suivie de la notation SAN française entre parenthèses.
+ * Retire l'indication de mat (#) pour ne pas divulguer la bonne réponse dans les QCM.
  * Ex: "Fou f1 en c4 (Fc4)", "Pion e2 en e4 (e4)", "Petit roque (O-O)", "Grand roque (O-O-O)"
  * @param pos
  * @param san
  */
 export function formatMoveWithFrenchSan( pos: Chess, san: string ): string {
 	const formatted = formatMoveInFrench( pos, san );
-	const frSan = toFrenchNotation( san );
+	const frSan = toFrenchNotation( san ).replace( /#/g, '' );
 	if ( formatted.texte.endsWith( `(${ frSan })` ) ) {
 		return formatted.texte;
 	}

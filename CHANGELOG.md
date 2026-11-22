@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Correction du formatage des coups de Tour & masquage du symbole de mat (`#`) dans les QCM (`chessNotation.ts`, `chessNotation.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Priorisation de `parseSan()` en notation internationale avant le repli `toInternationalNotation()` dans `formatMoveInFrench()`, évitant qu'un coup de Tour (`Rfe1+`) ne soit converti en coup de Roi invalide (`Kfe1+`) et affiché brut (`Rfe1+ (Tfe1+)`) au lieu de `Tour f1 en e1 (Tfe1+)`. Gestion également des roques avec échec/mat (`O-O+`, `O-O#`).
+  - Suppression du symbole de mat (`#`) dans le rappel SAN français entre parenthèses généré par `formatMoveWithFrenchSan()` (ex. `Fou g7 en f6 (Ff6)` au lieu de `(Ff6#)`), afin de ne pas divulguer la bonne réponse dans les QCM (*La Partie dont tu es le Héros* et *Posi'Plan*).
+
 - **Affichage des appels à bénévoles dans Le Club & vue mobile (`BenevolatSegmentView.vue`, `BenevolatPage.vue`, `_base.scss`, `README.md`, `USING.md`)** :
   - Ajout du modificateur `.dame-badge-group--wrap` (`flex-wrap: wrap`, `margin-top: 6px`) dans `_base.scss`.
   - Déplacement du groupe de badges (`📅 Événement associé`, `Inscrit`, `Nouveau`, compteur de réponses) à l'intérieur de `<ion-label>` sous la date (avec `ion-text-wrap` sur les titres) dans `BenevolatSegmentView.vue` (appels en cours et terminés) et dans le slot `#mobile-item` de `BenevolatPage.vue`, évitant l'écrasement horizontal du titre sur mobile et dans la colonne maître.
