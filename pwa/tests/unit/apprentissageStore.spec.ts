@@ -178,4 +178,83 @@ describe( 'apprentissageStore - selective sync & modified timestamp', () => {
 			expect( progressionCall?.[ 1 ]?.cache ).toBe( 'no-store' );
 		} );
 	} );
+
+	it( 'computes niveauxDisponibles, prochainContenuAReprendre and getProchainCours', async () => {
+		await app.runWithContext( async () => {
+			const store = useApprentissageStore();
+			const identityId = 'default';
+
+			queryClient.setQueryData(
+				[ 'parcours', identityId ],
+				[
+					{
+						id: 1,
+						titre: 'Cours 1',
+						niveau: 1,
+						chapitre_nom: 'Matérialité',
+						chapitre_couleur: 'primary',
+						ordre: 1,
+						audience_type: 'all',
+						target_groups: [],
+						target_members: [],
+						is_assigned: false,
+						unlocked_by_assignment: false,
+						playlist: [
+							{ id: 101, type: 'roi_exercice', titre: 'Ex 1' },
+							{ id: 102, type: 'roi_exercice', titre: 'Ex 2' },
+						],
+					},
+					{
+						id: 2,
+						titre: 'Cours 2',
+						niveau: 2,
+						chapitre_nom: 'Activité',
+						chapitre_couleur: 'secondary',
+						ordre: 2,
+						audience_type: 'all',
+						target_groups: [],
+						target_members: [],
+						is_assigned: false,
+						unlocked_by_assignment: false,
+						playlist: [
+							{ id: 201, type: 'roi_exercice', titre: 'Ex 3' },
+						],
+					},
+					{
+						id: 3,
+						titre: 'Cours Assigné',
+						niveau: 3,
+						chapitre_nom: 'Sécurité',
+						chapitre_couleur: 'tertiary',
+						ordre: 3,
+						audience_type: 'restricted',
+						target_groups: [],
+						target_members: [],
+						is_assigned: true,
+						unlocked_by_assignment: true,
+						playlist: [
+							{ id: 301, type: 'roi_exercice', titre: 'Ex 4' },
+						],
+					},
+				]
+			);
+
+			// Ex 101 validé -> prochain = Cours 1, Ex 102
+			queryClient.setQueryData( [ 'progression', identityId ], [ 101 ] );
+
+			expect( store.niveauxDisponibles ).toEqual( [ 1, 2 ] );
+			expect( store.prochainContenuAReprendre?.cours.id ).toBe( 1 );
+			expect( store.prochainContenuAReprendre?.item.id ).toBe( 102 );
+			expect( store.prochainContenuAReprendre?.playlistIndex ).toBe( 1 );
+			expect( store.getProchainCours( 1 )?.id ).toBe( 2 );
+			expect( store.getProchainCours( 2 ) ).toBeNull();
+
+			// Tout validé -> prochain = null
+			queryClient.setQueryData(
+				[ 'progression', identityId ],
+				[ 101, 102, 201 ]
+			);
+			expect( store.prochainContenuAReprendre ).toBeNull();
+		} );
+	} );
 } );

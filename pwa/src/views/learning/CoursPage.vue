@@ -1,16 +1,42 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/apprentissage/cours"></ion-back-button>
+          <ion-back-button default-href="/tabs/apprentissage/cours"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ decodeHtmlEntities(cours?.titre) || 'Cours' }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button router-link="/apprentissage/cours" router-direction="back">
-            <ion-icon slot="icon-only" :icon="homeOutline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <ion-title>{{ cours ? `N${cours.niveau} · ${shortChapterLabel}` : 'Cours' }}</ion-title>
+      </ion-toolbar>
+
+      <ion-toolbar
+        v-if="cours && !apprentissageStore.isLoading"
+        :color="cours.chapitre_couleur || 'primary'"
+        class="cours-compact-toolbar"
+      >
+        <div class="cours-compact-header">
+          <div class="cours-compact-meta-row">
+            <h2 class="cours-compact-title">{{ decodeHtmlEntities(cours.titre) }}</h2>
+            <div class="cours-compact-actions">
+              <ion-badge
+                :color="isCourseCompleted ? 'success' : undefined"
+                class="cours-progress-badge"
+                :class="{ 'cours-progress-pill': !isCourseCompleted }"
+              >
+                {{ validatedCount }}/{{ cours.playlist.length }}
+              </ion-badge>
+              <ion-button
+                v-if="prochainElementCours"
+                size="small"
+                color="light"
+                :router-link="`/contenu/${prochainElementCours.id}`"
+                class="cours-continue-btn"
+              >
+                <ion-icon slot="start" :icon="playOutline"></ion-icon>
+                {{ hasAnyValidated ? 'Continuer' : 'Commencer' }}
+              </ion-button>
+            </div>
+          </div>
+        </div>
       </ion-toolbar>
     </ion-header>
 
@@ -21,12 +47,6 @@
       </ion-refresher>
 
       <div class="safe-area-wrapper">
-        <ion-header collapse="condense">
-          <ion-toolbar>
-            <ion-title size="large">{{ decodeHtmlEntities(cours?.titre) || 'Cours' }}</ion-title>
-          </ion-toolbar>
-        </ion-header>
-
         <div v-if="apprentissageStore.isLoading" class="ion-text-center ion-padding spinner-container">
           <ion-spinner name="crescent"></ion-spinner>
           <p>Chargement du cours...</p>
@@ -37,14 +57,7 @@
         </div>
 
         <div v-else class="playlist-container">
-          <div class="cours-meta-card ion-padding">
-            <h2>{{ decodeHtmlEntities(cours.titre) }}</h2>
-            <p class="chapitre-badge" :style="{ backgroundColor: 'var(--ion-color-' + cours.chapitre_couleur + ')' }">
-              Niveau {{ cours.niveau }} — {{ decodeHtmlEntities(cours.chapitre_nom) }}
-            </p>
-          </div>
-
-          <ion-list lines="inset" class="playlist-list ion-margin-top">
+          <ion-list lines="inset" class="playlist-list">
             <ion-item
               v-for="(item, i) in cours.playlist"
               :key="item.id"
@@ -105,6 +118,7 @@ import {
   IonLabel,
   IonIcon,
   IonButton,
+  IonBadge,
   IonRefresher,
   IonRefresherContent,
   type RefresherCustomEvent
@@ -121,7 +135,7 @@ import {
   bookOutline,
   extensionPuzzleOutline,
   videocamOutline,
-  homeOutline
+  playOutline
 } from 'ionicons/icons';
 
 const route = useRoute();
@@ -161,6 +175,37 @@ const isUnlocked = (playlistIndex: number): boolean => {
 const isValidated = (itemId: number): boolean => {
   return apprentissageStore.elementsValides.includes(itemId);
 };
+
+const shortChapterLabel = computed(() => {
+  const nom = decodeHtmlEntities(cours.value?.chapitre_nom || '').trim();
+  if (!nom) return 'Chapitre';
+  return nom.split(/\s+/)[0] || nom;
+});
+
+const validatedCount = computed(() => {
+  if (!cours.value?.playlist) return 0;
+  return cours.value.playlist.filter((item) => isValidated(item.id)).length;
+});
+
+const hasAnyValidated = computed(() => {
+  return validatedCount.value > 0;
+});
+
+const isCourseCompleted = computed(() => {
+  const total = cours.value?.playlist?.length ?? 0;
+  return total > 0 && validatedCount.value >= total;
+});
+
+const prochainElementCours = computed<PlaylistItem | null>(() => {
+  if (!cours.value?.playlist) return null;
+  for (let i = 0; i < cours.value.playlist.length; i++) {
+    const item = cours.value.playlist[i];
+    if (item && isUnlocked(i) && !isValidated(item.id)) {
+      return item;
+    }
+  }
+  return null;
+});
 
 const handleRefresh = async (event: RefresherCustomEvent) => {
   await Promise.all([

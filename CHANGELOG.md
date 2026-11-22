@@ -6,6 +6,42 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Type 9 (`stealth` & `developpement`) — Masquage initial et désactivation du piège sur les cercles rouges (`parcoursVariants.ts`, `ParcoursViewer.vue`, `TypeParcours.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Suppression de la vérification `isRedSquare()` dans `validateStealthConstraints()` afin que les cercles rouges ne soient pas considérés comme des cases piégées pour les variantes `stealth` et `developpement` (uniquement les cases attaquées par l'adversaire).
+  - Masquage des cercles rouges (`red`/`r`) dans `effectiveShapes` de `ParcoursViewer.vue` avant résolution pour `stealth` et `developpement`, puis révélation complète de toutes les `shapes` une fois l'exercice résolu.
+
+- **Surbrillance du dernier coup (`lastMove` / `highlightLastMove`) sur les exercices (`Chessboard.vue`, `DiagramViewer.vue`, `chessNotation.ts`, `TypeMarcheHeros.vue`, `TypePartieHeros.vue`, `partieHerosParser.ts`, `TypePosiPlan.vue`, `posiPlanParser.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Activation par défaut de `highlightLastMove: true` dans le wrapper `Chessboard.vue` (aligné sur `eg-chessboard` 1.8.7), transmission de `props.lastMove` dans `setPosition(fen, lastMove)`, `normalizedDiagram` et `zoomBoardConfig` afin de préserver la surbrillance sur les positions statiques.
+  - Ajout de la prop `lastMove` (et `highlightLastMove`) sur `DiagramViewer.vue`.
+  - **La Marche du Héros (Type 7)** : calcul et affichage de `lastMoveHighlight` sur les mini-échiquiers générés (`diag0`..`diagN`) dès les étapes `selection` et `ordonnancement`, en complément de l'étape `resolution` (`PuzzleViewer`) et du replay post-résolution.
+  - **La Partie du Héros (Type 4) & Posi'Plan (Type 5)** : ajout de `playSanAndGetLastMove()` dans `chessNotation.ts`, extraction de `lastMove` / `startingLastMove` dans `partieHerosParser.ts` et `posiPlanParser.ts`, et affichage de la surbrillance du coup précédent en navigation PGN / variante ainsi qu'à l'entrée des étapes QCM.
+
+- **Correction du formatage des coups de Tour & masquage du symbole de mat (`#`) dans les QCM (`chessNotation.ts`, `chessNotation.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Priorisation de `parseSan()` en notation internationale avant le repli `toInternationalNotation()` dans `formatMoveInFrench()`, évitant qu'un coup de Tour (`Rfe1+`) ne soit converti en coup de Roi invalide (`Kfe1+`) et affiché brut (`Rfe1+ (Tfe1+)`) au lieu de `Tour f1 en e1 (Tfe1+)`. Gestion également des roques avec échec/mat (`O-O+`, `O-O#`).
+  - Suppression du symbole de mat (`#`) dans le rappel SAN français entre parenthèses généré par `formatMoveWithFrenchSan()` (ex. `Fou g7 en f6 (Ff6)` au lieu de `(Ff6#)`), afin de ne pas divulguer la bonne réponse dans les QCM (*La Partie dont tu es le Héros* et *Posi'Plan*).
+
+- **Affichage des appels à bénévoles dans Le Club & vue mobile (`BenevolatSegmentView.vue`, `BenevolatPage.vue`, `_base.scss`, `README.md`, `USING.md`)** :
+  - Ajout du modificateur `.dame-badge-group--wrap` (`flex-wrap: wrap`, `margin-top: 6px`) dans `_base.scss`.
+  - Déplacement du groupe de badges (`📅 Événement associé`, `Inscrit`, `Nouveau`, compteur de réponses) à l'intérieur de `<ion-label>` sous la date (avec `ion-text-wrap` sur les titres) dans `BenevolatSegmentView.vue` (appels en cours et terminés) et dans le slot `#mobile-item` de `BenevolatPage.vue`, évitant l'écrasement horizontal du titre sur mobile et dans la colonne maître.
+
+- **Lisibilité des badges d'onglets & bouton « Tout lu » sur Le Club (`LeClubPage.vue`, `_club-badges.scss`, `USING.md`)** :
+  - Passage de la barre de segments en mode `scrollable` (`.club-segment`) avec largeur naturelle des boutons (`flex: 0 0 auto`, `min-width: auto`, centrage automatique lorsqu'ils tiennent à l'écran) et badges non compressibles (`.segment-badge`, `white-space: nowrap`, `flex-shrink: 0`) afin d'éviter toute troncature sur mobile.
+  - Remplacement de l'icône seule `checkmarkDoneOutline` par un bouton explicite `checkboxOutline` + libellé **« Tout lu »** (`.mark-read-btn`).
+
+- **Refonte de la navigation Apprentissage (`ApprentissageHubPage.vue`, `ApprentissageCoursListPage.vue`, `CoursPage.vue`, `ContenuPage.vue`, `PlayPage.vue`, `AnalysisPage.vue`, `TabsPage.vue`, `router/index.ts`, `apprentissage.ts`, `_learning-components.scss`, `apprentissageStore.spec.ts`, `README.md`, `USING.md`)** :
+  - **Hub Apprentissage à 3 panneaux** : titre simplifié en « Apprentissage », retrait du ruban « En dev » sur *Cours, Leçons & Exercices*, suppression des sous-titres et chips superflus, et ajout du 3ᵉ panneau *Analyse de partie* (en développement).
+  - **Parcours par niveaux & onglets chapitres** : ajout des getters `niveauxDisponibles`, `prochainContenuAReprendre` et `getProchainCours` dans `useApprentissageStore`, carte d'accès direct « Reprendre » colorée selon le chapitre (`N1 · Chapitre · Cours`), sélecteur de niveau dynamique (affiché dès que $\ge 2$ niveaux existent en base) et onglets par chapitre (`<ion-segment scrollable>`) pré-sélectionnés automatiquement sur la progression en cours.
+  - **Sommaire d'un cours (`CoursPage.vue`)** : remplacement du grand titre et de `.cours-meta-card` par un bandeau pleine largeur `<ion-toolbar :color="...">` aux couleurs du chapitre affichant le titre complet (`1.05rem`), le badge `X/Y` et le bouton *Continuer / Commencer*.
+  - **Barre d'onglets & vues plein écran** : intégration de `/tabs/apprentissage/cours` et `/tabs/apprentissage/cours/:id` sous `/tabs/` (avec redirections rétrocompatibles), fiabilisation du changement d'onglet dans `TabsPage.vue`, `router.replace()` dans `allerAuSuivant()` pour que `<ion-back-button>` ramène directement au cours, boutons `listOutline` (chapitres/cours) et `homeOutline` (Hub Apprentissage) dans `ContenuPage.vue`, confirmation *Reprendre plus tard / Abandonner* (`resignGame()`) au retour d'une partie en cours sur `PlayPage.vue`, et `default-href="/tabs/apprentissage"` sur `AnalysisPage.vue`.
+
+## [1.13.13] - 2026-11-22
+
+- **Correction des shapes sur erreur & replay automatique post-résolution pour La Marche du Héros / Type 7 (`TypeMarcheHeros.vue`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Suppression de l'injection de `serie.shapes` dans `<PuzzleViewer>` (`:shapes="[]"`) afin qu'aucune shape ne soit affichée au départ ni réinjectée lors d'un mauvais coup.
+  - Extraction des shapes de chaque ply du mini-PGN complet via `extractShapesAndComment()` (`game.comments` / `child.data?.comments`, avec repli sur `serie.shapes` au ply 0).
+  - Bascule automatique en mode lecture seule `600 ms` après la trouvaille du coup décisif pour rejouer le mini-PGN complet à raison d'un ply par seconde (`1000 ms`) avec les shapes de chaque ply (boucle avec pause de `2500 ms` en fin de séquence).
+  - Maintien du verrouillage de `isCurrentStepSolved` jusqu'à la fin du premier passage complet de l'animation, empêchant le passage anticipé à la série suivante et retardant les confettis sur la dernière série jusqu'à la fin du premier visionnage.
+
 ## [1.13.12] - 2026-11-21
 
 - **Refonte Type 11 (`Class'échecs`) & commentaires post-validation (`TypeClassEchecs.vue`, `OrderViewer.vue`, `TypeClassEchecs.spec.ts`, `_learning-layout.scss`, `_learning-components.scss`)** :

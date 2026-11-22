@@ -176,7 +176,7 @@ describe( 'parcoursVariants - Logic & Extensibility', () => {
 		expect( allEatenResult.isFinished ).toBe( true );
 	} );
 
-	test( 'stealth variant prevents stepping onto attacked squares', () => {
+	test( 'stealth variant prevents stepping onto attacked squares but allows red circles', () => {
 		const stealth = getParcoursVariant( 'stealth' );
 		expect( stealth.id ).toBe( 'stealth' );
 
@@ -197,6 +197,20 @@ describe( 'parcoursVariants - Logic & Extensibility', () => {
 		} );
 		expect( attackedResult.valid ).toBe( false );
 		expect( attackedResult.errorMessage ).toBe( 'Vous avez été repéré !' );
+
+		// Les cercles rouges ne sont pas des cases piégées en variante stealth
+		const redCircleAllowed = stealth.validateMove( {
+			from: 'c3',
+			to: 'd5',
+			fenDepart: '8/8/8/8/8/2N5/8/8 w - - 0 1',
+			couleurJoueur: 'white',
+			caseDepart: 'c3',
+			caseArrivee: 'e4',
+			shapes: [ { orig: 'd5', brush: 'red' } ],
+			boardApi: mockBoardAttacked,
+		} );
+		expect( redCircleAllowed.valid ).toBe( true );
+		expect( redCircleAllowed.isFinished ).toBe( false );
 	} );
 
 	test( 'traces variant and piece helpers work correctly', () => {
@@ -670,7 +684,7 @@ describe( 'TypeParcours.vue', () => {
 		expect( attackedRes.valid ).toBe( false );
 		expect( attackedRes.errorMessage ).toBe( 'Vous avez été repéré !' );
 
-		// Case rouge rejetée
+		// Case rouge autorisée en développement (non considérée comme case piégée)
 		const redRes = dev.validateMove( {
 			from: 'e1',
 			to: 'd5',
@@ -682,8 +696,8 @@ describe( 'TypeParcours.vue', () => {
 			shapes: [ ...altShapes, { orig: 'd5', brush: 'red' } ],
 			boardApi: mockBoardAttacked,
 		} );
-		expect( redRes.valid ).toBe( false );
-		expect( redRes.errorMessage ).toBe( 'Case interdite !' );
+		expect( redRes.valid ).toBe( true );
+		expect( redRes.isFinished ).toBe( false );
 
 		// Coup intermédiaire sûr accepté
 		const safeStepRes = dev.validateMove( {
@@ -729,6 +743,7 @@ describe( 'TypeParcours.vue', () => {
 					couleur_joueur: 'white' as const,
 					shapes: [
 						{ orig: 'c6', brush: 'blue' },
+						{ orig: 'd5', brush: 'red' },
 						{ orig: 'e1', dest: 'd3', brush: 'blue' },
 						{ orig: 'd3', dest: 'b4', brush: 'blue' },
 						{ orig: 'b4', dest: 'c6', brush: 'blue' },
@@ -762,7 +777,7 @@ describe( 'TypeParcours.vue', () => {
 			"Ton Cavalier n'est pas bien placé... Quelle est la case à atteindre ? Comment ?"
 		);
 
-		// Avant résolution : ni cercle bleu c6 ni flèches bleues ne doivent être affichés
+		// Avant résolution : ni cercle bleu c6, ni cercle rouge d5, ni flèches bleues ne doivent être affichés
 		const initialShapes = JSON.parse(
 			wrapper.find( '.mock-shapes' ).text()
 		);
@@ -776,10 +791,67 @@ describe( 'TypeParcours.vue', () => {
 			'Bravo ! Vous avez trouvé la bonne case de développement.'
 		);
 
-		// Après résolution : le cercle bleu c6 et toutes les flèches sont révélés
+		// Après résolution : le cercle bleu c6, le cercle rouge d5 et toutes les flèches sont révélés
+		const solvedShapes = JSON.parse(
+			wrapper.find( '.mock-shapes' ).text()
+		);
+		expect( solvedShapes ).toHaveLength( 5 );
+	} );
+
+	test( 'TypeParcours renders stealth variant hiding red circles and arrows initially and revealing on solve', async () => {
+		const stealthConfig = {
+			consigne: 'Infiltrez h8.',
+			series: [
+				{
+					variante: 'stealth',
+					description: 'Infiltrez h8 sans vous faire repérer.',
+					fen_depart: '8/5N2/8/8/8/8/8/8 w - - 0 1',
+					couleur_joueur: 'white' as const,
+					case_depart: 'f7',
+					case_arrivee: 'h8',
+					shapes: [
+						{ orig: 'd5', brush: 'red' },
+						{ orig: 'f7', dest: 'h8', brush: 'blue' },
+					],
+				},
+			],
+		};
+
+		const wrapper = mount( TypeParcours, {
+			global: {
+				plugins: [ [ VueQueryPlugin, { queryClient } ] ],
+			},
+			props: {
+				id: 905,
+				config: stealthConfig,
+			},
+		} );
+
+		// Avant résolution : ni cercle rouge ni flèche, uniquement départ (bleu) et arrivée (vert)
+		const initialShapes = JSON.parse(
+			wrapper.find( '.mock-shapes' ).text()
+		);
+		expect( initialShapes ).toEqual( [
+			{ orig: 'f7', brush: 'blue' },
+			{ orig: 'h8', brush: 'green' },
+		] );
+
+		// Déplacement sur la case cible h8
+		await wrapper.find( '.mock-move-btn-h8' ).trigger( 'click' );
+		await wrapper.vm.$nextTick();
+
+		expect( wrapper.text() ).toContain( 'Infiltration réussie !' );
+
+		// Après résolution : le cercle rouge et la flèche sont révélés avec les repères
 		const solvedShapes = JSON.parse(
 			wrapper.find( '.mock-shapes' ).text()
 		);
 		expect( solvedShapes ).toHaveLength( 4 );
+		expect( solvedShapes ).toEqual(
+			expect.arrayContaining( [
+				{ orig: 'd5', brush: 'red' },
+				{ orig: 'f7', dest: 'h8', brush: 'blue' },
+			] )
+		);
 	} );
 } );

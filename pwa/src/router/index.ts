@@ -38,6 +38,18 @@ const routes: Array< RouteRecordRaw > = [
 					import( '@/views/learning/ApprentissageHubPage.vue' ),
 			},
 			{
+				path: 'apprentissage/cours',
+				name: 'ApprentissageCoursList',
+				component: () =>
+					import( '@/views/learning/ApprentissageCoursListPage.vue' ),
+				meta: { requiresAuth: true, requiresApprentissageAccess: true },
+			},
+			{
+				path: 'apprentissage/cours/:id',
+				component: () => import( '@/views/learning/CoursPage.vue' ),
+				meta: { requiresAuth: true, requiresApprentissageAccess: true },
+			},
+			{
 				path: 'profil',
 				component: () => import( '@/views/auth/ProfilePage.vue' ),
 			},
@@ -217,10 +229,7 @@ const routes: Array< RouteRecordRaw > = [
 	},
 	{
 		path: '/apprentissage/cours',
-		name: 'ApprentissageCoursList',
-		component: () =>
-			import( '@/views/learning/ApprentissageCoursListPage.vue' ),
-		meta: { requiresAuth: true, requiresApprentissageAccess: true },
+		redirect: '/tabs/apprentissage/cours',
 	},
 	{
 		path: '/contenu/:id',
@@ -229,8 +238,7 @@ const routes: Array< RouteRecordRaw > = [
 	},
 	{
 		path: '/cours/:id',
-		component: () => import( '@/views/learning/CoursPage.vue' ),
-		meta: { requiresAuth: true, requiresApprentissageAccess: true },
+		redirect: ( to ) => `/tabs/apprentissage/cours/${ to.params.id }`,
 	},
 ];
 

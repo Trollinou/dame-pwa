@@ -2,19 +2,47 @@
  * Styles partagés et normalisés pour les badges de notification et segments Club.
  */
 
+.club-segment {
+	ion-segment-button {
+		--padding-start: 10px;
+		--padding-end: 10px;
+		min-width: auto;
+		flex: 0 0 auto;
+
+		&:first-child {
+			margin-inline-start: auto;
+		}
+
+		&:last-child {
+			margin-inline-end: auto;
+		}
+	}
+}
+
+.mark-read-btn {
+	font-size: 13px;
+	font-weight: 500;
+	--padding-start: 8px;
+	--padding-end: 8px;
+}
+
 .segment-label-wrapper {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 6px;
+	gap: 5px;
+	white-space: nowrap;
 }
 
 .segment-badge {
-	font-size: 10px;
+	font-size: 11px;
 	font-weight: 700;
 	padding: 2px 6px;
-	border-radius: 10px;
+	border-radius: 999px;
+	min-width: 18px;
+	text-align: center;
 	line-height: 1.2;
+	flex-shrink: 0;
 }
 
 .news-subtitle-row {

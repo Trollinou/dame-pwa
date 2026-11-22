@@ -58,14 +58,6 @@ function isRedSquare( square: string, shapes: DrawShape[] ): boolean {
 function validateStealthConstraints(
 	ctx: ParcoursMoveContext
 ): ParcoursMoveResult | null {
-	if ( isRedSquare( ctx.to, ctx.shapes ) ) {
-		return {
-			valid: false,
-			isFinished: false,
-			errorMessage: 'Case interdite !',
-		};
-	}
-
 	const oppColor = ctx.couleurJoueur === 'white' ? 'black' : 'white';
 	if ( ctx.boardApi.isSquareAttacked( ctx.to, oppColor ) ) {
 		return {

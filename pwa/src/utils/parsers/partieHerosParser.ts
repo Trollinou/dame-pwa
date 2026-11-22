@@ -1,6 +1,5 @@
 import { Chess, parseSquare } from 'chessops';
 import { parseFen, makeFen } from 'chessops/fen';
-import { parseSan, makeSanAndPlay } from 'chessops/san';
 import {
 	parsePgn,
 	type Node,
@@ -8,7 +7,7 @@ import {
 	type PgnNodeData,
 	isChildNode,
 } from 'chessops/pgn';
-import type { DrawShape } from 'eg-chessboard';
+import type { DrawShape, Key } from 'eg-chessboard';
 import { getActiveColorFromFen } from '@/utils/chess/fenUtils';
 
 export interface PgnMoveStep {
@@ -16,6 +15,7 @@ export interface PgnMoveStep {
 	comment: string;
 	shapes: DrawShape[];
 	fenAfter: string;
+	lastMove?: Key[];
 }
 
 export interface PgnStage {
@@ -25,6 +25,7 @@ export interface PgnStage {
 	moves: PgnMoveStep[];
 	startingComment?: string;
 	startingShapes?: DrawShape[];
+	startingLastMove?: Key[];
 }
 
 export interface QcmChoice {
@@ -41,6 +42,7 @@ export interface QcmStage {
 	shapes: DrawShape[];
 	question: string;
 	choices: QcmChoice[];
+	lastMove?: Key[];
 }
 
 export type PartieHerosStage = PgnStage | QcmStage;
@@ -50,6 +52,7 @@ import {
 	formatMoveWithFrenchSan,
 	extractShapesAndComment,
 	shuffleArray,
+	playSanAndGetLastMove,
 } from '@/utils/chess/chessNotation';
 
 export {
@@ -171,6 +174,8 @@ export function parsePartieHerosPgn(
 	const stages: PartieHerosStage[] = [];
 	let currentPgnMoves: PgnMoveStep[] = [];
 	let stageStartFen = makeFen( currentPos.toSetup() );
+	let stageStartingLastMove: Key[] | undefined;
+	let lastPlayedMove: Key[] | undefined;
 
 	// Extraction du commentaire initial (avec fallback regex si besoin)
 	let initialStartingComment = '';
@@ -207,10 +212,14 @@ export function parsePartieHerosPgn(
 					moves: [ ...currentPgnMoves ],
 					startingComment: initialStartingComment,
 					startingShapes: initialStartingShapes,
+					...( stageStartingLastMove
+						? { startingLastMove: stageStartingLastMove }
+						: {} ),
 				} );
 				currentPgnMoves = [];
 				initialStartingComment = '';
 				initialStartingShapes = [];
+				stageStartingLastMove = undefined;
 			}
 			break;
 		}
@@ -235,10 +244,14 @@ export function parsePartieHerosPgn(
 					moves: [ ...currentPgnMoves ],
 					startingComment: initialStartingComment,
 					startingShapes: initialStartingShapes,
+					...( stageStartingLastMove
+						? { startingLastMove: stageStartingLastMove }
+						: {} ),
 				} );
 				currentPgnMoves = [];
 				initialStartingComment = '';
 				initialStartingShapes = [];
+				stageStartingLastMove = undefined;
 			}
 
 			const mainChild: ChildNode< PgnNodeData > = node.children[ 0 ];
@@ -290,13 +303,14 @@ export function parsePartieHerosPgn(
 				shapes: qcmShapes,
 				question: defaultConsigne || 'Quel est le meilleur coup ?',
 				choices: shuffleChoices( choices ),
+				...( lastPlayedMove ? { lastMove: lastPlayedMove } : {} ),
 			} );
 
 			// Avancer sur la ligne principale avec le bon coup joué dans le QCM
-			const parsedMove = parseSan( currentPos, mainChild.data.san );
-			if ( parsedMove ) {
-				makeSanAndPlay( currentPos, parsedMove );
-			}
+			lastPlayedMove = playSanAndGetLastMove(
+				currentPos,
+				mainChild.data.san
+			);
 
 			// La séquence PGN suivante repartira APRÈS le coup du QCM,
 			// avec comme commentaire et formes de départ ceux du coup validé dans le QCM
@@ -304,22 +318,25 @@ export function parsePartieHerosPgn(
 			currentPgnMoves = [];
 			initialStartingComment = mainParsed.comment;
 			initialStartingShapes = mainParsed.shapes;
+			stageStartingLastMove = lastPlayedMove;
 
 			node = mainChild;
 		} else {
 			// Défilement normal du coup de la ligne principale
 			const child: ChildNode< PgnNodeData > = node.children[ 0 ];
 			const parsed = extractShapesAndComment( child.data?.comments );
-			const parsedMove = parseSan( currentPos, child.data.san );
-			if ( parsedMove ) {
-				makeSanAndPlay( currentPos, parsedMove );
-			}
+			const moveLastMove = playSanAndGetLastMove(
+				currentPos,
+				child.data.san
+			);
+			lastPlayedMove = moveLastMove;
 
 			currentPgnMoves.push( {
 				san: child.data.san,
 				comment: parsed.comment,
 				shapes: parsed.shapes,
 				fenAfter: makeFen( currentPos.toSetup() ),
+				...( moveLastMove ? { lastMove: moveLastMove } : {} ),
 			} );
 
 			node = child;
@@ -334,6 +351,9 @@ export function parsePartieHerosPgn(
 			moves: [ ...currentPgnMoves ],
 			startingComment: initialStartingComment,
 			startingShapes: initialStartingShapes,
+			...( stageStartingLastMove
+				? { startingLastMove: stageStartingLastMove }
+				: {} ),
 		} );
 	}
 

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { Chess } from 'chessops';
+import { parseFen } from 'chessops/fen';
 import {
 	getPieceLabel,
 	getPieceDisplayName,
@@ -80,6 +81,26 @@ describe( 'chessNotation.ts', () => {
 
 		const nf3 = formatMoveWithFrenchSan( pos, 'Nf3' );
 		expect( nf3 ).toBe( 'Cavalier g1 en f3 (Cf3)' );
+	} );
+
+	test( 'formatMoveWithFrenchSan traduit les coups de Tour avec désambiguïsation et masque le symbole de mat (#)', () => {
+		// Position avant 16. Rfe1+ dans Fischer - Fine 1963
+		const fen16 =
+			'r1b1k1r1/pp1p1pBp/8/b2P4/2B4q/1Q6/P4PP1/R4RK1 w - - 1 16';
+		const setup16 = parseFen( fen16 ).unwrap();
+		const pos16 = Chess.fromSetup( setup16 ).unwrap();
+		expect( formatMoveWithFrenchSan( pos16, 'Rfe1+' ) ).toBe(
+			'Tour f1 en e1 (Tfe1+)'
+		);
+
+		// Position avant 18. Bf6# dans Fischer - Fine 1963
+		const fen18 =
+			'r1bk2r1/pp1p1pBp/8/b2P4/2B5/6q1/P4PP1/R3R1K1 w - - 0 18';
+		const setup18 = parseFen( fen18 ).unwrap();
+		const pos18 = Chess.fromSetup( setup18 ).unwrap();
+		expect( formatMoveWithFrenchSan( pos18, 'Bf6#' ) ).toBe(
+			'Fou g7 en f6 (Ff6)'
+		);
 	} );
 
 	test( 'extractShapesAndComment extrait correctement les annotations [%csl] et [%cal]', () => {

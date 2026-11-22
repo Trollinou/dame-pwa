@@ -1063,6 +1063,11 @@ cg-board.piece-icon-box {
   color: var(--ion-color-primary, #3880ff);
 }
 
+.analysis-icon {
+  background: rgba(var(--ion-color-secondary-rgb, 61, 194, 255), 0.15);
+  color: var(--ion-color-secondary, #3dc2ff);
+}
+
 .panel-title {
   font-size: 1.35rem;
   font-weight: 700;
@@ -1120,6 +1125,116 @@ cg-board.piece-icon-box {
   margin-bottom: 8px;
 }
 
+.resume-progress-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  ion-card-header {
+    padding: 12px 16px;
+  }
+
+  .resume-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .resume-meta {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .resume-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: inherit;
+    opacity: 0.9;
+    margin-bottom: 2px;
+  }
+
+  .resume-path {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.78rem;
+    color: inherit;
+    opacity: 0.85;
+  }
+
+  .resume-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: inherit;
+    margin-top: 2px;
+  }
+
+  .resume-arrow {
+    font-size: 1.25rem;
+    color: inherit;
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    padding: 8px;
+    flex-shrink: 0;
+  }
+}
+
+.level-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.level-select {
+  width: auto;
+  min-width: 110px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  --padding-start: 10px;
+  --padding-end: 8px;
+  background: var(--ion-color-step-100, #f4f5f8);
+  border-radius: 8px;
+}
+
+.level-badge {
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.chapter-segment {
+  margin: 4px 0 12px 0;
+  --background: var(--ion-color-step-100, #f4f5f8);
+  border-radius: 10px;
+}
+
+.chapter-segment-btn {
+  min-width: auto;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  font-size: 0.85rem;
+
+  .chapter-count {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    margin-left: 3px;
+  }
+}
+
 .section-title-wrapper {
   display: flex;
   align-items: center;
@@ -1161,6 +1276,15 @@ cg-board.piece-icon-box {
   margin: 0;
   border-radius: 12px;
   transition: transform 0.2s ease, opacity 0.2s ease;
+
+  ion-card-header {
+    padding: 12px 16px;
+  }
+
+  .cours-card-title {
+    font-size: 1.05rem;
+    line-height: 1.25;
+  }
 
   &:not(.locked):active {
     transform: scale(0.98);
@@ -1206,6 +1330,71 @@ cg-board.piece-icon-box {
   color: var(--ion-color-step-600, #666);
   flex-shrink: 0;
   margin-left: 8px;
+}
+
+.cours-compact-toolbar {
+  --min-height: auto;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  --border-width: 0;
+}
+
+.cours-compact-header {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+}
+
+.cours-compact-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: inherit;
+  min-width: 0;
+}
+
+.cours-compact-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cours-compact-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cours-progress-badge {
+  font-size: 0.78rem;
+  padding: 4px 8px;
+  border-radius: 10px;
+
+  &.cours-progress-pill {
+    --background: rgba(255, 255, 255, 0.25);
+    --color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+}
+
+.cours-continue-btn {
+  margin: 0;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  min-height: 28px;
+}
+
+.playlist-list {
+  margin-top: 6px;
 }
 
 .cours-meta-card {

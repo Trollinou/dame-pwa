@@ -190,6 +190,53 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		)
 	);
 
+	const niveauxDisponibles = computed< number[] >( () => {
+		const levels = new Set< number >();
+		for ( const cours of coursTroncCommun.value ) {
+			if ( typeof cours.niveau === 'number' ) {
+				levels.add( cours.niveau );
+			}
+		}
+		return Array.from( levels ).sort( ( a, b ) => a - b );
+	} );
+
+	const prochainContenuAReprendre = computed< {
+		cours: CoursItem;
+		item: PlaylistItem;
+		playlistIndex: number;
+	} | null >( () => {
+		for ( const cours of coursTroncCommun.value ) {
+			const parcoursIdx = parcours.value.findIndex(
+				( c ) => c.id === cours.id
+			);
+			if ( parcoursIdx < 0 || ! isCoursUnlocked.value( parcoursIdx ) ) {
+				continue;
+			}
+			const playlist = cours.playlist || [];
+			const nextIdx = playlist.findIndex(
+				( item ) => ! elementsValides.value.includes( item.id )
+			);
+			if ( nextIdx !== -1 && playlist[ nextIdx ] ) {
+				return {
+					cours,
+					item: playlist[ nextIdx ],
+					playlistIndex: nextIdx,
+				};
+			}
+		}
+		return null;
+	} );
+
+	const getProchainCours = ( coursId: number ): CoursItem | null => {
+		const idx = coursTroncCommun.value.findIndex(
+			( c ) => c.id === coursId
+		);
+		if ( idx === -1 || idx >= coursTroncCommun.value.length - 1 ) {
+			return null;
+		}
+		return coursTroncCommun.value[ idx + 1 ] ?? null;
+	};
+
 	const isElementUnlocked = computed( () => {
 		return ( coursIndex: number, playlistIndex: number ): boolean => {
 			if ( ! isCoursUnlocked.value( coursIndex ) ) {
@@ -460,6 +507,9 @@ export const useApprentissageStore = defineStore( 'apprentissage', () => {
 		parcours,
 		coursAssignes,
 		coursTroncCommun,
+		niveauxDisponibles,
+		prochainContenuAReprendre,
+		getProchainCours,
 		contenuActuel,
 		elementsValides,
 		isLoading,

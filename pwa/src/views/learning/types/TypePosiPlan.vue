@@ -64,6 +64,7 @@
             :key="`posi-variant-${activeVariant?.san}`"
             mode="game"
             :fen="activeVariantFen"
+            :last-move="activeVariantLastMove"
             :shapes="activeVariantShapes"
             :orientation="parsedData.orientation"
             :player-color="parsedData.orientation"
@@ -135,6 +136,7 @@
               :key="`main-pgn-${mainBranchStageIndex}`"
               mode="game"
               :fen="activeMainPgnFen"
+              :last-move="activeMainPgnLastMove"
               :orientation="currentMainStage.orientation"
               :player-color="currentMainStage.orientation"
               :shapes="activeMainPgnShapes"
@@ -190,6 +192,7 @@
               :key="`main-qcm-${mainBranchStageIndex}`"
               mode="game"
               :fen="activeMainQcmFen"
+              :last-move="activeMainQcmLastMove"
               :shapes="currentMainStage.shapes"
               :orientation="currentMainStage.orientation"
               :player-color="currentMainStage.orientation"
@@ -254,7 +257,7 @@ import {
   arrowBackOutline,
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
-import type { BoardCore, DrawShape } from 'eg-chessboard';
+import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import {
@@ -458,6 +461,13 @@ const activeVariantFen = computed<string>(() => {
   return activeVariant.value.variantMoves[currentVariantMoveIndex.value].fenAfter;
 });
 
+const activeVariantLastMove = computed<Key[] | undefined>(() => {
+  if (!activeVariant.value?.variantMoves || currentVariantMoveIndex.value < 0) {
+    return undefined;
+  }
+  return activeVariant.value.variantMoves[currentVariantMoveIndex.value]?.lastMove;
+});
+
 const activeVariantShapes = computed<DrawShape[]>(() => {
   if (!activeVariant.value || !activeVariant.value.variantMoves) {
     return [];
@@ -489,7 +499,7 @@ const isVariantAtEnd = computed<boolean>(() => {
 
 const syncVariantBoardPosition = () => {
   if (!variantBoardApi.value) return;
-  variantBoardApi.value.setPosition(activeVariantFen.value);
+  variantBoardApi.value.setPosition(activeVariantFen.value, activeVariantLastMove.value);
   variantBoardApi.value.setShapes(activeVariantShapes.value);
   if (typeof variantBoardApi.value.redraw === 'function') {
     variantBoardApi.value.redraw(true);
@@ -571,6 +581,17 @@ const activeMainPgnFen = computed<string>(() => {
   return stage.moves[currentMainPgnMoveIndex.value].fenAfter;
 });
 
+const activeMainPgnLastMove = computed<Key[] | undefined>(() => {
+  const stage = currentMainStage.value as PosiPlanPgnStage;
+  if (!stage || stage.type !== 'pgn') {
+    return undefined;
+  }
+  if (currentMainPgnMoveIndex.value < 0) {
+    return stage.startingLastMove;
+  }
+  return stage.moves[currentMainPgnMoveIndex.value]?.lastMove;
+});
+
 const activeMainPgnShapes = computed<DrawShape[]>(() => {
   const stage = currentMainStage.value as PosiPlanPgnStage;
   if (!stage || stage.type !== 'pgn') {
@@ -597,7 +618,7 @@ const activeMainPgnComment = computed<string>(() => {
 
 const syncMainPgnBoardPosition = () => {
   if (!mainPgnBoardApi.value) return;
-  mainPgnBoardApi.value.setPosition(activeMainPgnFen.value);
+  mainPgnBoardApi.value.setPosition(activeMainPgnFen.value, activeMainPgnLastMove.value);
   mainPgnBoardApi.value.setShapes(activeMainPgnShapes.value);
   if (typeof mainPgnBoardApi.value.redraw === 'function') {
     mainPgnBoardApi.value.redraw(true);
@@ -640,11 +661,19 @@ const selectedMainQcmChoiceIndex = ref<number | null>(null);
 const isMainQcmSolved = ref(false);
 const activeMainQcmFen = ref('');
 
+const activeMainQcmLastMove = computed<Key[] | undefined>(() => {
+  const stage = currentMainStage.value as PosiPlanQcmStage;
+  if (!stage || stage.type !== 'qcm') {
+    return undefined;
+  }
+  return stage.lastMove;
+});
+
 const onMainQcmBoardCreated = (api: BoardCore) => {
   mainQcmBoardApi.value = api;
   const stage = currentMainStage.value as PosiPlanQcmStage;
   if (stage && stage.type === 'qcm') {
-    api.setPosition(stage.fen);
+    api.setPosition(stage.fen, stage.lastMove);
     api.setShapes(stage.shapes || []);
   }
 };
@@ -710,7 +739,7 @@ watch(mainBranchStageIndex, () => {
     if (currentMainStage.value?.type === 'pgn') {
       syncMainPgnBoardPosition();
     } else if (currentMainStage.value?.type === 'qcm' && mainQcmBoardApi.value) {
-      mainQcmBoardApi.value.setPosition(currentMainStage.value.fen);
+      mainQcmBoardApi.value.setPosition(currentMainStage.value.fen, currentMainStage.value.lastMove);
       mainQcmBoardApi.value.setShapes(currentMainStage.value.shapes || []);
       if (typeof mainQcmBoardApi.value.redraw === 'function') {
         mainQcmBoardApi.value.redraw(true);

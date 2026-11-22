@@ -103,8 +103,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Étape `qcm`** : Affiche la FEN exacte au nœud d'embranchement (avant le choix du coup).
   - Orientation : déduite du trait de la FEN initiale de la partie.
 - **Affiché vs Caché** :
-  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` (pas de bouton Fin), zone de commentaire sous l'échiquier (`💬 ...`), et shapes du coup courant (ou `startingShapes` au départ).
-  - **Étape `qcm`** : Échiquier en lecture seule avec les **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
+  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` (pas de bouton Fin), zone de commentaire sous l'échiquier (`💬 ...`), surbrillance du dernier coup (`lastMove` / `startingLastMove`), et shapes du coup courant (ou `startingShapes` au départ).
+  - **Étape `qcm`** : Échiquier en lecture seule avec surbrillance du dernier coup précédant l'embranchement (`lastMove`), **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`) formatés via `formatMoveWithFrenchSan` (libellé français + SAN française entre parenthèses sans le symbole `#` pour ne pas révéler le mat). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
 - **Condition stricte de création d'une étape QCM (`hasValidQcmArrows`)** :
   - Le parser ne crée un embranchement `qcm` que si **les 2 conditions** sont réunies sur le nœud :
     1. Le nœud possède **plus d'un coup enfant** (`node.children.length > 1` : ligne principale + variantes).
@@ -132,8 +132,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Mode `main_branch`** : Démarre **après le 1er coup de la branche principale** (joué lors du choix initial) et enchaîne les sous-étapes `pgn` et `qcm` extraites de la suite.
 - **Affiché vs Caché** :
   - **Mode `initial_choice`** : Échiquier `view-only`, barre `"Trouve le bon plan"`, boutons correspondant aux coups candidats à la racine du PGN (`root.children`, non mélangés : principale + variantes).
-  - **Mode `variant_view`** : Bandeau jaune/warning `"Variante alternative : ..."`, bouton `"Choix initial"`, échiquier `view-only`, contrôles `Début / Précédent / Suivant`, zone de commentaire, et bouton `"Retourner au choix initial"` en fin de variante.
-  - **Mode `main_branch`** : Alternance `pgn` (contrôles + commentaires) et `qcm` (barre `"Trouve le coup suivant"` + choix mélangés).
+  - **Mode `variant_view`** : Bandeau jaune/warning `"Variante alternative : ..."`, bouton `"Choix initial"`, échiquier `view-only` avec surbrillance du dernier coup (`lastMove`), contrôles `Début / Précédent / Suivant`, zone de commentaire, et bouton `"Retourner au choix initial"` en fin de variante.
+  - **Mode `main_branch`** : Alternance `pgn` (contrôles + commentaires + `lastMove` / `startingLastMove`) et `qcm` (surbrillance du coup précédent `lastMove` + barre `"Trouve le coup suivant"` + choix mélangés).
 - **Changement de vue** :
   - Clic sur une **variante alternative** au choix initial → bascule immédiate en `variant_view`.
   - Clic sur `"Choix initial"` ou `"Retourner au choix initial"` → retour en `initial_choice`.
@@ -177,8 +177,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Les diagrammes suivants sont capturés tous les **2 demi-coups** (un tour complet).
   - Le dernier coup restant constitue le puzzle final (`solution: [dernierCoup]`) avec `lastMoveHighlight` sur le coup précédent.
 - **Position initiale affichée & Affiché vs Caché selon les 3 sous-étapes** :
-  1. **`selection`** : Grille 2 colonnes de tous les mini-diagrammes restants dans la banque (mélangés), avec coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
-  2. **`ordonnancement`** : Grille 2 colonnes des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
+  1. **`selection`** : Grille 2 colonnes de tous les mini-diagrammes restants dans la banque (mélangés), avec surbrillance du dernier coup (`lastMoveHighlight`) menant à chaque position et coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
+  2. **`ordonnancement`** : Grille 2 colonnes des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), avec surbrillance du dernier coup (`lastMoveHighlight`), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
   3. **`resolution`** : Grand échiquier `PuzzleViewer` sur la position finale de la série (avec `shapes` et `lastMoveHighlight`).
 - **Changement de vue** :
   - `selection` → `ordonnancement` : Lorsque les N cartes sélectionnées appartiennent toutes à la même partie, clic sur `Classer la série` dans `SeriesCardFooter`.
@@ -228,9 +228,9 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
      - **Validation** : Interdit sur case rouge. Si la pièce atteint `case_arrivee` alors qu'il reste au moins une pièce adverse sur l'échiquier → erreur `"Il reste des pièces à manger !"`. Gagné quand toutes les pièces adverses sont capturées et `to === case_arrivee`.
 
   3. **Variante `stealth` (Pas vu, pas pris)** :
-     - **Sous-mode Cible** (`case_arrivee` fournie et différente de `case_depart`) : `fen_depart` avec pièce retirée sur `case_arrivee` si présente ; flèches cachées jusqu'à résolution.
-     - **Sous-mode Boucle (`isLoop`)** (`case_arrivee` absente ou égale à `case_depart`) : `fen_depart` intacte. Utilise `LoopTracker` (suivi angulaire autour de la pièce adverse extraite de la FEN, 4 quadrants + rotation ≥ 95 % + retour à `case_depart` en ≥ 4 coups).
-     - **Validation** : Interdit sur case rouge (`"Case interdite !"`) et interdit sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`).
+     - **Sous-mode Cible** (`case_arrivee` fournie et différente de `case_depart`) : `fen_depart` avec pièce retirée sur `case_arrivee` si présente ; flèches et cercles rouges (`red`/`r`) cachés jusqu'à résolution.
+     - **Sous-mode Boucle (`isLoop`)** (`case_arrivee` absente ou égale à `case_depart`) : `fen_depart` intacte. Utilise `LoopTracker` (suivi angulaire autour de la pièce adverse extraite de la FEN, 4 quadrants + rotation ≥ 95 % + retour à `case_depart` en ≥ 4 coups). Flèches et cercles rouges (`red`/`r`) cachés jusqu'à résolution.
+     - **Validation** : Les cercles rouges ne sont **pas** considérés comme des cases piégées. Interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`).
 
   4. **Variante `traces` (Qui a laissé ces traces ?)** :
      - **Position affichée** : **Échiquier VIDE** (`8/8/8/8/8/8/8/8 w - - 0 1`), `view-only`.
@@ -239,9 +239,9 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
   5. **Variante `developpement` (Destination cachée — dérivée de `stealth`)** :
      - **Position affichée** : `fen_depart` intacte (la destination finale est toujours libre).
-     - **Affiché vs Caché** : Toutes les flèches et la case cible (**cercle vert** ou **cercle bleu cible** au format alternatif sans cercle vert) sont **cachées** au départ. Seules d'éventuelles cases rouges interdites et l'éventuel cercle bleu de départ (`case_depart`) restent visibles.
+     - **Affiché vs Caché** : Toutes les flèches, les cercles rouges (`red`/`r`) et la case cible (**cercle vert** ou **cercle bleu cible** au format alternatif sans cercle vert) sont **cachés** au départ et révélés uniquement une fois résolu. Seul l'éventuel cercle bleu de départ (`case_depart`) reste visible.
      - **Résolution de la cible (`extractDeveloppementTargetSquare`)** : Priorité à `case_arrivee`, sinon cercle vert dans `shapes`, sinon cercle bleu dans `shapes` différent de `case_depart`. Jamais en mode boucle (`isLoop = false`).
-     - **Validation** : Mêmes contraintes que `stealth` : interdit sur case rouge (`"Case interdite !"`) et sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`). Gagné dès que la pièce atteint la case cible par **n'importe quel chemin légal** sûr.
+     - **Validation** : Mêmes contraintes que `stealth` : les cercles rouges ne sont **pas** considérés comme des cases piégées ; interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`). Gagné dès que la pièce atteint la case cible par **n'importe quel chemin légal** sûr.
 
 - **Après une réponse (toutes variantes de déplacement)** :
   - **Coup invalide** : Feedback rouge + réinitialisation complète de la position (`resetPosition()`) après **400 ms**.
@@ -417,3 +417,4 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 | :--- | :--- | :--- | :--- |
 | `1.0.0` | `1.13.11` | `2026-11-21` | Rédaction initiale des spécifications TDD & Guide Entraîneur pour les Types 1 à 16. |
 | `1.1.0` | `1.13.11` | `2026-11-21` | **Type 9 (Parcours)** : ajout de la 5ᵉ variante `developpement` (dérivée de `stealth` à destination cachée, support double format Bleu+Vert et Cercle Bleu seul). |
+| `1.2.0` | `1.13.13` | `2026-11-22` | **Type 9 (`stealth` & `developpement`)** : les cercles rouges ne sont plus considérés comme des cases piégées, sont masqués au départ et révélés une fois la solution trouvée. |

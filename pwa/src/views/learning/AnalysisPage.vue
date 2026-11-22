@@ -3,7 +3,7 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/play"></ion-back-button>
+          <ion-back-button default-href="/tabs/apprentissage"></ion-back-button>
         </ion-buttons>
         <ion-title>Analyse de la partie</ion-title>
         <ion-buttons slot="end">

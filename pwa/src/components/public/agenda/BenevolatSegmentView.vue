@@ -29,37 +29,37 @@
               >
                 <ion-icon slot="start" :icon="handRightOutline" color="primary" class="ion-margin-end"></ion-icon>
                 <ion-label>
-                  <h2 v-safe-html="benevolat.title.rendered"></h2>
+                  <h2 v-safe-html="benevolat.title.rendered" class="ion-text-wrap"></h2>
                   <p>{{ formatBenevolatDates(benevolat) }}</p>
+                  <div v-if="hasBadges(benevolat, true)" class="dame-badge-group dame-badge-group--wrap">
+                    <ion-badge
+                      v-if="benevolat.linked_agenda"
+                      color="tertiary"
+                      class="badge-linked-agenda"
+                      @click.stop="openLinkedAgenda(benevolat.linked_agenda.id)"
+                    >
+                      📅 Événement associé
+                    </ion-badge>
+                    <ion-badge
+                      v-if="unreadStore.isBenevolatUnread(benevolat)"
+                      color="danger"
+                    >
+                      Nouveau
+                    </ion-badge>
+                    <ion-badge
+                      v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode"
+                      color="success"
+                    >
+                      Inscrit
+                    </ion-badge>
+                    <ion-badge
+                      v-if="authStore.adminMode"
+                      color="primary"
+                    >
+                      {{ benevolatStore.getResponseCount(benevolat.id) }} rép.
+                    </ion-badge>
+                  </div>
                 </ion-label>
-                <div slot="end" class="dame-badge-group">
-                  <ion-badge
-                    v-if="benevolat.linked_agenda"
-                    color="tertiary"
-                    class="badge-linked-agenda"
-                    @click.stop="openLinkedAgenda(benevolat.linked_agenda.id)"
-                  >
-                    📅 Événement associé
-                  </ion-badge>
-                  <ion-badge
-                    v-if="unreadStore.isBenevolatUnread(benevolat)"
-                    color="danger"
-                  >
-                    Nouveau
-                  </ion-badge>
-                  <ion-badge
-                    v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode"
-                    color="success"
-                  >
-                    Inscrit
-                  </ion-badge>
-                  <ion-badge
-                    v-if="authStore.adminMode"
-                    color="primary"
-                  >
-                    {{ benevolatStore.getResponseCount(benevolat.id) }} rép.
-                  </ion-badge>
-                </div>
               </ion-item>
             </ion-list>
 
@@ -78,32 +78,32 @@
               >
                 <ion-icon slot="start" :icon="handRightOutline" color="medium" class="ion-margin-end icon--dimmed"></ion-icon>
                 <ion-label>
-                  <h2 v-safe-html="benevolat.title.rendered"></h2>
+                  <h2 v-safe-html="benevolat.title.rendered" class="ion-text-wrap"></h2>
                   <p>{{ formatBenevolatDates(benevolat) }}</p>
+                  <div v-if="hasBadges(benevolat, false)" class="dame-badge-group dame-badge-group--wrap">
+                    <ion-badge
+                      v-if="benevolat.linked_agenda"
+                      color="tertiary"
+                      class="badge-linked-agenda badge--dimmed"
+                      @click.stop="openLinkedAgenda(benevolat.linked_agenda.id)"
+                    >
+                      📅 Événement associé
+                    </ion-badge>
+                    <ion-badge
+                      v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode"
+                      color="success"
+                      class="badge--dimmed"
+                    >
+                      Inscrit
+                    </ion-badge>
+                    <ion-badge
+                      v-if="authStore.adminMode"
+                      color="medium"
+                    >
+                      {{ benevolatStore.getResponseCount(benevolat.id) }} rép.
+                    </ion-badge>
+                  </div>
                 </ion-label>
-                <div slot="end" class="dame-badge-group">
-                  <ion-badge
-                    v-if="benevolat.linked_agenda"
-                    color="tertiary"
-                    class="badge-linked-agenda badge--dimmed"
-                    @click.stop="openLinkedAgenda(benevolat.linked_agenda.id)"
-                  >
-                    📅 Événement associé
-                  </ion-badge>
-                  <ion-badge
-                    v-if="benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode"
-                    color="success"
-                    class="badge--dimmed"
-                  >
-                    Inscrit
-                  </ion-badge>
-                  <ion-badge
-                    v-if="authStore.adminMode"
-                    color="medium"
-                  >
-                    {{ benevolatStore.getResponseCount(benevolat.id) }} rép.
-                  </ion-badge>
-                </div>
               </ion-item>
             </ion-list>
           </template>
@@ -160,6 +160,15 @@ const openLinkedAgenda = (agendaId: number) => {
   } else {
     router.push(`/agenda/${agendaId}`);
   }
+};
+
+const hasBadges = (benevolat: Benevolat, includeUnread: boolean): boolean => {
+  return Boolean(
+    benevolat.linked_agenda ||
+    (includeUnread && unreadStore.isBenevolatUnread(benevolat)) ||
+    (benevolatStore.hasUserVoted(benevolat.id) && !authStore.adminMode) ||
+    authStore.adminMode
+  );
 };
 
 const props = defineProps<{
