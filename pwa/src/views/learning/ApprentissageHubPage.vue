@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Apprentissage & Pratique</ion-title>
+        <ion-title>Apprentissage</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -10,7 +10,7 @@
       <div class="safe-area-wrapper">
         <ion-header collapse="condense">
           <ion-toolbar>
-            <ion-title size="large">Apprentissage & Pratique</ion-title>
+            <ion-title size="large">Apprentissage</ion-title>
           </ion-toolbar>
         </ion-header>
 
@@ -18,14 +18,9 @@
           <!-- PANNEAU 1 : COURS & EXERCICES TACTIQUES (Soumis à autorisation) -->
           <ion-card
             class="hub-panel-card cours-panel"
-            :class="{ 'card-in-dev': true }"
             :button="canAccessCours"
-            :router-link="canAccessCours ? '/apprentissage/cours' : undefined"
+            :router-link="canAccessCours ? '/tabs/apprentissage/cours' : undefined"
           >
-            <!-- Stamp / Ribbon diagonal En développement -->
-            <div class="dev-ribbon-wrapper">
-              <div class="dev-ribbon">En dev</div>
-            </div>
 
             <ion-card-header>
               <div class="panel-header">
@@ -43,7 +38,6 @@
                 </div>
               </div>
               <ion-card-title class="panel-title">Cours, Leçons & Exercices</ion-card-title>
-              <ion-card-subtitle class="panel-subtitle">Entraînement théorique et exercices interactifs</ion-card-subtitle>
             </ion-card-header>
 
             <ion-card-content>
@@ -62,7 +56,7 @@
                   <strong>Module en cours de développement</strong>
                 </div>
                 <p class="dev-desc">
-                  Ce module fait actuellement l'objet de développements et de tests. L'accès est temporairement restreint aux profils autorisés (administrateurs, entraîneurs...).
+                  L'accès est temporairement restreint aux profils autorisés (administrateurs, entraîneurs...).
                 </p>
                 <ion-button fill="outline" size="small" router-link="/tabs/profil" class="ion-margin-top">
                   <ion-icon slot="start" :icon="personOutline"></ion-icon>
@@ -77,7 +71,7 @@
                   <strong>Module en cours de développement</strong>
                 </div>
                 <p class="dev-desc">
-                  L'accès est actuellement réservé aux profils autorisés durant la phase de développement.
+                  L'accès est actuellement réservé aux profils autorisés.
                 </p>
                 <ion-button fill="outline" size="small" router-link="/tabs/profil" class="ion-margin-top">
                   <ion-icon slot="start" :icon="logInOutline"></ion-icon>
@@ -103,22 +97,42 @@
                 </div>
               </div>
               <ion-card-title class="panel-title">Partie d'Échecs</ion-card-title>
-              <ion-card-subtitle class="panel-subtitle">Jouer sur un échiquier interactif</ion-card-subtitle>
             </ion-card-header>
 
             <ion-card-content>
               <p>Jouez une partie complète contre l'ordinateur (Stockfish) ou à 2 joueurs sur le même écran.</p>
-              
-              <div class="play-features-chips ion-margin-top">
-                <span class="feature-chip">🤖 Solo vs Stockfish</span>
-                <span class="feature-chip">👥 À 2 joueurs (Pass & Play)</span>
-                <span class="feature-chip disabled">🌐 En ligne (À l'étude)</span>
-              </div>
-
               <div class="action-link ion-margin-top">
                 <span>Lancer l'échiquier</span>
                 <ion-icon :icon="arrowForwardOutline"></ion-icon>
               </div>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- PANNEAU 3 : ANALYSE DE PARTIE (En développement) -->
+          <ion-card
+            class="hub-panel-card analysis-panel card-in-dev"
+            :button="false"
+          >
+            <div class="dev-ribbon-wrapper">
+              <div class="dev-ribbon">En dev</div>
+            </div>
+
+            <ion-card-header>
+              <div class="panel-header">
+                <div class="panel-icon-wrapper analysis-icon">
+                  <ion-icon :icon="analyticsOutline"></ion-icon>
+                </div>
+                <div class="panel-badge-wrapper">
+                  <ion-badge color="warning">
+                    <ion-icon :icon="constructOutline" class="mini-lock"></ion-icon> En développement
+                  </ion-badge>
+                </div>
+              </div>
+              <ion-card-title class="panel-title">Analyse de partie</ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+              <p>Saisissez et analysez vos parties, puis transmettez-les à votre entraîneur.</p>
             </ion-card-content>
           </ion-card>
         </div>
@@ -138,7 +152,6 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardSubtitle,
   IonCardContent,
   IonIcon,
   IonBadge,
@@ -149,7 +162,7 @@ import { useApprentissageStore } from '@/stores/apprentissage';
 import {
   schoolOutline,
   gameControllerOutline,
-  lockClosedOutline,
+  analyticsOutline,
   arrowForwardOutline,
   personOutline,
   logInOutline,

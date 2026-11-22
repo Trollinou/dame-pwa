@@ -3,7 +3,9 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/tabs/apprentissage"></ion-back-button>
+          <ion-button aria-label="Retour" @click="handleBackClick">
+            <ion-icon slot="icon-only" :icon="arrowBackOutline"></ion-icon>
+          </ion-button>
         </ion-buttons>
         <ion-title>Partie d'Échecs</ion-title>
       </ion-toolbar>
@@ -107,11 +109,14 @@ import {
   IonContent,
   IonButtons,
   IonButton,
-  IonBackButton,
+  IonIcon,
   IonSpinner,
+  alertController,
   onIonViewDidEnter,
   onIonViewWillLeave
 } from '@ionic/vue';
+import { useRouter } from 'vue-router';
+import { arrowBackOutline } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import type { StockfishConfig, BoardCore } from 'eg-chessboard';
 import { useAuthStore } from '@/stores/auth';
@@ -127,8 +132,41 @@ const CoachLegendModal = defineAsyncComponent(() => import('@/components/learnin
 
 const showCoachLegend = ref(false);
 
+const router = useRouter();
 const authStore = useAuthStore();
 const chessStore = useChessStore();
+
+const handleBackClick = async () => {
+  if (currentPly.value > 0 && !isGameOver.value) {
+    const alert = await alertController.create({
+      header: 'Quitter la partie ?',
+      message: 'Une partie est en cours. Souhaitez-vous la reprendre plus tard ou abandonner ?',
+      buttons: [
+        {
+          text: 'Continuer la partie',
+          role: 'cancel',
+        },
+        {
+          text: 'Reprendre plus tard',
+          handler: () => {
+            void router.push('/tabs/apprentissage');
+          },
+        },
+        {
+          text: 'Abandonner',
+          role: 'destructive',
+          handler: () => {
+            resignGame();
+            void router.push('/tabs/apprentissage');
+          },
+        },
+      ],
+    });
+    await alert.present();
+    return;
+  }
+  void router.push('/tabs/apprentissage');
+};
 
 const { isLandscape, renderKey } = useBoardOrientation();
 

@@ -3,14 +3,14 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button :default-href="coursParentInfo ? `/cours/${coursParentInfo.cours.id}` : '/apprentissage/cours'"></ion-back-button>
+          <ion-back-button :default-href="coursParentInfo ? `/tabs/apprentissage/cours/${coursParentInfo.cours.id}` : '/tabs/apprentissage/cours'"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ decodeHtmlEntities(contenuActuel?.titre) || 'Contenu' }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button v-if="coursParentInfo" :router-link="`/cours/${coursParentInfo.cours.id}`" router-direction="back">
+          <ion-button :router-link="chapitresListRoute" title="Chapitres et cours">
             <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
           </ion-button>
-          <ion-button router-link="/apprentissage/cours" router-direction="back">
+          <ion-button router-link="/tabs/apprentissage" title="Accueil Apprentissage">
             <ion-icon slot="icon-only" :icon="homeOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -116,10 +116,18 @@
                     {{ prochainElement.type === 'roi_lecon' ? 'Leçon suivante' : (prochainElement.type === 'roi_video' ? 'Vidéo suivante' : 'Exercice suivant') }}
                   </ion-button>
                   <ion-button 
+                    v-else-if="prochainCours"
+                    expand="block" 
+                    color="success" 
+                    :router-link="`/tabs/apprentissage/cours/${prochainCours.id}`"
+                  >
+                    Cours suivant : {{ decodeHtmlEntities(prochainCours.titre) }}
+                  </ion-button>
+                  <ion-button 
                     v-else
                     expand="block" 
                     color="success" 
-                    router-link="/apprentissage/cours"
+                    :router-link="chapitresListRoute"
                   >
                     Terminer le cours
                   </ion-button>
@@ -128,7 +136,7 @@
                     expand="block" 
                     fill="outline" 
                     color="medium" 
-                    :router-link="`/cours/${coursParentInfo.cours.id}`"
+                    :router-link="`/tabs/apprentissage/cours/${coursParentInfo.cours.id}`"
                   >
                     Retour au cours
                   </ion-button>
@@ -252,6 +260,25 @@ const prochainElement = computed<PlaylistItem | null>(() => {
   return null;
 });
 
+const prochainCours = computed<CoursItem | null>(() => {
+  if (!coursParentInfo.value) return null;
+  return apprentissageStore.getProchainCours(coursParentInfo.value.cours.id);
+});
+
+const chapitresListRoute = computed(() => {
+  if (!coursParentInfo.value) {
+    return '/tabs/apprentissage/cours';
+  }
+  const { niveau, chapitre_nom } = coursParentInfo.value.cours;
+  return {
+    path: '/tabs/apprentissage/cours',
+    query: {
+      niveau: String(niveau),
+      chapitre: chapitre_nom
+    }
+  };
+});
+
 const EXERCISE_COMPONENTS: Record<number, Component> = {
   1: Type100Commandements,
   2: TypePopEchecs,
@@ -315,9 +342,11 @@ const allerAuSuivant = async () => {
     }
   }
   if (prochainElement.value) {
-    router.push(`/contenu/${prochainElement.value.id}`);
+    router.replace(`/contenu/${prochainElement.value.id}`);
+  } else if (prochainCours.value) {
+    router.push(`/tabs/apprentissage/cours/${prochainCours.value.id}`);
   } else {
-    router.push('/apprentissage/cours');
+    router.push(chapitresListRoute.value);
   }
 };
 
@@ -330,9 +359,9 @@ const retourAuCours = async () => {
     }
   }
   if (coursParentInfo.value) {
-    router.push(`/cours/${coursParentInfo.value.cours.id}`);
+    router.push(`/tabs/apprentissage/cours/${coursParentInfo.value.cours.id}`);
   } else {
-    router.push('/apprentissage/cours');
+    router.push('/tabs/apprentissage/cours');
   }
 };
 
@@ -352,7 +381,7 @@ provide(EXERCISE_NAVIGATION_KEY, {
   hasNext: computed(() => !!prochainElement.value),
   nextLabel: computed(() => {
     if (!prochainElement.value) {
-      return 'Terminer le cours';
+      return prochainCours.value ? 'Cours suivant' : 'Terminer le cours';
     }
     if (prochainElement.value.type === 'roi_lecon') {
       return 'Leçon suivante';
@@ -365,9 +394,9 @@ provide(EXERCISE_NAVIGATION_KEY, {
   hasCourse: computed(() => !!coursParentInfo.value),
   courseUrl: computed(() => {
     if (coursParentInfo.value) {
-      return `/cours/${coursParentInfo.value.cours.id}`;
+      return `/tabs/apprentissage/cours/${coursParentInfo.value.cours.id}`;
     }
-    return '/apprentissage/cours';
+    return '/tabs/apprentissage/cours';
   }),
   onNext: allerAuSuivant,
   onCourse: retourAuCours,

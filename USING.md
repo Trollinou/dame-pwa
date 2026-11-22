@@ -84,21 +84,22 @@ Pour optimiser les performances PageSpeed et la couverture de code (DevTools Cov
 
 ## Module Apprentissage & Jeu
 
-L'onglet **Apprentissage** permet d'accéder à deux espaces distincts :
+L'onglet **Apprentissage** (`/tabs/apprentissage`) présente trois pôles :
 
-1. **Cours & Parcours 🎓** :
+1. **Cours & Parcours 🎓** (`/tabs/apprentissage/cours`) :
+   - **Barre d'onglets toujours accessible** : La barre de navigation inférieure (*Accueil*, *Le Club*, *Apprentissage*, *Profil*) reste visible sur la liste des cours et dans le sommaire d'un cours (`/tabs/apprentissage/cours/:id`) ; seul l'exercice actif (`/contenu/:id`) passe en plein écran pour maximiser la hauteur de l'échiquier.
+   - **Carte « Reprendre »** : Affichée en haut de page aux couleurs du chapitre en cours, elle résume le chemin (`N1 · Chapitre · Cours`) et permet d'ouvrir en 1 clic le prochain exercice non validé.
    - **Section « Cours assignés » (Prescrits par vos entraîneurs)** : Lorsqu'un ou plusieurs cours sont prescrits spécifiquement à l'adhérent (ou à son groupe d'entraînement) par les entraîneurs, ils sont présentés en tête de liste sous la section dédiée `📌 Cours assignés` avec badge `📌 Assigné`. Ces cours bénéficient d'un déverrouillage immédiat sans prérequis séquentiel. Un badge contextuel `📌 X assigné(s)` est également visible sur la carte du Hub d'Apprentissage.
-   - **Section « Méthode EEF » (École d'Échecs à la Française)** : Présente les cours du tronc commun avec déblocage progressif linéaire au fil de la complétion des exercices.
+   - **Section « Méthode EEF »** : Organisée par niveau (sélecteur automatique dès que plusieurs niveaux existent en base) et par onglets chapitres (premier mot du chapitre avec compteur de progression), pré-sélectionnés automatiquement sur le niveau et le chapitre en cours de l'apprenant.
+   - **Sommaire d'un cours** (`/tabs/apprentissage/cours/:id`) : Bandeau pleine largeur coloré selon le chapitre affichant le titre complet du cours, l'avancement (`X/Y`) et un bouton d'accès rapide *Continuer / Commencer*.
    - **Actualisation Manuelle (Pull-to-refresh) 🔄** : Glisser vers le bas sur la liste des cours ou sur le détail d'un cours permet de forcer l'actualisation immédiate des parcours et de la progression.
    - **Synchronisation Différentielle & Économie Réseau** : Toute modification d'un exercice dans l'administration WordPress est automatiquement détectée grâce à son horodatage `modified`. L'application ne retélécharge que les exercices modifiés ou manquants, garantissant un affichage à jour sans nécessiter de vider le cache et sans surconsommer de données mobiles.
    - **Persistance & Synchronisation Instantanée de la Progression** : La validation d'un exercice ou d'une leçon met à jour immédiatement le cache local en 0ms (déblocage instantané du contenu suivant) et sauvegarde la réussite sur le serveur WordPress. L'utilisation des boutons d'en-tête (flèche retour, liste ou maison) ou du bouton retour du navigateur garantit l'enregistrement complet de la progression.
-   - **Fin de Cours Pédagogique** : À la fin du dernier exercice d'un cours, l'action *Terminer le cours* ramène automatiquement l'apprenant vers la liste des cours (`/apprentissage/cours`) pour poursuivre son parcours.
-   - Présente un ruban diagonal **"En dev"** signalant que le module est en cours de conception.
-   - Accessible temporairement aux seuls profils autorisés (administrateurs, entraîneurs).
-   - Pour les adhérents et visiteurs non autorisés : un panneau explicatif indique clairement que le module est en développement.
-   - Boutons de navigation d'en-tête (pour les profils autorisés) :
-     - **Maison** (`homeOutline`) : retour rapide à la liste des cours (`/apprentissage/cours`).
-     - **Liste** (`listOutline`) : retour au sommaire du cours actif (`/cours/:id`).
+   - **Fin de Cours Pédagogique** : À la fin du dernier exercice d'un cours, l'action *Cours suivant* (ou *Terminer le cours*) permet d'enchaîner directement vers le cours suivant ou de revenir à la sélection des chapitres.
+   - **Boutons de navigation d'en-tête dans un exercice (`/contenu/:id`)** :
+     - **Retour** (`ion-back-button`) : retour direct au sommaire du cours actif (`/tabs/apprentissage/cours/:id`), même après avoir enchaîné plusieurs exercices.
+     - **Liste** (`listOutline`) : retour à la page de sélection des chapitres et cours (`/tabs/apprentissage/cours`) sur l'onglet du chapitre en cours.
+     - **Maison** (`homeOutline`) : retour direct au Hub Apprentissage (`/tabs/apprentissage`).
    - **Structure des Exercices, Vidéos & Leçons** :
       - **En-tête unifié (`ContentHeader`)** : Affiche le titre de l'étape, le type adapté (« Exercice / Type », « Vidéo » ou « Leçon ») et le chapitre/niveau. Pour les Vidéos et Leçons, le deuxième panneau (consigne / question) est masqué automatiquement.
       - **Échiquiers, Grilles & Contrôles unifiés (Charte Apprentissage KISS)** :
