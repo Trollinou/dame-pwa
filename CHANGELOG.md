@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Affichage des appels à bénévoles dans Le Club & vue mobile (`BenevolatSegmentView.vue`, `BenevolatPage.vue`, `_base.scss`, `README.md`, `USING.md`)** :
+  - Ajout du modificateur `.dame-badge-group--wrap` (`flex-wrap: wrap`, `margin-top: 6px`) dans `_base.scss`.
+  - Déplacement du groupe de badges (`📅 Événement associé`, `Inscrit`, `Nouveau`, compteur de réponses) à l'intérieur de `<ion-label>` sous la date (avec `ion-text-wrap` sur les titres) dans `BenevolatSegmentView.vue` (appels en cours et terminés) et dans le slot `#mobile-item` de `BenevolatPage.vue`, évitant l'écrasement horizontal du titre sur mobile et dans la colonne maître.
+
 - **Lisibilité des badges d'onglets & bouton « Tout lu » sur Le Club (`LeClubPage.vue`, `_club-badges.scss`, `USING.md`)** :
   - Passage de la barre de segments en mode `scrollable` (`.club-segment`) avec largeur naturelle des boutons (`flex: 0 0 auto`, `min-width: auto`, centrage automatique lorsqu'ils tiennent à l'écran) et badges non compressibles (`.segment-badge`, `white-space: nowrap`, `flex-shrink: 0`) afin d'éviter toute troncature sur mobile.
   - Remplacement de l'icône seule `checkmarkDoneOutline` par un bouton explicite `checkboxOutline` + libellé **« Tout lu »** (`.mark-read-btn`).

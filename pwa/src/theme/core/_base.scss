@@ -264,6 +264,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
+
+  &--wrap {
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
 }
 
 /* Chevron d'élément de liste standardisé */

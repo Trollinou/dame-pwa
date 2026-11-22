@@ -24,40 +24,43 @@
           <!-- Slots personnalisés pour le rendu mobile -->
           <template #mobile-item="{ row }">
             <ion-label>
-              <h2 v-safe-html="row.title.rendered"></h2>
+              <h2 v-safe-html="row.title.rendered" class="ion-text-wrap"></h2>
               <p>{{ formatBenevolatDates(row) }}</p>
+              <div
+                v-if="row.linked_agenda || (hasUserVoted(row.id) && !authStore.adminMode) || authStore.adminMode"
+                class="dame-badge-group dame-badge-group--wrap"
+              >
+                <ion-badge
+                  v-if="row.linked_agenda"
+                  color="tertiary"
+                  class="badge-linked-agenda"
+                  @click.stop="router.push(authStore.adminMode ? '/admin/agenda/' + row.linked_agenda.id : '/agenda/' + row.linked_agenda.id)"
+                >
+                  📅 Événement associé
+                </ion-badge>
+                <ion-badge
+                  v-if="hasUserVoted(row.id) && !authStore.adminMode"
+                  color="success"
+                  :class="{ 'badge--dimmed': isBenevolatExpired(row) }"
+                >
+                  Inscrit
+                </ion-badge>
+                <ion-badge
+                  v-if="authStore.adminMode"
+                  :color="isBenevolatExpired(row) ? 'medium' : 'primary'"
+                  @click.stop="viewResults(row)"
+                >
+                  {{ getResponseCount(row.id) }} rép.
+                </ion-badge>
+                <ion-badge
+                  v-if="authStore.adminMode && getBenevolatNeededSummary(row).needed > 0"
+                  :color="getBenevolatNeededSummary(row).isFulfilled ? 'primary' : 'danger'"
+                  @click.stop="viewResults(row)"
+                >
+                  {{ getBenevolatNeededSummary(row).registered }} / {{ getBenevolatNeededSummary(row).needed }}
+                </ion-badge>
+              </div>
             </ion-label>
-            <div slot="end" class="dame-badge-group">
-              <ion-badge
-                v-if="row.linked_agenda"
-                color="tertiary"
-                class="badge-linked-agenda"
-                @click.stop="router.push(authStore.adminMode ? '/admin/agenda/' + row.linked_agenda.id : '/agenda/' + row.linked_agenda.id)"
-              >
-                📅 Événement associé
-              </ion-badge>
-              <ion-badge
-                v-if="hasUserVoted(row.id) && !authStore.adminMode"
-                color="success"
-                :class="{ 'badge--dimmed': isBenevolatExpired(row) }"
-              >
-                Inscrit
-              </ion-badge>
-              <ion-badge
-                v-if="authStore.adminMode"
-                :color="isBenevolatExpired(row) ? 'medium' : 'primary'"
-                @click.stop="viewResults(row)"
-              >
-                {{ getResponseCount(row.id) }} rép.
-              </ion-badge>
-              <ion-badge
-                v-if="authStore.adminMode && getBenevolatNeededSummary(row).needed > 0"
-                :color="getBenevolatNeededSummary(row).isFulfilled ? 'primary' : 'danger'"
-                @click.stop="viewResults(row)"
-              >
-                {{ getBenevolatNeededSummary(row).registered }} / {{ getBenevolatNeededSummary(row).needed }}
-              </ion-badge>
-            </div>
           </template>
         </DataTable>
       </div>
