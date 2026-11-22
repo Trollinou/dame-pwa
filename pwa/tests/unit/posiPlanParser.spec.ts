@@ -44,6 +44,7 @@ describe( 'posiPlanParser.ts', () => {
 
 		const rd5Variant = variantChoices.find( ( c ) => c.san === 'Rd5' );
 		expect( rd5Variant ).toBeDefined();
+		expect( rd5Variant?.label ).toBe( 'Tour d1 en d5 (Td5)' );
 		expect( rd5Variant?.variantMoves.length ).toBeGreaterThan( 0 );
 		expect( rd5Variant?.variantMoves[ 0 ].san ).toBe( 'Rd5' );
 
@@ -76,6 +77,8 @@ describe( 'posiPlanParser.ts', () => {
 			expect( wrong.map( ( c ) => c.san ).sort() ).toEqual(
 				[ 'Ng3', 'Rd2' ].sort()
 			);
+			const rd2Choice = wrong.find( ( c ) => c.san === 'Rd2' );
+			expect( rd2Choice?.label ).toBe( 'Tour d1 en d2 (Td2)' );
 		}
 
 		// Étape 3 : Réponse noire (13... Qc6)
