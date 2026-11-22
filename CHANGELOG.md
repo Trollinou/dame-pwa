@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Lisibilité des badges d'onglets & bouton « Tout lu » sur Le Club (`LeClubPage.vue`, `_club-badges.scss`, `USING.md`)** :
+  - Passage de la barre de segments en mode `scrollable` (`.club-segment`) avec largeur naturelle des boutons (`flex: 0 0 auto`, `min-width: auto`, centrage automatique lorsqu'ils tiennent à l'écran) et badges non compressibles (`.segment-badge`, `white-space: nowrap`, `flex-shrink: 0`) afin d'éviter toute troncature sur mobile.
+  - Remplacement de l'icône seule `checkmarkDoneOutline` par un bouton explicite `checkboxOutline` + libellé **« Tout lu »** (`.mark-read-btn`).
+
 - **Refonte de la navigation Apprentissage (`ApprentissageHubPage.vue`, `ApprentissageCoursListPage.vue`, `CoursPage.vue`, `ContenuPage.vue`, `PlayPage.vue`, `AnalysisPage.vue`, `TabsPage.vue`, `router/index.ts`, `apprentissage.ts`, `_learning-components.scss`, `apprentissageStore.spec.ts`, `README.md`, `USING.md`)** :
   - **Hub Apprentissage à 3 panneaux** : titre simplifié en « Apprentissage », retrait du ruban « En dev » sur *Cours, Leçons & Exercices*, suppression des sous-titres et chips superflus, et ajout du 3ᵉ panneau *Analyse de partie* (en développement).
   - **Parcours par niveaux & onglets chapitres** : ajout des getters `niveauxDisponibles`, `prochainContenuAReprendre` et `getProchainCours` dans `useApprentissageStore`, carte d'accès direct « Reprendre » colorée selon le chapitre (`N1 · Chapitre · Cours`), sélecteur de niveau dynamique (affiché dès que $\ge 2$ niveaux existent en base) et onglets par chapitre (`<ion-segment scrollable>`) pré-sélectionnés automatiquement sur la progression en cours.

@@ -68,11 +68,11 @@ Le module **Le Club** propose une navigation par segments adaptée dynamiquement
    - **Persistance** : Le choix d'affichage (Liste ou Calendrier) est sauvegardé dans le navigateur (`localStorage`) pour être conservé lors des futures sessions.
 
 4. **Badges de Nouveautés & Suivi des Non-Lus 🔴** :
-   - **Badges contextuels** : Affichage d'un badge rouge indiquant le nombre de nouveaux éléments sur les sous-onglets *Actualités*, *Tournois* et *Bénévolat* (aucun badge sur l'Agenda où les nouveautés s'insèrent naturellement dans la chronologie).
+   - **Badges contextuels** : Affichage d'un badge rouge indiquant le nombre de nouveaux éléments sur les sous-onglets *Actualités*, *Tournois* et *Bénévolat* dans une barre de segments défilante (aucun badge sur l'Agenda où les nouveautés s'insèrent naturellement dans la chronologie).
    - **Badge global** : La somme totale des éléments non lus est reportée sur l'onglet principal *Le Club* dans la barre de navigation inférieure.
    - **Initialisation intelligente (Cold Start)** : Lors de la première installation ou initialisation, l'historique antérieur est considéré comme déjà connu (compteur à zéro au départ), évitant la surcharge de badges.
    - **Filtre Bénévolat** : Les appels à bénévoles dont la date est passée (*Appels terminés*) sont automatiquement exclus des compteurs.
-   - **Décompte automatique & Action rapide** : Le badge d'un élément s'efface dès sa consultation (vue détail ou sélection split-view). Un bouton d'action rapide dans l'en-tête (✓✓) permet également de tout marquer comme lu en un clic.
+   - **Décompte automatique & Action rapide** : Le badge d'un élément s'efface dès sa consultation (vue détail ou sélection split-view). Un bouton d'action rapide dans l'en-tête (**Tout lu** avec icône case cochée) permet également de tout marquer comme lu en un clic.
 
 
 ## Intégration WordPress & Bannière d'Installation PWA

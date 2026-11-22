@@ -6,17 +6,25 @@
         <ion-buttons slot="end">
           <ion-button
             v-if="hasUnreadInCurrentSegment"
+            class="mark-read-btn"
             @click="markCurrentSegmentAsRead"
             title="Tout marquer comme lu"
+            aria-label="Tout marquer comme lu"
           >
-            <ion-icon slot="icon-only" :icon="checkmarkDoneOutline"></ion-icon>
+            <ion-icon slot="start" :icon="checkboxOutline"></ion-icon>
+            Tout lu
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
 
       <!-- Sous-navigation (Segment) -->
       <ion-toolbar>
-        <ion-segment :value="selectedSegment" @ionChange="onSegmentChange($event.detail.value as string, loadTabContent)">
+        <ion-segment
+          :value="selectedSegment"
+          scrollable
+          class="club-segment"
+          @ionChange="onSegmentChange($event.detail.value as string, loadTabContent)"
+        >
           <ion-segment-button value="actualites">
             <ion-label class="segment-label-wrapper">
               Actualités
@@ -133,7 +141,7 @@ import {
   IonButton,
   onIonViewWillEnter
 } from '@ionic/vue';
-import { listOutline, calendarOutline, checkmarkDoneOutline } from 'ionicons/icons';
+import { listOutline, calendarOutline, checkboxOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
 
 import { useAgendaStore, type AgendaEvent } from '@/stores/agenda';
