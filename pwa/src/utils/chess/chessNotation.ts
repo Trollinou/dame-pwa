@@ -1,5 +1,6 @@
-import { Chess } from 'chessops';
-import { parseSan } from 'chessops/san';
+import { Chess, makeSquare } from 'chessops';
+import { parseSan, makeSanAndPlay } from 'chessops/san';
+import { isNormal } from 'chessops/types';
 import type { Key, DrawShape } from 'eg-chessboard';
 
 /**
@@ -396,4 +397,32 @@ export function shuffleNonSorted< T >(
 		[ shuffled[ 0 ], shuffled[ 1 ] ] = [ shuffled[ 1 ], shuffled[ 0 ] ];
 	}
 	return shuffled;
+}
+
+/**
+ * Joue un coup SAN sur une position chessops et retourne les cases `[from, to]` pour la surbrillance.
+ *
+ * @param pos Position chessops mutée sur place.
+ * @param san Coup en notation algébrique standard.
+ */
+export function playSanAndGetLastMove(
+	pos: Chess,
+	san: string
+): Key[] | undefined {
+	try {
+		const parsedMove = parseSan( pos, san );
+		if ( ! parsedMove ) {
+			return undefined;
+		}
+		const lastMove = isNormal( parsedMove )
+			? ( [
+					makeSquare( parsedMove.from ) as Key,
+					makeSquare( parsedMove.to ) as Key,
+				] as Key[] )
+			: undefined;
+		makeSanAndPlay( pos, parsedMove );
+		return lastMove;
+	} catch {
+		return undefined;
+	}
 }

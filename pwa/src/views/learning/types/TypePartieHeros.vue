@@ -8,6 +8,7 @@
             :key="`pgn-${etapeCouranteIndex}`"
             mode="game"
             :fen="activePgnFen"
+            :last-move="activePgnLastMove"
             :orientation="etapeActuelle.orientation"
             :player-color="etapeActuelle.orientation"
             :shapes="activePgnShapes"
@@ -65,6 +66,7 @@
             :key="`qcm-${etapeCouranteIndex}`"
             mode="game"
             :fen="activeQcmFen"
+            :last-move="activeQcmLastMove"
             :shapes="etapeActuelle.shapes"
             :orientation="etapeActuelle.orientation"
             :player-color="etapeActuelle.orientation"
@@ -128,7 +130,7 @@ import {
   chevronForwardOutline,
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
-import type { BoardCore, DrawShape } from 'eg-chessboard';
+import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
@@ -303,6 +305,17 @@ const activePgnFen = computed<string>(() => {
   return stage.moves[currentPgnMoveIndex.value].fenAfter;
 });
 
+const activePgnLastMove = computed<Key[] | undefined>(() => {
+  const stage = etapeActuelle.value as PgnStage;
+  if (!stage || stage.type !== 'pgn') {
+    return undefined;
+  }
+  if (currentPgnMoveIndex.value < 0) {
+    return stage.startingLastMove;
+  }
+  return stage.moves[currentPgnMoveIndex.value]?.lastMove;
+});
+
 const activePgnShapes = computed<DrawShape[]>(() => {
   const stage = etapeActuelle.value as PgnStage;
   if (!stage || stage.type !== 'pgn') {
@@ -345,7 +358,7 @@ const syncPgnBoardPosition = () => {
   const targetFen = activePgnFen.value;
   const targetShapes = activePgnShapes.value;
 
-  pgnBoardApi.value.setPosition(targetFen);
+  pgnBoardApi.value.setPosition(targetFen, activePgnLastMove.value);
   pgnBoardApi.value.setShapes(targetShapes);
   if (typeof pgnBoardApi.value.redraw === 'function') {
     pgnBoardApi.value.redraw(true);
@@ -421,6 +434,14 @@ const isQcmSolved = ref(false);
 const qcmFeedback = ref<CardFeedback | null>(null);
 const activeQcmFen = ref('');
 
+const activeQcmLastMove = computed<Key[] | undefined>(() => {
+  const stage = etapeActuelle.value as QcmStage;
+  if (!stage || stage.type !== 'qcm') {
+    return undefined;
+  }
+  return stage.lastMove;
+});
+
 const onQcmBoardCreated = (api: BoardCore) => {
   qcmBoardApi.value = api;
   initQcmStage();
@@ -438,7 +459,7 @@ const initQcmStage = (stage?: QcmStage) => {
   isPgnCompleted.value = false;
 
   if (qcmBoardApi.value) {
-    qcmBoardApi.value.setPosition(current.fen);
+    qcmBoardApi.value.setPosition(current.fen, current.lastMove);
     qcmBoardApi.value.setShapes(current.shapes || []);
     if (typeof qcmBoardApi.value.redraw === 'function') {
       qcmBoardApi.value.redraw(true);
@@ -505,7 +526,7 @@ watch(etapeCouranteIndex, (newIdx) => {
       syncPgnBoardPosition();
     } else if (stage.type === 'qcm') {
       if (qcmBoardApi.value) {
-        qcmBoardApi.value.setPosition(stage.fen);
+        qcmBoardApi.value.setPosition(stage.fen, stage.lastMove);
         qcmBoardApi.value.setShapes(stage.shapes || []);
         if (typeof qcmBoardApi.value.redraw === 'function') {
           qcmBoardApi.value.redraw(true);
@@ -528,7 +549,7 @@ watch(
         syncPgnBoardPosition();
       } else if (stage?.type === 'qcm') {
         if (qcmBoardApi.value) {
-          qcmBoardApi.value.setPosition(stage.fen);
+          qcmBoardApi.value.setPosition(stage.fen, stage.lastMove);
           qcmBoardApi.value.setShapes(stage.shapes || []);
           if (typeof qcmBoardApi.value.redraw === 'function') {
             qcmBoardApi.value.redraw(true);

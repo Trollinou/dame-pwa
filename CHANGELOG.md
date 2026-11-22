@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Surbrillance du dernier coup (`lastMove` / `highlightLastMove`) sur les exercices (`Chessboard.vue`, `DiagramViewer.vue`, `chessNotation.ts`, `TypeMarcheHeros.vue`, `TypePartieHeros.vue`, `partieHerosParser.ts`, `TypePosiPlan.vue`, `posiPlanParser.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Activation par défaut de `highlightLastMove: true` dans le wrapper `Chessboard.vue` (aligné sur `eg-chessboard` 1.8.7), transmission de `props.lastMove` dans `setPosition(fen, lastMove)`, `normalizedDiagram` et `zoomBoardConfig` afin de préserver la surbrillance sur les positions statiques.
+  - Ajout de la prop `lastMove` (et `highlightLastMove`) sur `DiagramViewer.vue`.
+  - **La Marche du Héros (Type 7)** : calcul et affichage de `lastMoveHighlight` sur les mini-échiquiers générés (`diag0`..`diagN`) dès les étapes `selection` et `ordonnancement`, en complément de l'étape `resolution` (`PuzzleViewer`) et du replay post-résolution.
+  - **La Partie du Héros (Type 4) & Posi'Plan (Type 5)** : ajout de `playSanAndGetLastMove()` dans `chessNotation.ts`, extraction de `lastMove` / `startingLastMove` dans `partieHerosParser.ts` et `posiPlanParser.ts`, et affichage de la surbrillance du coup précédent en navigation PGN / variante ainsi qu'à l'entrée des étapes QCM.
+
 - **Correction du formatage des coups de Tour & masquage du symbole de mat (`#`) dans les QCM (`chessNotation.ts`, `chessNotation.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Priorisation de `parseSan()` en notation internationale avant le repli `toInternationalNotation()` dans `formatMoveInFrench()`, évitant qu'un coup de Tour (`Rfe1+`) ne soit converti en coup de Roi invalide (`Kfe1+`) et affiché brut (`Rfe1+ (Tfe1+)`) au lieu de `Tour f1 en e1 (Tfe1+)`. Gestion également des roques avec échec/mat (`O-O+`, `O-O#`).
   - Suppression du symbole de mat (`#`) dans le rappel SAN français entre parenthèses généré par `formatMoveWithFrenchSan()` (ex. `Fou g7 en f6 (Ff6)` au lieu de `(Ff6#)`), afin de ne pas divulguer la bonne réponse dans les QCM (*La Partie dont tu es le Héros* et *Posi'Plan*).

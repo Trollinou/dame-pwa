@@ -1,6 +1,5 @@
 import { Chess } from 'chessops';
 import { parseFen, makeFen } from 'chessops/fen';
-import { parseSan, makeSanAndPlay } from 'chessops/san';
 import {
 	parsePgn,
 	type Node,
@@ -8,13 +7,14 @@ import {
 	type PgnNodeData,
 	isChildNode,
 } from 'chessops/pgn';
-import type { DrawShape } from 'eg-chessboard';
+import type { DrawShape, Key } from 'eg-chessboard';
 import { getActiveColorFromFen } from '@/utils/chess/fenUtils';
 import {
 	toFrenchNotation,
 	formatMoveWithFrenchSan,
 	extractShapesAndComment,
 	shuffleArray,
+	playSanAndGetLastMove,
 } from '@/utils/chess/chessNotation';
 
 export interface PosiPlanMoveStep {
@@ -22,6 +22,7 @@ export interface PosiPlanMoveStep {
 	comment: string;
 	shapes: DrawShape[];
 	fenAfter: string;
+	lastMove?: Key[];
 }
 
 export interface PosiPlanVariantChoice {
@@ -47,6 +48,7 @@ export interface PosiPlanPgnStage {
 	moves: PosiPlanMoveStep[];
 	startingComment?: string;
 	startingShapes?: DrawShape[];
+	startingLastMove?: Key[];
 }
 
 export interface PosiPlanQcmStage {
@@ -56,6 +58,7 @@ export interface PosiPlanQcmStage {
 	shapes: DrawShape[];
 	question: string;
 	choices: PosiPlanQcmChoice[];
+	lastMove?: Key[];
 }
 
 export type PosiPlanStage = PosiPlanPgnStage | PosiPlanQcmStage;
@@ -92,16 +95,14 @@ function traceVariantMoves(
 
 	while ( current ) {
 		const parsed = extractShapesAndComment( current.data?.comments );
-		const parsedMove = parseSan( pos, current.data.san );
-		if ( parsedMove ) {
-			makeSanAndPlay( pos, parsedMove );
-		}
+		const moveLastMove = playSanAndGetLastMove( pos, current.data.san );
 
 		moves.push( {
 			san: current.data.san,
 			comment: parsed.comment,
 			shapes: parsed.shapes,
 			fenAfter: makeFen( pos.toSetup() ),
+			...( moveLastMove ? { lastMove: moveLastMove } : {} ),
 		} );
 
 		current =
@@ -249,15 +250,13 @@ export function parsePosiPlanPgn(
 	const mainPos = currentPos.clone();
 
 	// Jouer le premier coup de la branche principale
-	const parsedFirstMove = parseSan( mainPos, mainChild.data.san );
-	if ( parsedFirstMove ) {
-		makeSanAndPlay( mainPos, parsedFirstMove );
-	}
+	let lastPlayedMove = playSanAndGetLastMove( mainPos, mainChild.data.san );
 
 	let currentPgnMoves: PosiPlanMoveStep[] = [];
 	let stageStartFen = makeFen( mainPos.toSetup() );
 	let stageStartingComment = mainParsed.comment;
 	let stageStartingShapes = mainParsed.shapes;
+	let stageStartingLastMove: Key[] | undefined = lastPlayedMove;
 
 	let node: Node< PgnNodeData > | undefined = mainChild;
 
@@ -271,10 +270,14 @@ export function parsePosiPlanPgn(
 					moves: [ ...currentPgnMoves ],
 					startingComment: stageStartingComment,
 					startingShapes: stageStartingShapes,
+					...( stageStartingLastMove
+						? { startingLastMove: stageStartingLastMove }
+						: {} ),
 				} );
 				currentPgnMoves = [];
 				stageStartingComment = '';
 				stageStartingShapes = [];
+				stageStartingLastMove = undefined;
 			}
 			break;
 		}
@@ -289,10 +292,14 @@ export function parsePosiPlanPgn(
 					moves: [ ...currentPgnMoves ],
 					startingComment: stageStartingComment,
 					startingShapes: stageStartingShapes,
+					...( stageStartingLastMove
+						? { startingLastMove: stageStartingLastMove }
+						: {} ),
 				} );
 				currentPgnMoves = [];
 				stageStartingComment = '';
 				stageStartingShapes = [];
+				stageStartingLastMove = undefined;
 			}
 
 			const nodeComments = isChildNode( node )
@@ -346,34 +353,38 @@ export function parsePosiPlanPgn(
 				question:
 					defaultConsigne || 'Quel est le meilleur coup suivant ?',
 				choices: shuffleArray( qcmChoices ),
+				...( lastPlayedMove ? { lastMove: lastPlayedMove } : {} ),
 			} );
 
 			// Jouer le coup validé
-			const parsedMove = parseSan( mainPos, nextMainChild.data.san );
-			if ( parsedMove ) {
-				makeSanAndPlay( mainPos, parsedMove );
-			}
+			lastPlayedMove = playSanAndGetLastMove(
+				mainPos,
+				nextMainChild.data.san
+			);
 
 			stageStartFen = makeFen( mainPos.toSetup() );
 			currentPgnMoves = [];
 			stageStartingComment = nextMainParsed.comment;
 			stageStartingShapes = nextMainParsed.shapes;
+			stageStartingLastMove = lastPlayedMove;
 
 			node = nextMainChild;
 		} else {
 			// Défilement normal de coup (ex: réponse de l'adversaire)
 			const child: ChildNode< PgnNodeData > = node.children[ 0 ];
 			const parsed = extractShapesAndComment( child.data?.comments );
-			const parsedMove = parseSan( mainPos, child.data.san );
-			if ( parsedMove ) {
-				makeSanAndPlay( mainPos, parsedMove );
-			}
+			const moveLastMove = playSanAndGetLastMove(
+				mainPos,
+				child.data.san
+			);
+			lastPlayedMove = moveLastMove;
 
 			currentPgnMoves.push( {
 				san: child.data.san,
 				comment: parsed.comment,
 				shapes: parsed.shapes,
 				fenAfter: makeFen( mainPos.toSetup() ),
+				...( moveLastMove ? { lastMove: moveLastMove } : {} ),
 			} );
 
 			node = child;
@@ -388,6 +399,9 @@ export function parsePosiPlanPgn(
 			moves: [ ...currentPgnMoves ],
 			startingComment: stageStartingComment,
 			startingShapes: stageStartingShapes,
+			...( stageStartingLastMove
+				? { startingLastMove: stageStartingLastMove }
+				: {} ),
 		} );
 	}
 

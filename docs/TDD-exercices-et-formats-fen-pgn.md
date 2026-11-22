@@ -103,8 +103,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Étape `qcm`** : Affiche la FEN exacte au nœud d'embranchement (avant le choix du coup).
   - Orientation : déduite du trait de la FEN initiale de la partie.
 - **Affiché vs Caché** :
-  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` (pas de bouton Fin), zone de commentaire sous l'échiquier (`💬 ...`), et shapes du coup courant (ou `startingShapes` au départ).
-  - **Étape `qcm`** : Échiquier en lecture seule avec les **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`) formatés via `formatMoveWithFrenchSan` (libellé français + SAN française entre parenthèses sans le symbole `#` pour ne pas révéler le mat). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
+  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` (pas de bouton Fin), zone de commentaire sous l'échiquier (`💬 ...`), surbrillance du dernier coup (`lastMove` / `startingLastMove`), et shapes du coup courant (ou `startingShapes` au départ).
+  - **Étape `qcm`** : Échiquier en lecture seule avec surbrillance du dernier coup précédant l'embranchement (`lastMove`), **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`) formatés via `formatMoveWithFrenchSan` (libellé français + SAN française entre parenthèses sans le symbole `#` pour ne pas révéler le mat). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
 - **Condition stricte de création d'une étape QCM (`hasValidQcmArrows`)** :
   - Le parser ne crée un embranchement `qcm` que si **les 2 conditions** sont réunies sur le nœud :
     1. Le nœud possède **plus d'un coup enfant** (`node.children.length > 1` : ligne principale + variantes).
@@ -132,8 +132,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Mode `main_branch`** : Démarre **après le 1er coup de la branche principale** (joué lors du choix initial) et enchaîne les sous-étapes `pgn` et `qcm` extraites de la suite.
 - **Affiché vs Caché** :
   - **Mode `initial_choice`** : Échiquier `view-only`, barre `"Trouve le bon plan"`, boutons correspondant aux coups candidats à la racine du PGN (`root.children`, non mélangés : principale + variantes).
-  - **Mode `variant_view`** : Bandeau jaune/warning `"Variante alternative : ..."`, bouton `"Choix initial"`, échiquier `view-only`, contrôles `Début / Précédent / Suivant`, zone de commentaire, et bouton `"Retourner au choix initial"` en fin de variante.
-  - **Mode `main_branch`** : Alternance `pgn` (contrôles + commentaires) et `qcm` (barre `"Trouve le coup suivant"` + choix mélangés).
+  - **Mode `variant_view`** : Bandeau jaune/warning `"Variante alternative : ..."`, bouton `"Choix initial"`, échiquier `view-only` avec surbrillance du dernier coup (`lastMove`), contrôles `Début / Précédent / Suivant`, zone de commentaire, et bouton `"Retourner au choix initial"` en fin de variante.
+  - **Mode `main_branch`** : Alternance `pgn` (contrôles + commentaires + `lastMove` / `startingLastMove`) et `qcm` (surbrillance du coup précédent `lastMove` + barre `"Trouve le coup suivant"` + choix mélangés).
 - **Changement de vue** :
   - Clic sur une **variante alternative** au choix initial → bascule immédiate en `variant_view`.
   - Clic sur `"Choix initial"` ou `"Retourner au choix initial"` → retour en `initial_choice`.
@@ -177,8 +177,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Les diagrammes suivants sont capturés tous les **2 demi-coups** (un tour complet).
   - Le dernier coup restant constitue le puzzle final (`solution: [dernierCoup]`) avec `lastMoveHighlight` sur le coup précédent.
 - **Position initiale affichée & Affiché vs Caché selon les 3 sous-étapes** :
-  1. **`selection`** : Grille 2 colonnes de tous les mini-diagrammes restants dans la banque (mélangés), avec coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
-  2. **`ordonnancement`** : Grille 2 colonnes des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
+  1. **`selection`** : Grille 2 colonnes de tous les mini-diagrammes restants dans la banque (mélangés), avec surbrillance du dernier coup (`lastMoveHighlight`) menant à chaque position et coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
+  2. **`ordonnancement`** : Grille 2 colonnes des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), avec surbrillance du dernier coup (`lastMoveHighlight`), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
   3. **`resolution`** : Grand échiquier `PuzzleViewer` sur la position finale de la série (avec `shapes` et `lastMoveHighlight`).
 - **Changement de vue** :
   - `selection` → `ordonnancement` : Lorsque les N cartes sélectionnées appartiennent toutes à la même partie, clic sur `Classer la série` dans `SeriesCardFooter`.

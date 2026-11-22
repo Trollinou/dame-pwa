@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="chessboard-container chessboard-container--mini">
-          <DiagramViewer :fen="item.fen" :orientation="item.orientation" />
+          <DiagramViewer :fen="item.fen" :orientation="item.orientation" :last-move="item.lastMoveHighlight" />
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
           </div>
 
           <div class="chessboard-container chessboard-container--mini">
-            <DiagramViewer :fen="item.fen" :orientation="item.orientation" />
+            <DiagramViewer :fen="item.fen" :orientation="item.orientation" :last-move="item.lastMoveHighlight" />
           </div>
         </div>
       </div>
@@ -129,6 +129,7 @@ interface Diagramme {
   orientation: 'white' | 'black';
   serieIndex: number;
   ordre: number;
+  lastMoveHighlight?: Key[];
 }
 
 interface ReplayMove {
@@ -548,15 +549,20 @@ const initExercice = () => {
   const bank: Diagramme[] = [];
   const solutions: Solution[] = [];
 
-  const parseSanAndPlay = (pos: Chess, san: string) => {
+  const parseSanAndPlay = (pos: Chess, san: string): Key[] | undefined => {
     try {
       const parsed = parseSan(pos, san);
       if (parsed) {
+        const lastMove = isNormal(parsed)
+          ? ([makeSquare(parsed.from) as Key, makeSquare(parsed.to) as Key] as Key[])
+          : undefined;
         pos.play(parsed);
+        return lastMove;
       }
     } catch {
       // Ignorer si le coup est invalide
     }
+    return undefined;
   };
 
   for (let serieIndex = 0; serieIndex < Math.min(config.series.length, nbSeries.value); serieIndex++) {
@@ -592,14 +598,22 @@ const initExercice = () => {
 
     let startIndex = 0;
     const replayPos = tempPos.clone();
+    let diag0LastMove: Key[] | undefined = undefined;
 
     const joueurDoitJouer = (orientation === 'white' && tourInitial === 'white') || (orientation === 'black' && tourInitial === 'black');
     if (!joueurDoitJouer && history.length > 0) {
-      parseSanAndPlay(replayPos, history[0]);
+      diag0LastMove = parseSanAndPlay(replayPos, history[0]);
       startIndex = 1;
     }
 
-    const diag0: Diagramme = { id: `${serieIndex}-0`, fen: makeFen(replayPos.toSetup()), orientation, serieIndex, ordre: 0 };
+    const diag0: Diagramme = {
+      id: `${serieIndex}-0`,
+      fen: makeFen(replayPos.toSetup()),
+      orientation,
+      serieIndex,
+      ordre: 0,
+      ...(diag0LastMove ? { lastMoveHighlight: diag0LastMove } : {})
+    };
     bank.push(diag0);
     diagrammesOriginalParSerie[serieIndex].push(diag0);
 
@@ -608,11 +622,19 @@ const initExercice = () => {
     let i = startIndex;
 
     while (ordre < nbDiagrammesPerSerie.value && i < maxIndexPourReconstitution) {
-      if (i < maxIndexPourReconstitution) parseSanAndPlay(replayPos, history[i]);
-      if (i + 1 < maxIndexPourReconstitution) parseSanAndPlay(replayPos, history[i + 1]);
+      let stepLastMove: Key[] | undefined = undefined;
+      if (i < maxIndexPourReconstitution) stepLastMove = parseSanAndPlay(replayPos, history[i]) ?? stepLastMove;
+      if (i + 1 < maxIndexPourReconstitution) stepLastMove = parseSanAndPlay(replayPos, history[i + 1]) ?? stepLastMove;
       i += 2;
 
-      const diagN: Diagramme = { id: `${serieIndex}-${ordre}`, fen: makeFen(replayPos.toSetup()), orientation, serieIndex, ordre };
+      const diagN: Diagramme = {
+        id: `${serieIndex}-${ordre}`,
+        fen: makeFen(replayPos.toSetup()),
+        orientation,
+        serieIndex,
+        ordre,
+        ...(stepLastMove ? { lastMoveHighlight: stepLastMove } : {})
+      };
       bank.push(diagN);
       diagrammesOriginalParSerie[serieIndex].push(diagN);
       ordre++;

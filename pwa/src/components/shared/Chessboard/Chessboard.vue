@@ -106,7 +106,7 @@ const chessPreferences = useChessPreferencesStore();
 const props = withDefaults(defineProps<ChessboardProps>(), {
   viewOnly: true,
   orientation: 'white',
-  highlightLastMove: false,
+  highlightLastMove: true,
   coordinates: true,
   autoCastling: true,
   stockfishEnabled: false,
@@ -143,7 +143,7 @@ const applyGlyphsToApi = (
 const handleBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
   if (props.fen && props.fen !== 'start') {
-    api.setPosition(props.fen);
+    api.setPosition(props.fen, props.lastMove);
   }
   if (props.glyphs) {
     applyGlyphsToApi(api, props.glyphs);
@@ -155,7 +155,10 @@ watch(
   () => props.fen,
   (newFen) => {
     if (boardApi.value && newFen) {
-      boardApi.value.setPosition(newFen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : newFen);
+      boardApi.value.setPosition(
+        newFen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : newFen,
+        props.lastMove
+      );
     }
   }
 );
@@ -193,12 +196,15 @@ watch(
 );
 
 const normalizedDiagram = computed(() => {
-  if (props.fen === undefined && props.shapes === undefined) {
+  if (props.fen === undefined && props.shapes === undefined && props.lastMove === undefined) {
     return undefined;
   }
   return {
     fen: props.fen ?? 'start',
-    shapes: props.shapes ?? []
+    shapes: props.shapes ?? [],
+    ...(props.lastMove && props.lastMove.length === 2
+      ? { lastMove: props.lastMove as [Key, Key] }
+      : {})
   };
 });
 
@@ -241,8 +247,9 @@ const zoomBoardConfig = computed<ChessboardConfig>(() => ({
     enabled: false
   },
   highlight: {
-    lastMove: false
-  }
+    lastMove: props.highlightLastMove
+  },
+  ...(props.lastMove && props.lastMove.length > 0 ? { lastMove: props.lastMove } : {})
 }));
 
 const resolvedPlayerColor = computed(() => {
