@@ -228,9 +228,9 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
      - **Validation** : Interdit sur case rouge. Si la pièce atteint `case_arrivee` alors qu'il reste au moins une pièce adverse sur l'échiquier → erreur `"Il reste des pièces à manger !"`. Gagné quand toutes les pièces adverses sont capturées et `to === case_arrivee`.
 
   3. **Variante `stealth` (Pas vu, pas pris)** :
-     - **Sous-mode Cible** (`case_arrivee` fournie et différente de `case_depart`) : `fen_depart` avec pièce retirée sur `case_arrivee` si présente ; flèches cachées jusqu'à résolution.
-     - **Sous-mode Boucle (`isLoop`)** (`case_arrivee` absente ou égale à `case_depart`) : `fen_depart` intacte. Utilise `LoopTracker` (suivi angulaire autour de la pièce adverse extraite de la FEN, 4 quadrants + rotation ≥ 95 % + retour à `case_depart` en ≥ 4 coups).
-     - **Validation** : Interdit sur case rouge (`"Case interdite !"`) et interdit sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`).
+     - **Sous-mode Cible** (`case_arrivee` fournie et différente de `case_depart`) : `fen_depart` avec pièce retirée sur `case_arrivee` si présente ; flèches et cercles rouges (`red`/`r`) cachés jusqu'à résolution.
+     - **Sous-mode Boucle (`isLoop`)** (`case_arrivee` absente ou égale à `case_depart`) : `fen_depart` intacte. Utilise `LoopTracker` (suivi angulaire autour de la pièce adverse extraite de la FEN, 4 quadrants + rotation ≥ 95 % + retour à `case_depart` en ≥ 4 coups). Flèches et cercles rouges (`red`/`r`) cachés jusqu'à résolution.
+     - **Validation** : Les cercles rouges ne sont **pas** considérés comme des cases piégées. Interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`).
 
   4. **Variante `traces` (Qui a laissé ces traces ?)** :
      - **Position affichée** : **Échiquier VIDE** (`8/8/8/8/8/8/8/8 w - - 0 1`), `view-only`.
@@ -239,9 +239,9 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
   5. **Variante `developpement` (Destination cachée — dérivée de `stealth`)** :
      - **Position affichée** : `fen_depart` intacte (la destination finale est toujours libre).
-     - **Affiché vs Caché** : Toutes les flèches et la case cible (**cercle vert** ou **cercle bleu cible** au format alternatif sans cercle vert) sont **cachées** au départ. Seules d'éventuelles cases rouges interdites et l'éventuel cercle bleu de départ (`case_depart`) restent visibles.
+     - **Affiché vs Caché** : Toutes les flèches, les cercles rouges (`red`/`r`) et la case cible (**cercle vert** ou **cercle bleu cible** au format alternatif sans cercle vert) sont **cachés** au départ et révélés uniquement une fois résolu. Seul l'éventuel cercle bleu de départ (`case_depart`) reste visible.
      - **Résolution de la cible (`extractDeveloppementTargetSquare`)** : Priorité à `case_arrivee`, sinon cercle vert dans `shapes`, sinon cercle bleu dans `shapes` différent de `case_depart`. Jamais en mode boucle (`isLoop = false`).
-     - **Validation** : Mêmes contraintes que `stealth` : interdit sur case rouge (`"Case interdite !"`) et sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`). Gagné dès que la pièce atteint la case cible par **n'importe quel chemin légal** sûr.
+     - **Validation** : Mêmes contraintes que `stealth` : les cercles rouges ne sont **pas** considérés comme des cases piégées ; interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`). Gagné dès que la pièce atteint la case cible par **n'importe quel chemin légal** sûr.
 
 - **Après une réponse (toutes variantes de déplacement)** :
   - **Coup invalide** : Feedback rouge + réinitialisation complète de la position (`resetPosition()`) après **400 ms**.
@@ -417,3 +417,4 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 | :--- | :--- | :--- | :--- |
 | `1.0.0` | `1.13.11` | `2026-11-21` | Rédaction initiale des spécifications TDD & Guide Entraîneur pour les Types 1 à 16. |
 | `1.1.0` | `1.13.11` | `2026-11-21` | **Type 9 (Parcours)** : ajout de la 5ᵉ variante `developpement` (dérivée de `stealth` à destination cachée, support double format Bleu+Vert et Cercle Bleu seul). |
+| `1.2.0` | `1.13.13` | `2026-11-22` | **Type 9 (`stealth` & `developpement`)** : les cercles rouges ne sont plus considérés comme des cases piégées, sont masqués au départ et révélés une fois la solution trouvée. |

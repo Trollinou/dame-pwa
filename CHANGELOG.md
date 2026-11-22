@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Type 9 (`stealth` & `developpement`) — Masquage initial et désactivation du piège sur les cercles rouges (`parcoursVariants.ts`, `ParcoursViewer.vue`, `TypeParcours.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Suppression de la vérification `isRedSquare()` dans `validateStealthConstraints()` afin que les cercles rouges ne soient pas considérés comme des cases piégées pour les variantes `stealth` et `developpement` (uniquement les cases attaquées par l'adversaire).
+  - Masquage des cercles rouges (`red`/`r`) dans `effectiveShapes` de `ParcoursViewer.vue` avant résolution pour `stealth` et `developpement`, puis révélation complète de toutes les `shapes` une fois l'exercice résolu.
+
 - **Surbrillance du dernier coup (`lastMove` / `highlightLastMove`) sur les exercices (`Chessboard.vue`, `DiagramViewer.vue`, `chessNotation.ts`, `TypeMarcheHeros.vue`, `TypePartieHeros.vue`, `partieHerosParser.ts`, `TypePosiPlan.vue`, `posiPlanParser.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Activation par défaut de `highlightLastMove: true` dans le wrapper `Chessboard.vue` (aligné sur `eg-chessboard` 1.8.7), transmission de `props.lastMove` dans `setPosition(fen, lastMove)`, `normalizedDiagram` et `zoomBoardConfig` afin de préserver la surbrillance sur les positions statiques.
   - Ajout de la prop `lastMove` (et `highlightLastMove`) sur `DiagramViewer.vue`.

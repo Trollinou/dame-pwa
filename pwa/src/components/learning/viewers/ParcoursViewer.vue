@@ -136,6 +136,12 @@ const resolvedDeveloppementTarget = computed(() => {
   );
 });
 
+const isArrowShape = (s: DrawShape): boolean =>
+  Boolean(s.dest && s.dest.toLowerCase() !== s.orig.toLowerCase());
+
+const isRedShape = (s: DrawShape): boolean =>
+  s.brush === 'red' || s.brush === 'r';
+
 const effectiveShapes = computed<DrawShape[]>(() => {
   if (props.isSolved) {
     return props.shapes || [];
@@ -144,7 +150,11 @@ const effectiveShapes = computed<DrawShape[]>(() => {
     const targetLower = resolvedDeveloppementTarget.value?.toLowerCase();
     return (props.shapes || []).filter((s) => {
       // Masquer toutes les flèches
-      if (s.dest && s.dest.toLowerCase() !== s.orig.toLowerCase()) {
+      if (isArrowShape(s)) {
+        return false;
+      }
+      // Masquer les cercles rouges (non utilisés comme cases piégées en développement, révélés à la résolution)
+      if (isRedShape(s)) {
         return false;
       }
       // Masquer les cercles verts de destination
@@ -162,11 +172,15 @@ const effectiveShapes = computed<DrawShape[]>(() => {
       return true;
     });
   }
-  if (props.variante === 'standard' || props.variante === 'stealth') {
-    // Ne pas afficher les flèches lors de l'affichage initial
+  if (props.variante === 'stealth') {
+    // Ne pas afficher les flèches ni les cercles rouges lors de l'affichage initial
     return (props.shapes || []).filter(
-      (s) => !s.dest || s.dest.toLowerCase() === s.orig.toLowerCase()
+      (s) => !isArrowShape(s) && !isRedShape(s)
     );
+  }
+  if (props.variante === 'standard') {
+    // Ne pas afficher les flèches lors de l'affichage initial
+    return (props.shapes || []).filter((s) => !isArrowShape(s));
   }
   return props.shapes || [];
 });
