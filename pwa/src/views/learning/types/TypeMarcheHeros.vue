@@ -52,12 +52,22 @@
     <!-- SOUS-ÉTAPE 3 : Résolution du coup suivant -->
     <div v-else-if="sousEtape === 'resolution'" class="animate-fade-in learning-step-resolution">
       <div v-if="solutionCourante" class="learning-full-width">
+        <Chessboard
+          v-if="showResolutionReplay"
+          :key="`replay-${serieCouranteIndex}`"
+          :fen="solutionCourante.fenInitiale"
+          :orientation="solutionCourante.orientation"
+          :player-color="solutionCourante.orientation"
+          :view-only="true"
+          @board-created="onReplayBoardCreated"
+        />
         <PuzzleViewer
+          v-else
           :key="`puzzle-${serieCouranteIndex}`"
           :fen="solutionCourante.fenDepart"
           :couleur-joueur="solutionCourante.orientation"
           :solution="solutionCourante.solution"
-          :shapes="solutionCourante.shapes"
+          :shapes="[]"
           :lastMoveHighlight="solutionCourante.lastMoveHighlight"
           :disable-feedback-toast="true"
           @success="handlePuzzleSuccess"
@@ -81,19 +91,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { Chess, makeSquare } from 'chessops';
 import { parseFen, makeFen } from 'chessops/fen';
 import { parseSan } from 'chessops/san';
 import { parsePgn } from 'chessops/pgn';
 import { isNormal } from 'chessops/types';
+import { Chessboard } from '@/components/shared/Chessboard';
 import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import PuzzleViewer from '@/components/learning/viewers/PuzzleViewer.vue';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
-import { shuffleArray, shuffleNonSorted } from '@/utils/chess/chessNotation';
+import { shuffleArray, shuffleNonSorted, extractShapesAndComment } from '@/utils/chess/chessNotation';
 
-import type { Key, DrawShape } from 'eg-chessboard';
+import type { BoardCore, Key, DrawShape } from 'eg-chessboard';
 import type { ExerciseType7Config } from '@/types/roi';
 
 interface Serie {
@@ -120,11 +131,19 @@ interface Diagramme {
   ordre: number;
 }
 
+interface ReplayMove {
+  san: string;
+  shapes: DrawShape[];
+}
+
 interface Solution {
   fenDepart: string;
+  fenInitiale: string;
   orientation: 'white' | 'black';
   solution: string[];
   shapes: DrawShape[];
+  initialShapes: DrawShape[];
+  replayMoves: ReplayMove[];
   lastMoveHighlight?: Key[];
 }
 
@@ -163,10 +182,32 @@ const itemsEnCoursOrdonnancement = ref<Diagramme[]>([]);
 let diagrammesOriginalParSerie: Diagramme[][] = [];
 const solutionsSeries = ref<Solution[]>([]);
 
-// Puzzle résolu pour la série courante
-const isPuzzleSolved = ref(false);
+// Puzzle résolu et replay automatique pour la série courante
+const isPuzzleMoveFound = ref(false);
+const showResolutionReplay = ref(false);
+const hasCompletedFirstReplay = ref(false);
 const puzzleError = ref<string | null>(null);
 let puzzleErrorTimer: ReturnType<typeof setTimeout> | null = null;
+let replayStartTimer: ReturnType<typeof setTimeout> | null = null;
+let replayStepTimer: ReturnType<typeof setTimeout> | null = null;
+
+const clearReplayTimers = () => {
+  if (replayStartTimer) {
+    clearTimeout(replayStartTimer);
+    replayStartTimer = null;
+  }
+  if (replayStepTimer) {
+    clearTimeout(replayStepTimer);
+    replayStepTimer = null;
+  }
+};
+
+const resetResolutionState = () => {
+  clearReplayTimers();
+  isPuzzleMoveFound.value = false;
+  showResolutionReplay.value = false;
+  hasCompletedFirstReplay.value = false;
+};
 
 // Sous-titre ou consigne contextuelle
 const consigneCourante = computed(() => {
@@ -222,7 +263,7 @@ const isCurrentStepSolved = computed(() => {
     return isOrdonnancementValid.value;
   }
   if (sousEtape.value === 'resolution') {
-    return isPuzzleSolved.value;
+    return isPuzzleMoveFound.value && hasCompletedFirstReplay.value;
   }
   return false;
 });
@@ -257,7 +298,7 @@ const currentStepFeedback = computed<CardFeedback | null>(() => {
   }
 
   if (sousEtape.value === 'resolution') {
-    if (isPuzzleSolved.value) {
+    if (isPuzzleMoveFound.value) {
       return {
         type: 'success',
         message: 'Coup décisif trouvé !'
@@ -291,6 +332,9 @@ const currentStepPendingHint = computed(() => {
       return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touchez une autre position pour permuter.`;
     }
     return 'Touchez 2 cartes pour permuter leur ordre chronologique';
+  }
+  if (isPuzzleMoveFound.value && !hasCompletedFirstReplay.value) {
+    return 'Démonstration de la série en cours...';
   }
   return 'Trouvez le bon coup sur l\'échiquier';
 });
@@ -358,7 +402,68 @@ const handleCardClickSwap = (index: number) => {
 const handlePuzzleSuccess = () => {
   if (puzzleErrorTimer) clearTimeout(puzzleErrorTimer);
   puzzleError.value = null;
-  isPuzzleSolved.value = true;
+  isPuzzleMoveFound.value = true;
+
+  const currentSolution = solutionCourante.value;
+  if (!currentSolution || currentSolution.replayMoves.length === 0) {
+    hasCompletedFirstReplay.value = true;
+    return;
+  }
+
+  clearReplayTimers();
+  replayStartTimer = setTimeout(() => {
+    showResolutionReplay.value = true;
+  }, 600);
+};
+
+const onReplayBoardCreated = (api: BoardCore) => {
+  const currentSolution = solutionCourante.value;
+  if (!currentSolution) return;
+
+  const { fenInitiale, initialShapes, replayMoves } = currentSolution;
+  if (replayMoves.length === 0) {
+    hasCompletedFirstReplay.value = true;
+    return;
+  }
+
+  let currentMoveIndex = 0;
+
+  const applyInitialState = () => {
+    api.setPosition(fenInitiale);
+    api.setShapes(initialShapes);
+  };
+
+  const playStep = () => {
+    if (sousEtape.value !== 'resolution' || !showResolutionReplay.value) return;
+
+    if (currentMoveIndex < replayMoves.length) {
+      const step = replayMoves[currentMoveIndex];
+      try {
+        api.move(step.san);
+        api.setShapes(step.shapes);
+      } catch {
+        // Ignorer si le coup échoue
+      }
+      currentMoveIndex++;
+
+      if (currentMoveIndex >= replayMoves.length) {
+        hasCompletedFirstReplay.value = true;
+      }
+
+      replayStepTimer = setTimeout(playStep, 1000);
+    } else {
+      // Fin de la séquence : pause de 2500ms, réinitialisation et reprise
+      replayStepTimer = setTimeout(() => {
+        if (sousEtape.value !== 'resolution' || !showResolutionReplay.value) return;
+        applyInitialState();
+        currentMoveIndex = 0;
+        replayStepTimer = setTimeout(playStep, 1000);
+      }, 2500);
+    }
+  };
+
+  applyInitialState();
+  replayStepTimer = setTimeout(playStep, 1000);
 };
 
 const handlePuzzleError = () => {
@@ -389,17 +494,18 @@ const passerEtapeSuivante = () => {
 
   if (sousEtape.value === 'ordonnancement') {
     if (!isOrdonnancementValid.value) return;
-    isPuzzleSolved.value = false;
+    resetResolutionState();
     sousEtape.value = 'resolution';
     return;
   }
 
   if (sousEtape.value === 'resolution') {
-    if (!isPuzzleSolved.value) return;
+    if (!isCurrentStepSolved.value) return;
+
+    resetResolutionState();
 
     if (serieCouranteIndex.value < nbSeries.value - 1) {
       serieCouranteIndex.value++;
-      isPuzzleSolved.value = false;
 
       // Pour la dernière série, si les cartes restantes correspondent exactement à la dernière série
       if (serieCouranteIndex.value === nbSeries.value - 1) {
@@ -436,7 +542,7 @@ const initExercice = () => {
   sousEtape.value = 'selection';
   itemsSelectionnes.value = [];
   itemsEnCoursOrdonnancement.value = [];
-  isPuzzleSolved.value = false;
+  resetResolutionState();
 
   diagrammesOriginalParSerie = Array.from({ length: nbSeries.value }, () => []);
   const bank: Diagramme[] = [];
@@ -460,14 +566,24 @@ const initExercice = () => {
     const fenInitiale = game?.headers.get('FEN') || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
     const history: string[] = [];
+    const replayMoves: ReplayMove[] = [];
     if (game) {
       let node = game.moves;
       while (node.children.length > 0) {
         const child = node.children[0];
         history.push(child.data.san);
+        const parsedComment = extractShapesAndComment(child.data?.comments);
+        replayMoves.push({
+          san: child.data.san,
+          shapes: parsedComment.shapes as DrawShape[],
+        });
         node = child;
       }
     }
+    const rootParsed = extractShapesAndComment(game?.comments);
+    const initialShapes = (
+      rootParsed.shapes.length > 0 ? rootParsed.shapes : (serie.shapes || [])
+    ) as DrawShape[];
 
     const initSetup = parseFen(fenInitiale);
     const tempPos = initSetup.isOk ? Chess.fromSetup(initSetup.value).unwrap() : Chess.default();
@@ -523,9 +639,12 @@ const initExercice = () => {
 
     solutions.push({
       fenDepart: makeFen(replayPos.toSetup()),
+      fenInitiale,
       orientation,
       solution: [dernierCoup],
-      shapes: serie.shapes || [],
+      shapes: [],
+      initialShapes,
+      replayMoves,
       ...(lastMoveHighlight ? { lastMoveHighlight } : {})
     });
   }
@@ -536,6 +655,14 @@ const initExercice = () => {
 
 onMounted(() => {
   initExercice();
+});
+
+onBeforeUnmount(() => {
+  clearReplayTimers();
+  if (puzzleErrorTimer) {
+    clearTimeout(puzzleErrorTimer);
+    puzzleErrorTimer = null;
+  }
 });
 
 watch(

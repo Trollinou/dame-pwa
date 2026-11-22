@@ -187,7 +187,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Après une réponse** :
   - `selection` : Si N cartes sélectionnées de parties différentes → feedback rouge immédiat ; si même partie → feedback vert + bouton `Classer la série`.
   - `ordonnancement` : Dès que l'ordre est exact → feedback vert `"Chronologie exacte ! Bravo."` + bouton `Coup suivant`.
-  - `resolution` : Mauvais coup → annulé + feedback rouge `"Mauvais coup, cherchez encore !"` (2500 ms). Bon coup → feedback vert `"Coup décisif trouvé !"` + bouton `Série suivante`.
+  - `resolution` : Mauvais coup → annulé sans aucune shape affichée + feedback rouge `"Mauvais coup, cherchez encore !"` (2500 ms). Bon coup → feedback vert `"Coup décisif trouvé !"`, puis après `600 ms`, bascule en mode lecture seule pour rejouer automatiquement le mini-PGN complet depuis la position initiale à raison d'un ply par seconde (`1000 ms`) avec les shapes de chaque ply (boucle avec pause de `2500 ms` en fin de séquence). Le bouton `Série suivante` (et le déclenchement des confettis sur la dernière série) reste bloqué jusqu'à la fin du premier passage complet de l'animation.
 - **Rédaction Entraîneur** :
   - Choisir le `mode` (`3x5` ou `5x3`) et fournir 3 ou 5 `series` avec `pgn_data`, `couleur_joueur`, et optionnellement `shapes`.
   - Chaque PGN doit contenir **au moins `(nbDiagrammes - 1) * 2 + 1` demi-coups** (soit min 9 demi-coups pour `3x5`, 5 demi-coups pour `5x3`) afin de générer tous les diagrammes + le coup final à trouver.
