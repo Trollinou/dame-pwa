@@ -1,10 +1,24 @@
 /**
  * Styles de mise en page (Layout) unifiés pour la section Apprentissage.
- * Respecte le principe KISS :
- * - Mobile portrait par défaut (centré, 1 colonne, zéro-scroll vertical).
- * - Grille multi-échiquiers 2 par ligne (.learning-board-grid-2col).
- * - Bascule 2 colonnes automatique pour Tablette Paysage / PC.
+ * Seuils unifiés :
+ * - Mobile (portrait & paysage) : 1 colonne par défaut (pas de bascule paysage).
+ * - Tablette Portrait : @include learning-tablet-portrait (1 colonne élargie à 720px).
+ * - Tablette Paysage & Ordinateur : @include learning-landscape (2+ colonnes, jusqu'à 1040px).
+ * - Exception Type 15 (Jugement Final) : toujours en 2 colonnes sur tous appareils.
  */
+
+@mixin learning-tablet-portrait {
+  @media (min-width: 768px) and (min-height: 560px) and (orientation: portrait) {
+    @content;
+  }
+}
+
+@mixin learning-landscape {
+  @media (min-width: 992px) and (min-height: 560px),
+         (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+    @content;
+  }
+}
 
 /* ==========================================================================
    1. Conteneurs de base & Safe Areas
@@ -12,8 +26,17 @@
 
 .contenu-ion-content .safe-area-wrapper,
 .learning-layout .safe-area-wrapper {
-  max-width: 800px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
+
+  @include learning-tablet-portrait {
+    max-width: 720px;
+  }
+
+  @include learning-landscape {
+    max-width: 1040px;
+  }
 }
 
 .exercise-viewer-layout {
@@ -27,18 +50,26 @@
 
 .exercise-stage {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   flex: 1;
   min-height: 100%;
   box-sizing: border-box;
+
+  @include learning-tablet-portrait {
+    max-width: 720px;
+  }
+
+  @include learning-landscape {
+    max-width: 1040px;
+  }
 }
 
 .etape-container {
   width: 100%;
-  max-width: 500px;
+  max-width: 100%;
   margin: 0 auto;
   flex: 1;
   display: flex;
@@ -101,14 +132,22 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
   padding-bottom: 24px;
+
+  @include learning-tablet-portrait {
+    max-width: 720px;
+  }
+
+  @include learning-landscape {
+    max-width: 960px;
+  }
 }
 
 .diagram-viewer-container {
   width: 100%;
-  max-width: min(100%, 38dvh, 440px);
+  max-width: min(100%, 42dvh, 460px);
   margin: 16px auto;
 }
 
@@ -117,12 +156,20 @@
 .exercice-type-parcours,
 .exercice-type-partie-heros {
   width: 100%;
-  max-width: 500px;
+  max-width: 100%;
   margin: 0 auto;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 100%;
+
+  @include learning-tablet-portrait {
+    max-width: 720px;
+  }
+
+  @include learning-landscape {
+    max-width: 1040px;
+  }
 }
 
 .phase-container {
@@ -136,8 +183,16 @@
 
 .pgn-card-wrapper {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
+
+  @include learning-tablet-portrait {
+    max-width: 720px;
+  }
+
+  @include learning-landscape {
+    max-width: 1040px;
+  }
 }
 
 /* ==========================================================================
@@ -152,12 +207,23 @@
   margin: 6px 0;
   box-sizing: border-box;
 
-  /* Si nombre impair d'éléments, centrer le dernier */
+  /* Si nombre impair d'éléments en 2 colonnes, centrer le dernier */
   & > .learning-board-card:last-child:nth-child(odd) {
     grid-column: 1 / -1;
     max-width: calc(50% - 4px);
     margin: 0 auto;
     width: 100%;
+  }
+
+  @include learning-landscape {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+
+    & > .learning-board-card:last-child:nth-child(odd) {
+      grid-column: auto;
+      max-width: none;
+      margin: 0;
+    }
   }
 }
 
@@ -178,11 +244,16 @@
 .matching-row {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 8px;
   width: 100%;
 
-  @media (max-width: 768px) {
-    gap: 8px;
+  @include learning-tablet-portrait {
+    gap: 14px;
+  }
+
+  @include learning-landscape {
+    gap: 16px;
+    align-items: center;
   }
 }
 
@@ -231,13 +302,17 @@
 
 .order-validated-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 8px;
   width: 100%;
 
-  @media (max-width: 768px) {
-    gap: 8px;
-    align-items: flex-start;
+  @include learning-tablet-portrait {
+    gap: 12px;
+  }
+
+  @include learning-landscape {
+    align-items: center;
+    gap: 14px;
   }
 }
 
@@ -252,16 +327,14 @@
 
 .vision-main-layout {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   width: 100%;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-
-  @media (min-width: 769px) {
+  @include learning-landscape {
     flex-direction: row;
     align-items: flex-start;
+    gap: 24px;
   }
 }
 
@@ -273,7 +346,7 @@
   box-sizing: border-box;
   width: 100%;
 
-  @media (min-width: 769px) {
+  @include learning-landscape {
     flex: 0 0 38%;
     max-width: 400px;
   }
@@ -288,13 +361,9 @@
 .pieces-container {
   display: grid;
   gap: 6px;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
 
-  @media (max-width: 360px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  @media (min-width: 769px) {
+  @include learning-landscape {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -312,7 +381,7 @@
   box-sizing: border-box;
 }
 
-/* Jugement Final Stage */
+/* Jugement Final Stage — Toujours en 2 colonnes sur tous appareils */
 .jugement-final-layout {
   width: 100%;
   display: flex;
@@ -322,31 +391,49 @@
 
 .observation-stage {
   width: 100%;
-  max-width: 900px;
+  max-width: 1040px;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 
-  @media (min-width: 769px) {
-    flex-direction: row;
-    align-items: flex-start;
+  @include learning-tablet-portrait {
+    gap: 18px;
+  }
+
+  @include learning-landscape {
+    gap: 24px;
   }
 }
 
 .main-board-wrapper {
   flex: 1 1 50%;
+  min-width: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .chessboard-container {
+    max-width: 100%;
+  }
 }
 
 .scenarios-container {
   flex: 1 1 50%;
+  min-width: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+
+  @include learning-tablet-portrait {
+    gap: 12px;
+  }
+
+  @include learning-landscape {
+    gap: 14px;
+  }
 }
 
 /* Parcours & Cap Ou Pas Cap Layouts */
@@ -378,12 +465,19 @@
    4. Disposition 2 Colonnes : Tablette Paysage & Ordinateur
    ========================================================================== */
 
-@media (orientation: landscape) and (min-width: 768px), (min-width: 992px) {
+@include learning-landscape {
   .exercise-stage--split,
   .exercise-stage:has(.chessboard-container + .exercise-card),
   .exercise-stage:has(.chessboard-container + .qcm-choices),
-  .exercise-stage:has(.chessboard-container + .learning-callout) {
-    max-width: 960px;
+  .exercise-stage:has(.chessboard-container + .learning-callout),
+  .exercise-viewer-layout:has(> .chessboard-container + .pgn-side-panel),
+  .exercise-viewer-layout:has(> .chessboard-container + .traces-palette-section),
+  .stage-pgn-wrapper:has(> .chessboard-container + .pgn-side-panel),
+  .stage-qcm-wrapper:has(> .chessboard-container + .learning-side-panel),
+  .cap-ou-pas-cap-viewer-wrapper {
+    width: 100%;
+    max-width: 1040px;
+    display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
@@ -391,19 +485,36 @@
     padding: 12px 16px;
 
     /* Colonne gauche (Échiquier dominant) */
-    & > .chessboard-container {
+    & > .chessboard-container,
+    & > .chessboard-panel {
       flex: 0 0 auto;
-      width: min(65vh, 480px);
-      max-width: 480px;
+      width: min(60dvh, 460px);
+      max-width: 48%;
       margin: 0;
     }
 
-    /* Colonne droite (Contenu / Consignes / Choix) */
-    & > :not(.chessboard-container) {
+    /* Colonne droite (Contenu / Consignes / Choix / Contrôles PGN) */
+    & > :not(.chessboard-container):not(.chessboard-panel) {
       flex: 1;
       min-width: 0;
       width: 100%;
       margin: 0;
+    }
+  }
+
+  /* Type 12 (Qui suis-je) : Indices à gauche, zone d'interaction à droite */
+  .exercise-stage:has(.learning-piece-palette),
+  .exercise-stage:has(.learning-interaction-column) {
+    max-width: 1040px;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    padding: 12px 16px;
+
+    & > .learning-full-width {
+      flex: 1;
+      min-width: 0;
     }
   }
 }
@@ -424,9 +535,17 @@
 }
 
 .exercice-container {
-  max-width: 600px;
-  margin: 0 auto;
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+
+  @include learning-tablet-portrait {
+    max-width: 720px;
+  }
+
+  @include learning-landscape {
+    max-width: 1040px;
+  }
 }
 
 .exercise-ion-footer {
@@ -471,7 +590,7 @@
   justify-content: flex-start;
   padding-bottom: 24px;
 
-  @media (min-width: 768px), (orientation: landscape) {
+  @include learning-landscape {
     height: 100%;
     min-height: 0;
     overflow: hidden;
@@ -487,7 +606,7 @@
   width: 100%;
   margin: 0 auto;
 
-  @media (min-width: 768px), (orientation: landscape) {
+  @include learning-landscape {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -512,9 +631,13 @@
 .board-section {
   display: block;
   width: 100%;
-  padding: 6px 0 10px 0;
+  padding: 6px 0 5px 0;
 
-  @media (min-width: 768px), (orientation: landscape) {
+  @include learning-tablet-portrait {
+    padding: 14px 0;
+  }
+
+  @include learning-landscape {
     flex: 0 0 auto;
     width: auto;
     height: 100%;
@@ -536,7 +659,11 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  @media (min-width: 768px), (orientation: landscape) {
+  @include learning-tablet-portrait {
+    max-width: min(680px, 58vh);
+  }
+
+  @include learning-landscape {
     width: min(72vh, 48vw);
     height: auto;
     max-height: calc(100vh - 140px);
@@ -557,7 +684,7 @@
   min-width: 0;
   min-height: 0;
 
-  @media (min-width: 768px), (orientation: landscape) {
+  @include learning-landscape {
     max-width: 440px;
     height: 100%;
     min-width: 280px;
@@ -624,28 +751,7 @@
   margin-top: 5px;
 }
 
-/* Adaptations Media Queries Jeu & Analyse */
-@media (min-width: 768px) and (orientation: portrait) {
-  .board-container {
-    max-width: min(680px, 58vh);
-  }
-
-  .board-section {
-    padding: 14px 0;
-  }
-}
-
-@media (max-width: 767px) and (orientation: portrait) {
-  .board-section {
-    padding-bottom: 5px !important;
-  }
-
-  .analysis-controls {
-    padding-top: 0 !important;
-  }
-}
-
-/* Stabilité Landscape Jeu & Analyse */
+/* Stabilité Landscape Jeu & Analyse (Tablette Paysage & Ordinateur uniquement) */
 .landscape-mode {
   .main-wrap {
     width: 100% !important;
@@ -684,65 +790,6 @@
 
   .analysis-controls {
     padding: 0;
-  }
-}
-
-/* Optimisation iPhone Paysage */
-@media (max-height: 500px) and (orientation: landscape) {
-  ion-header {
-    display: none !important;
-  }
-
-  .analysis-layout {
-    padding-top: 2px !important;
-    height: 100% !important;
-  }
-
-  .main-container.landscape-mode {
-    align-items: center !important;
-    padding-bottom: 2px !important;
-    gap: 15px;
-  }
-
-  .landscape-mode .board-container {
-    width: min(75vh, 48vw) !important;
-    height: auto !important;
-    aspect-ratio: 1 / 1 !important;
-  }
-
-  .side-section {
-    min-width: 180px !important;
-    height: 75vh !important;
-    max-height: none;
-  }
-
-  .history-controls {
-    padding: 2px 2px !important;
-
-    ion-grid {
-      flex: 0 0 32px !important;
-      margin-bottom: 2px !important;
-    }
-
-    ion-button {
-      height: 28px !important;
-      margin: 0 !important;
-    }
-  }
-
-  .move-history-container {
-    font-size: 0.75rem !important;
-    margin-top: 2px;
-  }
-
-  .move-group {
-    padding: 4px 2px !important;
-    font-size: 0.8rem !important;
-  }
-
-  .move-num {
-    width: 26px !important;
-    white-space: nowrap !important;
   }
 }
 

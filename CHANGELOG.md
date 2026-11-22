@@ -6,6 +6,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Unification des seuils responsive Apprentissage, Jeu & Analyse (`_learning-layout.scss`, `_learning-components.scss`, `useBoardOrientation.ts`, `AnalysisPage.vue`, `PgnViewer.vue`, `TypePartieHeros.vue`, `TypePosiPlan.vue`, `README.md`, `USING.md`)** :
+  - Introduction des mixins unifiés `@mixin learning-tablet-portrait` (`min-width: 768px` et `min-height: 560px` en portrait, `max-width: 720px`) et `@mixin learning-landscape` (`min-width: 992px` ou `(min-width: 768px) and (orientation: landscape)` avec `min-height: 560px`, `max-width: 1040px`) afin d'ignorer le basculement paysage sur smartphone (`height < 560px`), y compris sur `PlayPage` et `AnalysisPage` (`isLearningLandscapeViewport()`).
+  - Suppression du plafond fixe `600px` sur `.exercice-container` et `.exercise-stage` pour exploiter toute la largeur disponible sur mobile (`100%`), tablette portrait (`720px`) et paysage/desktop (`1040px`).
+  - **Type 15 (Jugement Final)** : affichage permanent en 2 colonnes sur tous les appareils (échiquier de départ centré verticalement à gauche, 3 scénarios à droite).
+  - **Types 7 & 11 (grilles multi-échiquiers)** : passage à 3–4 colonnes (`auto-fit`, `minmax(210px, 1fr)`) en mode Paysage.
+  - **Lecteur PGN & étapes QCM/PGN** : regroupement dans `.pgn-side-panel` et `.learning-side-panel` pour le split 2 colonnes en mode Paysage (`PgnViewer`, `TypePartieHeros`, `TypePosiPlan`, `CapOuPasCapViewer`, `QuiSuisJeViewer`, `ParcoursViewer`).
+
 ## [1.14.0] - 2026-11-22
 
 - **Type 9 (`stealth` & `developpement`) — Masquage initial et désactivation du piège sur les cercles rouges (`parcoursVariants.ts`, `ParcoursViewer.vue`, `TypeParcours.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :

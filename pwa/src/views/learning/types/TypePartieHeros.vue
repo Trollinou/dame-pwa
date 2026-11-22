@@ -17,45 +17,47 @@
           />
         </div>
 
-        <!-- Contrôles de Navigation PGN -->
-        <div class="navigation-controls">
-          <ion-button
-            fill="outline"
-            color="primary"
-            class="nav-btn"
-            :disabled="currentPgnMoveIndex < 0"
-            @click="viewPgnStart"
-            title="Début"
-          >
-            <ion-icon slot="icon-only" :icon="playBackOutline" />
-          </ion-button>
-          <ion-button
-            fill="outline"
-            color="primary"
-            class="nav-btn"
-            :disabled="currentPgnMoveIndex < 0"
-            @click="viewPgnPrevious"
-            title="Précédent"
-          >
-            <ion-icon slot="icon-only" :icon="chevronBackOutline" />
-          </ion-button>
-          <ion-button
-            fill="outline"
-            color="primary"
-            class="nav-btn"
-            :disabled="isPgnAtEnd"
-            @click="viewPgnNext"
-            title="Suivant"
-          >
-            <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
-          </ion-button>
-        </div>
+        <div class="pgn-side-panel">
+          <!-- Contrôles de Navigation PGN -->
+          <div class="navigation-controls">
+            <ion-button
+              fill="outline"
+              color="primary"
+              class="nav-btn"
+              :disabled="currentPgnMoveIndex < 0"
+              @click="viewPgnStart"
+              title="Début"
+            >
+              <ion-icon slot="icon-only" :icon="playBackOutline" />
+            </ion-button>
+            <ion-button
+              fill="outline"
+              color="primary"
+              class="nav-btn"
+              :disabled="currentPgnMoveIndex < 0"
+              @click="viewPgnPrevious"
+              title="Précédent"
+            >
+              <ion-icon slot="icon-only" :icon="chevronBackOutline" />
+            </ion-button>
+            <ion-button
+              fill="outline"
+              color="primary"
+              class="nav-btn"
+              :disabled="isPgnAtEnd"
+              @click="viewPgnNext"
+              title="Suivant"
+            >
+              <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
+            </ion-button>
+          </div>
 
-        <!-- Affichage du Commentaire du Coup Courant (hauteur constante réservée pour éviter les sauts d'interface) -->
-        <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !activePgnComment }">
-          <p class="comment-text">
-            {{ activePgnComment ? '💬 ' + activePgnComment : '' }}
-          </p>
+          <!-- Affichage du Commentaire du Coup Courant (hauteur constante réservée pour éviter les sauts d'interface) -->
+          <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !activePgnComment }">
+            <p class="comment-text">
+              {{ activePgnComment ? '💬 ' + activePgnComment : '' }}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -75,29 +77,31 @@
           />
         </div>
 
-        <!-- Consigne fixe entre l'échiquier et les 3 boutons de choix -->
-        <div class="learning-instruction-bar">
-          <span>Trouve le coup suivant</span>
-        </div>
+        <div class="learning-side-panel">
+          <!-- Consigne fixe entre l'échiquier et les 3 boutons de choix -->
+          <div class="learning-instruction-bar">
+            <span>Trouve le coup suivant</span>
+          </div>
 
-        <ion-card class="exercise-card">
-          <ion-card-content>
-            <div class="qcm-choices">
-              <ion-button
-                v-for="(choix, index) in etapeActuelle.choices"
-                :key="index"
-                expand="block"
-                fill="solid"
-                :color="couleurBoutonQcm(index)"
-                :disabled="isQcmSolved"
-                class="choice-btn"
-                @click="validerChoixQcm(index)"
-              >
-                {{ choix.label }}
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
+          <ion-card class="exercise-card">
+            <ion-card-content>
+              <div class="qcm-choices">
+                <ion-button
+                  v-for="(choix, index) in etapeActuelle.choices"
+                  :key="index"
+                  expand="block"
+                  fill="solid"
+                  :color="couleurBoutonQcm(index)"
+                  :disabled="isQcmSolved"
+                  class="choice-btn"
+                  @click="validerChoixQcm(index)"
+                >
+                  {{ choix.label }}
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
       </div>
 
       <!-- Footer Unique de Navigation par Carte pour TypePartieHeros -->

@@ -9,56 +9,58 @@
       />
     </div>
 
-    <!-- Navigation Controls -->
-    <div class="navigation-controls">
-      <ion-button
-        fill="outline"
-        color="primary"
-        class="nav-btn"
-        :disabled="isAtStart"
-        @click="viewStart"
-        title="Début"
-      >
-        <ion-icon slot="icon-only" :icon="playBackOutline"></ion-icon>
-      </ion-button>
-      <ion-button
-        fill="outline"
-        color="primary"
-        class="nav-btn"
-        :disabled="isAtStart"
-        @click="viewPrevious"
-        title="Précédent"
-      >
-        <ion-icon slot="icon-only" :icon="chevronBackOutline"></ion-icon>
-      </ion-button>
-      <ion-button
-        fill="outline"
-        color="primary"
-        class="nav-btn"
-        :disabled="isAtEnd"
-        @click="viewNext"
-        title="Suivant"
-      >
-        <ion-icon slot="icon-only" :icon="chevronForwardOutline"></ion-icon>
-      </ion-button>
-      <ion-button
-        v-if="!props.hideEndButton"
-        fill="outline"
-        color="primary"
-        class="nav-btn"
-        :disabled="isAtEnd"
-        @click="viewEnd"
-        title="Fin"
-      >
-        <ion-icon slot="icon-only" :icon="playForwardOutline"></ion-icon>
-      </ion-button>
-    </div>
+    <div class="pgn-side-panel">
+      <!-- Navigation Controls -->
+      <div class="navigation-controls">
+        <ion-button
+          fill="outline"
+          color="primary"
+          class="nav-btn"
+          :disabled="isAtStart"
+          @click="viewStart"
+          title="Début"
+        >
+          <ion-icon slot="icon-only" :icon="playBackOutline"></ion-icon>
+        </ion-button>
+        <ion-button
+          fill="outline"
+          color="primary"
+          class="nav-btn"
+          :disabled="isAtStart"
+          @click="viewPrevious"
+          title="Précédent"
+        >
+          <ion-icon slot="icon-only" :icon="chevronBackOutline"></ion-icon>
+        </ion-button>
+        <ion-button
+          fill="outline"
+          color="primary"
+          class="nav-btn"
+          :disabled="isAtEnd"
+          @click="viewNext"
+          title="Suivant"
+        >
+          <ion-icon slot="icon-only" :icon="chevronForwardOutline"></ion-icon>
+        </ion-button>
+        <ion-button
+          v-if="!props.hideEndButton"
+          fill="outline"
+          color="primary"
+          class="nav-btn"
+          :disabled="isAtEnd"
+          @click="viewEnd"
+          title="Fin"
+        >
+          <ion-icon slot="icon-only" :icon="playForwardOutline"></ion-icon>
+        </ion-button>
+      </div>
 
-    <!-- Comment Display (hauteur fixe et réservée) -->
-    <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !currentComment }">
-      <p class="comment-text">
-        {{ currentComment ? '💬 ' + currentComment : '' }}
-      </p>
+      <!-- Comment Display (hauteur fixe et réservée) -->
+      <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !currentComment }">
+        <p class="comment-text">
+          {{ currentComment ? '💬 ' + currentComment : '' }}
+        </p>
+      </div>
     </div>
   </div>
 </template>

@@ -196,7 +196,7 @@ Barre de navigation et zone d'action fixe pour les exercices, vidéos et leçons
 ### 6. Architecture CSS & Charte de Styles Unifiée de l'Apprentissage (Principe KISS)
 
 Pour garantir une expérience graphique et tactile fluide sans dispersion de code, toute la section Apprentissage est régie par une architecture SCSS centralisée dans `pwa/src/theme/learning/` :
-- **`_learning-layout.scss`** : Gestion des conteneurs (Mobile portrait centré sans scroll avec budget `38dvh`, Grille multi-échiquiers 2 par ligne `.learning-board-grid-2col`, et bascule automatique en 2 colonnes côte-à-côte pour Tablette Paysage et Ordinateur `@media (orientation: landscape) and (min-width: 768px)`).
+- **`_learning-layout.scss`** : Gestion des conteneurs et des seuils unifiés via deux mixins (`learning-tablet-portrait` à `min-width: 768px` et `min-height: 560px` en portrait → `max-width: 720px` ; `learning-landscape` à `min-width: 992px` ou `(min-width: 768px) and (orientation: landscape)` avec `min-height: 560px` → `max-width: 1040px` en 2+ colonnes). Les smartphones restent en présentation 1 colonne même en rotation paysage (à l'exception du Type 15 *Jugement final*, toujours affiché en 2 colonnes). La grille `.learning-board-grid-2col` passe automatiquement à 3–4 colonnes (`auto-fit`) en mode Paysage.
 - **`_learning-components.scss`** : Composants maîtres réutilisables basés sur les variables natives Ionic.
 
 #### ⚠️ Règle d'Or d'Architecture (KISS & Maintenance)
@@ -286,8 +286,8 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 | Famille | Classe Canonique | Usage & Description |
 | :--- | :--- | :--- |
 | **Layouts** | `.exercise-viewer-layout` | Conteneur principal flex centré (largeur 100%) pour les viewers d'exercice. |
-| | `.exercise-stage` | Sous-conteneur de phase ou étape intermédiaire d'exercice (largeur max 600px). |
-| **Échiquiers** | `.chessboard-container` | Conteneur standard responsive (ratio 1:1, portrait `max-width: min(100%, 38dvh, 440px)`, `margin: 0 auto 8px auto`, `flex-shrink: 0`, `border-radius: 0;`, `box-shadow: none;`, landscape tablette `min(65vh, 48vw)`). |
+| | `.exercise-stage` | Sous-conteneur de phase ou étape intermédiaire d'exercice (`100%` mobile, `720px` tablette portrait, `1040px` paysage). |
+| **Échiquiers** | `.chessboard-container` | Conteneur standard responsive (ratio 1:1, mobile `max-width: min(100%, 42dvh, 460px)`, tablette portrait `min(100%, 48dvh, 520px)`, paysage `min(60dvh, 460px)`, `margin: 0 auto 6px auto`, `flex-shrink: 0`, `border-radius: 0;`, `box-shadow: none;`). |
 | | `.chessboard-container--mini` | Miniaturisation (300px, `flex-shrink: 0`) pour l'appariement (`MatchingViewer`) et les choix de plans (`JugementFinalViewer`). |
 | | `.chessboard-container--small` | Variante compacte (360px, `flex-shrink: 0`) pour écrans à faible hauteur / portrait restreint. |
 | **Cartes & En-têtes** | `.exercise-card` | Carte standard pour consignes, questions et contenus (bord arrondi 8px, padding interne `8px 10px`, ombre légère). |
