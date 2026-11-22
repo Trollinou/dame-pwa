@@ -136,4 +136,16 @@ describe( 'ouvreBoiteParser', () => {
 		expect( filteredCartes[ 0 ].choix.length ).toBe( 3 );
 		expect( filteredCartes[ 0 ].solutionSan ).toBe( 'e4' );
 	} );
+
+	it( 'correctly translates rook moves with disambiguation in mini-PGNs', () => {
+		const pgnWithRook = `[FEN "r1b1k1r1/pp1p1pBp/8/b2P4/2B4q/1Q6/P4PP1/R4RK1 w - - 1 16"]
+[SetUp "1"]
+
+16. Rfe1+ { Bon coup. } (16. Bb2 { Moins bon. }) (16. Qe3+ { Moins bon. }) *`;
+
+		const carte = parseOuvreBoiteMiniPgn( pgnWithRook, 0 );
+		const rookChoice = carte.choix.find( ( c ) => c.san === 'Rfe1+' );
+		expect( rookChoice ).toBeDefined();
+		expect( rookChoice?.texte ).toBe( 'Tour f1 en e1' );
+	} );
 } );
