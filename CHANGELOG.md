@@ -6,6 +6,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Refonte de la navigation Apprentissage (`ApprentissageHubPage.vue`, `ApprentissageCoursListPage.vue`, `CoursPage.vue`, `ContenuPage.vue`, `PlayPage.vue`, `AnalysisPage.vue`, `TabsPage.vue`, `router/index.ts`, `apprentissage.ts`, `_learning-components.scss`, `apprentissageStore.spec.ts`, `README.md`, `USING.md`)** :
+  - **Hub Apprentissage à 3 panneaux** : titre simplifié en « Apprentissage », retrait du ruban « En dev » sur *Cours, Leçons & Exercices*, suppression des sous-titres et chips superflus, et ajout du 3ᵉ panneau *Analyse de partie* (en développement).
+  - **Parcours par niveaux & onglets chapitres** : ajout des getters `niveauxDisponibles`, `prochainContenuAReprendre` et `getProchainCours` dans `useApprentissageStore`, carte d'accès direct « Reprendre » colorée selon le chapitre (`N1 · Chapitre · Cours`), sélecteur de niveau dynamique (affiché dès que $\ge 2$ niveaux existent en base) et onglets par chapitre (`<ion-segment scrollable>`) pré-sélectionnés automatiquement sur la progression en cours.
+  - **Sommaire d'un cours (`CoursPage.vue`)** : remplacement du grand titre et de `.cours-meta-card` par un bandeau pleine largeur `<ion-toolbar :color="...">` aux couleurs du chapitre affichant le titre complet (`1.05rem`), le badge `X/Y` et le bouton *Continuer / Commencer*.
+  - **Barre d'onglets & vues plein écran** : intégration de `/tabs/apprentissage/cours` et `/tabs/apprentissage/cours/:id` sous `/tabs/` (avec redirections rétrocompatibles), fiabilisation du changement d'onglet dans `TabsPage.vue`, `router.replace()` dans `allerAuSuivant()` pour que `<ion-back-button>` ramène directement au cours, boutons `listOutline` (chapitres/cours) et `homeOutline` (Hub Apprentissage) dans `ContenuPage.vue`, confirmation *Reprendre plus tard / Abandonner* (`resignGame()`) au retour d'une partie en cours sur `PlayPage.vue`, et `default-href="/tabs/apprentissage"` sur `AnalysisPage.vue`.
+
 ## [1.13.13] - 2026-11-22
 
 - **Correction des shapes sur erreur & replay automatique post-résolution pour La Marche du Héros / Type 7 (`TypeMarcheHeros.vue`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
