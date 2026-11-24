@@ -13,7 +13,7 @@ describe( 'wpApi utility', () => {
 	} );
 
 	test( 'fetches single page collection and injects Authorization header if token exists', async () => {
-		localStorage.setItem( 'dame_jwt_token', 'test-token-123' );
+		localStorage.setItem( 'dame:jwt', 'test-token-123' );
 
 		const mockData = [
 			{ id: 1, name: 'Item 1' },
@@ -47,7 +47,7 @@ describe( 'wpApi utility', () => {
 	} );
 
 	test( 'fetches multi-page collection concurrently and merges results', async () => {
-		localStorage.setItem( 'dame_jwt_token', 'test-token-multi' );
+		localStorage.setItem( 'dame:jwt', 'test-token-multi' );
 
 		const page1Data = [ { id: 1 }, { id: 2 } ];
 		const page2Data = [ { id: 3 }, { id: 4 } ];
