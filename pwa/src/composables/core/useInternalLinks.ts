@@ -15,7 +15,7 @@ export function useInternalLinks() {
 	];
 
 	/**
-	 * Handler à attacher sur l'événement @click du conteneur v-html
+	 * Handler à attacher sur l'événement `@click` du conteneur `v-html`.
 	 * @param event
 	 */
 	const handleInternalLinks = ( event: MouseEvent ) => {
