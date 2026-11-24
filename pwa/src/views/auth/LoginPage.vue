@@ -20,16 +20,24 @@
 
           <div class="login-header">
             <h2>Bienvenue</h2>
-            <p>Connectez-vous à votre dossier administratif</p>
+            <p v-if="!twoFactorChallenge">Connectez-vous à votre dossier administratif</p>
+            <p v-else>Vérification en deux étapes requise</p>
           </div>
 
-          <form @submit.prevent="handleSubmit">
+          <div v-if="twoFactorChallenge" class="dame-banner dame-banner--primary ion-margin-bottom">
+            <ion-icon :icon="shieldCheckmarkOutline" color="primary"></ion-icon>
+            <p>{{ getTwoFactorProviderLabel(twoFactorChallenge.provider) }}</p>
+          </div>
+
+          <form v-if="!twoFactorChallenge" @submit.prevent="handleSubmit">
             <ion-item lines="full" class="ion-margin-bottom">
               <ion-label position="stacked">Identifiant</ion-label>
               <ion-input
                 v-model="credentials.username"
                 type="text"
                 placeholder="Nom d'utilisateur"
+                :autocorrect="false"
+                autocomplete="off"
                 required
               ></ion-input>
             </ion-item>
@@ -65,6 +73,36 @@
               </ion-button>
             </div>
           </form>
+
+          <form v-else @submit.prevent="handleVerifyTwoFactor">
+            <ion-item lines="full" class="ion-margin-bottom">
+              <ion-label position="stacked">Code de vérification</ion-label>
+              <ion-input
+                v-model="twoFactorCode"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                :autocorrect="false"
+                placeholder="Code à 6 chiffres"
+                required
+              ></ion-input>
+            </ion-item>
+
+            <ion-button
+              expand="block"
+              type="submit"
+              class="ion-margin-top"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? 'Vérification en cours...' : 'Valider le code' }}
+            </ion-button>
+
+            <div class="ion-text-center ion-margin-top">
+              <ion-button fill="clear" @click="handleCancelTwoFactor" color="medium">
+                Retour à la connexion
+              </ion-button>
+            </div>
+          </form>
         </div>
       </div>
     </ion-content>
@@ -87,16 +125,17 @@ import {
   IonBackButton,
   onIonViewWillLeave
 } from '@ionic/vue';
-import { informationCircleOutline } from 'ionicons/icons';
-import { reactive, computed } from 'vue';
+import { informationCircleOutline, shieldCheckmarkOutline } from 'ionicons/icons';
+import { reactive, computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { getTwoFactorProviderLabel } from '@/stores/auth/jwtService';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const { isLoading } = storeToRefs(authStore);
+const { isLoading, twoFactorChallenge } = storeToRefs(authStore);
 
 // Force reset isLoading to false to avoid being stuck if it was persisted as true
 authStore.isLoading = false;
@@ -109,6 +148,7 @@ const credentials = reactive({
   username: '',
   password: ''
 });
+const twoFactorCode = ref('');
 
 /**
  * Gère la soumission du formulaire
@@ -117,7 +157,26 @@ const handleSubmit = () => {
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }
+  twoFactorCode.value = '';
   authStore.login(credentials.username, credentials.password);
+};
+
+const handleVerifyTwoFactor = async () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  const success = await authStore.verifyTwoFactor(twoFactorCode.value);
+  if (success) {
+    twoFactorCode.value = '';
+  }
+};
+
+const handleCancelTwoFactor = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  twoFactorCode.value = '';
+  authStore.cancelTwoFactor();
 };
 
 const goToRegister = () => {
@@ -145,6 +204,10 @@ const handleCancel = () => {
 onIonViewWillLeave(() => {
   if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
+  }
+  twoFactorCode.value = '';
+  if (twoFactorChallenge.value) {
+    authStore.cancelTwoFactor();
   }
 });
 </script>

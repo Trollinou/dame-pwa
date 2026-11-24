@@ -1,9 +1,32 @@
 import {
 	SimpleJwtLogin,
+	SimpleJwtLoginApiError,
 	LocalStorageTokenStorage,
-	type SimpleJwtLoginApiError,
+	ERROR_CODES,
 } from 'simple-jwt-login';
 import type { TokenExpiryInfo } from './types';
+
+export const encodeBase64Utf8 = ( value: string ): string => {
+	const bytes = new TextEncoder().encode( value );
+	let binary = '';
+	for ( const byte of bytes ) {
+		binary += String.fromCharCode( byte );
+	}
+	return btoa( binary );
+};
+
+export const getTwoFactorProviderLabel = ( provider?: string ): string => {
+	switch ( provider ) {
+		case 'Two_Factor_Totp':
+			return 'Application d’authentification (TOTP)';
+		case 'Two_Factor_Email':
+			return 'Code envoyé par e-mail';
+		case 'Two_Factor_Backup_Codes':
+			return 'Code de secours';
+		default:
+			return 'Vérification en deux étapes';
+	}
+};
 
 export const getApiOrigin = (): string => {
 	const url = import.meta.env.VITE_API_BASE_URL || '';
@@ -115,4 +138,67 @@ export const translateErrorMessage = ( msg: string ): string => {
 	}
 
 	return msg;
+};
+
+export const formatJwtErrorMessage = (
+	error: unknown,
+	fallback = 'Erreur serveur.'
+): string => {
+	if ( error instanceof SimpleJwtLoginApiError ) {
+		if ( error.isErrorCode( ERROR_CODES.INVALID_CREDENTIALS ) ) {
+			return 'Identifiants incorrects.';
+		}
+		if ( error.isErrorCode( ERROR_CODES.USER_NOT_FOUND ) ) {
+			return 'Utilisateur non trouvé.';
+		}
+		if ( error.isErrorCode( ERROR_CODES.JWT_EXPIRED ) ) {
+			return 'Votre session a expiré. Veuillez vous reconnecter.';
+		}
+		if ( error.isErrorCode( ERROR_CODES.JWT_REVOKED ) ) {
+			return 'Votre session a été fermée sur le serveur.';
+		}
+		if (
+			error.isErrorCode( ERROR_CODES.JWT_NOT_BEFORE ) ||
+			error.isErrorCode( ERROR_CODES.JWT_NOT_YET_VALID ) ||
+			error.isErrorCode( ERROR_CODES.JWT_SIGNATURE_INVALID ) ||
+			error.isErrorCode( ERROR_CODES.JWT_STRUCTURAL_ERROR ) ||
+			error.isErrorCode( ERROR_CODES.JWT_AUDIENCE_MISMATCH )
+		) {
+			return 'Session invalide. Veuillez vous reconnecter.';
+		}
+		if ( error.isErrorCode( ERROR_CODES.PROTECT_ENDPOINTS_MISSING_JWT ) ) {
+			return 'Authentification requise.';
+		}
+		if (
+			error.isErrorCode( ERROR_CODES.PROTECT_ENDPOINTS_INSUFFICIENT_ROLE )
+		) {
+			return 'Droits insuffisants pour accéder à cette ressource.';
+		}
+		if ( error.isErrorCode( ERROR_CODES.TWO_FACTOR_INVALID_CODE ) ) {
+			if ( /reset/i.test( error.message ) ) {
+				return error.message;
+			}
+			return 'Code de vérification invalide. Veuillez réessayer.';
+		}
+		if (
+			error.isErrorCode( ERROR_CODES.TWO_FACTOR_INVALID_NONCE ) ||
+			error.isErrorCode( ERROR_CODES.TWO_FACTOR_INTERIM_JWT_REQUIRED ) ||
+			error.isErrorCode( ERROR_CODES.TWO_FACTOR_INTERIM_JWT_REJECTED )
+		) {
+			return 'La session de vérification 2FA a expiré. Veuillez vous reconnecter.';
+		}
+		if ( error.isErrorCode( ERROR_CODES.TWO_FACTOR_RATE_LIMITED ) ) {
+			return 'Trop de tentatives. Veuillez patienter avant de réessayer.';
+		}
+		if ( error.isErrorCode( ERROR_CODES.TWO_FACTOR_NONCE_CREATE_FAILED ) ) {
+			return 'Erreur temporaire du serveur lors de la vérification 2FA. Veuillez réessayer.';
+		}
+		return translateErrorMessage( error.message || fallback );
+	}
+
+	if ( error instanceof Error ) {
+		return translateErrorMessage( error.message || fallback );
+	}
+
+	return fallback;
 };

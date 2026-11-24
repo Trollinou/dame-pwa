@@ -4,13 +4,18 @@ import { alertController } from '@ionic/vue';
 import { App } from '@capacitor/app';
 import { queryClient } from '../queryClient';
 import router from '../router';
+import {
+	SimpleJwtLoginApiError,
+	ERROR_CODES,
+} from 'simple-jwt-login';
 import type { WpUser } from '@/types/wp';
 import type { Identity, AssociatedMember } from './auth/types';
 import {
 	createJwtSdk,
+	encodeBase64Utf8,
+	formatJwtErrorMessage,
 	getTokenExpiryInfo,
 	isTokenExpired,
-	translateErrorMessage,
 } from './auth/jwtService';
 import { useIdentitiesService } from './auth/identitiesService';
 import { useAppConfig } from './auth/appConfig';
@@ -29,15 +34,17 @@ import { useApprentissageStore } from './apprentissage';
 
 export type { AssociatedMember, Identity };
 
+export interface TwoFactorChallenge {
+	jwt: string;
+	provider: string;
+	username: string;
+}
+
 export const useAuthStore = defineStore(
 	'auth',
 	() => {
 		const isLoading = ref( false );
-
-		const getStoredToken = () => {
-			const t = localStorage.getItem( 'dame_jwt_token' );
-			return t === 'null' || t === 'undefined' || ! t ? '' : t;
-		};
+		const twoFactorChallenge = ref< TwoFactorChallenge | null >( null );
 
 		const getStoredUser = () => {
 			const u = localStorage.getItem( 'dame_user' );
@@ -61,12 +68,14 @@ export const useAuthStore = defineStore(
 			}
 		};
 
-		const token = ref( getStoredToken() );
 		const user = ref< WpUser | null >( getStoredUser() );
 		const selectedIdentity = ref< Identity | null >( getStoredIdentity() );
 		const adminMode = ref( false );
 
 		// ─── SDK simple-jwt-login & Session ───────────────────────────────────────
+		const token = ref( '' );
+		const isAuthState = ref( false );
+
 		const clearLocalSessionState = () => {
 			try {
 				queryClient.clear();
@@ -78,6 +87,7 @@ export const useAuthStore = defineStore(
 			}
 			token.value = '';
 			isAuthState.value = false;
+			twoFactorChallenge.value = null;
 			user.value = null;
 			selectedIdentity.value = null;
 			adminMode.value = false;
@@ -99,7 +109,6 @@ export const useAuthStore = defineStore(
 			( jwt ) => {
 				token.value = jwt;
 				isAuthState.value = true;
-				localStorage.setItem( 'dame_jwt_token', jwt );
 			},
 			() => {
 				clearLocalSessionState();
@@ -113,20 +122,23 @@ export const useAuthStore = defineStore(
 			}
 		);
 
-		if ( token.value && ! jwtSdk.getJwt() ) {
-			jwtSdk.setTokens( token.value );
-		} else if ( ! token.value && jwtSdk.getJwt() ) {
-			const sdkJwt = jwtSdk.getJwt() || '';
-			token.value = sdkJwt;
-			if ( sdkJwt ) {
-				localStorage.setItem( 'dame_jwt_token', sdkJwt );
+		// Migration one-shot depuis l'ancienne clé dame_jwt_token vers LocalStorageTokenStorage('dame')
+		const legacyToken = localStorage.getItem( 'dame_jwt_token' );
+		if (
+			legacyToken &&
+			legacyToken !== 'null' &&
+			legacyToken !== 'undefined'
+		) {
+			if ( ! jwtSdk.getJwt() ) {
+				jwtSdk.setTokens( legacyToken );
 			}
+			localStorage.removeItem( 'dame_jwt_token' );
 		}
 
-		const isAuthState = ref(
-			jwtSdk.isAuthenticated() ||
-				( !! token.value && token.value.length > 10 )
-		);
+		if ( jwtSdk.isAuthenticated() ) {
+			token.value = jwtSdk.getJwt() || '';
+			isAuthState.value = true;
+		}
 
 		const isAuthenticated = computed(
 			() =>
@@ -215,30 +227,26 @@ export const useAuthStore = defineStore(
 		const tryRefreshToken = async (
 			force = true
 		): Promise< string | null > => {
-			if ( token.value && ! jwtSdk.getJwt() ) {
-				jwtSdk.setTokens( token.value );
-			}
 			const newJwt = await jwtSdk.getValidJwt( force );
 			if ( newJwt ) {
 				token.value = newJwt;
 				isAuthState.value = true;
-				localStorage.setItem( 'dame_jwt_token', newJwt );
 				return newJwt;
 			}
 			// Ne déconnecter l'utilisateur que si sdk.isAuthenticated() est false
 			// (les erreurs réseau ou 5xx préservent les tokens dans le SDK)
 			if ( ! jwtSdk.isAuthenticated() ) {
 				isAuthState.value = false;
+				token.value = '';
+			} else {
+				isAuthState.value = true;
 			}
 			return null;
 		};
 
 		const validateSession = async () => {
-			if ( ! jwtSdk.isAuthenticated() && ! token.value ) {
+			if ( ! jwtSdk.isAuthenticated() ) {
 				return;
-			}
-			if ( token.value && ! jwtSdk.getJwt() ) {
-				jwtSdk.setTokens( token.value );
 			}
 
 			const currentJwt = await jwtSdk.getValidJwt();
@@ -249,7 +257,6 @@ export const useAuthStore = defineStore(
 
 			token.value = currentJwt;
 			isAuthState.value = true;
-			localStorage.setItem( 'dame_jwt_token', currentJwt );
 
 			try {
 				const response = await jwtSdk.validateToken( {
@@ -259,38 +266,100 @@ export const useAuthStore = defineStore(
 					await tryRefreshToken( true );
 				}
 			} catch ( error: unknown ) {
-				const err = error as
-					| {
-							response?: unknown;
-							data?: { message?: string };
-							message?: string;
-					  }
-					| undefined;
-				let rawResponse = '';
-				if ( typeof err?.response === 'string' ) {
-					rawResponse = err.response;
-				} else if ( typeof error === 'string' ) {
-					rawResponse = error;
-				}
+				if ( error instanceof SimpleJwtLoginApiError ) {
+					if (
+						error.isErrorCode( ERROR_CODES.VALIDATION_DISABLED )
+					) {
+						return;
+					}
 
-				if (
-					rawResponse.includes( 'not enabled' ) ||
-					rawResponse.includes( '82' )
-				) {
-					return;
-				}
+					const shouldRefresh =
+						error.isErrorCode( ERROR_CODES.JWT_EXPIRED ) ||
+						error.isErrorCode( ERROR_CODES.JWT_NOT_BEFORE ) ||
+						error.isErrorCode( ERROR_CODES.JWT_NOT_YET_VALID ) ||
+						error.isErrorCode(
+							ERROR_CODES.JWT_SIGNATURE_INVALID
+						) ||
+						error.isErrorCode(
+							ERROR_CODES.JWT_STRUCTURAL_ERROR
+						) ||
+						error.isErrorCode( ERROR_CODES.JWT_REVOKED ) ||
+						error.isErrorCode(
+							ERROR_CODES.JWT_AUDIENCE_MISMATCH
+						) ||
+						error.status === 401 ||
+						error.status === 400;
 
-				const msg = String(
-					err?.data?.message || err?.message || rawResponse
-				).toLowerCase();
-				if (
-					msg.includes( 'expired' ) ||
-					msg.includes( 'invalid' ) ||
-					msg.includes( 'revoked' )
-				) {
-					await tryRefreshToken( true );
+					if ( shouldRefresh ) {
+						await tryRefreshToken( true );
+					}
 				}
 			}
+		};
+
+		const completeAuthenticatedSession = async (
+			jwtToken: string,
+			username: string
+		) => {
+			token.value = jwtToken;
+			isAuthState.value = true;
+
+			let roles: string[] = [];
+			let displayName = username;
+			let email = '';
+
+			try {
+				const profileRes = await safeFetch(
+					'/wp/v2/users/me?context=edit'
+				);
+
+				if ( profileRes.ok ) {
+					const profile = await profileRes.json();
+					if ( profile.roles ) {
+						roles = profile.roles;
+					}
+					if ( profile.name ) {
+						displayName = profile.name;
+					}
+					if ( profile.email ) {
+						email = profile.email;
+					}
+
+					if (
+						roles.length === 1 &&
+						roles.includes( 'subscriber' )
+					) {
+						await jwtSdk.logout();
+						token.value = '';
+						isAuthState.value = false;
+						throw new Error(
+							'Veuillez valider votre adresse e-mail avant de vous connecter.'
+						);
+					}
+				}
+			} catch ( e: unknown ) {
+				const err = e as Error | undefined;
+				if (
+					err?.message &&
+					err.message.includes( 'Veuillez valider' )
+				) {
+					throw e;
+				}
+				console.warn(
+					"Profil complet non accessible, utilisation des données d'identifiants."
+				);
+			}
+
+			user.value = {
+				name: displayName,
+				email,
+				roles,
+			};
+
+			localStorage.setItem( 'dame_user', JSON.stringify( user.value ) );
+
+			useAgendaStore().clearData();
+			await checkIdentities();
 		};
 
 		const login = async ( username: string, password: string ) => {
@@ -298,11 +367,10 @@ export const useAuthStore = defineStore(
 				return;
 			}
 			isLoading.value = true;
+			twoFactorChallenge.value = null;
 
 			try {
-				const base64Password = btoa(
-					unescape( encodeURIComponent( password ) )
-				);
+				const base64Password = encodeBase64Utf8( password );
 				const authParams: {
 					password: string;
 					email?: string;
@@ -315,124 +383,32 @@ export const useAuthStore = defineStore(
 				}
 
 				const authResponse = await jwtSdk.authenticate( authParams );
+
+				if (
+					authResponse.data?.two_factor_required &&
+					authResponse.data?.jwt
+				) {
+					twoFactorChallenge.value = {
+						jwt: authResponse.data.jwt,
+						provider: authResponse.data.provider || '',
+						username,
+					};
+					return;
+				}
+
 				const jwtToken = authResponse.data?.jwt;
 
 				if ( jwtToken ) {
-					token.value = jwtToken;
-					isAuthState.value = true;
-					localStorage.setItem( 'dame_jwt_token', jwtToken );
-
-					let roles: string[] = [];
-					let displayName = username;
-					let email = '';
-
-					try {
-						const profileRes = await safeFetch(
-							'/wp/v2/users/me?context=edit',
-							{
-								headers: {
-									Authorization: `Bearer ${ token.value }`,
-								},
-							}
-						);
-
-						if ( profileRes.ok ) {
-							const profile = await profileRes.json();
-							if ( profile.roles ) {
-								roles = profile.roles;
-							}
-							if ( profile.name ) {
-								displayName = profile.name;
-							}
-							if ( profile.email ) {
-								email = profile.email;
-							}
-
-							if (
-								roles.length === 1 &&
-								roles.includes( 'subscriber' )
-							) {
-								await jwtSdk.logout();
-								token.value = '';
-								isAuthState.value = false;
-								localStorage.removeItem( 'dame_jwt_token' );
-								throw new Error(
-									'Veuillez valider votre adresse e-mail avant de vous connecter.'
-								);
-							}
-						}
-					} catch ( e: unknown ) {
-						const err = e as Error | undefined;
-						if (
-							err?.message &&
-							err.message.includes( 'Veuillez valider' )
-						) {
-							throw e;
-						}
-						console.warn(
-							"Profil complet non accessible, utilisation des données d'identifiants."
-						);
-					}
-
-					user.value = {
-						name: displayName,
-						email,
-						roles,
-					};
-
-					localStorage.setItem(
-						'dame_user',
-						JSON.stringify( user.value )
-					);
-
-					useAgendaStore().clearData();
-					await checkIdentities();
+					await completeAuthenticatedSession( jwtToken, username );
 				} else {
 					throw new Error( "Erreur d'identifiants" );
 				}
 			} catch ( error: unknown ) {
 				console.error( 'Erreur de connexion:', error );
 
-				const err = error as
-					| {
-							response?: string;
-							message?: string;
-							data?: { message?: string };
-					  }
-					| undefined;
-				let errorMessage = 'Erreur serveur.';
-				if ( err && err.response ) {
-					try {
-						const parsed = JSON.parse( err.response );
-						errorMessage =
-							parsed.message ||
-							( parsed.data && parsed.data.message ) ||
-							errorMessage;
-					} catch {
-						errorMessage = err.response || errorMessage;
-					}
-				} else if ( err && err.message ) {
-					const match = err.message.match(
-						/^HTTP Error: \d+ - (.*)$/
-					);
-					if ( match && match[ 1 ] ) {
-						try {
-							const parsed = JSON.parse( match[ 1 ] );
-							errorMessage =
-								parsed.message ||
-								( parsed.data && parsed.data.message ) ||
-								match[ 1 ];
-						} catch {
-							errorMessage = match[ 1 ];
-						}
-					} else if ( err.message ) {
-						errorMessage = err.message;
-					}
-				}
-
 				const alert = await alertController.create( {
 					header: 'Échec de connexion',
-					message: translateErrorMessage( errorMessage ),
+					message: formatJwtErrorMessage( error ),
 					buttons: [ 'OK' ],
 				} );
 				await alert.present();
@@ -441,10 +417,66 @@ export const useAuthStore = defineStore(
 			}
 		};
 
-		const logout = async () => {
-			if ( token.value && ! jwtSdk.getJwt() ) {
-				jwtSdk.setTokens( token.value );
+		const verifyTwoFactor = async ( code: string ): Promise< boolean > => {
+			const challenge = twoFactorChallenge.value;
+			const trimmedCode = code.trim();
+			if ( ! challenge || ! trimmedCode ) {
+				return false;
 			}
+			isLoading.value = true;
+
+			try {
+				const response = await jwtSdk.verifyTwoFactor( {
+					JWT: challenge.jwt,
+					code: trimmedCode,
+				} );
+				const jwtToken = response.data?.jwt;
+
+				if ( ! jwtToken ) {
+					throw new Error( 'Code de vérification invalide.' );
+				}
+
+				twoFactorChallenge.value = null;
+				await completeAuthenticatedSession(
+					jwtToken,
+					challenge.username
+				);
+				return true;
+			} catch ( error: unknown ) {
+				console.error( 'Erreur vérification 2FA:', error );
+
+				if (
+					error instanceof SimpleJwtLoginApiError &&
+					( error.isErrorCode(
+						ERROR_CODES.TWO_FACTOR_INVALID_NONCE
+					) ||
+						error.isErrorCode(
+							ERROR_CODES.TWO_FACTOR_INTERIM_JWT_REQUIRED
+						) ||
+						error.isErrorCode(
+							ERROR_CODES.TWO_FACTOR_INTERIM_JWT_REJECTED
+						) )
+				) {
+					twoFactorChallenge.value = null;
+				}
+
+				const alert = await alertController.create( {
+					header: 'Vérification 2FA',
+					message: formatJwtErrorMessage( error ),
+					buttons: [ 'OK' ],
+				} );
+				await alert.present();
+				return false;
+			} finally {
+				isLoading.value = false;
+			}
+		};
+
+		const cancelTwoFactor = () => {
+			twoFactorChallenge.value = null;
+		};
+
+		const logout = async () => {
 			clearLocalSessionState();
 			router.push( '/tabs/home' );
 			await jwtSdk.logout();
@@ -495,7 +527,10 @@ export const useAuthStore = defineStore(
 			isAdmin,
 			isAdherent,
 			isLoading,
+			twoFactorChallenge,
 			login,
+			verifyTwoFactor,
+			cancelTwoFactor,
 			logout,
 			selectIdentity,
 			checkIdentities,
@@ -515,7 +550,7 @@ export const useAuthStore = defineStore(
 	},
 	{
 		persist: {
-			omit: [ 'isLoading', 'jwtSdk' ],
+			omit: [ 'isLoading', 'jwtSdk', 'token', 'twoFactorChallenge' ],
 		},
 	}
 );
