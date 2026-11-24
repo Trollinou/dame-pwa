@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.14.1] - 2026-11-24
+
 - **Alignement SDK `simple-jwt-login` `1.2.0` (plugin WP `4.2.1`) & support conditionnel 2FA (`auth.ts`, `jwtService.ts`, `LoginPage.vue`, `safeFetch.ts`, `wpApi.ts`, `authStore.spec.ts`, `safeFetch.spec.ts`, `wpApi.spec.ts`, `README.md`, `USING.md`)** :
   - Migration one-shot de l'ancienne clé `dame_jwt_token` vers `LocalStorageTokenStorage('dame')` comme source unique de vérité (et omission de `token` / `twoFactorChallenge` dans la persistance Pinia).
   - Gestion structurée des erreurs via `SimpleJwtLoginApiError` et `ERROR_CODES` (`formatJwtErrorMessage()` dans `jwtService.ts`, nettoyage du parsing legacy et du code numérique en dur dans `validateSession()` et `login()`), avec modernisation de l'encodage Base64 UTF-8 (`encodeBase64Utf8()` via `TextEncoder`).
