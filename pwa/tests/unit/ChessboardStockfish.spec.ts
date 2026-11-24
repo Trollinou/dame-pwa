@@ -18,6 +18,7 @@ vi.mock( 'eg-chessboard/vue', () => ( {
 			'fitContainer',
 		],
 		emits: [
+			'board-created',
 			'evaluation',
 			'engine-status',
 			'game-review-progress',

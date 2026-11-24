@@ -127,6 +127,10 @@ describe( 'useAuthStore — SDK 1.2.0 & 2FA', () => {
 	} );
 
 	test( 'keeps 2FA challenge on 401 TWO_FACTOR_INVALID_CODE and 429 TWO_FACTOR_RATE_LIMITED', async () => {
+		const consoleErrorSpy = vi
+			.spyOn( console, 'error' )
+			.mockImplementation( () => {} );
+
 		await app.runWithContext( async () => {
 			const authStore = useAuthStore();
 			authStore.twoFactorChallenge = {
@@ -180,9 +184,14 @@ describe( 'useAuthStore — SDK 1.2.0 & 2FA', () => {
 				} )
 			);
 		} );
+		consoleErrorSpy.mockRestore();
 	} );
 
 	test( 'resets 2FA challenge to login form on 401 TWO_FACTOR_INVALID_NONCE', async () => {
+		const consoleErrorSpy = vi
+			.spyOn( console, 'error' )
+			.mockImplementation( () => {} );
+
 		await app.runWithContext( async () => {
 			const authStore = useAuthStore();
 			authStore.twoFactorChallenge = {
@@ -215,6 +224,7 @@ describe( 'useAuthStore — SDK 1.2.0 & 2FA', () => {
 				} )
 			);
 		} );
+		consoleErrorSpy.mockRestore();
 	} );
 
 	test( 'validateSession ignores VALIDATION_DISABLED (82) and refreshes on JWT_REVOKED (55) or JWT_AUDIENCE_MISMATCH (130)', async () => {

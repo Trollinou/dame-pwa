@@ -1,7 +1,17 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AgendaSegmentView from '@/components/public/agenda/AgendaSegmentView.vue';
 import type { AgendaEvent } from '@/stores/agenda';
+
+vi.mock( 'vue-router', async ( importOriginal ) => {
+	const actual = await importOriginal< typeof import( 'vue-router' ) >();
+	return {
+		...actual,
+		useRouter: () => ( {
+			push: vi.fn(),
+		} ),
+	};
+} );
 
 describe( 'AgendaSegmentView.vue - Liste filtrée aux événements en cours ou futurs', () => {
 	const mockEvents: AgendaEvent[] = [

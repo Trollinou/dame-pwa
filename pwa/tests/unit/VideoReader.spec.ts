@@ -31,6 +31,14 @@ describe( 'useYouTubePlayer', () => {
 } );
 
 describe( 'VideoReader.vue', () => {
+	const globalMountOptions = {
+		directives: {
+			'safe-html': ( el: HTMLElement, binding: { value: string } ) => {
+				el.innerHTML = binding.value || '';
+			},
+		},
+	};
+
 	beforeEach( () => {
 		vi.clearAllMocks();
 	} );
@@ -43,6 +51,7 @@ describe( 'VideoReader.vue', () => {
 				duree: '12:45',
 				isAlreadyCompleted: false,
 			},
+			global: globalMountOptions,
 		} );
 
 		expect( wrapper.text() ).toContain( 'Les principes d’ouverture' );
@@ -57,6 +66,7 @@ describe( 'VideoReader.vue', () => {
 				videoId: 'dQw4w9WgXcQ',
 				isAlreadyCompleted: true,
 			},
+			global: globalMountOptions,
 		} );
 
 		expect( wrapper.text() ).toContain( 'Valider la vidéo' );
@@ -72,6 +82,7 @@ describe( 'VideoReader.vue', () => {
 				videoId: 'dQw4w9WgXcQ',
 				isAlreadyCompleted: false,
 			},
+			global: globalMountOptions,
 		} );
 
 		// Appel direct de la méthode ou clic

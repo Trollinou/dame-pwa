@@ -243,6 +243,9 @@ describe( 'chessStore - saveCompletedGame & syncPendingGames', () => {
 	} );
 
 	it( 'does not queue game offline on definitive 4xx client errors (e.g. 400 Bad Request)', async () => {
+		const consoleWarnSpy = vi
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
 		const authStore = useAuthStore();
 		authStore.token = 'dummy_valid_jwt_token';
 		authStore.selectedIdentity = {
@@ -263,9 +266,13 @@ describe( 'chessStore - saveCompletedGame & syncPendingGames', () => {
 
 		expect( safeFetch ).toHaveBeenCalledTimes( 1 );
 		expect( localStorage.getItem( 'dame_pending_games' ) ).toBeNull();
+		consoleWarnSpy.mockRestore();
 	} );
 
 	it( 'syncPendingGames purges permanently rejected 4xx games instead of looping infinitely', async () => {
+		const consoleWarnSpy = vi
+			.spyOn( console, 'warn' )
+			.mockImplementation( () => {} );
 		const authStore = useAuthStore();
 		authStore.token = 'dummy_valid_jwt_token';
 		authStore.selectedIdentity = {
@@ -302,6 +309,7 @@ describe( 'chessStore - saveCompletedGame & syncPendingGames', () => {
 		expect( safeFetch ).toHaveBeenCalledTimes( 1 );
 		// The rejected game is purged from the queue
 		expect( localStorage.getItem( 'dame_pending_games' ) ).toBe( '[]' );
+		consoleWarnSpy.mockRestore();
 	} );
 
 	it( 'saveGame and clearGame correctly handle isGameOver state', () => {
