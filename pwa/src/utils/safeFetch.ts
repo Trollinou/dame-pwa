@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth';
+import { getApiOrigin } from '@/stores/auth/jwtService';
 
 const resolveWpJsonUrl = ( url: string ): string => {
 	if ( url.startsWith( 'http://' ) || url.startsWith( 'https://' ) ) {
@@ -63,25 +64,10 @@ export const safeFetch = async (
 			authStore = null;
 		}
 
-		const legacyToken =
-			typeof localStorage !== 'undefined'
-				? localStorage.getItem( 'dame_jwt_token' )
-				: null;
-		if (
-			authStore &&
-			legacyToken &&
-			! authStore.jwtSdk.getJwt() &&
-			legacyToken !== 'null' &&
-			legacyToken !== 'undefined'
-		) {
-			authStore.jwtSdk.setTokens( legacyToken );
-		}
-
 		const shouldUseAuth = Boolean(
 			hasExplicitAuthHeader ||
 				authStore?.isAuthenticated ||
-				authStore?.jwtSdk.isAuthenticated() ||
-				legacyToken
+				authStore?.jwtSdk.isAuthenticated()
 		);
 
 		const fetchOptions: RequestInit = {
@@ -90,30 +76,41 @@ export const safeFetch = async (
 			signal: controller.signal,
 		};
 
+		const usedSdkFetchWithAuth = Boolean(
+			shouldUseAuth && authStore?.jwtSdk && ! isRetry
+		);
+
 		let response: Response;
-		if ( shouldUseAuth && authStore?.jwtSdk && ! isRetry ) {
+		if ( usedSdkFetchWithAuth && authStore?.jwtSdk ) {
 			response = await authStore.jwtSdk.fetchWithAuth(
 				resolvedUrl,
 				fetchOptions
 			);
 		} else {
+			const apiOrigin =
+				getApiOrigin() ||
+				( typeof window !== 'undefined' && window.location?.origin
+					? window.location.origin
+					: '' );
 			const finalUrl =
-				resolvedUrl.startsWith( '/' ) &&
-				typeof window !== 'undefined' &&
-				window.location?.origin
-					? `${ window.location.origin }${ resolvedUrl }`
+				resolvedUrl.startsWith( '/' ) && apiOrigin
+					? `${ apiOrigin }${ resolvedUrl }`
 					: resolvedUrl;
 			response = await fetch( finalUrl, fetchOptions );
 		}
 
 		clearTimeout( id );
 
-		// Repli de compatibilité : en cas de 401 (si non déjà rejoué) ou de 400 avec jeton d'authentification (rejet Simple-JWT-Login)
-		const isAuthError =
-			response.status === 401 ||
-			( response.status === 400 && shouldUseAuth );
+		// sdk.fetchWithAuth() gère déjà un refresh + retry unique sur 401.
+		// Ne pas déclencher de second refresh sur 401 si fetchWithAuth a déjà été utilisé
+		// (protection des refresh tokens rotatifs à usage unique en WP plugin >= 4.2.0).
+		const shouldFallbackRefresh =
+			( response.status === 400 && shouldUseAuth ) ||
+			( response.status === 401 &&
+				! usedSdkFetchWithAuth &&
+				shouldUseAuth );
 
-		if ( isAuthError && ! isRetry && authStore && shouldUseAuth ) {
+		if ( shouldFallbackRefresh && ! isRetry && authStore ) {
 			try {
 				const newToken = await authStore.tryRefreshToken( true );
 				if ( newToken ) {

@@ -373,10 +373,11 @@ En bas de la page **Profil** (accessible à tous les utilisateurs, connectés ou
    - Permet de forcer un nettoyage complet manuel si nécessaire.
    - Purge le `CacheStorage` d'assets et le cache des requêtes tout en **préservant scrupuleusement la session active** (aucun mot de passe à resaisir).
    - Recharge immédiatement l'application pour afficher la dernière version disponible.
-5. **Résilience de Session Hors-Ligne (`simple-jwt-login`)** :
-   - Persistance des jetons JWT et `refresh_token` via `LocalStorageTokenStorage` avec initialisation instantanée de l'état connecté au démarrage (`sdk.isAuthenticated()`).
-   - Les requêtes authentifiées utilisent `sdk.fetchWithAuth()` (via `safeFetch`) pour injecter automatiquement le jeton Bearer et rejouer de manière transparente toute requête recevant un statut `401`.
-   - En cas de coupure réseau (mode hors-ligne, tunnel, perte 4G/Wi-Fi) ou d'erreur serveur `5xx` lors d'un rafraîchissement, la session reste active localement sans déconnecter l'utilisateur. Seul un rejet explicite du `refresh_token` par le serveur (`400`/`401`/`403`) déclenche `onSessionExpired` et redirige vers la page de connexion.
+5. **Résilience de Session Hors-Ligne & Support 2FA (`simple-jwt-login` `1.2.0`)** :
+   - Persistance unique des jetons JWT et `refresh_token` via `LocalStorageTokenStorage('dame')` (avec migration automatique de l'ancienne clé `dame_jwt_token`) et initialisation instantanée de l'état connecté au démarrage (`sdk.isAuthenticated()`).
+   - Les requêtes authentifiées utilisent `sdk.fetchWithAuth()` (via `safeFetch`) pour injecter automatiquement le jeton Bearer et rejouer de manière transparente toute requête recevant un statut `401`, sans double rafraîchissement afin de préserver les *refresh tokens* rotatifs à usage unique.
+   - Gestion typée des erreurs via `SimpleJwtLoginApiError` et `ERROR_CODES`, avec support conditionnel de la 2FA (`two_factor_required` / `verifyTwoFactor()`) totalement transparent et invisible pour les comptes sans 2FA activée.
+   - En cas de coupure réseau (mode hors-ligne, tunnel, perte 4G/Wi-Fi) ou d'erreur serveur `5xx` lors d'un rafraîchissement (`REFRESH_TOKEN_STORE_FAILED`), la session reste active localement sans déconnecter l'utilisateur. Seul un rejet explicite du `refresh_token` par le serveur (`400`/`401`/`403`) déclenche `onSessionExpired` et redirige vers la page de connexion.
    - La déconnexion (`await sdk.logout()`) nettoie immédiatement le stockage local et révoque le jeton côté serveur sans erreur même hors-ligne.
 
 ## Système de Design & Classes Canoniques Réutilisables

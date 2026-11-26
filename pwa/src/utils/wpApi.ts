@@ -27,11 +27,10 @@ export async function fetchWpCollection< T >(
 	const apiBase = import.meta.env?.VITE_API_BASE_URL || '';
 	const baseUrl = path.startsWith( 'http' ) ? path : `${ apiBase }${ path }`;
 
-	// Récupération du jeton JWT actuel si disponible (compatibilité SDK + legacy)
+	// Récupération du jeton JWT actuel si disponible
 	const token =
 		typeof localStorage !== 'undefined'
-			? localStorage.getItem( 'dame:jwt' ) ||
-			  localStorage.getItem( 'dame_jwt_token' )
+			? localStorage.getItem( 'dame:jwt' )
 			: null;
 
 	const headers: Record< string, string > = {

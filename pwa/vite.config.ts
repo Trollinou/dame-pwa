@@ -225,6 +225,7 @@ export default defineConfig( {
 	// ---------------------------------------
 	test: {
 		globals: true,
+		pool: 'vmThreads',
 		environment: 'jsdom',
 		server: {
 			deps: {

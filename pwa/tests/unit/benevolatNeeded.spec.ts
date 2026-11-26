@@ -7,6 +7,23 @@ import { queryClient } from '@/queryClient';
 import BenevolatDetailContent from '@/components/public/agenda/detail/BenevolatDetailContent.vue';
 import type { Benevolat } from '@/stores/benevolat';
 
+vi.mock( 'vue-router', async ( importOriginal ) => {
+	const actual = await importOriginal< typeof import( 'vue-router' ) >();
+	return {
+		...actual,
+		useRouter: () => ( {
+			push: vi.fn(),
+		} ),
+	};
+} );
+
+vi.mock( '@/utils/safeFetch', () => ( {
+	safeFetch: vi.fn().mockResolvedValue( {
+		ok: true,
+		json: async () => ( {} ),
+	} ),
+} ) );
+
 vi.mock( '@/stores/auth/jwtService', async ( importOriginal ) => {
 	const actual = await importOriginal< typeof import( '@/stores/auth/jwtService' ) >();
 	return {
