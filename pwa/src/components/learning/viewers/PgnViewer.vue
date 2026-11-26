@@ -1,15 +1,15 @@
 <template>
-  <div class="exercise-viewer-layout">
-    <div class="chessboard-container">
-      <Chessboard
-        mode="study"
-        :orientation="(props.orientation === 'black' ? 'black' : 'white')"
-        :view-only="true"
-        @board-created="onBoardCreated"
-      />
-    </div>
+  <div class="exercise-viewer-layout pgn-layout" :class="{ 'pgn-layout--with-comments': hasPgnComments }">
+    <div class="pgn-board-column">
+      <div class="chessboard-container">
+        <Chessboard
+          mode="study"
+          :orientation="(props.orientation === 'black' ? 'black' : 'white')"
+          :view-only="true"
+          @board-created="onBoardCreated"
+        />
+      </div>
 
-    <div class="pgn-side-panel">
       <!-- Navigation Controls -->
       <div class="navigation-controls">
         <ion-button
@@ -54,8 +54,10 @@
           <ion-icon slot="icon-only" :icon="playForwardOutline"></ion-icon>
         </ion-button>
       </div>
+    </div>
 
-      <!-- Comment Display (hauteur fixe et réservée) -->
+    <!-- Comment Display (masqué si le PGN ne contient aucun commentaire textuel) -->
+    <div v-if="hasPgnComments" class="pgn-comment-panel">
       <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !currentComment }">
         <p class="comment-text">
           {{ currentComment ? '💬 ' + currentComment : '' }}
@@ -75,6 +77,7 @@ import {
   playForwardOutline
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
+import { hasPgnTextComments } from '@/utils/stringUtils';
 import type { BoardCore } from 'eg-chessboard';
 
 const props = defineProps<{
@@ -108,6 +111,9 @@ const isAtStart = computed(() => !boardApi.value || currentPly.value <= 0);
 const isAtEnd = computed(() => !boardApi.value || totalPly.value === 0 || currentPly.value >= totalPly.value);
 
 const activePgn = computed(() => props.pgn || props.pgnString || '');
+const hasPgnComments = computed(
+  () => currentComment.value.trim().length > 0 || hasPgnTextComments(activePgn.value)
+);
 
 const syncComment = () => {
   if (boardApi.value) {

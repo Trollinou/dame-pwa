@@ -43,37 +43,20 @@
       </div>
 
       <!-- 2. MODE EXPLORATION D'UNE VARIANTE ALTERNATIVE -->
-      <div v-else-if="currentMode === 'variant_view'" class="stage-pgn-wrapper animate-fade-in">
-        <div class="chessboard-container">
-          <Chessboard
-            :key="`posi-variant-${activeVariant?.san}`"
-            mode="game"
-            :fen="activeVariantFen"
-            :last-move="activeVariantLastMove"
-            :shapes="activeVariantShapes"
-            :orientation="parsedData.orientation"
-            :player-color="parsedData.orientation"
-            :view-only="true"
-            @board-created="onVariantBoardCreated"
-          />
-        </div>
-
-        <div class="pgn-side-panel">
-          <!-- Bandeau d'indication de la variante -->
-          <div class="variant-indicator-bar">
-            <span class="variant-title">
-              Variante alternative : <strong>{{ activeVariant?.label }}</strong>
-            </span>
-            <ion-button
-              size="small"
-              color="warning"
-              fill="solid"
-              class="return-btn"
-              @click="retournerAuChoixInitial"
-            >
-              <ion-icon slot="start" :icon="arrowBackOutline" />
-              Choix initial
-            </ion-button>
+      <div v-else-if="currentMode === 'variant_view'" class="stage-pgn-wrapper pgn-layout pgn-layout--with-comments animate-fade-in">
+        <div class="pgn-board-column">
+          <div class="chessboard-container">
+            <Chessboard
+              :key="`posi-variant-${activeVariant?.san}`"
+              mode="game"
+              :fen="activeVariantFen"
+              :last-move="activeVariantLastMove"
+              :shapes="activeVariantShapes"
+              :orientation="parsedData.orientation"
+              :player-color="parsedData.orientation"
+              :view-only="true"
+              @board-created="onVariantBoardCreated"
+            />
           </div>
 
           <!-- Contrôles de Navigation de la Variante -->
@@ -109,6 +92,25 @@
               <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
             </ion-button>
           </div>
+        </div>
+
+        <div class="pgn-comment-panel">
+          <!-- Bandeau d'indication de la variante -->
+          <div class="variant-indicator-bar">
+            <span class="variant-title">
+              Variante alternative : <strong>{{ activeVariant?.label }}</strong>
+            </span>
+            <ion-button
+              size="small"
+              color="warning"
+              fill="solid"
+              class="return-btn"
+              @click="retournerAuChoixInitial"
+            >
+              <ion-icon slot="start" :icon="arrowBackOutline" />
+              Choix initial
+            </ion-button>
+          </div>
 
           <!-- Commentaire du Coup Courant de la Variante -->
           <div ref="variantCommentContainerEl" class="comment-container" :class="{ 'comment-empty': !activeVariantComment }">
@@ -134,22 +136,22 @@
       <!-- 3. DÉROULEMENT DE LA BRANCHE PRINCIPALE (PGN ou QCM) -->
       <div v-else-if="currentMode === 'main_branch'" class="main-branch-wrapper animate-fade-in">
         <!-- 3.A. Sous-étape PGN (visionnage des coups) -->
-        <div v-if="currentMainStage?.type === 'pgn'" class="stage-pgn-wrapper">
-          <div class="chessboard-container">
-            <Chessboard
-              :key="`main-pgn-${mainBranchStageIndex}`"
-              mode="game"
-              :fen="activeMainPgnFen"
-              :last-move="activeMainPgnLastMove"
-              :orientation="currentMainStage.orientation"
-              :player-color="currentMainStage.orientation"
-              :shapes="activeMainPgnShapes"
-              :view-only="true"
-              @board-created="onMainPgnBoardCreated"
-            />
-          </div>
+        <div v-if="currentMainStage?.type === 'pgn'" class="stage-pgn-wrapper pgn-layout pgn-layout--with-comments">
+          <div class="pgn-board-column">
+            <div class="chessboard-container">
+              <Chessboard
+                :key="`main-pgn-${mainBranchStageIndex}`"
+                mode="game"
+                :fen="activeMainPgnFen"
+                :last-move="activeMainPgnLastMove"
+                :orientation="currentMainStage.orientation"
+                :player-color="currentMainStage.orientation"
+                :shapes="activeMainPgnShapes"
+                :view-only="true"
+                @board-created="onMainPgnBoardCreated"
+              />
+            </div>
 
-          <div class="pgn-side-panel">
             <div class="navigation-controls">
               <ion-button
                 fill="outline"
@@ -182,7 +184,9 @@
                 <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
               </ion-button>
             </div>
+          </div>
 
+          <div class="pgn-comment-panel">
             <div ref="mainCommentContainerEl" class="comment-container" :class="{ 'comment-empty': !activeMainPgnComment }">
               <p class="comment-text">
                 {{ activeMainPgnComment ? '💬 ' + activeMainPgnComment : '' }}

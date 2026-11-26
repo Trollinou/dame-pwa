@@ -2,22 +2,22 @@
   <div class="exercice-type-partie-heros">
     <div class="etape-container">
       <!-- 1. Étape de Défilement / Visionnage PGN -->
-      <div v-if="etapeActuelle.type === 'pgn'" class="stage-pgn-wrapper animate-fade-in">
-        <div class="chessboard-container">
-          <Chessboard
-            :key="`pgn-${etapeCouranteIndex}`"
-            mode="game"
-            :fen="activePgnFen"
-            :last-move="activePgnLastMove"
-            :orientation="etapeActuelle.orientation"
-            :player-color="etapeActuelle.orientation"
-            :shapes="activePgnShapes"
-            :view-only="true"
-            @board-created="onPgnBoardCreated"
-          />
-        </div>
+      <div v-if="etapeActuelle.type === 'pgn'" class="stage-pgn-wrapper pgn-layout pgn-layout--with-comments animate-fade-in">
+        <div class="pgn-board-column">
+          <div class="chessboard-container">
+            <Chessboard
+              :key="`pgn-${etapeCouranteIndex}`"
+              mode="game"
+              :fen="activePgnFen"
+              :last-move="activePgnLastMove"
+              :orientation="etapeActuelle.orientation"
+              :player-color="etapeActuelle.orientation"
+              :shapes="activePgnShapes"
+              :view-only="true"
+              @board-created="onPgnBoardCreated"
+            />
+          </div>
 
-        <div class="pgn-side-panel">
           <!-- Contrôles de Navigation PGN -->
           <div class="navigation-controls">
             <ion-button
@@ -51,7 +51,9 @@
               <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
             </ion-button>
           </div>
+        </div>
 
+        <div class="pgn-comment-panel">
           <!-- Affichage du Commentaire du Coup Courant (hauteur constante réservée pour éviter les sauts d'interface) -->
           <div ref="commentContainerEl" class="comment-container" :class="{ 'comment-empty': !activePgnComment }">
             <p class="comment-text">

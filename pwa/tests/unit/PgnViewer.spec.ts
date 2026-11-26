@@ -278,4 +278,62 @@ describe( 'PgnViewer.vue', () => {
 			true
 		);
 	} );
+
+	test( 'n’affiche pas la colonne commentaire pour un PGN sans texte (annotations shapes uniquement)', async () => {
+		const mockApi = createMockBoardApi( 1 );
+		const wrapper = mount( PgnViewer, {
+			props: {
+				pgnString: '1. Rc1 { [%cal Gc6c1] [%csl Gc1] }',
+			},
+			global: {
+				stubs: {
+					Chessboard: {
+						template: '<div class="mock-chessboard"></div>',
+						emits: [ 'board-created' ],
+						mounted() {
+							this.$emit( 'board-created', mockApi );
+						},
+					},
+				},
+			},
+		} );
+
+		await flushPromises();
+
+		expect( wrapper.find( '.pgn-layout--with-comments' ).exists() ).toBe(
+			false
+		);
+		expect( wrapper.find( '.pgn-comment-panel' ).exists() ).toBe( false );
+	} );
+
+	test( 'affiche la colonne commentaire à droite lorsque le PGN contient des commentaires textuels', async () => {
+		const mockApi = createMockBoardApi( 1 );
+		mockApi.getCurrentComment = () => 'Le Roi récupère vite le Pion b.';
+		const wrapper = mount( PgnViewer, {
+			props: {
+				pgnString: '1. Kb7 { Le Roi récupère vite le Pion b. }',
+			},
+			global: {
+				stubs: {
+					Chessboard: {
+						template: '<div class="mock-chessboard"></div>',
+						emits: [ 'board-created' ],
+						mounted() {
+							this.$emit( 'board-created', mockApi );
+						},
+					},
+				},
+			},
+		} );
+
+		await flushPromises();
+
+		expect( wrapper.find( '.pgn-layout--with-comments' ).exists() ).toBe(
+			true
+		);
+		expect( wrapper.find( '.pgn-comment-panel' ).exists() ).toBe( true );
+		expect( wrapper.find( '.comment-text' ).text() ).toContain(
+			'Le Roi récupère vite le Pion b.'
+		);
+	} );
 } );

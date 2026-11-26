@@ -18,8 +18,8 @@
   margin-bottom: 6px;
 }
 
-.meta-card-content {
-  padding: 6px 10px;
+.header-card-content {
+  padding: 6px 12px;
 }
 
 .meta-title {
@@ -49,15 +49,17 @@
   color: var(--ion-color-medium-shade, #666666);
 }
 
-.consigne-card-content {
-  padding: 6px 10px;
-}
-
 .consigne-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+
+  &--merged {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--ion-color-step-150, #e5e7eb);
+  }
 }
 
 .consigne-text {

@@ -4,6 +4,8 @@ import {
 	includesNormalized,
 	decodeHtmlEntities,
 	getContenuTypeLabel,
+	formatChapitreNiveauLabel,
+	hasPgnTextComments,
 } from '@/utils/stringUtils';
 
 describe( 'stringUtils', () => {
@@ -170,6 +172,49 @@ describe( 'stringUtils', () => {
 				'Exercice'
 			);
 			expect( getContenuTypeLabel( null ) ).toBe( '' );
+		} );
+	} );
+
+	describe( 'formatChapitreNiveauLabel', () => {
+		test( 'keeps only first word of chapter and shortens level to N<level>', () => {
+			expect(
+				formatChapitreNiveauLabel( 'Activité des Pièces', 1 )
+			).toBe( 'Activité · N1' );
+			expect( formatChapitreNiveauLabel( 'Matérialité', 2 ) ).toBe(
+				'Matérialité · N2'
+			);
+			expect(
+				formatChapitreNiveauLabel( 'Sécurité du Roi', 3 )
+			).toBe( 'Sécurité · N3' );
+		} );
+
+		test( 'handles chapter-only, level-only, and empty inputs', () => {
+			expect(
+				formatChapitreNiveauLabel( 'Structure de Pions', null )
+			).toBe( 'Structure' );
+			expect( formatChapitreNiveauLabel( null, 4 ) ).toBe( 'N4' );
+			expect( formatChapitreNiveauLabel( '', null ) ).toBe( '' );
+		} );
+	} );
+
+	describe( 'hasPgnTextComments', () => {
+		test( 'returns true for human-readable comments and false for shape-only annotations', () => {
+			expect( hasPgnTextComments( '1. e4 { Bon coup } e5' ) ).toBe(
+				true
+			);
+			expect(
+				hasPgnTextComments(
+					'1. Rc1 { [%cal Gc6c1] [%csl Gc1] }'
+				)
+			).toBe( false );
+			expect(
+				hasPgnTextComments(
+					'1. Kb7 { [%cal Ga3a8] Le Roi récupère le pion }'
+				)
+			).toBe( true );
+			expect( hasPgnTextComments( '1. e4 e5 2. Nf3' ) ).toBe( false );
+			expect( hasPgnTextComments( '' ) ).toBe( false );
+			expect( hasPgnTextComments( null ) ).toBe( false );
 		} );
 	} );
 } );

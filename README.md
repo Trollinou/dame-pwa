@@ -287,7 +287,7 @@ Nomenclature canonique standardisée à utiliser systématiquement par les déve
 | :--- | :--- | :--- |
 | **Layouts** | `.exercise-viewer-layout` | Conteneur principal flex centré (largeur 100%) pour les viewers d'exercice. |
 | | `.exercise-stage` | Sous-conteneur de phase ou étape intermédiaire d'exercice (`100%` mobile, `720px` tablette portrait, `1040px` paysage). |
-| **Échiquiers** | `.chessboard-container` | Conteneur standard responsive (ratio 1:1, mobile `max-width: min(100%, 42dvh, 460px)`, tablette portrait `min(100%, 48dvh, 520px)`, paysage 1 colonne `min(100%, max(280px, calc(100dvh - 445px)), 540px)` — identique pour diagrammes et PGN, 2 colonnes `min(calc(100dvh - 350px), 520px)`, `margin: 0 auto 6px auto`, `flex-shrink: 0`, `border-radius: 0;`, `box-shadow: none;`). |
+| **Échiquiers** | `.chessboard-container` | Conteneur standard responsive (ratio 1:1, mobile `max-width: min(100%, 42dvh, 460px)`, tablette portrait `min(100%, 48dvh, 520px)`, paysage 1 colonne `min(100%, max(280px, calc(100dvh - 395px)), 580px)` — identique pour diagrammes et PGN sans commentaires, 2 colonnes `min(calc(100dvh - 300px), 540px)`, `margin: 0 auto 6px auto`, `flex-shrink: 0`, `border-radius: 0;`, `box-shadow: none;`). |
 | | `.chessboard-container--mini` | Miniaturisation (300px, `flex-shrink: 0`) pour l'appariement (`MatchingViewer`) et les choix de plans (`JugementFinalViewer`). |
 | | `.chessboard-container--small` | Variante compacte (360px, `flex-shrink: 0`) pour écrans à faible hauteur / portrait restreint. |
 | **Cartes & En-têtes** | `.exercise-card` | Carte standard pour consignes, questions et contenus (bord arrondi 8px, padding interne `8px 10px`, ombre légère). |

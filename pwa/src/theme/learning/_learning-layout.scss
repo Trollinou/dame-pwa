@@ -155,7 +155,7 @@
   }
 
   @include learning-landscape {
-    max-width: min(100%, max(280px, calc(100dvh - 445px)), 540px);
+    max-width: min(100%, max(280px, calc(100dvh - 395px)), 580px);
   }
 }
 
@@ -398,6 +398,8 @@
 }
 
 .observation-stage {
+  --jf-mobile-board: max(100px, calc((100dvh - 365px) / 3));
+
   width: 100%;
   max-width: 1040px;
   display: flex;
@@ -411,51 +413,85 @@
 
   @include learning-landscape {
     gap: 24px;
-    height: calc(100dvh - 345px);
+    height: calc(100dvh - 285px);
     min-height: 360px;
     align-items: center;
   }
 }
 
 .main-board-wrapper {
-  flex: 1 1 0;
+  flex: 1 1 50%;
   min-width: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
   justify-content: center;
+  padding: 2px 0;
+
+  .board-caption {
+    margin: 0;
+    padding: 4px 8px;
+    min-height: 24px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
 
   .chessboard-container {
-    width: min(100%, max(150px, calc(100dvh - 410px)));
+    width: min(calc(100% - 4px), var(--jf-mobile-board));
     max-width: 100%;
     margin: 0;
   }
 
   @include learning-tablet-portrait {
+    flex: 1 1 0;
+    flex-direction: column;
+    padding: 0;
+
+    .board-caption {
+      margin-top: 6px;
+      padding: 0;
+      min-height: 0;
+      font-size: 0.85rem;
+    }
+
     .chessboard-container {
-      width: min(100%, max(220px, calc(100dvh - 400px)), 440px);
+      width: min(100%, max(220px, calc(100dvh - 350px)), 440px);
     }
   }
 
   @include learning-landscape {
+    flex: 1 1 0;
+    flex-direction: column;
     height: 100%;
+    padding: 0;
+
+    .board-caption {
+      margin-top: 6px;
+      padding: 0;
+      min-height: 0;
+      font-size: 0.85rem;
+    }
 
     .chessboard-container {
-      width: min(100%, max(240px, calc(100dvh - 385px)), 520px);
+      width: min(100%, max(240px, calc(100dvh - 330px)), 540px);
     }
   }
 }
 
 .scenarios-container {
-  flex: 0 0 auto;
-  width: auto;
+  flex: 1 1 50%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
 
   .scenario-card {
-    width: min(44vw, max(96px, calc((100dvh - 465px) / 3)));
+    width: min(100%, calc(var(--jf-mobile-board) + 4px));
     max-width: none;
     margin: 0;
   }
@@ -467,20 +503,58 @@
   }
 
   @include learning-tablet-portrait {
+    flex: 0 0 auto;
+    width: auto;
     gap: 8px;
 
     .scenario-card {
-      width: min(210px, max(100px, calc((100dvh - 465px) / 3)));
+      width: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .scenario-header {
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 8px 10px;
+      gap: 2px;
+      min-width: 74px;
+    }
+
+    .chessboard-container--mini {
+      width: min(240px, max(110px, calc((100dvh - 335px) / 3)));
+      flex-shrink: 0;
     }
   }
 
   @include learning-landscape {
+    flex: 0 0 auto;
+    width: auto;
     height: 100%;
     justify-content: space-between;
     gap: 8px;
 
     .scenario-card {
-      width: min(220px, max(100px, calc((100dvh - 450px) / 3)));
+      width: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .scenario-header {
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 8px 12px;
+      gap: 2px;
+      min-width: 78px;
+    }
+
+    .chessboard-container--mini {
+      width: min(250px, max(110px, calc((100dvh - 315px) / 3)));
+      flex-shrink: 0;
     }
   }
 }
@@ -535,7 +609,7 @@
     & > .chessboard-container,
     & > .chessboard-panel {
       flex: 0 0 auto;
-      width: min(calc(100dvh - 350px), 520px);
+      width: min(calc(100dvh - 300px), 540px);
       max-width: 48%;
       margin: 0;
     }
@@ -553,17 +627,48 @@
     }
   }
 
-  /* Lecteurs PGN : conservés en 1 colonne centrée (flèches et commentaire sous l'échiquier) */
-  .exercise-viewer-layout:has(> .chessboard-container + .pgn-side-panel),
-  .stage-pgn-wrapper:has(> .chessboard-container + .pgn-side-panel) {
+  /* Lecteurs PGN sans commentaires : 1 colonne centrée (flèches sous l'échiquier) */
+  .pgn-layout:not(.pgn-layout--with-comments) {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
+  }
 
-    & > .pgn-side-panel {
-      max-width: 720px;
-      margin: 0 auto;
+  /* Lecteurs PGN avec commentaires : 2 colonnes (échiquier + flèches à gauche, commentaire à droite) */
+  .pgn-layout--with-comments {
+    width: 100%;
+    max-width: 1040px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    padding: 12px 0;
+
+    & > .pgn-board-column {
+      flex: 0 0 auto;
+      width: min(calc(100dvh - 350px), 520px);
+      max-width: 48%;
+      margin: 0;
+
+      & > .chessboard-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto 6px auto;
+      }
+    }
+
+    & > .pgn-comment-panel {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      margin: 0;
+
+      .comment-container {
+        margin-top: 0;
+        max-height: calc(100dvh - 300px);
+      }
     }
   }
 
@@ -777,6 +882,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  touch-action: manipulation;
 
   ion-grid {
     flex: 0 0 auto !important;

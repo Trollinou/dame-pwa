@@ -3,23 +3,22 @@ import { mount } from '@vue/test-utils';
 import ContentHeader from '@/components/learning/ContentHeader.vue';
 
 describe( 'ContentHeader.vue', () => {
-	test( 'renders unified 2-panel header correctly for exercise', () => {
+	test( 'renders merged single-card header without duplicate title for exercise', () => {
 		const wrapper = mount( ContentHeader, {
 			props: {
 				title: "T8 - Vision'checs",
 				typeLabel: "Vision'checs",
-				chapitreNiveauLabel: 'Matérialité // Niveau 1',
+				chapitreNiveauLabel: 'Matérialité · N1',
 				consigne: 'Observez les 4 diagrammes ci-dessous.',
 				stepBadgeText: 'Diagramme 1 / 4',
 			},
 		} );
 
-		expect( wrapper.find( '.meta-title' ).text() ).toBe(
-			"T8 - Vision'checs"
-		);
+		expect( wrapper.findAll( '.header-card' ) ).toHaveLength( 1 );
+		expect( wrapper.find( '.meta-title' ).exists() ).toBe( false );
 		expect( wrapper.find( '.meta-type' ).text() ).toBe( "Vision'checs" );
 		expect( wrapper.find( '.meta-chapitre-niveau' ).text() ).toBe(
-			'Matérialité // Niveau 1'
+			'Matérialité · N1'
 		);
 		expect( wrapper.find( '.consigne-text' ).text() ).toBe(
 			'Observez les 4 diagrammes ci-dessous.'
@@ -29,15 +28,16 @@ describe( 'ContentHeader.vue', () => {
 		);
 	} );
 
-	test( 'hides Panel 2 when hideSubPanel is true (e.g. for Video or Lesson)', () => {
+	test( 'shows title and hides consigne row when showTitle and hideSubPanel are true (Video/Lesson)', () => {
 		const wrapper = mount( ContentHeader, {
 			props: {
 				title: 'Vidéo : Les mats élémentaires',
 				typeLabel: 'Vidéo',
-				chapitreNiveauLabel: 'Bases // Niveau 1',
+				chapitreNiveauLabel: 'Bases · N1',
 				consigne: 'Consigne ignorée',
 				stepBadgeText: 'Étape 1/1',
 				hideSubPanel: true,
+				showTitle: true,
 			},
 		} );
 
@@ -46,17 +46,18 @@ describe( 'ContentHeader.vue', () => {
 		);
 		expect( wrapper.find( '.meta-type' ).text() ).toBe( 'Vidéo' );
 		expect( wrapper.find( '.meta-chapitre-niveau' ).text() ).toBe(
-			'Bases // Niveau 1'
+			'Bases · N1'
 		);
-		expect( wrapper.find( '.consigne-card' ).exists() ).toBe( false );
+		expect( wrapper.find( '.consigne-row' ).exists() ).toBe( false );
 	} );
 
-	test( 'hides Panel 2 when no consigne or stepBadgeText is provided', () => {
+	test( 'hides consigne row when no consigne or stepBadgeText is provided', () => {
 		const wrapper = mount( ContentHeader, {
 			props: {
 				title: 'Leçon d’introduction',
 				typeLabel: 'Leçon',
-				chapitreNiveauLabel: 'Initiation // Niveau 1',
+				chapitreNiveauLabel: 'Initiation · N1',
+				showTitle: true,
 			},
 		} );
 
@@ -64,6 +65,6 @@ describe( 'ContentHeader.vue', () => {
 			'Leçon d’introduction'
 		);
 		expect( wrapper.find( '.meta-type' ).text() ).toBe( 'Leçon' );
-		expect( wrapper.find( '.consigne-card' ).exists() ).toBe( false );
+		expect( wrapper.find( '.consigne-row' ).exists() ).toBe( false );
 	} );
 } );

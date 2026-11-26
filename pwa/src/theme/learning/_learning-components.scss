@@ -29,16 +29,22 @@
 
   @media (min-width: 992px) and (min-height: 560px),
          (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
-    max-width: min(100%, max(280px, calc(100dvh - 445px)), 540px);
+    max-width: min(100%, max(280px, calc(100dvh - 395px)), 580px);
   }
 }
 
-.pgn-side-panel,
+.pgn-board-column,
+.pgn-comment-panel,
 .learning-side-panel {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.pgn-board-column {
+  align-items: center;
+  gap: 4px;
 }
 
 .chessboard-container--small {
@@ -921,6 +927,7 @@ cg-board.piece-icon-box {
   align-items: center;
   gap: 10px;
   margin-top: 4px;
+  touch-action: manipulation;
 }
 
 .learning-pgn-btn,
@@ -933,6 +940,7 @@ cg-board.piece-icon-box {
   --padding-top: 0;
   --padding-bottom: 0;
   margin: 0;
+  touch-action: manipulation;
 
   ion-icon {
     font-size: 1.3rem;
