@@ -1,6 +1,6 @@
 # TDD & Guide Entraîneur — Module Exercices (Types 1 à 16)
 
-> **Version du document** : `1.2.0` | **Version DAME-PWA** : `1.13.12` | **Dernière mise à jour** : `2026-11-21`
+> **Version du document** : `1.3.0` | **Version DAME-PWA** : `1.14.0` | **Dernière mise à jour** : `2026-11-26`
 
 Ce document consigne la logique complète du module d'exercices de **DAME-PWA** (`pwa/src/views/learning/ContenuPage.vue`, `types/Type*.vue`, `viewers/*.vue` et `utils/parsers/*.ts`).  
 Il sert à la fois de **spécification technique de vérification (TDD)** pour le développement et de **guide de rédaction FEN / PGN** pour les entraîneurs.
@@ -11,9 +11,9 @@ Il sert à la fois de **spécification technique de vérification (TDD)** pour l
 
 ### 1.1 Conteneur Unifié (`ContenuPage.vue`)
 Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquille :
-- **Header (`ContentHeader.vue` via `useExerciseHeader`)** : affiche le titre, le label du type, le chapitre/niveau, la **consigne** dynamique de l'étape active et le **badge d'étape** (`Carte X / N`, `Étape X / N`, etc.).
+- **Header (`ContentHeader.vue` via `useExerciseHeader`)** : carte unique compacte et fusionnée (`showTitle: false` par défaut pour éviter la répétition du titre déjà affiché dans la barre de navigation) affichant le **label du type** à gauche, le **chapitre/niveau abrégé** (`formatChapitreNiveauLabel` → 1er mot du chapitre + `N<x>`, ex. `Activité · N1`) à droite, puis sous un fin séparateur la **consigne** dynamique de l'étape active et le **badge d'étape** (`Carte X / N`, `Étape X / N`, etc.).
 - **Corps scrollable (`<ion-content>`)** : réinitialisé automatiquement en haut (`scrollToTop(0)`) lors des transitions.
-- **Footer persistant (`SeriesCardFooter.vue`)** : téléporté dans `<ion-footer>`. Affiche :
+- **Footer persistant (`SeriesCardFooter.vue`)** : téléporté dans `<ion-footer>` et aligné exactement sur les mêmes largeurs maximales que le Header et le contenu (`100%` mobile, `720px` tablette portrait, `1040px` tablette paysage / ordinateur). Affiche :
   - le feedback de réponse (`success` vert / `danger` rouge / `warning`),
   - l'indice d'attente (`pendingHint`) tant que l'étape n'est pas résolue,
   - le bouton de progression (`Suivant`, `Étape suivante`, `Carte suivante` ou `Terminer l'exercice`).
@@ -30,6 +30,20 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Flèches : `[%cal Ge2e4,Rc1f4]`
   - Les balises `[%...]` sont automatiquement extraites et retirées du texte affiché à l'élève.
 - **Notation des coups** : les parseurs acceptent le SAN international (`K, Q, R, B, N`) et affichent à l'élève les libellés traduits en français (`R, D, T, F, C`).
+
+### 1.3 Architecture Responsive, Lecteurs PGN & Ergonomie Tactile (`_learning-layout.scss`, `_base.scss`)
+- **Seuils unifiés** :
+  - `@mixin learning-tablet-portrait` : `(min-width: 768px) and (min-height: 560px) and (orientation: portrait)` → présentation 1 colonne élargie (`max-width: 720px`).
+  - `@mixin learning-landscape` : `(min-width: 992px) and (min-height: 560px)` ou `(min-width: 768px) and (min-height: 560px) and (orientation: landscape)` → présentation Paysage (`max-width: 1040px`).
+  - **Mobile (portrait & paysage)** : le basculement en paysage sur smartphone (`height < 560px`) **n'a aucun effet** sur la mise en page (exercices, `PlayPage` et `AnalysisPage` conservent la présentation portrait, à l'exception du Type 15 toujours en 2 colonnes).
+- **Taille uniforme des échiquiers** :
+  - En 1 colonne (diagrammes solo et PGN sans commentaires) : `min(100%, 42dvh, 460px)` sur mobile, `min(100%, 48dvh, 520px)` en tablette portrait, `min(100%, max(280px, calc(100dvh - 395px)), 580px)` en paysage/ordinateur.
+  - En 2 colonnes (exercices interactifs avec panneau latéral) : `min(calc(100dvh - 300px), 540px)` (ou `calc(100dvh - 350px)` lorsque les flèches PGN restent sous l'échiquier).
+- **Lecteurs PGN adaptatifs (`PgnViewer.vue`, `hasPgnTextComments`)** :
+  - Les flèches de navigation (`.navigation-controls`) restent toujours groupées sous l'échiquier dans `.pgn-board-column`.
+  - Si le PGN contient au moins un commentaire textuel (en ignorant les blocs ne contenant que des annotations `[%cal ...]` / `[%csl ...]`), le panneau de commentaire (`.pgn-comment-panel`) passe à **droite** en mode paysage/ordinateur (`2` colonnes).
+  - Si le PGN ne contient aucun commentaire textuel, `.pgn-comment-panel` n'est pas rendu et le lecteur reste centré en **1 colonne**.
+- **Anti-double-tap zoom iOS** : `touch-action: manipulation` appliqué globalement aux contrôles interactifs (`button`, `a`, `ion-button`, etc.) et aux barres de navigation PGN / historique (`.navigation-controls`, `.learning-pgn-bar`, `.history-controls`) pour éviter le zoom involontaire lors des clics rapides tout en préservant le *pinch-to-zoom*.
 
 ---
 
@@ -81,7 +95,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Phase `playing`** : Affiche la **FEN de départ** du PGN (`[FEN "..."]`, sinon position standard), orientée selon le trait de la FEN.
 - **Affiché vs Caché** :
   - **Phase `playing`** : Échiquier interactif (`mode="game"`) + uniquement les **cercles jaunes** extraits du commentaire racine du PGN (`filterYellowShapes`). Les commentaires texte et flèches/cercles d'autres couleurs sont cachés.
-  - **Phase `recap`** : Remplacement complet de la vue par `PgnViewer` (boutons Début/Précédent/Suivant + zone de commentaires, bouton Fin masqué via `:hideEndButton="true"`).
+  - **Phase `recap`** : Remplacement complet de la vue par `PgnViewer` (boutons Début/Précédent/Suivant sous l'échiquier, bouton Fin masqué via `:hideEndButton="true"` ; zone de commentaires affichée à droite en paysage/ordinateur uniquement si le PGN contient des commentaires textuels, sinon centrée en 1 colonne sans saut visuel).
 - **Changement de vue** :
   - Jouer toute la séquence de la ligne principale du PGN (coups du joueur + réponses automatiques de l'ordinateur après **500 ms**) bascule automatiquement de `playing` vers `recap`.
 - **Après une réponse** :
@@ -103,7 +117,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Étape `qcm`** : Affiche la FEN exacte au nœud d'embranchement (avant le choix du coup).
   - Orientation : déduite du trait de la FEN initiale de la partie.
 - **Affiché vs Caché** :
-  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` (pas de bouton Fin), zone de commentaire sous l'échiquier (`💬 ...`), surbrillance du dernier coup (`lastMove` / `startingLastMove`), et shapes du coup courant (ou `startingShapes` au départ).
+  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` sous l'échiquier (pas de bouton Fin), zone de commentaire (`💬 ...` sous l'échiquier sur mobile, à droite en paysage/ordinateur), surbrillance du dernier coup (`lastMove` / `startingLastMove`), et shapes du coup courant (ou `startingShapes` au départ).
   - **Étape `qcm`** : Échiquier en lecture seule avec surbrillance du dernier coup précédant l'embranchement (`lastMove`), **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`) formatés via `formatMoveWithFrenchSan` (libellé français + SAN française entre parenthèses sans le symbole `#` pour ne pas révéler le mat). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
 - **Condition stricte de création d'une étape QCM (`hasValidQcmArrows`)** :
   - Le parser ne crée un embranchement `qcm` que si **les 2 conditions** sont réunies sur le nœud :
@@ -177,8 +191,8 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Les diagrammes suivants sont capturés tous les **2 demi-coups** (un tour complet).
   - Le dernier coup restant constitue le puzzle final (`solution: [dernierCoup]`) avec `lastMoveHighlight` sur le coup précédent.
 - **Position initiale affichée & Affiché vs Caché selon les 3 sous-étapes** :
-  1. **`selection`** : Grille 2 colonnes de tous les mini-diagrammes restants dans la banque (mélangés), avec surbrillance du dernier coup (`lastMoveHighlight`) menant à chaque position et coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
-  2. **`ordonnancement`** : Grille 2 colonnes des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), avec surbrillance du dernier coup (`lastMoveHighlight`), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
+  1. **`selection`** : Grille adaptative (`.learning-board-grid-2col` : 2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) de tous les mini-diagrammes restants dans la banque (mélangés), avec surbrillance du dernier coup (`lastMoveHighlight`) menant à chaque position et coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
+  2. **`ordonnancement`** : Grille adaptative (2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), avec surbrillance du dernier coup (`lastMoveHighlight`), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
   3. **`resolution`** : Grand échiquier `PuzzleViewer` sur la position finale de la série (avec `shapes` et `lastMoveHighlight`).
 - **Changement de vue** :
   - `selection` → `ordonnancement` : Lorsque les N cartes sélectionnées appartiennent toutes à la même partie, clic sur `Classer la série` dans `SeriesCardFooter`.
@@ -275,7 +289,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 - **Rôle** : Classer une liste de diagrammes (3 ou 5) dans l'ordre exact attendu (de la position la plus forte à la moins forte).
 - **Position initiale affichée** :
-  - Grille 2 colonnes (`.learning-board-grid-2col`) affichant tous les diagrammes mélangés via `shuffleNonSorted()` (garantissant qu'une position déjà triée n'est jamais présentée au départ), rendus par `DiagramViewer` (`view-only`).
+  - Grille adaptative (`.learning-board-grid-2col` : 2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) affichant tous les diagrammes mélangés via `shuffleNonSorted()` (garantissant qu'une position déjà triée n'est jamais présentée au départ), rendus par `DiagramViewer` (`view-only`).
   - Chaque carte affiche son rang `1..N` dans `.learning-board-card__header` au-dessus de l'échiquier (sans masquer les cases d'angle), orienté selon `position.couleur_joueur` (`'white' | 'black'`) avec ses `shapes`.
 - **Affiché vs Caché** :
   - **Pendant le tri (`!isSolved`)** : `position.commentaire` est **masqué** ; seules les positions, leur orientation (`couleur_joueur`) et leurs `shapes` sont visibles.
@@ -377,10 +391,12 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 - **Rôle** : Observer 3 plans animés en boucle sur des mini-échiquiers, choisir le meilleur plan, puis consulter l'explication PGN.
 - **Position initiale affichée** :
-  - **Phase `observation`** : Grand échiquier fixe sur `fenDepart` (`"Position de départ"`), plus **3 mini-échiquiers** (`Plan 1`, `Plan 2`, `Plan 3`) qui démarrent sur `fenDepart` puis **jouent en boucle** les coups de leur PGN (`1 coup / 1000 ms`, pause `2500 ms` à la fin, puis retour sur `fenDepart`).
-  - **Phase `explication`** : `PgnViewer` complet affichant `pgnExplication`.
+  - **Phase `observation`** : Affichage permanent en **2 colonnes calibrées zéro-scroll** sur tous les appareils : grand échiquier fixe sur `fenDepart` (`"Position de départ"`) à gauche et **3 mini-échiquiers** (`Plan 1`, `Plan 2`, `Plan 3`) à droite qui démarrent sur `fenDepart` puis **jouent en boucles synchronisées** (`startSynchronizedPlayback`) les coups de leur PGN (`1 coup / 1000 ms`, les scénarios plus courts attendent la fin de la séquence la plus longue, pause commune de `2500 ms`, puis réinitialisation et redémarrage simultanés sur `fenDepart`).
+    - *Mobile* : les 4 échiquiers partagent exactement la même dimension (`--jf-mobile-board`), avec `"Position de départ"` placé au-dessus de l'échiquier (`flex-direction: column-reverse`) pour l'aligner au pixel près avec le `Plan 2`.
+    - *Tablette & Ordinateur* : les libellés `Plan X` / `Choisir` sont placés à gauche de chaque mini-échiquier pour maximiser leur taille, les 3 plans sont répartis sur la hauteur disponible à droite et l'échiquier de départ (légende dessous) est centré dans la colonne gauche restante.
+  - **Phase `explication`** : `PgnViewer` complet affichant `pgnExplication` (commentaire à droite en paysage/ordinateur).
 - **Affiché vs Caché** :
-  - **Phase `observation`** : Les commentaires des scénarios et `is_correct` sont cachés ; seul le titre `Plan X` et `"Toucher pour choisir"` sont affichés.
+  - **Phase `observation`** : Les commentaires des scénarios et `is_correct` sont cachés ; seul le titre `Plan X` et `"Choisir"` sont affichés.
   - **Phase `explication`** : Remplace toute la vue d'observation par le `PgnViewer`.
 - **Changement de vue** :
   - Clic sur le scénario marqué `is_correct: true` → arrêt de tous les timers d'animation, bascule vers `explication`.

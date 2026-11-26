@@ -15,13 +15,36 @@
 .chessboard-container {
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-width: min(100%, 38dvh, 440px);
+  max-width: min(100%, 42dvh, 460px);
   margin: 0 auto 6px auto;
   border-radius: 0 !important;
   overflow: hidden;
   box-shadow: none !important;
   position: relative;
   flex-shrink: 0;
+
+  @media (min-width: 768px) and (min-height: 560px) and (orientation: portrait) {
+    max-width: min(100%, 48dvh, 520px);
+  }
+
+  @media (min-width: 992px) and (min-height: 560px),
+         (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+    max-width: min(100%, max(280px, calc(100dvh - 395px)), 580px);
+  }
+}
+
+.pgn-board-column,
+.pgn-comment-panel,
+.learning-side-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pgn-board-column {
+  align-items: center;
+  gap: 4px;
 }
 
 .chessboard-container--small {
@@ -88,9 +111,10 @@
 }
 
 .board-caption {
-  margin-top: 8px;
+  margin-top: 6px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
   color: var(--ion-color-primary, #3880ff);
   text-align: center;
 }
@@ -345,10 +369,10 @@
   flex-grow: 1;
   gap: 8px;
   position: relative;
-  padding: 14px;
+  padding: 8px 10px;
 
-  @media (max-width: 768px) {
-    padding: 8px 10px;
+  @media (min-width: 768px) and (min-height: 560px) {
+    padding: 14px;
   }
 }
 
@@ -365,7 +389,7 @@
 }
 
 .desc-text-content {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   line-height: 1.45;
   color: var(--ion-color-step-800, #333);
   font-weight: 500;
@@ -374,8 +398,8 @@
   margin: 6px 0;
   word-break: break-word;
 
-  @media (max-width: 768px) {
-    font-size: 0.85rem;
+  @media (min-width: 768px) and (min-height: 560px) {
+    font-size: 0.88rem;
   }
 }
 
@@ -541,14 +565,6 @@
     --padding-start: 8px;
     --padding-end: 8px;
   }
-}
-
-.consigne-card {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 0 16px 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .consigne-title {
@@ -815,7 +831,7 @@
   width: 100%;
   box-sizing: border-box;
 
-  @media (min-width: 400px) {
+  @media (min-width: 768px) and (min-height: 560px) {
     gap: 8px;
   }
 }
@@ -911,6 +927,7 @@ cg-board.piece-icon-box {
   align-items: center;
   gap: 10px;
   margin-top: 4px;
+  touch-action: manipulation;
 }
 
 .learning-pgn-btn,
@@ -923,6 +940,7 @@ cg-board.piece-icon-box {
   --padding-top: 0;
   --padding-bottom: 0;
   margin: 0;
+  touch-action: manipulation;
 
   ion-icon {
     font-size: 1.3rem;
@@ -1940,9 +1958,11 @@ cg-board.piece-icon-box {
 
 .scenario-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 100%;
   margin: 0 auto;
   border-radius: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   border: 2px solid transparent;
@@ -1958,7 +1978,10 @@ cg-board.piece-icon-box {
 }
 
 .scenario-header {
-  padding: 10px 14px 6px 14px;
+  padding: 4px 8px;
+  gap: 4px;
+  min-height: 24px;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1966,12 +1989,19 @@ cg-board.piece-icon-box {
 
 .scenario-badge {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
   color: var(--ion-color-primary, #3880ff);
 }
 
 .scenario-hint {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--ion-color-step-600, #666);
 }
 

@@ -6,6 +6,7 @@
       :typeLabel="typeLabel || 'Leçon'"
       :chapitreNiveauLabel="chapitreNiveauLabel"
       :hideSubPanel="true"
+      :showTitle="true"
     />
 
     <!-- Contenu HTML de la Leçon hydratant FEN & PGN -->

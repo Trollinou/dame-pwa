@@ -8,16 +8,18 @@
 
 .content-unified-header {
   width: 100%;
+  margin-bottom: 8px;
 }
 
 .header-card {
+  width: 100%;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-bottom: 6px;
 }
 
-.meta-card-content {
-  padding: 6px 10px;
+.header-card-content {
+  padding: 6px 12px;
 }
 
 .meta-title {
@@ -47,15 +49,17 @@
   color: var(--ion-color-medium-shade, #666666);
 }
 
-.consigne-card-content {
-  padding: 6px 10px;
-}
-
 .consigne-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+
+  &--merged {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--ion-color-step-150, #e5e7eb);
+  }
 }
 
 .consigne-text {
@@ -156,9 +160,18 @@
   flex-direction: column;
   gap: 6px;
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+
+  @media (min-width: 768px) and (min-height: 560px) and (orientation: portrait) {
+    max-width: 720px;
+  }
+
+  @media (min-width: 992px) and (min-height: 560px),
+         (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+    max-width: 1040px;
+  }
 }
 
 .feedback-row {

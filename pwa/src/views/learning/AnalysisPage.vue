@@ -386,6 +386,10 @@
 
 <script setup lang="ts">
 import {
+  isLearningLandscapeViewport,
+  isLearningTabletOrDesktopViewport,
+} from '@/composables/learning/play/useBoardOrientation';
+import {
   IonPage,
   IonHeader,
   IonToolbar,
@@ -505,15 +509,15 @@ const activeUndoneMoves = computed(() => {
   return undoneMovesMap.value.get(activePly.value) || [];
 });
 
-const isLandscape = ref(window.innerWidth > window.innerHeight);
-const isDesktop = ref(window.innerWidth >= 768);
+const isLandscape = ref(isLearningLandscapeViewport());
+const isDesktop = ref(isLearningTabletOrDesktopViewport());
 let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const updateOrientation = () => {
   if (resizeTimeout) clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    isLandscape.value = window.innerWidth > window.innerHeight;
-    isDesktop.value = window.innerWidth >= 768;
+    isLandscape.value = isLearningLandscapeViewport();
+    isDesktop.value = isLearningTabletOrDesktopViewport();
     boardApi?.redraw(true);
   }, 150);
 };

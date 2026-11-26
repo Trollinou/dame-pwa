@@ -194,27 +194,54 @@ export function getContenuTypeLabel(
 }
 
 /**
- * Formats the Chapter and Level label (e.g. "Matérialité // Niveau 1", "Activité", or "Niveau 2").
+ * Formats the Chapter and Level label in compact form (e.g. "Activité · N1", "Matérialité · N1", or "N2").
  *
- * @param chapitreNom Name of the chapter (e.g., "Matérialité", "Activité", "Sécurité", "Structure", "Combinaison")
+ * @param chapitreNom Name of the chapter (e.g., "Matérialité", "Activité des Pièces", "Sécurité du Roi", "Structure de Pions", "Combinaison")
  * @param niveau      Level number (1 to 4)
- * @return Formatted label string
+ * @return Compact formatted label string
  */
 export function formatChapitreNiveauLabel(
 	chapitreNom?: string | null,
 	niveau?: number | null
 ): string {
 	const cleanChapitre = decodeHtmlEntities( chapitreNom?.trim() );
-	const cleanNiveau = niveau ? `Niveau ${ niveau }` : '';
+	const shortChapitre = cleanChapitre
+		? cleanChapitre.split( /\s+/ )[ 0 ]
+		: '';
+	const cleanNiveau = niveau ? `N${ niveau }` : '';
 
-	if ( cleanChapitre && cleanNiveau ) {
-		return `${ cleanChapitre } // ${ cleanNiveau }`;
+	if ( shortChapitre && cleanNiveau ) {
+		return `${ shortChapitre } · ${ cleanNiveau }`;
 	}
-	if ( cleanChapitre ) {
-		return cleanChapitre;
+	if ( shortChapitre ) {
+		return shortChapitre;
 	}
 	if ( cleanNiveau ) {
 		return cleanNiveau;
 	}
 	return '';
+}
+
+/**
+ * Checks whether a PGN string contains at least one human-readable text comment inside `{...}`
+ * (ignoring PGN drawing/annotation commands like `[%cal ...]` or `[%csl ...]`).
+ *
+ * @param pgn Raw PGN string
+ * @return True if a non-empty text comment exists
+ */
+export function hasPgnTextComments( pgn?: string | null ): boolean {
+	if ( ! pgn ) {
+		return false;
+	}
+	const blocks = pgn.match( /\{([^}]*)\}/g );
+	if ( ! blocks ) {
+		return false;
+	}
+	return blocks.some(
+		( block ) =>
+			block
+				.slice( 1, -1 )
+				.replace( /\[%[a-zA-Z]+\s+[^\]]*\]/g, '' )
+				.trim().length > 0
+	);
 }

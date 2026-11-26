@@ -7,6 +7,7 @@
       :typeLabel="typeLabel || 'Vidéo'"
       :chapitreNiveauLabel="chapitreNiveauLabel"
       :hideSubPanel="true"
+      :showTitle="true"
     />
 
     <!-- Conteneur Vidéo Principal -->

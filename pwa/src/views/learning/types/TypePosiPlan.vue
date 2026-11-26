@@ -16,142 +16,57 @@
           />
         </div>
 
-        <div class="learning-instruction-bar">
-          <span>Trouve le bon plan</span>
-        </div>
+        <div class="learning-side-panel">
+          <div class="learning-instruction-bar">
+            <span>Trouve le bon plan</span>
+          </div>
 
-        <ion-card class="exercise-card">
-          <ion-card-content>
-            <div class="qcm-choices">
-              <ion-button
-                v-for="(choix, index) in initialChoicesList"
-                :key="index"
-                expand="block"
-                fill="solid"
-                :color="couleurBoutonInitial(choix, index)"
-                :disabled="isInitialChoiceSolved"
-                class="choice-btn"
-                @click="selectionnerChoixInitial(choix, index)"
-              >
-                {{ choix.label }}
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
+          <ion-card class="exercise-card">
+            <ion-card-content>
+              <div class="qcm-choices">
+                <ion-button
+                  v-for="(choix, index) in initialChoicesList"
+                  :key="index"
+                  expand="block"
+                  fill="solid"
+                  :color="couleurBoutonInitial(choix, index)"
+                  :disabled="isInitialChoiceSolved"
+                  class="choice-btn"
+                  @click="selectionnerChoixInitial(choix, index)"
+                >
+                  {{ choix.label }}
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
       </div>
 
       <!-- 2. MODE EXPLORATION D'UNE VARIANTE ALTERNATIVE -->
-      <div v-else-if="currentMode === 'variant_view'" class="stage-pgn-wrapper animate-fade-in">
-        <!-- Bandeau d'indication de la variante -->
-        <div class="variant-indicator-bar">
-          <span class="variant-title">
-            Variante alternative : <strong>{{ activeVariant?.label }}</strong>
-          </span>
-          <ion-button
-            size="small"
-            color="warning"
-            fill="solid"
-            class="return-btn"
-            @click="retournerAuChoixInitial"
-          >
-            <ion-icon slot="start" :icon="arrowBackOutline" />
-            Choix initial
-          </ion-button>
-        </div>
-
-        <div class="chessboard-container">
-          <Chessboard
-            :key="`posi-variant-${activeVariant?.san}`"
-            mode="game"
-            :fen="activeVariantFen"
-            :last-move="activeVariantLastMove"
-            :shapes="activeVariantShapes"
-            :orientation="parsedData.orientation"
-            :player-color="parsedData.orientation"
-            :view-only="true"
-            @board-created="onVariantBoardCreated"
-          />
-        </div>
-
-        <!-- Contrôles de Navigation de la Variante -->
-        <div class="navigation-controls">
-          <ion-button
-            fill="outline"
-            color="primary"
-            class="nav-btn"
-            :disabled="currentVariantMoveIndex < 0"
-            @click="viewVariantStart"
-            title="Début"
-          >
-            <ion-icon slot="icon-only" :icon="playBackOutline" />
-          </ion-button>
-          <ion-button
-            fill="outline"
-            color="primary"
-            class="nav-btn"
-            :disabled="currentVariantMoveIndex < 0"
-            @click="viewVariantPrevious"
-            title="Précédent"
-          >
-            <ion-icon slot="icon-only" :icon="chevronBackOutline" />
-          </ion-button>
-          <ion-button
-            fill="outline"
-            color="primary"
-            class="nav-btn"
-            :disabled="isVariantAtEnd"
-            @click="viewVariantNext"
-            title="Suivant"
-          >
-            <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
-          </ion-button>
-        </div>
-
-        <!-- Commentaire du Coup Courant de la Variante -->
-        <div ref="variantCommentContainerEl" class="comment-container" :class="{ 'comment-empty': !activeVariantComment }">
-          <p class="comment-text">
-            {{ activeVariantComment ? '💬 ' + activeVariantComment : '' }}
-          </p>
-        </div>
-
-        <!-- Bouton retour bien visible en fin de variante -->
-        <div v-if="isVariantAtEnd" class="variant-finish-action animate-fade-in">
-          <ion-button
-            expand="block"
-            color="primary"
-            @click="retournerAuChoixInitial"
-          >
-            <ion-icon slot="start" :icon="arrowBackOutline" />
-            Retourner au choix initial
-          </ion-button>
-        </div>
-      </div>
-
-      <!-- 3. DÉROULEMENT DE LA BRANCHE PRINCIPALE (PGN ou QCM) -->
-      <div v-else-if="currentMode === 'main_branch'" class="main-branch-wrapper animate-fade-in">
-        <!-- 3.A. Sous-étape PGN (visionnage des coups) -->
-        <div v-if="currentMainStage?.type === 'pgn'" class="stage-pgn-wrapper">
+      <div v-else-if="currentMode === 'variant_view'" class="stage-pgn-wrapper pgn-layout pgn-layout--with-comments animate-fade-in">
+        <div class="pgn-board-column">
           <div class="chessboard-container">
             <Chessboard
-              :key="`main-pgn-${mainBranchStageIndex}`"
+              :key="`posi-variant-${activeVariant?.san}`"
               mode="game"
-              :fen="activeMainPgnFen"
-              :last-move="activeMainPgnLastMove"
-              :orientation="currentMainStage.orientation"
-              :player-color="currentMainStage.orientation"
-              :shapes="activeMainPgnShapes"
+              :fen="activeVariantFen"
+              :last-move="activeVariantLastMove"
+              :shapes="activeVariantShapes"
+              :orientation="parsedData.orientation"
+              :player-color="parsedData.orientation"
               :view-only="true"
-              @board-created="onMainPgnBoardCreated"
+              @board-created="onVariantBoardCreated"
             />
           </div>
 
+          <!-- Contrôles de Navigation de la Variante -->
           <div class="navigation-controls">
             <ion-button
               fill="outline"
               color="primary"
               class="nav-btn"
-              :disabled="currentMainPgnMoveIndex < 0"
-              @click="viewMainPgnStart"
+              :disabled="currentVariantMoveIndex < 0"
+              @click="viewVariantStart"
               title="Début"
             >
               <ion-icon slot="icon-only" :icon="playBackOutline" />
@@ -160,8 +75,8 @@
               fill="outline"
               color="primary"
               class="nav-btn"
-              :disabled="currentMainPgnMoveIndex < 0"
-              @click="viewMainPgnPrevious"
+              :disabled="currentVariantMoveIndex < 0"
+              @click="viewVariantPrevious"
               title="Précédent"
             >
               <ion-icon slot="icon-only" :icon="chevronBackOutline" />
@@ -170,18 +85,113 @@
               fill="outline"
               color="primary"
               class="nav-btn"
-              :disabled="isMainPgnAtEnd"
-              @click="viewMainPgnNext"
+              :disabled="isVariantAtEnd"
+              @click="viewVariantNext"
               title="Suivant"
             >
               <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
             </ion-button>
           </div>
+        </div>
 
-          <div ref="mainCommentContainerEl" class="comment-container" :class="{ 'comment-empty': !activeMainPgnComment }">
+        <div class="pgn-comment-panel">
+          <!-- Bandeau d'indication de la variante -->
+          <div class="variant-indicator-bar">
+            <span class="variant-title">
+              Variante alternative : <strong>{{ activeVariant?.label }}</strong>
+            </span>
+            <ion-button
+              size="small"
+              color="warning"
+              fill="solid"
+              class="return-btn"
+              @click="retournerAuChoixInitial"
+            >
+              <ion-icon slot="start" :icon="arrowBackOutline" />
+              Choix initial
+            </ion-button>
+          </div>
+
+          <!-- Commentaire du Coup Courant de la Variante -->
+          <div ref="variantCommentContainerEl" class="comment-container" :class="{ 'comment-empty': !activeVariantComment }">
             <p class="comment-text">
-              {{ activeMainPgnComment ? '💬 ' + activeMainPgnComment : '' }}
+              {{ activeVariantComment ? '💬 ' + activeVariantComment : '' }}
             </p>
+          </div>
+
+          <!-- Bouton retour bien visible en fin de variante -->
+          <div v-if="isVariantAtEnd" class="variant-finish-action animate-fade-in">
+            <ion-button
+              expand="block"
+              color="primary"
+              @click="retournerAuChoixInitial"
+            >
+              <ion-icon slot="start" :icon="arrowBackOutline" />
+              Retourner au choix initial
+            </ion-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. DÉROULEMENT DE LA BRANCHE PRINCIPALE (PGN ou QCM) -->
+      <div v-else-if="currentMode === 'main_branch'" class="main-branch-wrapper animate-fade-in">
+        <!-- 3.A. Sous-étape PGN (visionnage des coups) -->
+        <div v-if="currentMainStage?.type === 'pgn'" class="stage-pgn-wrapper pgn-layout pgn-layout--with-comments">
+          <div class="pgn-board-column">
+            <div class="chessboard-container">
+              <Chessboard
+                :key="`main-pgn-${mainBranchStageIndex}`"
+                mode="game"
+                :fen="activeMainPgnFen"
+                :last-move="activeMainPgnLastMove"
+                :orientation="currentMainStage.orientation"
+                :player-color="currentMainStage.orientation"
+                :shapes="activeMainPgnShapes"
+                :view-only="true"
+                @board-created="onMainPgnBoardCreated"
+              />
+            </div>
+
+            <div class="navigation-controls">
+              <ion-button
+                fill="outline"
+                color="primary"
+                class="nav-btn"
+                :disabled="currentMainPgnMoveIndex < 0"
+                @click="viewMainPgnStart"
+                title="Début"
+              >
+                <ion-icon slot="icon-only" :icon="playBackOutline" />
+              </ion-button>
+              <ion-button
+                fill="outline"
+                color="primary"
+                class="nav-btn"
+                :disabled="currentMainPgnMoveIndex < 0"
+                @click="viewMainPgnPrevious"
+                title="Précédent"
+              >
+                <ion-icon slot="icon-only" :icon="chevronBackOutline" />
+              </ion-button>
+              <ion-button
+                fill="outline"
+                color="primary"
+                class="nav-btn"
+                :disabled="isMainPgnAtEnd"
+                @click="viewMainPgnNext"
+                title="Suivant"
+              >
+                <ion-icon slot="icon-only" :icon="chevronForwardOutline" />
+              </ion-button>
+            </div>
+          </div>
+
+          <div class="pgn-comment-panel">
+            <div ref="mainCommentContainerEl" class="comment-container" :class="{ 'comment-empty': !activeMainPgnComment }">
+              <p class="comment-text">
+                {{ activeMainPgnComment ? '💬 ' + activeMainPgnComment : '' }}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -201,28 +211,30 @@
             />
           </div>
 
-          <div class="qcm-instruction-bar">
-            <span class="qcm-instruction-text">Trouve le coup suivant</span>
-          </div>
+          <div class="learning-side-panel">
+            <div class="qcm-instruction-bar">
+              <span class="qcm-instruction-text">Trouve le coup suivant</span>
+            </div>
 
-          <ion-card class="exercise-card">
-            <ion-card-content>
-              <div class="qcm-choices">
-                <ion-button
-                  v-for="(choix, index) in currentMainStage.choices"
-                  :key="index"
-                  expand="block"
-                  fill="solid"
-                  :color="couleurBoutonMainQcm(choix, index)"
-                  :disabled="isMainQcmSolved"
-                  class="choice-btn"
-                  @click="validerChoixMainQcm(choix, index)"
-                >
-                  {{ choix.label }}
-                </ion-button>
-              </div>
-            </ion-card-content>
-          </ion-card>
+            <ion-card class="exercise-card">
+              <ion-card-content>
+                <div class="qcm-choices">
+                  <ion-button
+                    v-for="(choix, index) in currentMainStage.choices"
+                    :key="index"
+                    expand="block"
+                    fill="solid"
+                    :color="couleurBoutonMainQcm(choix, index)"
+                    :disabled="isMainQcmSolved"
+                    class="choice-btn"
+                    @click="validerChoixMainQcm(choix, index)"
+                  >
+                    {{ choix.label }}
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </div>
         </div>
       </div>
 

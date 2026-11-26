@@ -15,6 +15,17 @@
   --dame-item-radius: 8px;
 }
 
+/* Désactivation du double-tap-to-zoom iOS sur les contrôles interactifs (tout en préservant le pinch-to-zoom) */
+button,
+a,
+ion-button,
+ion-button::part(native),
+ion-segment-button,
+ion-tab-button,
+[role="button"] {
+  touch-action: manipulation;
+}
+
 /* Utilitaires de conteneur & centrage */
 .dame-container {
   width: 100%;
