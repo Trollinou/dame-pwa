@@ -26,7 +26,7 @@
         >
           <div class="scenario-header">
             <span class="scenario-badge">Plan {{ index + 1 }}</span>
-            <span class="scenario-hint">Toucher pour choisir</span>
+            <span class="scenario-hint">Choisir</span>
           </div>
           <div class="chessboard-container--mini">
             <Chessboard
@@ -105,11 +105,14 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
+const MOVE_INTERVAL_MS = 1000;
+const END_PAUSE_MS = 2500;
+
 const phase = ref<'observation' | 'explication'>('observation');
 const footerFeedback = ref<CardFeedback | null>(null);
 const mainBoardApi = shallowRef<BoardCore | null>(null);
 const boardApis = shallowRef<Map<number, BoardCore>>(new Map());
-const playbackTimers = ref<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+let masterPlaybackTimer: ReturnType<typeof setTimeout> | null = null;
 
 watch(
   [phase, () => props.consigne],
@@ -156,16 +159,11 @@ const onMainBoardCreated = (api: BoardCore) => {
   }
 };
 
-const clearScenarioTimer = (index: number) => {
-  if (playbackTimers.value.has(index)) {
-    clearTimeout(playbackTimers.value.get(index)!);
-    playbackTimers.value.delete(index);
-  }
-};
-
 const clearAllTimers = () => {
-  playbackTimers.value.forEach((timer) => clearTimeout(timer));
-  playbackTimers.value.clear();
+  if (masterPlaybackTimer !== null) {
+    clearTimeout(masterPlaybackTimer);
+    masterPlaybackTimer = null;
+  }
 };
 
 onBeforeUnmount(() => {
@@ -230,60 +228,74 @@ const getMoveSequence = (fenDepart: string, pgnString: string) => {
   }
 };
 
-const startScenarioPlayback = (index: number, api: BoardCore) => {
-  clearScenarioTimer(index);
+const startSynchronizedPlayback = () => {
+  clearAllTimers();
 
-  const scenario = props.scenarios[index];
-  if (!scenario || !scenario.pgn) return;
+  if (phase.value !== 'observation') return;
+  if (props.scenarios.length === 0 || boardApis.value.size < props.scenarios.length) {
+    return;
+  }
 
-  const moves = getMoveSequence(props.fenDepart, scenario.pgn);
-  if (moves.length === 0) return;
+  const sequences = props.scenarios.map((scenario) =>
+    scenario?.pgn ? getMoveSequence(props.fenDepart, scenario.pgn) : []
+  );
+  const maxMoves = sequences.reduce((max, seq) => Math.max(max, seq.length), 0);
+
+  const initialFen = props.fenDepart || 'start';
+  boardApis.value.forEach((api) => {
+    api.setPosition(initialFen);
+  });
+
+  if (maxMoves === 0) return;
 
   let currentMoveIndex = 0;
 
   const playStep = () => {
     if (phase.value !== 'observation') return;
 
-    if (currentMoveIndex < moves.length) {
-      const moveObj = moves[currentMoveIndex];
-      try {
-        api.move(moveObj.san);
-      } catch {
-        // Ignorer si le coup échoue
+    boardApis.value.forEach((api, index) => {
+      const seq = sequences[index];
+      if (seq && currentMoveIndex < seq.length) {
+        try {
+          api.move(seq[currentMoveIndex].san);
+        } catch {
+          // Ignorer si le coup échoue
+        }
       }
-      currentMoveIndex++;
-      const timer = setTimeout(playStep, 1000);
-      playbackTimers.value.set(index, timer);
+    });
+
+    currentMoveIndex++;
+
+    if (currentMoveIndex < maxMoves) {
+      masterPlaybackTimer = setTimeout(playStep, MOVE_INTERVAL_MS);
     } else {
-      // Fin de la séquence : pause de 2500ms, réinitialisation FEN, puis reprise
-      const timer = setTimeout(() => {
+      // Tous les échiquiers attendent la fin de la séquence la plus longue, puis redémarrent ensemble
+      masterPlaybackTimer = setTimeout(() => {
         if (phase.value !== 'observation') return;
-        api.setPosition(props.fenDepart || 'start');
+        const resetFen = props.fenDepart || 'start';
+        boardApis.value.forEach((api) => {
+          api.setPosition(resetFen);
+        });
         currentMoveIndex = 0;
-        const restartTimer = setTimeout(playStep, 1000);
-        playbackTimers.value.set(index, restartTimer);
-      }, 2500);
-      playbackTimers.value.set(index, timer);
+        masterPlaybackTimer = setTimeout(playStep, MOVE_INTERVAL_MS);
+      }, END_PAUSE_MS);
     }
   };
 
-  api.setPosition(props.fenDepart || 'start');
-  const initialTimer = setTimeout(playStep, 1000);
-  playbackTimers.value.set(index, initialTimer);
+  masterPlaybackTimer = setTimeout(playStep, MOVE_INTERVAL_MS);
 };
 
 const onScenarioBoardCreated = (index: number, api: BoardCore) => {
   boardApis.value.set(index, api);
-  startScenarioPlayback(index, api);
+  api.setPosition(props.fenDepart || 'start');
+  startSynchronizedPlayback();
 };
 
-watch(() => props.fenDepart, (newFen) => {
+watch([() => props.fenDepart, () => props.scenarios], ([newFen]) => {
   if (mainBoardApi.value && newFen) {
     mainBoardApi.value.setPosition(newFen);
   }
-  boardApis.value.forEach((api, index) => {
-    startScenarioPlayback(index, api);
-  });
+  startSynchronizedPlayback();
 });
 
 const selectScenario = async (index: number) => {

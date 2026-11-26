@@ -377,10 +377,10 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 - **Rôle** : Observer 3 plans animés en boucle sur des mini-échiquiers, choisir le meilleur plan, puis consulter l'explication PGN.
 - **Position initiale affichée** :
-  - **Phase `observation`** : Grand échiquier fixe sur `fenDepart` (`"Position de départ"`), plus **3 mini-échiquiers** (`Plan 1`, `Plan 2`, `Plan 3`) qui démarrent sur `fenDepart` puis **jouent en boucle** les coups de leur PGN (`1 coup / 1000 ms`, pause `2500 ms` à la fin, puis retour sur `fenDepart`).
+  - **Phase `observation`** : Grand échiquier fixe sur `fenDepart` (`"Position de départ"`), plus **3 mini-échiquiers** (`Plan 1`, `Plan 2`, `Plan 3`) qui démarrent sur `fenDepart` puis **jouent en boucles synchronisées** (`startSynchronizedPlayback`) les coups de leur PGN (`1 coup / 1000 ms`, les scénarios plus courts attendent la fin de la séquence la plus longue, pause commune de `2500 ms`, puis réinitialisation et redémarrage simultanés sur `fenDepart`).
   - **Phase `explication`** : `PgnViewer` complet affichant `pgnExplication`.
 - **Affiché vs Caché** :
-  - **Phase `observation`** : Les commentaires des scénarios et `is_correct` sont cachés ; seul le titre `Plan X` et `"Toucher pour choisir"` sont affichés.
+  - **Phase `observation`** : Les commentaires des scénarios et `is_correct` sont cachés ; seul le titre `Plan X` et `"Choisir"` sont affichés.
   - **Phase `explication`** : Remplace toute la vue d'observation par le `PgnViewer`.
 - **Changement de vue** :
   - Clic sur le scénario marqué `is_correct: true` → arrêt de tous les timers d'animation, bascule vers `explication`.

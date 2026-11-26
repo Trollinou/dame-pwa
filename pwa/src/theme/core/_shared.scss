@@ -8,9 +8,11 @@
 
 .content-unified-header {
   width: 100%;
+  margin-bottom: 8px;
 }
 
 .header-card {
+  width: 100%;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-bottom: 6px;
@@ -156,9 +158,18 @@
   flex-direction: column;
   gap: 6px;
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+
+  @media (min-width: 768px) and (min-height: 560px) and (orientation: portrait) {
+    max-width: 720px;
+  }
+
+  @media (min-width: 992px) and (min-height: 560px),
+         (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+    max-width: 1040px;
+  }
 }
 
 .feedback-row {
