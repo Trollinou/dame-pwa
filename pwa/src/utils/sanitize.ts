@@ -28,6 +28,7 @@ const DEFAULT_CONFIG = {
 		'data-pgn',
 		'data-orientation',
 		'data-shapes',
+		'data-wp-context',
 		'style', // data-path est utilisé pour useInternalLinks
 	],
 };

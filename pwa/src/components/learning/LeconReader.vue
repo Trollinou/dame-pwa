@@ -119,12 +119,21 @@ const hydraterBlocs = () => {
   if (!contentRef.value) return;
 
   // 1. Hydrater les FEN / Diagrammes
-  const fenElements = contentRef.value.querySelectorAll('.roi-bloc-fen, .roi-bloc-diagramme');
+  const fenElements = contentRef.value.querySelectorAll('.roi-bloc-fen, .roi-bloc-diagramme, .wp-block-roi-diagramme, .chessboard-block');
   fenElements.forEach((el) => {
     const htmlEl = el as HTMLElement;
-    const fen = htmlEl.dataset.fen || '';
-    const orientation = (htmlEl.dataset.orientation || 'white') as 'white' | 'black';
-    let shapes: DrawShape[] = [];
+    let wpContext: { fen?: string; orientation?: 'white' | 'black'; shapes?: DrawShape[] } = {};
+    if (htmlEl.dataset.wpContext) {
+      try {
+        wpContext = JSON.parse(htmlEl.dataset.wpContext);
+      } catch (e) {
+        console.error('Erreur lors du parsing de data-wp-context :', e);
+      }
+    }
+
+    const fen = htmlEl.dataset.fen || wpContext.fen || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    const orientation = (htmlEl.dataset.orientation || wpContext.orientation || 'white') as 'white' | 'black';
+    let shapes: DrawShape[] = Array.isArray(wpContext.shapes) ? wpContext.shapes : [];
     if (htmlEl.dataset.shapes) {
       try {
         shapes = JSON.parse(htmlEl.dataset.shapes);

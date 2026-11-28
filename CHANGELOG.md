@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Leçons (`roi_lecon`) & Échiquier (`Chessboard.vue`, `LeconReader.vue`, `sanitize.ts`, `README.md`, `USING.md`) — Affichage initial des `shapes` et alignement contrat `roi/diagramme`** :
+  - Application des `shapes` (`api.setShapes(props.shapes)`) dans `handleBoardCreated` et après `setPosition()` dans le `watch` sur `props.fen` de `Chessboard.vue` afin d'afficher flèches et cercles dès le montage initial.
+  - Mise en conformité de `LeconReader.vue` et `sanitize.ts` avec le contrat HTML `roi/diagramme` : ajout des sélecteurs `.wp-block-roi-diagramme` et `.chessboard-block`, autorisation de l'attribut `data-wp-context` dans DOMPurify et repli sur `data-wp-context` / FEN initial par défaut.
+
 - **Type 5 (Posi'Plan) — Jeu direct sur l'échiquier à l'étape QCM (`TypePosiPlan.vue`, `TypePosiPlan.spec.ts`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Suppression des 3 boutons de choix sur les sous-étapes `qcm` de la branche principale afin de jouer le coup directement sur l'échiquier (`:view-only="isMainQcmSolved"`, validation via `@move` avec réinitialisation de la position en cas d'erreur ou de coup hors propositions), aligné sur les Types 4 et 13.
 

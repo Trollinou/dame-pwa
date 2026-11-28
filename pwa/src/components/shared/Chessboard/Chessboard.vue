@@ -145,6 +145,9 @@ const handleBoardCreated = (api: BoardCore) => {
   if (props.fen && props.fen !== 'start') {
     api.setPosition(props.fen, props.lastMove);
   }
+  if (props.shapes && props.shapes.length > 0) {
+    api.setShapes(props.shapes);
+  }
   if (props.glyphs) {
     applyGlyphsToApi(api, props.glyphs);
   }
@@ -159,6 +162,9 @@ watch(
         newFen === 'start' ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' : newFen,
         props.lastMove
       );
+      if (props.shapes && props.shapes.length > 0) {
+        boardApi.value.setShapes(props.shapes);
+      }
     }
   }
 );
