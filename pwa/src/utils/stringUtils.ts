@@ -106,22 +106,22 @@ export function decodeHtmlEntities( str: string | null | undefined ): string {
  * Map of exercise type IDs to their human-readable type labels.
  */
 export const EXERCICE_TYPES_MAP: Record< number, string > = {
-	1: '100 Commandements',
-	2: 'Pop-échecs',
-	3: 'ABCDaire',
-	4: 'Partie des Héros',
-	5: 'Posi-Plan',
-	6: 'Associ-Plan',
-	7: 'La Marche du Héros',
+	1: "100 Commandements",
+	2: "Pop'échecs",
+	3: "ABCDaire Tactique",
+	4: "Partie dont tu es le Héros",
+	5: "Posi'Plan",
+	6: "Associ'Plan",
+	7: "La Marche du Héros",
 	8: "Vision'checs",
-	9: 'Parcours',
-	10: 'Échec & Éval',
+	9: "Parkour",
+	10: "Échec'éval",
 	11: "Class'échecs",
-	12: 'Qui suis-je ?',
-	13: 'Ouvre-Boîte',
-	14: 'Cap ou pas Cap ?',
-	15: 'Jugement final',
-	16: 'Destination finale',
+	12: "Qui suis-je ?",
+	13: "Ouvre-Boîte",
+	14: "Cap ou pas Cap ?",
+	15: "Jugement final",
+	16: "Destination finale",
 };
 
 /**

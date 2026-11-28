@@ -135,9 +135,9 @@ describe( 'stringUtils', () => {
 			expect(
 				getContenuTypeLabel( {
 					type: 'roi_exercice',
-					titre: 'T9 &#8211; Parcours',
+					titre: 'T9 &#8211; Parkour',
 				} )
-			).toBe( 'Parcours' );
+			).toBe( 'Parkour' );
 			expect(
 				getContenuTypeLabel( {
 					type: 'roi_exercice',
