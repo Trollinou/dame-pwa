@@ -211,7 +211,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 ### Type 8 — Vision'Échecs (`TypeVisionChecs.vue` → `VisionViewer.vue`)
 
-- **Rôle** : Visualisation mentale sans pièces sur l'échiquier : lire la liste des pièces et trouver le coup cible à l'aveugle.
+- **Rôle** : Visualisation mentale sans pièces sur l'échiquier : lire la liste des pièces et trouver le coup cible à l'aveugle (consigne par défaut : `"Visualise et joue le meilleur coup !"`).
 - **Position initiale affichée** :
   - **Phase `reflexion`** : L'échiquier affiché est **complètement VIDE** (`8/8/8/8/8/8/8/8 w/b - - 0 1`), orienté selon le trait de la FEN.
 - **Affiché vs Caché** :

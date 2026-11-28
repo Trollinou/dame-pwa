@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Type 8 (Vision'checs) — Consigne par défaut (`VisionViewer.vue`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Mise à jour de la consigne par défaut en `"Visualise et joue le meilleur coup !"` (en remplacement de `"Observe les 4 diagrammes ci-dessous."`).
+
 - **Restauration de la surbrillance `lastMove` après un mauvais coup (`PuzzleViewer.vue`, `ABCDaireTactiqueViewer.vue`, `README.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Mémorisation du dernier coup valide (`props.lastMoveHighlight` initial ou dernier coup joué par l'ordinateur) et réapplication après `undoLastMove()` lors d'un mauvais coup pour préserver la surbrillance visuelle sur l'échiquier.
 

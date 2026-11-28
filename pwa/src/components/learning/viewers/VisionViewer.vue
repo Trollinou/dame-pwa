@@ -133,7 +133,7 @@ const diagrammesListe = computed<DiagrammeConfig[]>(() => {
 });
 
 const consigneTexte = computed<string>(() => {
-  return props.consigne || props.legacyConfig?.description || 'Observe les 4 diagrammes ci-dessous.';
+  return props.consigne || props.legacyConfig?.description || 'Visualise et joue le meilleur coup !';
 });
 
 watch(
