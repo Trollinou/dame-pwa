@@ -119,4 +119,77 @@ describe('JugementFinalViewer.vue', () => {
 
     wrapper.unmount();
   });
+
+  test('verrouille la validation et les fireworks jusqu’à la fin de la visualisation du PGN', async () => {
+    const ChessboardStub = defineComponent({
+      name: 'Chessboard',
+      emits: ['board-created'],
+      mounted() {
+        this.$emit('board-created', { move: vi.fn(), setPosition: vi.fn() });
+      },
+      template: '<div class="mock-chessboard"></div>'
+    });
+
+    const PgnViewerStub = defineComponent({
+      name: 'PgnViewer',
+      emits: ['finished'],
+      template: '<div class="mock-pgn-viewer"></div>'
+    });
+
+    const SeriesCardFooterStub = defineComponent({
+      name: 'SeriesCardFooter',
+      props: ['currentCard', 'totalCards', 'isSolved', 'disabled'],
+      emits: ['next'],
+      template: '<div class="mock-footer"></div>'
+    });
+
+    const wrapper = mount(JugementFinalViewer, {
+      props: {
+        fenDepart: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        couleurJoueur: 'white',
+        pgnExplication: '1. d4 d5 2. c4',
+        scenarios: [
+          { pgn: '1. e4', is_correct: false },
+          { pgn: '1. d4 d5 2. c4', is_correct: true },
+          { pgn: '1. Nf3 Nf6', is_correct: false }
+        ]
+      },
+      global: {
+        stubs: {
+          Chessboard: ChessboardStub,
+          PgnViewer: PgnViewerStub,
+          SeriesCardFooter: SeriesCardFooterStub
+        }
+      }
+    });
+
+    await flushPromises();
+
+    // Avant le choix du bon plan : étape 1, non résolu
+    const footerBefore = wrapper.findComponent(SeriesCardFooterStub);
+    expect(footerBefore.props('currentCard')).toBe(1);
+    expect(footerBefore.props('isSolved')).toBe(false);
+
+    // Clic sur le bon scénario (Plan 2)
+    const cards = wrapper.findAll('.scenario-card');
+    await cards[1].trigger('click');
+    await flushPromises();
+
+    // En phase explication : le PGN n'est pas encore terminé -> footer désactivé, pas de succès émis
+    const pgnViewer = wrapper.findComponent(PgnViewerStub);
+    expect(pgnViewer.exists()).toBe(true);
+    expect(footerBefore.props('currentCard')).toBe(2);
+    expect(footerBefore.props('isSolved')).toBe(true);
+    expect(footerBefore.props('disabled')).toBe(true);
+    expect(wrapper.emitted('success')).toBeUndefined();
+
+    // Fin de visualisation du PGN -> débloque le footer (validation + fireworks)
+    pgnViewer.vm.$emit('finished');
+    await flushPromises();
+
+    expect(footerBefore.props('disabled')).toBe(false);
+    expect(wrapper.emitted('success')).toBeUndefined();
+
+    wrapper.unmount();
+  });
 });

@@ -6,6 +6,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.14.4] - 2026-11-28
+
+- **Type 15 (Le Jugement Final) — Visualisation obligatoire du PGN avant validation (`JugementFinalViewer.vue`, `JugementFinalViewer.spec.ts`)** :
+  - Désactivation du bouton de fin/validation dans `SeriesCardFooter` tant que l'élève n'a pas déroulé le PGN d'explication jusqu'au bout (`@finished` sur `PgnViewer`), différant ainsi la validation de l'exercice, les confettis/fireworks et le passage à l'exercice suivant après la lecture du PGN.
+
+- **Type 15 (Le Jugement Final) — Visualisation obligatoire du PGN avant validation (`JugementFinalViewer.vue`, `JugementFinalViewer.spec.ts`)** :
+  - Désactivation du bouton de fin/validation dans `SeriesCardFooter` tant que l'élève n'a pas déroulé le PGN d'explication jusqu'au bout (`@finished` sur `PgnViewer`), différant ainsi la validation de l'exercice, les confettis/fireworks et le passage à l'exercice suivant après la lecture du PGN.
+
 - **Leçons (`roi_lecon`) & Échiquier (`Chessboard.vue`, `LeconReader.vue`, `sanitize.ts`, `README.md`, `USING.md`) — Affichage initial des `shapes` et alignement contrat `roi/diagramme`** :
   - Application des `shapes` (`api.setShapes(props.shapes)`) dans `handleBoardCreated` et après `setPosition()` dans le `watch` sur `props.fen` de `Chessboard.vue` afin d'afficher flèches et cercles dès le montage initial.
   - Mise en conformité de `LeconReader.vue` et `sanitize.ts` avec le contrat HTML `roi/diagramme` : ajout des sélecteurs `.wp-block-roi-diagramme` et `.chessboard-block`, autorisation de l'attribut `data-wp-context` dans DOMPurify et repli sur `data-wp-context` / FEN initial par défaut.

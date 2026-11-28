@@ -46,8 +46,9 @@
     <div v-else-if="phase === 'explication'" class="exercise-stage">
       <PgnViewer
         :pgnString="pgnExplication"
+        :orientation="playerColorTyped"
         :autoCompleteDelay="0"
-        @finished="onSuccess"
+        @finished="onPgnFinished"
       />
     </div>
 
@@ -55,8 +56,10 @@
       :currentCard="phase === 'observation' ? 1 : 2"
       :totalCards="2"
       :isSolved="phase === 'explication'"
+      :disabled="phase === 'explication' && !isPgnFinished"
       :feedback="footerFeedback"
       badgePrefix="Étape"
+      disabledHint="Visionne tous les coups du PGN pour continuer"
       :finishText="'Terminer l\'exercice'"
       @next="onSuccess"
     />
@@ -109,6 +112,7 @@ const MOVE_INTERVAL_MS = 1000;
 const END_PAUSE_MS = 2500;
 
 const phase = ref<'observation' | 'explication'>('observation');
+const isPgnFinished = ref(false);
 const footerFeedback = ref<CardFeedback | null>(null);
 const mainBoardApi = shallowRef<BoardCore | null>(null);
 const boardApis = shallowRef<Map<number, BoardCore>>(new Map());
@@ -306,11 +310,16 @@ const selectScenario = async (index: number) => {
 
   if (scenario.is_correct) {
     clearAllTimers();
+    isPgnFinished.value = !props.pgnExplication?.trim();
     phase.value = 'explication';
     await showSuccess("Excellente analyse ! Voici l'explication détaillée.", 2000);
   } else {
     await showError("Ce n'est pas le meilleur plan, observe encore !", 2500);
   }
+};
+
+const onPgnFinished = () => {
+  isPgnFinished.value = true;
 };
 
 const onSuccess = () => {
