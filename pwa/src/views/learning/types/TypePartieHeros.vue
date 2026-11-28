@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <!-- 2. Étape de Choix Interactif QCM -->
+      <!-- 2. Étape de Choix Interactif sur l'Échiquier -->
       <div v-else-if="etapeActuelle.type === 'qcm'" class="stage-qcm-wrapper animate-fade-in">
         <div class="chessboard-container">
           <Chessboard
@@ -74,35 +74,10 @@
             :shapes="etapeActuelle.shapes"
             :orientation="etapeActuelle.orientation"
             :player-color="etapeActuelle.orientation"
-            :view-only="true"
+            :view-only="isQcmSolved"
             @board-created="onQcmBoardCreated"
+            @move="handleQcmBoardMove"
           />
-        </div>
-
-        <div class="learning-side-panel">
-          <!-- Consigne fixe entre l'échiquier et les 3 boutons de choix -->
-          <div class="learning-instruction-bar">
-            <span>Trouve le coup suivant</span>
-          </div>
-
-          <ion-card class="exercise-card">
-            <ion-card-content>
-              <div class="qcm-choices">
-                <ion-button
-                  v-for="(choix, index) in etapeActuelle.choices"
-                  :key="index"
-                  expand="block"
-                  fill="solid"
-                  :color="couleurBoutonQcm(index)"
-                  :disabled="isQcmSolved"
-                  class="choice-btn"
-                  @click="validerChoixQcm(index)"
-                >
-                  {{ choix.label }}
-                </ion-button>
-              </div>
-            </ion-card-content>
-          </ion-card>
         </div>
       </div>
 
@@ -125,8 +100,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
 import {
-  IonCard,
-  IonCardContent,
   IonButton,
   IonIcon,
 } from '@ionic/vue';
@@ -136,7 +109,7 @@ import {
   chevronForwardOutline,
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
-import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
+import type { BoardCore, DrawShape, Key, Move } from 'eg-chessboard';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { useApprentissageStore } from '@/stores/apprentissage';
@@ -189,6 +162,8 @@ const normalizedConfig = computed<Record<string, any>>(() => {
   return (cfg && typeof cfg === 'object') ? cfg : {};
 });
 
+const DEFAULT_CONSIGNE = 'Joue comme un champion !';
+
 const exerciseHeader = useExerciseHeader();
 const etapeCouranteIndex = ref(0);
 
@@ -232,7 +207,7 @@ const etapesListe = computed<PartieHerosStage[]>(() => {
           fen: item.fen || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
           orientation: 'white',
           shapes: item.shapes || [],
-          question: item.question || 'Quel est le meilleur coup ?',
+          question: item.question || DEFAULT_CONSIGNE,
           choices: shuffleChoices(choices),
         });
       }
@@ -269,9 +244,9 @@ const etapeActuelle = computed<PartieHerosStage>(() => {
 
 const consigneActuelle = computed<string>(() => {
   if (etapeActuelle.value.type === 'qcm') {
-    return etapeActuelle.value.question || props.config?.consigne || 'Trouver le meilleur coup.';
+    return etapeActuelle.value.question || props.config?.consigne || DEFAULT_CONSIGNE;
   }
-  return props.config?.consigne || 'Revis la partie du héros et trouve le bon coup.';
+  return props.config?.consigne || DEFAULT_CONSIGNE;
 });
 
 watch(
@@ -383,11 +358,9 @@ const resetStageState = (stage?: PartieHerosStage) => {
   if (current.type === 'pgn') {
     currentPgnMoveIndex.value = -1;
     isPgnCompleted.value = !current.moves || current.moves.length === 0;
-    selectedChoiceIndex.value = null;
     isQcmSolved.value = false;
     qcmFeedback.value = null;
   } else if (current.type === 'qcm') {
-    selectedChoiceIndex.value = null;
     isQcmSolved.value = false;
     qcmFeedback.value = null;
     activeQcmFen.value = current.fen;
@@ -400,7 +373,6 @@ const initPgnStage = (stage?: PgnStage) => {
   const current = stage || (etapeActuelle.value as PgnStage);
   currentPgnMoveIndex.value = -1;
   isPgnCompleted.value = !current?.moves || current.moves.length === 0;
-  selectedChoiceIndex.value = null;
   isQcmSolved.value = false;
   qcmFeedback.value = null;
   syncPgnBoardPosition();
@@ -435,7 +407,6 @@ const viewPgnNext = () => {
 // 2. ÉTAT & CONTRÔLE DE L'ÉTAPE QCM
 // ==========================================
 const qcmBoardApi = ref<BoardCore | null>(null);
-const selectedChoiceIndex = ref<number | null>(null);
 const isQcmSolved = ref(false);
 const qcmFeedback = ref<CardFeedback | null>(null);
 const activeQcmFen = ref('');
@@ -457,7 +428,6 @@ const initQcmStage = (stage?: QcmStage) => {
   const current = stage || (etapeActuelle.value as QcmStage);
   if (!current || current.type !== 'qcm') return;
 
-  selectedChoiceIndex.value = null;
   isQcmSolved.value = false;
   qcmFeedback.value = null;
   activeQcmFen.value = current.fen;
@@ -473,49 +443,57 @@ const initQcmStage = (stage?: QcmStage) => {
   }
 };
 
-const couleurBoutonQcm = (index: number): string => {
-  if (selectedChoiceIndex.value === null) {
-    return 'primary';
-  }
-  const stage = etapeActuelle.value as QcmStage;
-  const choice = stage.choices?.[index];
-  if (choice && choice.isCorrect && isQcmSolved.value) {
-    return 'success';
-  }
-  if (index === selectedChoiceIndex.value && !choice?.isCorrect) {
-    return 'danger';
-  }
-  return 'primary';
-};
-
-const validerChoixQcm = (index: number) => {
+const handleQcmBoardMove = (move: Move) => {
   if (isQcmSolved.value) {
     return;
   }
 
-  selectedChoiceIndex.value = index;
   const stage = etapeActuelle.value as QcmStage;
-  const choice = stage.choices?.[index];
+  if (!stage || stage.type !== 'qcm') {
+    return;
+  }
 
-  if (choice && choice.isCorrect) {
-    isQcmSolved.value = true;
-    qcmFeedback.value = {
-      type: 'success',
-      message: choice.explanation || 'Bravo ! C\'est le meilleur coup.',
-    };
+  const moveSanClean = (move.san || '').replace(/[+#x=]/g, '').trim();
+  const matchedChoice = stage.choices?.find(
+    (c) => c.san && c.san.replace(/[+#x=]/g, '').trim() === moveSanClean
+  );
 
-    if (qcmBoardApi.value) {
-      try {
-        qcmBoardApi.value.move(choice.san);
-      } catch (err) {
-        console.warn('Erreur coup QCM sur échiquier:', err);
-      }
+  if (matchedChoice) {
+    if (matchedChoice.isCorrect) {
+      isQcmSolved.value = true;
+      qcmFeedback.value = {
+        type: 'success',
+        message: matchedChoice.explanation || 'Bravo ! C\'est le meilleur coup.',
+      };
+    } else {
+      qcmFeedback.value = {
+        type: 'danger',
+        message: matchedChoice.explanation || 'Ce n\'est pas le bon coup ! Réessaie.',
+      };
+      setTimeout(() => {
+        if (qcmBoardApi.value && !isQcmSolved.value && etapeActuelle.value.type === 'qcm') {
+          qcmBoardApi.value.setPosition(stage.fen, stage.lastMove);
+          qcmBoardApi.value.setShapes(stage.shapes || []);
+          if (typeof qcmBoardApi.value.redraw === 'function') {
+            qcmBoardApi.value.redraw(true);
+          }
+        }
+      }, 1200);
     }
   } else {
     qcmFeedback.value = {
-      type: 'danger',
-      message: choice?.explanation || 'Ce n\'est pas le bon coup ! Réessaie.',
+      type: 'warning',
+      message: 'Observe bien les flèches sur l’échiquier et joue l’un des coups proposés.',
     };
+    setTimeout(() => {
+      if (qcmBoardApi.value && !isQcmSolved.value && etapeActuelle.value.type === 'qcm') {
+        qcmBoardApi.value.setPosition(stage.fen, stage.lastMove);
+        qcmBoardApi.value.setShapes(stage.shapes || []);
+        if (typeof qcmBoardApi.value.redraw === 'function') {
+          qcmBoardApi.value.redraw(true);
+        }
+      }
+    }, 800);
   }
 };
 

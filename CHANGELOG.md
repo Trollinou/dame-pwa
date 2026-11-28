@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Type 4 (La Partie dont tu es le Héros) — Choix sur l'échiquier, hauteur adaptative des commentaires & consigne par défaut (`TypePartieHeros.vue`, `partieHerosParser.ts`, `_learning-components.scss`, `_learning-layout.scss`, `TypePartieHeros.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Remplacement des 3 boutons de choix à l'étape `qcm` par une sélection directe du coup sur l'échiquier (`:view-only="isQcmSolved"`, validation via `@move` avec réinitialisation de la position sur erreur).
+  - Suppression du défilement interne (`max-height` et `overflow-y: auto`) des zones de commentaires `.learning-comment-box` et `.comment-container` afin qu'elles s'adaptent automatiquement à la longueur du texte (défilement global de l'écran sur mobile).
+  - Mise à jour de la consigne par défaut en `"Joue comme un champion !"`.
+
 - **Type 13 (Ouvre'boîte) — Interaction exclusive sur l'échiquier & consigne par défaut (`OuvreBoiteViewer.vue`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Suppression de l'affichage des 3 boutons de propositions QCM sous l'échiquier afin de conserver uniquement la sélection directe du coup sur l'échiquier (tout en maintenant l'encart `LearningFeedbackCallout` pour les explications de succès ou d'erreur).
   - Mise à jour de la consigne par défaut en `"Trouve le bon coup !"`.

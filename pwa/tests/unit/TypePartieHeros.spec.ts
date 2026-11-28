@@ -134,19 +134,16 @@ describe( 'TypePartieHeros.vue', () => {
 		await nextStageBtn.trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
-		// Étape 2 : QCM (choix entre a6 et Cf6)
+		// Étape 2 : QCM (choix uniquement sur l'échiquier entre a6 et Cf6)
 		expect( wrapper.text() ).toContain( 'Étape 2 / 3' );
+		expect( wrapper.findAll( '.choice-btn' ).length ).toBe( 0 );
 		const qcmFooter = wrapper.findComponent( { name: 'SeriesCardFooter' } );
 		expect( qcmFooter.props( 'isSolved' ) ).toBe( false );
 
-		// Sélectionner le bon coup (a6)
-		const choiceBtns = wrapper.findAll( '.choice-btn' );
-		expect( choiceBtns.length ).toBeGreaterThanOrEqual( 2 );
-		const correctBtn = choiceBtns.find( ( btn ) =>
-			btn.text().includes( 'a6' )
-		);
-		expect( correctBtn ).toBeDefined();
-		await correctBtn!.trigger( 'click' );
+		// Jouer le bon coup (a6) directement sur l'échiquier
+		const qcmBoard = wrapper.findComponent( { name: 'Chessboard' } );
+		qcmBoard.vm.$emit( 'move', { from: 'a7', to: 'a6', san: 'a6' } );
+		await wrapper.vm.$nextTick();
 		expect( qcmFooter.props( 'isSolved' ) ).toBe( true );
 		// Pas de célébration lors du succès du QCM
 		expect( fireCelebrationMock ).not.toHaveBeenCalled();

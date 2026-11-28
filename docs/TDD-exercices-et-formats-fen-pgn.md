@@ -111,24 +111,25 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 ### Type 4 — La Partie du Héros (`TypePartieHeros.vue` + `partieHerosParser.ts`)
 
-- **Rôle** : Parcours guidé d'une partie complète alternant séquences de visionnage PGN (`pgn`) et embranchements interactifs QCM (`qcm`).
+- **Rôle** : Parcours guidé d'une partie complète alternant séquences de visionnage PGN (`pgn`) et étapes de choix interactif sur l'échiquier (`qcm`). Consigne par défaut : `"Joue comme un champion !"`.
 - **Position initiale affichée** :
-  - **Étape `pgn`** : Affiche `stage.fenDepart` (position avant les coups de la séquence, ou position **après** le coup validé du QCM précédent pour les séquences suivantes).
+  - **Étape `pgn`** : Affiche `stage.fenDepart` (position avant les coups de la séquence, ou position **après** le coup validé de l'étape précédente pour les séquences suivantes).
   - **Étape `qcm`** : Affiche la FEN exacte au nœud d'embranchement (avant le choix du coup).
   - Orientation : déduite du trait de la FEN initiale de la partie.
 - **Affiché vs Caché** :
-  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` sous l'échiquier (pas de bouton Fin), zone de commentaire (`💬 ...` sous l'échiquier sur mobile, à droite en paysage/ordinateur), surbrillance du dernier coup (`lastMove` / `startingLastMove`), et shapes du coup courant (ou `startingShapes` au départ).
-  - **Étape `qcm`** : Échiquier en lecture seule avec surbrillance du dernier coup précédant l'embranchement (`lastMove`), **shapes du nœud parent** (flèches de couleur), barre fixe `"Trouve le coup suivant"`, et **boutons de choix mélangés** (`shuffleChoices`) formatés via `formatMoveWithFrenchSan` (libellé français + SAN française entre parenthèses sans le symbole `#` pour ne pas révéler le mat). Les coups du PGN suivant sont cachés tant que le QCM n'est pas résolu.
+  - **Étape `pgn`** : Échiquier en lecture seule, boutons `Début / Précédent / Suivant` sous l'échiquier (pas de bouton Fin), zone de commentaire à hauteur adaptative sans défilement interne (`💬 ...` sous l'échiquier sur mobile, à droite en paysage/ordinateur), surbrillance du dernier coup (`lastMove` / `startingLastMove`), et shapes du coup courant (ou `startingShapes` au départ).
+  - **Étape `qcm`** : Échiquier interactif (`:view-only="isQcmSolved"`) avec surbrillance du dernier coup précédant l'embranchement (`lastMove`) et **shapes du nœud parent** (flèches de couleur) ; aucun bouton de choix n'est affiché sous l'échiquier. Les coups du PGN suivant sont cachés tant que le coup n'est pas trouvé.
 - **Condition stricte de création d'une étape QCM (`hasValidQcmArrows`)** :
   - Le parser ne crée un embranchement `qcm` que si **les 2 conditions** sont réunies sur le nœud :
     1. Le nœud possède **plus d'un coup enfant** (`node.children.length > 1` : ligne principale + variantes).
     2. Le commentaire du nœud parent contient **au moins 3 flèches de couleurs distinctes** (`[%cal ...]`), **chacune partant d'une case occupée par une pièce** sur la position courante (`hasValidQcmArrows`).
   - *Sinon*, les variantes sont ignorées et la ligne principale continue en mode `pgn` normal.
 - **Changement de vue** :
-  - Clic sur `Étape suivante` dans `SeriesCardFooter` une fois l'étape courante résolue (dernier coup atteint en `pgn`, ou bonne réponse trouvée en `qcm`).
+  - Clic sur `Étape suivante` dans `SeriesCardFooter` une fois l'étape courante résolue (dernier coup atteint en `pgn`, ou bon coup joué en `qcm`).
 - **Après une réponse (en étape `qcm`)** :
-  - **Mauvais choix** : Bouton en rouge (`danger`), feedback rouge avec le commentaire de la variante (ou `"Mauvais choix ! Cherche encore."`). L'élève peut cliquer sur un autre choix.
-  - **Bon choix** : Bouton en vert (`success`), tous les boutons sont désactivés, **le coup est joué/animé sur l'échiquier** (`qcmBoardApi.move(choice.san)`), feedback vert avec le commentaire du coup principal (ou `"Bravo ! C'est le meilleur coup."`).
+  - **Mauvais coup (variante)** : Feedback rouge dans le footer avec le commentaire de la variante (ou `"Ce n'est pas le bon coup ! Réessaie."`), puis réinitialisation de la position sur l'échiquier après **1200 ms**.
+  - **Coup hors propositions** : Feedback warning dans le footer et réinitialisation de la position après **800 ms**.
+  - **Bon coup** : L'échiquier passe en `view-only`, feedback vert avec le commentaire du coup principal (ou `"Bravo ! C'est le meilleur coup."`).
   - L'élève clique sur `Étape suivante` pour passer à la séquence `pgn` suivante (qui démarre **après** le coup joué, avec son commentaire comme commentaire de départ).
 - **Rédaction Entraîneur** :
   - Fournir un PGN complet avec `[FEN "..."]` si différent de la position initiale.

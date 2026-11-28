@@ -301,7 +301,7 @@ export function parsePartieHerosPgn(
 					makeFen( currentPos.toSetup() )
 				),
 				shapes: qcmShapes,
-				question: defaultConsigne || 'Quel est le meilleur coup ?',
+				question: defaultConsigne || 'Joue comme un champion !',
 				choices: shuffleChoices( choices ),
 				...( lastPlayedMove ? { lastMove: lastPlayedMove } : {} ),
 			} );
