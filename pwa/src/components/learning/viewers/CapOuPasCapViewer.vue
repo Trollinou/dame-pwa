@@ -91,7 +91,7 @@
         <div v-if="isMultiMove">
           <div class="multi-move-status">
             <span class="multi-move-badge">Trouvés : {{ foundMovesSan.length }} / {{ expectedMovesSan.length }}</span>
-            <span v-if="!isCardSolved" class="multi-move-instruction">Trouvez tous les coups légaux possibles !</span>
+            <span v-if="!isCardSolved" class="multi-move-instruction">Trouve tous les coups légaux possibles !</span>
             <span v-else class="multi-move-success">✓ Bravo ! Tous les coups ont été trouvés.</span>
           </div>
           <div v-if="foundMovesSan.length > 0" class="found-moves-chips">
@@ -101,7 +101,7 @@
         <div v-else>
           <div v-if="!isCardSolved" class="move-hint">
             <span class="move-hint-icon">♟</span>
-            <span>Jouez le coup attendu directement sur l'échiquier.</span>
+            <span>Joue le coup attendu directement sur l'échiquier.</span>
           </div>
           <div v-else class="move-success-hint">
             <span class="move-success-icon">✓</span>
@@ -163,17 +163,17 @@
         </div>
         <div v-if="!isCardSolved" class="clic-hint">
           <span class="clic-hint-icon">👆</span>
-          <span v-if="modeClic === 'materiel'">Cliquez sur les pièces excédentaires pour les entourer.</span>
+          <span v-if="modeClic === 'materiel'">Clique sur les pièces excédentaires pour les entourer.</span>
           <span v-else-if="modeClic === 'prises_meilleur_coup' && clicPhase === 'clic'">
-            Étape 1/2 : Cliquez sur les pièces attaquées ({{ userSelectedSquares.size }} / {{ targetCirclesCount }} trouvée{{ targetCirclesCount > 1 ? 's' : '' }}).
+            Étape 1/2 : Clique sur les pièces attaquées ({{ userSelectedSquares.size }} / {{ targetCirclesCount }} trouvée{{ targetCirclesCount > 1 ? 's' : '' }}).
           </span>
-          <span v-else-if="modeClic === 'prises_meilleur_coup' && clicPhase === 'move'">Étape 2/2 : Jouez maintenant la meilleure prise !</span>
-          <span v-else>Cliquez sur les pièces ou cases cibles pour les entourer ({{ userSelectedSquares.size }} / {{ targetCirclesCount }}).</span>
+          <span v-else-if="modeClic === 'prises_meilleur_coup' && clicPhase === 'move'">Étape 2/2 : Joue maintenant la meilleure prise !</span>
+          <span v-else>Clique sur les pièces ou cases cibles pour les entourer ({{ userSelectedSquares.size }} / {{ targetCirclesCount }}).</span>
         </div>
         <div v-else class="move-success-hint">
           <span class="move-success-icon">✓</span>
           <span v-if="modeClic === 'prises_meilleur_coup'">{{ exerciceCourant.move_explication || 'Bravo ! Prises identifiées et meilleur coup joué avec succès.' }}</span>
-          <span v-else>Bravo ! Vous avez trouvé toutes les cibles.</span>
+          <span v-else>Bravo ! Tu as trouvé toutes les cibles.</span>
         </div>
       </div>
 
@@ -181,7 +181,7 @@
       <div v-else-if="resolvedVariante === 'setup'" class="setup-panel">
         <!-- Mode Mémoire - Phase 1: Mémorisation -->
         <div v-if="modeSetup === 'memoire' && setupPhase === 'memorize'" class="setup-memorize-panel">
-          <p class="setup-hint">👀 Mémorisez bien la position des pièces sur l'échiquier.</p>
+          <p class="setup-hint">👀 Mémorise bien la position des pièces sur l'échiquier.</p>
 
           <div v-if="exerciceCourant.conseil" class="learning-callout learning-callout--tip">
             <div class="learning-callout__title">💡 Conseil de l'entraîneur :</div>
@@ -262,8 +262,8 @@
             </div>
           </div>
           <p class="setup-instruction">
-            <span v-if="!isEraseActive">Pièce sélectionnée. Cliquez sur une case pour la poser.</span>
-            <span v-else>Outil gomme actif. Cliquez sur une case pour retirer la pièce.</span>
+            <span v-if="!isEraseActive">Pièce sélectionnée. Clique sur une case pour la poser.</span>
+            <span v-else>Outil gomme actif. Clique sur une case pour retirer la pièce.</span>
           </p>
         </div>
       </div>
@@ -418,7 +418,7 @@ const isBoardViewOnly = computed<boolean>(() => {
 });
 
 const consigneTexte = computed<string>(() => {
-  return props.consigne || 'Relevez le défi Cap ou pas Cap ?';
+  return props.consigne || 'Relève le défi Cap ou pas Cap ?';
 });
 
 const propositionsListe = computed<string[]>(() => {
@@ -525,24 +525,24 @@ watch(
 
 const pendingHintTexte = computed<string>(() => {
   if (resolvedVariante.value === 'move') {
-    return isMultiMove.value ? "Trouvez tous les coups légaux pour continuer" : "Jouez le coup attendu pour continuer";
+    return isMultiMove.value ? "Trouve tous les coups légaux pour continuer" : "Joue le coup attendu pour continuer";
   }
   if (resolvedVariante.value === 'notation') {
-    return "Saisissez la notation de chaque pièce pour continuer";
+    return "Saisis la notation de chaque pièce pour continuer";
   }
   if (resolvedVariante.value === 'clic') {
-    if (modeClic.value === 'materiel') return "Entourez les pièces excédentaires pour continuer";
+    if (modeClic.value === 'materiel') return "Entoure les pièces excédentaires pour continuer";
     if (modeClic.value === 'prises_meilleur_coup') {
       return clicPhase.value === 'clic'
-        ? `Entourez toutes les pièces attaquées (${userSelectedSquares.value.size} / ${targetCirclesCount.value})`
-        : "Jouez la meilleure prise pour continuer";
+        ? `Entoure toutes les pièces attaquées (${userSelectedSquares.value.size} / ${targetCirclesCount.value})`
+        : "Joue la meilleure prise pour continuer";
     }
-    return `Entourez les pièces cibles (${userSelectedSquares.value.size} / ${targetCirclesCount.value})`;
+    return `Entoure les pièces cibles (${userSelectedSquares.value.size} / ${targetCirclesCount.value})`;
   }
   if (resolvedVariante.value === 'setup') {
-    return setupPhase.value === 'memorize' ? "Mémorisez la position puis retournez la carte" : "Placez les pièces sur l'échiquier pour continuer";
+    return setupPhase.value === 'memorize' ? "Mémorise la position puis retourne la carte" : "Place les pièces sur l'échiquier pour continuer";
   }
-  return "Sélectionnez vos réponses pour continuer";
+  return "Sélectionne tes réponses pour continuer";
 });
 
 // Extraction et parsing PGN du mini-PGN courant
@@ -985,7 +985,7 @@ const onNotationInput = (idx: number, val: string) => {
   } else if (allFilled) {
     feedback.value = {
       type: 'danger',
-      message: "Certaines notations sont inexactes. Vérifiez l'initiale de la pièce et les coordonnées.",
+      message: "Certaines notations sont inexactes. Vérifie l'initiale de la pièce et les coordonnées.",
     };
   } else {
     feedback.value = null;
@@ -1077,7 +1077,7 @@ const verifierClic = () => {
       isCardSolved.value = true;
       feedback.value = {
         type: 'success',
-        message: 'Bravo ! Vous avez correctement identifié les pièces en plus.',
+        message: 'Bravo ! Tu as correctement identifié les pièces en plus.',
       };
       if (boardApi.value) {
         boardApi.value.setShapes(currentPgnData.value.shapes);
@@ -1104,7 +1104,7 @@ const verifierClic = () => {
           clicPhase.value = 'move';
           feedback.value = {
             type: 'success',
-            message: "Bravo ! Toutes les prises ont été identifiées. Étape 2/2 : Jouez maintenant la meilleure prise !",
+            message: "Bravo ! Toutes les prises ont été identifiées. Étape 2/2 : Joue maintenant la meilleure prise !",
           };
         } else {
           isCardSolved.value = true;
@@ -1128,8 +1128,8 @@ const verifierClic = () => {
       feedback.value = {
         type: 'danger',
         message: modeClic.value === 'prises_meilleur_coup'
-          ? 'Vous avez sélectionné trop de pièces. Cliquez sur une case pour désélectionner.'
-          : 'Vous avez sélectionné trop de cibles.',
+          ? 'Tu as sélectionné trop de pièces. Clique sur une case pour désélectionner.'
+          : 'Tu as sélectionné trop de cibles.',
       };
     } else {
       feedback.value = null;
@@ -1153,7 +1153,7 @@ const verifierPasDeDifference = () => {
   } else {
     feedback.value = {
       type: 'danger',
-      message: 'Il y a bien une différence de matériel dans cette position. Observez attentivement !',
+      message: 'Il y a bien une différence de matériel dans cette position. Observe attentivement !',
     };
   }
 };
@@ -1180,7 +1180,7 @@ const verifierSetup = () => {
     isCardSolved.value = true;
     feedback.value = {
       type: 'success',
-      message: 'Parfait ! Vous avez reproduit exactement la position.',
+      message: 'Parfait ! Tu as reproduit exactement la position.',
     };
     if (boardApi.value) {
       boardApi.value.setShapes(currentPgnData.value.shapes);
@@ -1358,7 +1358,7 @@ const setMultipleAnswer = (propIdx: number, val: boolean | string, optIdx?: numb
       isCardSolved.value = true;
       feedback.value = {
         type: 'success',
-        message: 'Excellent ! Toutes vos réponses sont exactes.',
+        message: 'Excellent ! Toutes tes réponses sont exactes.',
       };
       if (boardApi.value) {
         boardApi.value.setShapes(currentPgnData.value.shapes);
@@ -1366,7 +1366,7 @@ const setMultipleAnswer = (propIdx: number, val: boolean | string, optIdx?: numb
     } else {
       feedback.value = {
         type: 'danger',
-        message: 'Certaines réponses sont inexactes. Modifiez vos choix.',
+        message: 'Certaines réponses sont inexactes. Modifie tes choix.',
       };
     }
   } else {
@@ -1405,7 +1405,7 @@ const setSingleAnswer = (val: boolean | string, optIdx?: number) => {
   } else {
     feedback.value = {
       type: 'danger',
-      message: 'Mauvaise réponse. Réessayez !',
+      message: 'Mauvaise réponse. Réessaie !',
     };
   }
 };
@@ -1465,7 +1465,7 @@ const verifierCoup = (move: Move) => {
       boardApi.value?.undoLastMove();
       feedback.value = {
         type: 'danger',
-        message: exerciceCourant.value.move_explication || "Ce n'est pas la meilleure prise. Observez la valeur des pièces et réessayez !",
+        message: exerciceCourant.value.move_explication || "Ce n'est pas la meilleure prise. Observe la valeur des pièces et réessaie !",
       };
     }
     return;
@@ -1485,7 +1485,7 @@ const verifierCoup = (move: Move) => {
         isCardSolved.value = true;
         feedback.value = {
           type: 'success',
-          message: exerciceCourant.value.move_explication || `Bravo ! Vous avez trouvé tous les ${expectedList.length} coups possibles.`,
+          message: exerciceCourant.value.move_explication || `Bravo ! Tu as trouvé tous les ${expectedList.length} coups possibles.`,
         };
         if (boardApi.value) {
           boardApi.value.setShapes(currentPgnData.value.shapes);
@@ -1493,7 +1493,7 @@ const verifierCoup = (move: Move) => {
       } else {
         feedback.value = {
           type: 'success',
-          message: `Coup trouvé (${foundMovesSan.value.length}/${expectedList.length}) ! Cherchez les autres.`,
+          message: `Coup trouvé (${foundMovesSan.value.length}/${expectedList.length}) ! Cherche les autres.`,
         };
         setTimeout(() => {
           if (boardApi.value && !isCardSolved.value) {
@@ -1505,7 +1505,7 @@ const verifierCoup = (move: Move) => {
       boardApi.value?.undoLastMove();
       feedback.value = {
         type: 'danger',
-        message: "Ce coup ne répond pas à la consigne. Réessayez !",
+        message: "Ce coup ne répond pas à la consigne. Réessaie !",
       };
     }
   } else {
@@ -1530,7 +1530,7 @@ const verifierCoup = (move: Move) => {
       boardApi.value?.undoLastMove();
       feedback.value = {
         type: 'danger',
-        message: exerciceCourant.value.move_explication || "Ce n'est pas le bon coup. Réessayez !",
+        message: exerciceCourant.value.move_explication || "Ce n'est pas le bon coup. Réessaie !",
       };
     }
   }

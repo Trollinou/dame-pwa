@@ -279,7 +279,7 @@ const validerAssociations = () => {
   if (errorsCount > 0) {
     emit('feedback', {
       type: 'danger',
-      message: 'Certaines associations sont incorrectes, réessayez !',
+      message: 'Certaines associations sont incorrectes, réessaie !',
     });
     // Reprendre la sélection sur le premier échiquier vide et non correct
     const firstEmpty = [0, 1, 2, 3].find(

@@ -18,7 +18,7 @@
 
     <!-- Palette de sélection des pièces pour la variante Traces -->
     <div v-if="isTracesVariant" class="traces-palette-section ion-margin-top">
-      <p class="section-instruction">Sélectionnez la pièce qui a laissé ces traces :</p>
+      <p class="section-instruction">Sélectionne la pièce qui a laissé ces traces :</p>
       <div :class="['piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
         <button
           v-for="item in tracesPieces"
@@ -276,7 +276,7 @@ const handleSelectTracesPiece = (role: string) => {
   } else {
     emit('feedback', {
       type: 'danger',
-      message: "Ce n'est pas cette pièce qui a laissé ces traces ! Observez bien le déplacement.",
+      message: "Ce n'est pas cette pièce qui a laissé ces traces ! Observe bien le déplacement.",
     });
   }
 };

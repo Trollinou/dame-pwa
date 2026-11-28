@@ -725,7 +725,7 @@ const validerChoixMainQcm = (choix: PosiPlanQcmChoice, index: number) => {
   } else {
     mainBranchFeedback.value = {
       type: 'danger',
-      message: choix.explanation || 'Ce n\'est pas le bon coup ! Réessayez.',
+      message: choix.explanation || 'Ce n\'est pas le bon coup ! Réessaie.',
     };
   }
 };
@@ -788,9 +788,9 @@ const consigneActuelle = computed<string>(() => {
     if (currentMainStage.value?.type === 'qcm') {
       return currentMainStage.value.question || 'Trouve le coup suivant';
     }
-    return 'Visionnez les coups pour continuer le plan.';
+    return 'Visionne les coups pour continuer le plan.';
   }
-  return props.config?.consigne || 'Évaluez la position et choisissez le meilleur plan.';
+  return props.config?.consigne || 'Évalue la position et choisis le meilleur plan.';
 });
 
 watch(
@@ -834,16 +834,16 @@ const footerFeedback = computed<CardFeedback | null>(() => {
 
 const footerPendingHint = computed<string>(() => {
   if (currentMode.value === 'initial_choice') {
-    return 'Trouvez le bon plan pour continuer';
+    return 'Trouve le bon plan pour continuer';
   }
   if (currentMode.value === 'variant_view') {
-    return 'Explorez la variante ou retournez au choix initial';
+    return 'Explore la variante ou retourne au choix initial';
   }
   if (currentMode.value === 'main_branch') {
     if (currentMainStage.value?.type === 'qcm') {
-      return 'Trouvez le meilleur coup pour continuer';
+      return 'Trouve le meilleur coup pour continuer';
     }
-    return 'Visionnez tous les coups pour continuer';
+    return 'Visionne tous les coups pour continuer';
   }
   return '';
 });

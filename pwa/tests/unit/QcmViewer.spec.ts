@@ -34,7 +34,7 @@ describe( 'QcmViewer.vue', () => {
 		expect( footer.exists() ).toBe( true );
 		expect( wrapper.find( '.card-badge' ).text() ).toBe( 'Carte 1 / 1' );
 		expect( wrapper.find( '.pending-hint' ).text() ).toBe(
-			'Trouvez la solution pour continuer'
+			'Trouve la solution pour continuer'
 		);
 
 		// Clic sur la bonne réponse

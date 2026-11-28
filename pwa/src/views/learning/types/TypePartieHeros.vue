@@ -271,7 +271,7 @@ const consigneActuelle = computed<string>(() => {
   if (etapeActuelle.value.type === 'qcm') {
     return etapeActuelle.value.question || props.config?.consigne || 'Trouver le meilleur coup.';
   }
-  return props.config?.consigne || 'Revivez la partie du héros et trouvez le bon coup.';
+  return props.config?.consigne || 'Revis la partie du héros et trouve le bon coup.';
 });
 
 watch(
@@ -514,7 +514,7 @@ const validerChoixQcm = (index: number) => {
   } else {
     qcmFeedback.value = {
       type: 'danger',
-      message: choice?.explanation || 'Ce n\'est pas le bon coup ! Réessayez.',
+      message: choice?.explanation || 'Ce n\'est pas le bon coup ! Réessaie.',
     };
   }
 };
@@ -586,9 +586,9 @@ const currentStageFeedback = computed<CardFeedback | null>(() => {
 
 const currentStagePendingHint = computed<string>(() => {
   if (etapeActuelle.value.type === 'qcm') {
-    return 'Trouvez le meilleur coup pour continuer';
+    return 'Trouve le meilleur coup pour continuer';
   }
-  return 'Visionnez tous les coups pour continuer';
+  return 'Visionne tous les coups pour continuer';
 });
 
 watch(

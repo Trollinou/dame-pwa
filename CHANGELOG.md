@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Généralisation du tutoiement dans les exercices, leçons et vidéos (`LeconReader.vue`, `VideoReader.vue`, `SeriesCardFooter.vue`, `ContenuPage.vue`, `viewers/`, `views/learning/types/`, `parcoursVariants.ts`, `partieHerosParser.ts`, `posiPlanParser.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`, `AGENTS.md`)** :
+  - Passage systématique de la 2ᵉ personne du pluriel (« vous ») à la 2ᵉ personne du singulier (« tu ») pour l'ensemble des consignes par défaut, aides de pied de carte (`pendingHint` / `disabledHint`), questions et messages de feedback (succès/erreur) dans les 12 viewers d'exercices, les 4 vues `types/`, les 3 parseurs (`parcoursVariants.ts`, `partieHerosParser.ts`, `posiPlanParser.ts`), les lecteurs de leçons/vidéos et l'écran de validation `ContenuPage.vue`.
+  - Mise à jour des assertions des tests unitaires impactés (`QcmViewer.spec.ts`, `TypeCapOuPasCap.spec.ts`, `TypeParcours.spec.ts`) et des exemples/messages cités dans la documentation technique.
+
 ## [1.14.2] - 2026-11-26
 
 - **Unification des seuils responsive Apprentissage, Jeu & Analyse (`_learning-layout.scss`, `_learning-components.scss`, `useBoardOrientation.ts`, `AnalysisPage.vue`, `PgnViewer.vue`, `TypePartieHeros.vue`, `TypePosiPlan.vue`, `README.md`, `USING.md`)** :

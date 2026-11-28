@@ -36,8 +36,8 @@
       :isSolved="isCardSolved"
       :disabled="!isPgnFinished"
       :feedback="feedback"
-      pendingHint="Trouvez le bon coup pour continuer"
-      disabledHint="Visionnez tous les coups du PGN pour continuer"
+      pendingHint="Trouve le bon coup pour continuer"
+      disabledHint="Visionne tous les coups du PGN pour continuer"
       @next="passerCarteSuivante"
     />
   </div>
@@ -363,7 +363,7 @@ const verifierCoup = async (move: Move) => {
     }
     feedback.value = {
       type: 'danger',
-      message: "Ce n'est pas le bon coup ! Cherchez encore."
+      message: "Ce n'est pas le bon coup ! Cherche encore."
     };
     setTimeout(() => {
       if (feedback.value?.type === 'danger') {

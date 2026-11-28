@@ -80,6 +80,7 @@ L'application suit un principe de découplage strict :
   - Masquage initial des `shapes` de solution pendant la recherche, avec **maintien visible du cercle jaune (`brush: 'yellow'`)** pour mettre en évidence la pièce d'étude (Types 2 Pop'Echecs, 3 ABCDaire Tactique et 14 Cap ou pas Cap ? dans toutes les variantes), puis révélation complète des annotations dès la réussite.
   - Gestion des séries multi-diagrammes et étapes avec `ContentHeader` (`useExerciseHeader`) et `SeriesCardFooter`.
   - Intégration de vidéos pédagogiques (`VideoReader.vue`) avec mode plein écran universel (hybride Fullscreen natif Android/Desktop + Pseudo-Fullscreen CSS iOS sans blocage), bascule automatique en immersion lors de la rotation paysage sur mobile et validation de progression au seuil de 95%.
+  - **Ton pédagogique unifié (tutoiement)** : Ensemble des consignes par défaut, indications de progression (`SeriesCardFooter`), questions et messages de retour des exercices, leçons et vidéos rédigés à la 2ᵉ personne du singulier (« tu »).
 
 ## Composants & Composables Partagés (PWA Frontend)
 
@@ -213,7 +214,7 @@ Pour garantir une expérience graphique et tactile fluide sans dispersion de cod
 ```vue
 <template>
   <div class="exercise-stage">
-    <ContentHeader title="Mon Exercice" consigne="Trouvez le bon coup" />
+    <ContentHeader title="Mon Exercice" consigne="Trouve le bon coup" />
 
     <div class="chessboard-container">
       <Chessboard :fen="fen" :view-only="true" />

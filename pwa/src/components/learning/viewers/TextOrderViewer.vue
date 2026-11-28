@@ -105,7 +105,7 @@ watch(
   () => {
     if (phase.value === 'order') {
       exerciseHeader?.setHeaderState({
-        consigne: props.consigne || 'Remettez les étapes dans le bon ordre.',
+        consigne: props.consigne || 'Remets les étapes dans le bon ordre.',
         stepBadgeText: 'Étape 1 / 2\nClassement'
       });
     } else {
@@ -176,7 +176,7 @@ const validerOrdre = async () => {
     await showSuccess("Excellente réponse ! L'ordre des étapes est parfait.", 2000);
     phase.value = 'solution';
   } else {
-    await showError("L'ordre des étapes n'est pas correct, réessayez !", 2500);
+    await showError("L'ordre des étapes n'est pas correct, réessaie !", 2500);
   }
 };
 

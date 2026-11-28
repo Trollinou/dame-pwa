@@ -119,7 +119,7 @@ watch(
   () => {
     if (phase.value === 'observation') {
       exerciseHeader?.setHeaderState({
-        consigne: props.consigne || 'Observez les différents plans et choisissez le meilleur.',
+        consigne: props.consigne || 'Observe les différents plans et choisis le meilleur.',
         stepBadgeText: 'Étape 1 / 2\nObservation'
       });
     } else {
@@ -309,7 +309,7 @@ const selectScenario = async (index: number) => {
     phase.value = 'explication';
     await showSuccess("Excellente analyse ! Voici l'explication détaillée.", 2000);
   } else {
-    await showError("Ce n'est pas le meilleur plan, observez encore !", 2500);
+    await showError("Ce n'est pas le meilleur plan, observe encore !", 2500);
   }
 };
 

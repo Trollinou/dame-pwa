@@ -80,7 +80,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Caché** : Le cercle bleu cible et toutes les autres shapes non jaunes (vertes, rouges, flèches) sont cachés pendant la recherche.
 - **Changement de vue** : Aucun changement de vue de phase ; au clic sur une case (`@square-click`), la pièce est posée visuellement sur la case cliquée.
 - **Après une réponse** :
-  - **Mauvaise case** : La pièce apparaît brièvement sur la case cliquée, feedback rouge `"Ce n'est pas la bonne case ! Réessayez."`, puis après **800 ms** la position est réinitialisée (`fenDepart` + shapes jaunes uniquement) et l'erreur s'efface.
+  - **Mauvaise case** : La pièce apparaît brièvement sur la case cliquée, feedback rouge `"Ce n'est pas la bonne case ! Réessaie."`, puis après **800 ms** la position est réinitialisée (`fenDepart` + shapes jaunes uniquement) et l'erreur s'efface.
   - **Bonne case** : Feedback vert `"Parfait ! Bonne case trouvée."`, la FEN complète d'origine et **toutes les shapes** (y compris le cercle bleu et les flèches) sont révélées sur l'échiquier. L'élève passe à la carte suivante via `SeriesCardFooter`.
 - **Rédaction Entraîneur** :
   - Fournir pour chaque carte une `fen` complète **contenant la pièce déjà posée sur sa case solution**, et placer un **cercle bleu** (`[%csl Be4]`) sur cette case dans `shapes`.
@@ -99,9 +99,9 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Changement de vue** :
   - Jouer toute la séquence de la ligne principale du PGN (coups du joueur + réponses automatiques de l'ordinateur après **500 ms**) bascule automatiquement de `playing` vers `recap`.
 - **Après une réponse** :
-  - **Mauvais coup** : Le coup est annulé (`undoLastMove()`), les cercles jaunes sont restaurés, feedback rouge `"Ce n'est pas le bon coup ! Cherchez encore."` pendant **2000 ms**.
+  - **Mauvais coup** : Le coup est annulé (`undoLastMove()`), les cercles jaunes sont restaurés, feedback rouge `"Ce n'est pas le bon coup ! Cherche encore."` pendant **2000 ms**.
   - **Bon coup intermédiaire** : L'ordinateur joue sa réponse après 500 ms.
-  - **Dernier coup de la séquence** : Passage immédiat en mode `recap` avec feedback `"Bravo ! Coup correct."`. **Attention** : le bouton Suivant du `SeriesCardFooter` reste désactivé (`disabled="!isPgnFinished"`) tant que l'élève n'a pas déroulé tous les coups du `PgnViewer` jusqu'à la fin (`"Visionnez tous les coups du PGN pour continuer"`). Une fois le PGN terminé, feedback `"Bravo ! Exercice réussi."` et déblocage du bouton Suivant.
+  - **Dernier coup de la séquence** : Passage immédiat en mode `recap` avec feedback `"Bravo ! Coup correct."`. **Attention** : le bouton Suivant du `SeriesCardFooter` reste désactivé (`disabled="!isPgnFinished"`) tant que l'élève n'a pas déroulé tous les coups du `PgnViewer` jusqu'à la fin (`"Visionne tous les coups du PGN pour continuer"`). Une fois le PGN terminé, feedback `"Bravo ! Exercice réussi."` et déblocage du bouton Suivant.
 - **Rédaction Entraîneur** :
   - Écrire un PGN par carte avec `[FEN "..."]` (trait au camp qui doit jouer).
   - Placer les indices initiaux éventuels en **cercles jaunes** `{[%csl Ye4]}` avant le 1er coup.
@@ -127,7 +127,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Changement de vue** :
   - Clic sur `Étape suivante` dans `SeriesCardFooter` une fois l'étape courante résolue (dernier coup atteint en `pgn`, ou bonne réponse trouvée en `qcm`).
 - **Après une réponse (en étape `qcm`)** :
-  - **Mauvais choix** : Bouton en rouge (`danger`), feedback rouge avec le commentaire de la variante (ou `"Mauvais choix ! Cherchez encore."`). L'élève peut cliquer sur un autre choix.
+  - **Mauvais choix** : Bouton en rouge (`danger`), feedback rouge avec le commentaire de la variante (ou `"Mauvais choix ! Cherche encore."`). L'élève peut cliquer sur un autre choix.
   - **Bon choix** : Bouton en vert (`success`), tous les boutons sont désactivés, **le coup est joué/animé sur l'échiquier** (`qcmBoardApi.move(choice.san)`), feedback vert avec le commentaire du coup principal (ou `"Bravo ! C'est le meilleur coup."`).
   - L'élève clique sur `Étape suivante` pour passer à la séquence `pgn` suivante (qui démarre **après** le coup joué, avec son commentaire comme commentaire de départ).
 - **Rédaction Entraîneur** :
@@ -174,7 +174,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - **Carte 1 → Carte 2** : Après validation réussie des 4 associations, clic sur `Position suivante` dans `SeriesCardFooter`.
   - **Cartes 2 → 5** : Clic sur `Position suivante` / `Terminer l'exercice` une fois le PGN déroulé jusqu'au bout (`onPgnFinished`).
 - **Après une réponse (Carte 1)** :
-  - Clic sur `"Valider mes choix"` : les paires correctes sont **verrouillées en vert** (`✓ Correct`), les paires erronées sont **supprimées** pour correction immédiate, feedback rouge `"Certaines associations sont incorrectes, réessayez !"`.
+  - Clic sur `"Valider mes choix"` : les paires correctes sont **verrouillées en vert** (`✓ Correct`), les paires erronées sont **supprimées** pour correction immédiate, feedback rouge `"Certaines associations sont incorrectes, réessaie !"`.
   - Si 4/4 correctes : feedback vert `"Bravo ! Toutes les correspondances sont trouvées."`, déblocage du footer.
 - **Rédaction Entraîneur** :
   - Fournir 4 PGN (`paires[0..3]`).
@@ -192,7 +192,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Le dernier coup restant constitue le puzzle final (`solution: [dernierCoup]`) avec `lastMoveHighlight` sur le coup précédent.
 - **Position initiale affichée & Affiché vs Caché selon les 3 sous-étapes** :
   1. **`selection`** : Grille adaptative (`.learning-board-grid-2col` : 2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) de tous les mini-diagrammes restants dans la banque (mélangés), avec surbrillance du dernier coup (`lastMoveHighlight`) menant à chaque position et coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
-  2. **`ordonnancement`** : Grille adaptative (2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), avec surbrillance du dernier coup (`lastMoveHighlight`), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touchez deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
+  2. **`ordonnancement`** : Grille adaptative (2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), avec surbrillance du dernier coup (`lastMoveHighlight`), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Touche deux cartes pour permuter leur position chronologique."` (mode *Tap & Swap*).
   3. **`resolution`** : Grand échiquier `PuzzleViewer` sur la position finale de la série (avec `shapes` et `lastMoveHighlight`).
 - **Changement de vue** :
   - `selection` → `ordonnancement` : Lorsque les N cartes sélectionnées appartiennent toutes à la même partie, clic sur `Classer la série` dans `SeriesCardFooter`.
@@ -201,7 +201,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Après une réponse** :
   - `selection` : Si N cartes sélectionnées de parties différentes → feedback rouge immédiat ; si même partie → feedback vert + bouton `Classer la série`.
   - `ordonnancement` : Dès que l'ordre est exact → feedback vert `"Chronologie exacte ! Bravo."` + bouton `Coup suivant`.
-  - `resolution` : Mauvais coup → annulé sans aucune shape affichée + feedback rouge `"Mauvais coup, cherchez encore !"` (2500 ms). Bon coup → feedback vert `"Coup décisif trouvé !"`, puis après `600 ms`, bascule en mode lecture seule pour rejouer automatiquement le mini-PGN complet depuis la position initiale à raison d'un ply par seconde (`1000 ms`) avec les shapes de chaque ply (boucle avec pause de `2500 ms` en fin de séquence). Le bouton `Série suivante` (et le déclenchement des confettis sur la dernière série) reste bloqué jusqu'à la fin du premier passage complet de l'animation.
+  - `resolution` : Mauvais coup → annulé sans aucune shape affichée + feedback rouge `"Mauvais coup, cherche encore !"` (2500 ms). Bon coup → feedback vert `"Coup décisif trouvé !"`, puis après `600 ms`, bascule en mode lecture seule pour rejouer automatiquement le mini-PGN complet depuis la position initiale à raison d'un ply par seconde (`1000 ms`) avec les shapes de chaque ply (boucle avec pause de `2500 ms` en fin de séquence). Le bouton `Série suivante` (et le déclenchement des confettis sur la dernière série) reste bloqué jusqu'à la fin du premier passage complet de l'animation.
 - **Rédaction Entraîneur** :
   - Choisir le `mode` (`3x5` ou `5x3`) et fournir 3 ou 5 `series` avec `pgn_data`, `couleur_joueur`, et optionnellement `shapes`.
   - Chaque PGN doit contenir **au moins `(nbDiagrammes - 1) * 2 + 1` demi-coups** (soit min 9 demi-coups pour `3x5`, 5 demi-coups pour `5x3`) afin de générer tous les diagrammes + le coup final à trouver.
@@ -219,7 +219,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Changement de vue** :
   - Le joueur clique sur la **case de départ** (cercle bleu affiché), puis sur la **case d'arrivée**. Si la paire `(orig, dest)` correspond à la **flèche bleue** (`brush: 'blue'`) du diagramme, passage immédiat en phase `revelation`.
 - **Après une réponse** :
-  - **Mauvais couple de cases** : Feedback rouge `"Ce n'est pas le bon coup ! Réessayez."` (effacé après 2000 ms), sélection réinitialisée.
+  - **Mauvais couple de cases** : Feedback rouge `"Ce n'est pas le bon coup ! Réessaie."` (effacé après 2000 ms), sélection réinitialisée.
   - **Bon couple de cases** : La position réelle apparaît, feedback vert `"Bravo ! Bon coup trouvé."`, puis après **400 ms**, le coup trouvé est **animé sur l'échiquier** (`boardApi.move({ from, to })`). L'élève clique sur `SeriesCardFooter` pour passer au diagramme suivant.
 - **Rédaction Entraîneur** :
   - Fournir une liste de `diagrammes[]` avec `fen` complète et une **flèche bleue** (`[%cal Be2e4]`) dans `shapes` indiquant le coup à trouver.
@@ -244,7 +244,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   3. **Variante `stealth` (Pas vu, pas pris)** :
      - **Sous-mode Cible** (`case_arrivee` fournie et différente de `case_depart`) : `fen_depart` avec pièce retirée sur `case_arrivee` si présente ; flèches et cercles rouges (`red`/`r`) cachés jusqu'à résolution.
      - **Sous-mode Boucle (`isLoop`)** (`case_arrivee` absente ou égale à `case_depart`) : `fen_depart` intacte. Utilise `LoopTracker` (suivi angulaire autour de la pièce adverse extraite de la FEN, 4 quadrants + rotation ≥ 95 % + retour à `case_depart` en ≥ 4 coups). Flèches et cercles rouges (`red`/`r`) cachés jusqu'à résolution.
-     - **Validation** : Les cercles rouges ne sont **pas** considérés comme des cases piégées. Interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`).
+     - **Validation** : Les cercles rouges ne sont **pas** considérés comme des cases piégées. Interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Tu as été repéré !"`).
 
   4. **Variante `traces` (Qui a laissé ces traces ?)** :
      - **Position affichée** : **Échiquier VIDE** (`8/8/8/8/8/8/8/8 w - - 0 1`), `view-only`.
@@ -255,7 +255,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
      - **Position affichée** : `fen_depart` intacte (la destination finale est toujours libre).
      - **Affiché vs Caché** : Toutes les flèches, les cercles rouges (`red`/`r`) et la case cible (**cercle vert** ou **cercle bleu cible** au format alternatif sans cercle vert) sont **cachés** au départ et révélés uniquement une fois résolu. Seul l'éventuel cercle bleu de départ (`case_depart`) reste visible.
      - **Résolution de la cible (`extractDeveloppementTargetSquare`)** : Priorité à `case_arrivee`, sinon cercle vert dans `shapes`, sinon cercle bleu dans `shapes` différent de `case_depart`. Jamais en mode boucle (`isLoop = false`).
-     - **Validation** : Mêmes contraintes que `stealth` : les cercles rouges ne sont **pas** considérés comme des cases piégées ; interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Vous avez été repéré !"`). Gagné dès que la pièce atteint la case cible par **n'importe quel chemin légal** sûr.
+     - **Validation** : Mêmes contraintes que `stealth` : les cercles rouges ne sont **pas** considérés comme des cases piégées ; interdit uniquement sur toute case attaquée par l'adversaire (`isSquareAttacked` → `"Tu as été repéré !"`). Gagné dès que la pièce atteint la case cible par **n'importe quel chemin légal** sûr.
 
 - **Après une réponse (toutes variantes de déplacement)** :
   - **Coup invalide** : Feedback rouge + réinitialisation complète de la position (`resetPosition()`) après **400 ms**.
@@ -323,7 +323,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Position initiale affichée** :
   - Affiche `fenDepart` extraite du mini-PGN (`[FEN "..."]`, sinon position standard), orientée selon le trait de la FEN.
 - **Affiché vs Caché** :
-  - **Pendant la recherche** : Échiquier interactif avec toutes les shapes extraites (si aucune shape `[%cal]` n'est fournie dans le PGN, le parser génère automatiquement des **flèches colorées** `green, yellow, blue, red` pour chaque coup proposé). Sous l'échiquier : carte `"Quel coup choisissez-vous ?"` avec les boutons mélangés (libellés en français, ex. `"Fou f1 en c4"`).
+  - **Pendant la recherche** : Échiquier interactif avec toutes les shapes extraites (si aucune shape `[%cal]` n'est fournie dans le PGN, le parser génère automatiquement des **flèches colorées** `green, yellow, blue, red` pour chaque coup proposé). Sous l'échiquier : carte `"Quel coup choisis-tu ?"` avec les boutons mélangés (libellés en français, ex. `"Fou f1 en c4"`).
   - **Une fois résolu** : La carte de choix est **remplacée** par un encart `LearningFeedbackCallout` `"Explication"` affichant le commentaire du bon coup.
 - **Changement de vue** : Substitution de la carte des choix par l'encart d'explication dès que le bon coup est choisi ou joué.
 - **Après une réponse** :
@@ -401,7 +401,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Changement de vue** :
   - Clic sur le scénario marqué `is_correct: true` → arrêt de tous les timers d'animation, bascule vers `explication`.
 - **Après une réponse** :
-  - **Mauvais plan** : Toast erreur `"Ce n'est pas le meilleur plan, observez encore !"`, l'élève reste en phase `observation`.
+  - **Mauvais plan** : Toast erreur `"Ce n'est pas le meilleur plan, observe encore !"`, l'élève reste en phase `observation`.
   - **Bon plan** : Toast succès `"Excellente analyse ! Voici l'explication détaillée."` + passage en `explication` (`SeriesCardFooter` à l'étape `2 / 2` avec bouton `Terminer l'exercice`).
 - **Rédaction Entraîneur** :
   - Fournir `fen_depart` (ou `fen`), `couleur_joueur`, 3 `scenarios[]` (`pgn` + `is_correct: boolean`) et `pgn_explication`.
@@ -420,7 +420,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Changement de vue** :
   - Clic sur `"Valider l'ordre"` dans `SeriesCardFooter` lorsque l'ordre est exact → bascule vers `solution`.
 - **Après une réponse** :
-  - **Ordre incorrect** : Toast erreur `"L'ordre des étapes n'est pas correct, réessayez !"`, l'élève reste en phase `order`.
+  - **Ordre incorrect** : Toast erreur `"L'ordre des étapes n'est pas correct, réessaie !"`, l'élève reste en phase `order`.
   - **Ordre exact** : Toast succès `"Excellente réponse ! L'ordre des étapes est parfait."`, passage en phase `solution` (`SeriesCardFooter` étape `2 / 2` avec bouton `Terminer l'exercice`).
 - **Rédaction Entraîneur** :
   - Fournir `fen_depart` (ou `fen`), `couleur_joueur`, `etapes_texte[]` **dans l'ordre exact attendu** (mélangées automatiquement au chargement), et `pgn_explication`.

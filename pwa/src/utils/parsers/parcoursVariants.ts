@@ -63,7 +63,7 @@ function validateStealthConstraints(
 		return {
 			valid: false,
 			isFinished: false,
-			errorMessage: 'Vous avez été repéré !',
+			errorMessage: 'Tu as été repéré !',
 		};
 	}
 
@@ -103,12 +103,12 @@ const standardVariant: ParcoursVariant = {
 	name: 'Parcours classique',
 	getDefaultConsigne: ( caseArrivee ) =>
 		caseArrivee
-			? `Atteignez la case ${ caseArrivee.toUpperCase() } en évitant les cases rouges.`
-			: "Rejoignez la case d'arrivée.",
+			? `Atteins la case ${ caseArrivee.toUpperCase() } en évitant les cases rouges.`
+			: "Rejoins la case d'arrivée.",
 	getPendingHint: ( caseArrivee ) =>
 		caseArrivee
-			? `Déplacez votre pièce jusqu'à la case ${ caseArrivee.toUpperCase() } en évitant les cases rouges.`
-			: "Rejoignez la case d'arrivée verte.",
+			? `Déplace ta pièce jusqu'à la case ${ caseArrivee.toUpperCase() } en évitant les cases rouges.`
+			: "Rejoins la case d'arrivée verte.",
 	validateMove: ( ctx ) => {
 		if ( isRedSquare( ctx.to, ctx.shapes ) ) {
 			return {
@@ -141,12 +141,12 @@ const pacmanVariant: ParcoursVariant = {
 	name: 'Pacman (Gourmand)',
 	getDefaultConsigne: ( caseArrivee ) =>
 		caseArrivee
-			? `Capturez toutes les pièces adverses avant d'atteindre la case ${ caseArrivee.toUpperCase() }.`
-			: "Capturez toutes les pièces adverses avant d'atteindre l'arrivée.",
+			? `Capture toutes les pièces adverses avant d'atteindre la case ${ caseArrivee.toUpperCase() }.`
+			: "Capture toutes les pièces adverses avant d'atteindre l'arrivée.",
 	getPendingHint: ( caseArrivee ) =>
 		caseArrivee
-			? `Mangez toutes les pièces adverses avant d'atteindre la case verte ${ caseArrivee.toUpperCase() }.`
-			: "Capturez toutes les pièces avant d'aller sur la case verte.",
+			? `Mange toutes les pièces adverses avant d'atteindre la case verte ${ caseArrivee.toUpperCase() }.`
+			: "Capture toutes les pièces avant d'aller sur la case verte.",
 	validateMove: ( ctx ) => {
 		if ( isRedSquare( ctx.to, ctx.shapes ) ) {
 			return {
@@ -197,12 +197,12 @@ const stealthVariant: ParcoursVariant = {
 	name: 'Pas vu, pas pris (Stealth)',
 	getDefaultConsigne: ( caseArrivee, _couleurJoueur, isLoop ) =>
 		isLoop || ! caseArrivee
-			? 'Faites le tour complet de la pièce adverse sans vous faire repérer et revenez à votre case de départ.'
-			: `Infiltrez la zone cible (${ caseArrivee.toUpperCase() }) sans passer par les cases surveillées par l'adversaire.`,
+			? 'Fais le tour complet de la pièce adverse sans te faire repérer et reviens à ta case de départ.'
+			: `Infiltre la zone cible (${ caseArrivee.toUpperCase() }) sans passer par les cases surveillées par l'adversaire.`,
 	getPendingHint: ( caseArrivee, isLoop ) =>
 		isLoop || ! caseArrivee
-			? 'Contournez la pièce adverse en restant hors de sa portée pour revenir à votre case de départ.'
-			: `Évitez les cases surveillées par les pièces adverses pour atteindre ${ caseArrivee.toUpperCase() }.`,
+			? 'Contourne la pièce adverse en restant hors de sa portée pour revenir à ta case de départ.'
+			: `Évite les cases surveillées par les pièces adverses pour atteindre ${ caseArrivee.toUpperCase() }.`,
 	validateMove: ( ctx ) => {
 		const constraintError = validateStealthConstraints( ctx );
 		if ( constraintError ) {
@@ -216,7 +216,7 @@ const stealthVariant: ParcoursVariant = {
 					valid: true,
 					isFinished: true,
 					successMessage:
-						'Tour complet réussi sans vous faire repérer ! Bravo.',
+						'Tour complet réussi sans te faire repérer ! Bravo.',
 				};
 			}
 			return {
@@ -248,11 +248,11 @@ const tracesVariant: ParcoursVariant = {
 	name: 'Traces (Qui a laissé ces traces ?)',
 	getDefaultConsigne: () => 'Mais qui a bien pu laisser ces traces ?',
 	getPendingHint: () =>
-		"Observez les traces sur l'échiquier et sélectionnez la pièce correspondante ci-dessous.",
+		"Observe les traces sur l'échiquier et sélectionne la pièce correspondante ci-dessous.",
 	validateMove: () => ( {
 		valid: true,
 		isFinished: true,
-		successMessage: 'Bravo ! Vous avez identifié la bonne pièce.',
+		successMessage: 'Bravo ! Tu as identifié la bonne pièce.',
 	} ),
 };
 
@@ -260,9 +260,9 @@ const developpementVariant: ParcoursVariant = {
 	id: 'developpement',
 	name: 'Développement (Destination cachée)',
 	getDefaultConsigne: () =>
-		'Trouvez la bonne case de développement sans vous faire prendre.',
+		'Trouve la bonne case de développement sans te faire prendre.',
 	getPendingHint: () =>
-		'Déplacez votre pièce vers la bonne case de développement sans passer par une case attaquée.',
+		'Déplace ta pièce vers la bonne case de développement sans passer par une case attaquée.',
 	validateMove: ( ctx ) => {
 		const constraintError = validateStealthConstraints( ctx );
 		if ( constraintError ) {
@@ -283,7 +283,7 @@ const developpementVariant: ParcoursVariant = {
 				valid: true,
 				isFinished: true,
 				successMessage:
-					'Bravo ! Vous avez trouvé la bonne case de développement.',
+					'Bravo ! Tu as trouvé la bonne case de développement.',
 			};
 		}
 

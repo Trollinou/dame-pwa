@@ -27,7 +27,7 @@
       <ion-card v-else class="exercise-card">
         <ion-card-header>
           <ion-card-title class="exercise-card-header">
-            Quel coup choisissez-vous ?
+            Quel coup choisis-tu ?
           </ion-card-title>
         </ion-card-header>
 
@@ -174,7 +174,7 @@ const carteActuelle = computed<CarteOuvreBoite | null>(() => {
 });
 
 const consigneAffichee = computed(() => {
-  return props.consigne || 'Trouvez le bon coup d’ouverture.';
+  return props.consigne || 'Trouve le bon coup d’ouverture.';
 });
 
 watch(
@@ -269,7 +269,7 @@ const selectionnerChoix = (choix: OuvreBoiteChoix, animateOnBoard: boolean = tru
     isCurrentCardSolved.value = false;
     feedback.value = {
       type: 'danger',
-      message: 'Ce n’est pas le bon coup. Observez bien l’explication !'
+      message: 'Ce n’est pas le bon coup. Observe bien l’explication !'
     };
     currentExplanation.value = {
       type: 'error',
@@ -320,7 +320,7 @@ const handleBoardMove = (move: Move) => {
     };
     currentExplanation.value = {
       type: 'error',
-      message: 'Observez bien les flèches sur l’échiquier et choisissez l’un des coups proposés.'
+      message: 'Observe bien les flèches sur l’échiquier et choisis l’un des coups proposés.'
     };
     setTimeout(() => {
       if (boardApi.value && carteActuelle.value && !isCurrentCardSolved.value) {

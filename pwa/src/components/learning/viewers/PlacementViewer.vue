@@ -240,7 +240,7 @@ const verifierPlacement = async (square: string) => {
     // Mauvaise case
     feedback.value = {
       type: 'danger',
-      message: "Ce n'est pas la bonne case ! Réessayez."
+      message: "Ce n'est pas la bonne case ! Réessaie."
     };
 
     errorTimeout = setTimeout(() => {

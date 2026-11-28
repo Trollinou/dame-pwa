@@ -25,7 +25,7 @@
     <!-- SOUS-ÉTAPE 2 : Ordonnancement chronologique en grille 2 colonnes (Tap & Swap) -->
     <div v-else-if="sousEtape === 'ordonnancement'" class="animate-fade-in learning-full-width">
       <div class="learning-callout learning-callout--info ion-text-center">
-        <span>Touchez deux cartes pour permuter leur position chronologique.</span>
+        <span>Touche deux cartes pour permuter leur position chronologique.</span>
       </div>
 
       <div class="learning-board-grid-2col">
@@ -213,12 +213,12 @@ const resetResolutionState = () => {
 // Sous-titre ou consigne contextuelle
 const consigneCourante = computed(() => {
   if (sousEtape.value === 'selection') {
-    return `Sélectionnez ${nbDiagrammesPerSerie.value} diagrammes appartenant à une même partie.`;
+    return `Sélectionne ${nbDiagrammesPerSerie.value} diagrammes appartenant à une même partie.`;
   }
   if (sousEtape.value === 'ordonnancement') {
-    return `Remettez les ${nbDiagrammesPerSerie.value} positions dans l'ordre chronologique de la partie.`;
+    return `Remets les ${nbDiagrammesPerSerie.value} positions dans l'ordre chronologique de la partie.`;
   }
-  return 'Trouvez le coup décisif pour conclure cette série.';
+  return 'Trouve le coup décisif pour conclure cette série.';
 });
 
 const sousEtapeBadge = computed(() => {
@@ -326,18 +326,18 @@ const currentStepPendingHint = computed(() => {
     if (restant > 0) {
       return `Sélection : ${compte} / ${total} position${total > 1 ? 's' : ''} (${restant} restante${restant > 1 ? 's' : ''})`;
     }
-    return 'Désélectionnez une position pour corriger le groupe';
+    return 'Désélectionne une position pour corriger le groupe';
   }
   if (sousEtape.value === 'ordonnancement') {
     if (selectedSwapIndex.value !== null) {
-      return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touchez une autre position pour permuter.`;
+      return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touche une autre position pour permuter.`;
     }
-    return 'Touchez 2 cartes pour permuter leur ordre chronologique';
+    return 'Touche 2 cartes pour permuter leur ordre chronologique';
   }
   if (isPuzzleMoveFound.value && !hasCompletedFirstReplay.value) {
     return 'Démonstration de la série en cours...';
   }
-  return 'Trouvez le bon coup sur l\'échiquier';
+  return 'Trouve le bon coup sur l\'échiquier';
 });
 
 // Libellé du bouton suivant dans le footer
@@ -468,7 +468,7 @@ const onReplayBoardCreated = (api: BoardCore) => {
 };
 
 const handlePuzzleError = () => {
-  puzzleError.value = 'Mauvais coup, cherchez encore !';
+  puzzleError.value = 'Mauvais coup, cherche encore !';
   if (puzzleErrorTimer) clearTimeout(puzzleErrorTimer);
   puzzleErrorTimer = setTimeout(() => {
     puzzleError.value = null;

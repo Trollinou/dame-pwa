@@ -56,6 +56,7 @@
   - **Routeur (`router/index.ts`)** : Toutes les vues de route sont obligatoirement déclarées en lazy-loading dynamique inliné `component: () => import(...)`.
   - **Composants d'exercices & Modales lourdes** : Chargement obligatoire via `defineAsyncComponent(() => import(...))` dans les hubs de contenu (ex. `ContenuPage.vue`) et pour les fenêtres modales/tiroirs non visibles initialement.
   - **CSS Ionic (`main.ts`)** : N'importer que les feuilles strictement utiles (`core.css`, `normalize.css`, `structure.css`, `typography.css`, `padding.css`, `text-alignment.css`). Proscrire `float-elements.css` (incompatible LightningCSS), `text-transformation.css`, `flex-utils.css` et `display.css`.
+- **Ton Pédagogique Apprentissage (Tutoiement)** : Tous les textes d'interface des exercices, leçons et vidéos (consignes par défaut, aides de pied de carte, questions et messages de feedback) doivent impérativement employer le tutoiement (2ᵉ personne du singulier).
 
 ## 5. API, Réseau & Caching Offline
 - **Appels HTTP** : Interdiction du `fetch` natif. Utiliser `safeFetch` (`src/utils/safeFetch.ts`) ou `fetchWpCollection` (`src/utils/wpApi.ts`).

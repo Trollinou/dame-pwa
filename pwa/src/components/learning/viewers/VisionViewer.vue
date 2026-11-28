@@ -133,7 +133,7 @@ const diagrammesListe = computed<DiagrammeConfig[]>(() => {
 });
 
 const consigneTexte = computed<string>(() => {
-  return props.consigne || props.legacyConfig?.description || 'Observez les 4 diagrammes ci-dessous.';
+  return props.consigne || props.legacyConfig?.description || 'Observe les 4 diagrammes ci-dessous.';
 });
 
 watch(
@@ -243,7 +243,7 @@ const gererClicCase = async (square: string) => {
     // Erreur !
     feedback.value = {
       type: 'danger',
-      message: "Ce n'est pas le bon coup ! Réessayez."
+      message: "Ce n'est pas le bon coup ! Réessaie."
     };
     caseSelectionnee.value = null;
     shapesActuelles.value = [];

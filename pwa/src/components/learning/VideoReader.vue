@@ -67,7 +67,7 @@
       <!-- Notice de fallback si l'API YouTube n'a pas pu se charger -->
       <div v-if="apiError && !estValide && !isImmersiveFullscreen" class="video-fallback-notice ion-padding-horizontal">
         <ion-icon :icon="informationCircleOutline" />
-        <span>Suivi automatique restreint. Vous pouvez valider directement la vidéo.</span>
+        <span>Suivi automatique restreint. Tu peux valider directement la vidéo.</span>
       </div>
 
       <!-- Notes ou texte d'accompagnement de la vidéo si présent -->
@@ -89,8 +89,8 @@
       nextText="Valider la vidéo"
       finishText="Valider la vidéo"
       completedText="🎉 Vidéo validée !"
-      pendingHint="Visionnez au moins 95% de la vidéo pour valider"
-      disabledHint="Visionnez au moins 95% de la vidéo pour débloquer la validation"
+      pendingHint="Visionne au moins 95% de la vidéo pour valider"
+      disabledHint="Visionne au moins 95% de la vidéo pour débloquer la validation"
       badgePrefix="Vidéo"
       @action="validerVisionnage"
       @next="validerVisionnage"

@@ -15,7 +15,7 @@
     <div class="animate-fade-in learning-full-width">
       <!-- Variante 1 : Pièces (Palette des 6 pièces blanches) -->
       <div v-if="resolvedVariante === 'pieces'" class="learning-interaction-column">
-        <p class="learning-interaction-instruction ion-text-center">Sélectionnez la pièce blanche mystère :</p>
+        <p class="learning-interaction-instruction ion-text-center">Sélectionne la pièce blanche mystère :</p>
         <div :class="['learning-piece-palette', 'cg-board', `piece-set-${chessPreferences.pieceSet || 'cburnett'}`]">
           <button
             v-for="item in whitePieces"
@@ -34,7 +34,7 @@
 
       <!-- Variante 2 : Cases (Échiquier vide interactif avec révélation cercle vert) -->
       <div v-else-if="resolvedVariante === 'cases'" class="learning-interaction-column">
-        <p class="learning-interaction-instruction ion-text-center">Cliquez sur la case mystère sur l'échiquier :</p>
+        <p class="learning-interaction-instruction ion-text-center">Clique sur la case mystère sur l'échiquier :</p>
         <div class="chessboard-container" @contextmenu.prevent>
           <Chessboard
             :key="`t12-board-${indexCourant}`"
@@ -156,8 +156,8 @@ const carteCourante = computed<SerieQuiSuisJe>(() => {
 const consigneTexte = computed<string>(() => {
   if (props.consigne) return props.consigne;
   return resolvedVariante.value === 'pieces'
-    ? 'Devinez la pièce mystère d\'après les indices.'
-    : 'Trouvez la case mystère sur l\'échiquier d\'après les indices.';
+    ? 'Devine la pièce mystère d\'après les indices.'
+    : 'Trouve la case mystère sur l\'échiquier d\'après les indices.';
 });
 
 watch(
@@ -173,8 +173,8 @@ watch(
 
 const pendingHintTexte = computed<string>(() => {
   return resolvedVariante.value === 'pieces'
-    ? 'Sélectionnez la bonne pièce pour continuer'
-    : 'Cliquez sur la bonne case pour continuer';
+    ? 'Sélectionne la bonne pièce pour continuer'
+    : 'Clique sur la bonne case pour continuer';
 });
 
 // Réinitialisation de l'état de la carte lors du changement de carte

@@ -103,7 +103,7 @@
               </ion-card-header>
               <ion-card-content>
                 <p class="success-subtitle">
-                  {{ contenuActuel.post_type === 'roi_lecon' ? 'Vous avez validé cette leçon avec succès.' : (contenuActuel.post_type === 'roi_video' ? 'Vous avez terminé le visionnage de cette vidéo.' : 'Félicitations, vous avez trouvé la bonne séquence de coups.') }}
+                  {{ contenuActuel.post_type === 'roi_lecon' ? 'Tu as validé cette leçon avec succès.' : (contenuActuel.post_type === 'roi_video' ? 'Tu as terminé le visionnage de cette vidéo.' : 'Félicitations, tu as trouvé la bonne séquence de coups.') }}
                 </p>
                 <div class="action-buttons ion-margin-top">
                   <ion-button 

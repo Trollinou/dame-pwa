@@ -152,8 +152,8 @@ const props = withDefaults(
     nextText: 'Carte suivante',
     finishText: 'Terminer l\'exercice',
     completedText: '🎉 Exercice réussi !',
-    pendingHint: 'Trouvez la solution pour continuer',
-    disabledHint: 'Visionnez tous les coups pour continuer',
+    pendingHint: 'Trouve la solution pour continuer',
+    disabledHint: 'Visionne tous les coups pour continuer',
     badgePrefix: 'Carte',
     showActionButtonWhenUnsolved: false,
     actionButtonText: 'Valider',
@@ -256,7 +256,7 @@ const pendingHintText = computed(() => {
   if (props.pendingHint) {
     return props.pendingHint;
   }
-  return 'Trouvez la solution pour continuer';
+  return 'Trouve la solution pour continuer';
 });
 
 const handleFinalNext = async () => {

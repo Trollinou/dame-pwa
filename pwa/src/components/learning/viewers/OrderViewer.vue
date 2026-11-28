@@ -4,7 +4,7 @@
     <!-- Phase d'ordonnancement (Tap & Swap sur grille 2 colonnes, alignée sur TypeMarcheHeros) -->
     <template v-if="!isSolved">
       <div class="learning-callout learning-callout--info ion-text-center">
-        <span>Touchez deux cartes pour permuter leur position.</span>
+        <span>Touche deux cartes pour permuter leur position.</span>
       </div>
 
       <div class="learning-board-grid-2col">
@@ -138,16 +138,16 @@ const footerFeedback = computed<CardFeedback | null>(() => {
 
 const pendingHint = computed(() => {
   if (selectedSwapIndex.value !== null) {
-    return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touchez une autre position pour permuter.`;
+    return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touche une autre position pour permuter.`;
   }
-  return 'Touchez 2 cartes pour permuter leur ordre';
+  return 'Touche 2 cartes pour permuter leur ordre';
 });
 
 watch(
   [isSolved, () => props.correctItems.length, () => props.consigne],
   () => {
     exerciseHeader?.setHeaderState({
-      consigne: props.consigne || 'Classez les positions dans l\'ordre demandé.',
+      consigne: props.consigne || 'Classe les positions dans l\'ordre demandé.',
       stepBadgeText: `${isSolved.value ? props.correctItems.length : 0} / ${props.correctItems.length}`
     });
   },

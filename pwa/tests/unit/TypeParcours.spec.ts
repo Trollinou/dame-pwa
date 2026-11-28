@@ -196,7 +196,7 @@ describe( 'parcoursVariants - Logic & Extensibility', () => {
 			boardApi: mockBoardAttacked,
 		} );
 		expect( attackedResult.valid ).toBe( false );
-		expect( attackedResult.errorMessage ).toBe( 'Vous avez été repéré !' );
+		expect( attackedResult.errorMessage ).toBe( 'Tu as été repéré !' );
 
 		// Les cercles rouges ne sont pas des cases piégées en variante stealth
 		const redCircleAllowed = stealth.validateMove( {
@@ -682,7 +682,7 @@ describe( 'TypeParcours.vue', () => {
 			boardApi: mockBoardAttacked,
 		} );
 		expect( attackedRes.valid ).toBe( false );
-		expect( attackedRes.errorMessage ).toBe( 'Vous avez été repéré !' );
+		expect( attackedRes.errorMessage ).toBe( 'Tu as été repéré !' );
 
 		// Case rouge autorisée en développement (non considérée comme case piégée)
 		const redRes = dev.validateMove( {
@@ -788,7 +788,7 @@ describe( 'TypeParcours.vue', () => {
 		await wrapper.vm.$nextTick();
 
 		expect( wrapper.text() ).toContain(
-			'Bravo ! Vous avez trouvé la bonne case de développement.'
+			'Bravo ! Tu as trouvé la bonne case de développement.'
 		);
 
 		// Après résolution : le cercle bleu c6, le cercle rouge d5 et toutes les flèches sont révélés

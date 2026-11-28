@@ -14,7 +14,7 @@
         :totalCards="5"
         :isSolved="matchingReussi"
         :feedback="carte1Feedback"
-        pendingHint="Associez correctement les 4 diagrammes et descriptions pour continuer"
+        pendingHint="Associe correctement les 4 diagrammes et descriptions pour continuer"
         nextText="Position suivante"
         @next="passerCarteSuivante"
       />
@@ -36,7 +36,7 @@
           :totalCards="5"
           :isSolved="pgnVisionne"
           :feedback="pgnVisionne ? { type: 'success', message: 'Plan visualisé avec succès !' } : null"
-          pendingHint="Déroulez tous les coups du PGN jusqu'au bout pour continuer"
+          pendingHint="Déroule tous les coups du PGN jusqu'au bout pour continuer"
           :nextText="carteCourante === 5 ? 'Terminer l\'exercice' : 'Position suivante'"
           :finishText="'Terminer l\'exercice'"
           @next="passerCarteSuivante"
@@ -105,7 +105,7 @@ const exerciseHeader = useExerciseHeader();
 // Consigne contextuelle dynamique selon la carte
 const consigneActuelle = computed(() => {
   if (carteCourante.value === 1) {
-    return 'Associez chaque diagramme à sa description.';
+    return 'Associe chaque diagramme à sa description.';
   }
   const planNum = carteCourante.value - 1;
   return `Plan ${planNum}`;

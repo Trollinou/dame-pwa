@@ -343,7 +343,7 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		await row1Non.trigger( 'click' );
 
 		expect( wrapper.text() ).toContain(
-			'Excellent ! Toutes vos réponses sont exactes.'
+			'Excellent ! Toutes tes réponses sont exactes.'
 		);
 	} );
 
@@ -556,7 +556,7 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		} );
 
 		// Étape 1 : Phase de mémorisation initiale
-		expect( wrapper.text() ).toContain( 'Mémorisez bien la position' );
+		expect( wrapper.text() ).toContain( 'Mémorise bien la position' );
 		expect( wrapper.text() ).toContain( 'Regardez la position des Rois.' );
 		const memoriseBtn = wrapper.find(
 			'.setup-memorize-panel .action-btn--primary'
@@ -613,7 +613,7 @@ describe( 'TypeCapOuPasCap.vue', () => {
 
 		// Étape 5 : L'échiquier reconstitué correspond à la position cible -> Succès
 		expect( wrapper.text() ).toContain(
-			'Parfait ! Vous avez reproduit exactement la position.'
+			'Parfait ! Tu as reproduit exactement la position.'
 		);
 	} );
 
@@ -812,7 +812,7 @@ describe( 'TypeCapOuPasCap.vue', () => {
 		// Correction : Nb Attaquant = '2' (index 2), Nb Defenseur = '1' (index 1)
 		await row0Btns[ 2 ].trigger( 'click' );
 		expect( wrapper.text() ).toContain(
-			'Excellent ! Toutes vos réponses sont exactes.'
+			'Excellent ! Toutes tes réponses sont exactes.'
 		);
 	} );
 } );

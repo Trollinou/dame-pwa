@@ -117,12 +117,12 @@ watch(
   () => {
     if (phase.value === 'questions') {
       exerciseHeader?.setHeaderState({
-        consigne: questionActuelle.value?.texte || `Évaluez la position (${props.theme || 'Échec & Éval'})`,
+        consigne: questionActuelle.value?.texte || `Évalue la position (${props.theme || 'Échec & Éval'})`,
         stepBadgeText: `Question ${questionIndex.value + 1} / ${Math.max(1, props.questions.length)}`
       });
     } else if (phase.value === 'tactique') {
       exerciseHeader?.setHeaderState({
-        consigne: 'À vous de jouer ! Trouvez la séquence.',
+        consigne: 'À toi de jouer ! Trouve la séquence.',
         stepBadgeText: 'Tactique'
       });
     } else {
@@ -152,7 +152,7 @@ const repondre = async (valeur: string) => {
     }
   } else {
     await showError(
-      questionActuelle.value.explication || 'Mauvaise réponse, essayez à nouveau.',
+      questionActuelle.value.explication || 'Mauvaise réponse, essaie à nouveau.',
       3500
     );
   }

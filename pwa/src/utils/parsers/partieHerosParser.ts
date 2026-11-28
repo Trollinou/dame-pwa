@@ -287,7 +287,7 @@ export function parsePartieHerosPgn(
 					),
 					isCorrect: false,
 					explanation:
-						varParsed.comment || 'Mauvais choix ! Cherchez encore.',
+						varParsed.comment || 'Mauvais choix ! Cherche encore.',
 				} );
 			}
 
