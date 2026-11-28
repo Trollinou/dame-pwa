@@ -100,7 +100,7 @@ export function extractDeveloppementTargetSquare(
 
 const standardVariant: ParcoursVariant = {
 	id: 'standard',
-	name: 'Parcours classique',
+	name: 'Parkour classique',
 	getDefaultConsigne: ( caseArrivee ) =>
 		caseArrivee
 			? `Atteins la case ${ caseArrivee.toUpperCase() } en évitant les cases rouges.`
@@ -125,7 +125,7 @@ const standardVariant: ParcoursVariant = {
 			return {
 				valid: true,
 				isFinished: true,
-				successMessage: 'Parcours réussi !',
+				successMessage: 'Parkour réussi !',
 			};
 		}
 
@@ -181,7 +181,7 @@ const pacmanVariant: ParcoursVariant = {
 				valid: true,
 				isFinished: true,
 				successMessage:
-					'Parcours Pacman réussi ! Toutes les pièces ont été mangées.',
+					'Parkour Pacman réussi ! Toutes les pièces ont été mangées.',
 			};
 		}
 

@@ -316,7 +316,7 @@ const handleMove = (move: Move) => {
   if (result.isFinished) {
     emit('feedback', {
       type: 'success',
-      message: result.successMessage || 'Parcours réussi !',
+      message: result.successMessage || 'Parkour réussi !',
     });
     emit('solved');
     emit('success');

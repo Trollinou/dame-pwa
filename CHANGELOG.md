@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Type 9 (Parkour) — Renommage des libellés et de la documentation (`TypeParcours.vue`, `ParcoursViewer.vue`, `parcoursVariants.ts`, `TypeParcours.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Renommage des libellés utilisateur de « Parcours » vers « Parkour » (`Parkour X / Y`, `Parkour suivant`, `Parkour réussi !`, `Parkour classique`, `Parkour Pacman réussi !`) et mise à jour de la documentation et des assertions de tests unitaires.
+
 - **Type 8 (Vision'checs) — Consigne par défaut (`VisionViewer.vue`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Mise à jour de la consigne par défaut en `"Visualise et joue le meilleur coup !"` (en remplacement de `"Observe les 4 diagrammes ci-dessous."`).
 

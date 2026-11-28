@@ -21,7 +21,7 @@
       :isSolved="isSolved"
       :feedback="feedback"
       :pendingHint="pendingHint"
-      :nextText="indexCourant < totalParcours - 1 ? 'Parcours suivant' : 'Terminer l\'exercice'"
+      :nextText="indexCourant < totalParcours - 1 ? 'Parkour suivant' : 'Terminer l\'exercice'"
       @next="passerParcoursSuivant"
     />
   </div>
@@ -129,7 +129,7 @@ watch(
   ([consigne, idx, total]) => {
     exerciseHeader?.setHeaderState({
       consigne,
-      stepBadgeText: `Parcours ${idx + 1} / ${total}`,
+      stepBadgeText: `Parkour ${idx + 1} / ${total}`,
     });
   },
   { immediate: true }

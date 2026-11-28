@@ -227,12 +227,12 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 ---
 
-### Type 9 — Parcours (`TypeParcours.vue` + `ParcoursViewer.vue` + `parcoursVariants.ts`)
+### Type 9 — Parkour (`TypeParcours.vue` + `ParcoursViewer.vue` + `parcoursVariants.ts`)
 
 - **Rôle** : Déplacer une pièce sur l'échiquier (ou identifier la pièce d'après ses traces) selon 5 variantes.
 - **Variantes et logique** :
 
-  1. **Variante `standard` (Parcours classique)** :
+  1. **Variante `standard` (Parkour classique)** :
      - **Position affichée** : `fen_depart`, **en retirant automatiquement la pièce éventuellement présente sur `case_arrivee`** (cible verte) tant que non résolu.
      - **Affiché vs Caché** : Cercle bleu sur `case_depart`, cercle vert sur `case_arrivee`, cases rouges (`red`/`r`) interdites. **Toutes les flèches (`dest` différent de `orig`) sont cachées** au départ et révélées uniquement une fois résolu.
      - **Validation** : Interdit de poser la pièce sur une case rouge (`"Case interdite !"`). Gagné dès que `to === case_arrivee`.
@@ -261,7 +261,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Après une réponse (toutes variantes de déplacement)** :
   - **Coup invalide** : Feedback rouge + réinitialisation complète de la position (`resetPosition()`) après **400 ms**.
   - **Coup valide intermédiaire** : Efface le feedback éventuel, le joueur continue à déplacer sa pièce (`setSoloMode(true)`).
-  - **Parcours réussi** : Feedback vert, échiquier verrouillé (`isSolved`), révélation de `fen_depart` et de toutes les `shapes` (dont les flèches et cibles cachées en `standard`/`stealth`/`developpement`). Passage au parcours suivant via `SeriesCardFooter`.
+  - **Parkour réussi** : Feedback vert, échiquier verrouillé (`isSolved`), révélation de `fen_depart` et de toutes les `shapes` (dont les flèches et cibles cachées en `standard`/`stealth`/`developpement`). Passage au parkour suivant via `SeriesCardFooter`.
 - **Rédaction Entraîneur** :
   - Définir `series[]` avec `variante` (`standard`, `pacman`, `stealth`, `traces`, `developpement`), `fen_depart`, `couleur_joueur`, `case_depart`, `case_arrivee` (ou vide pour boucle `stealth`, ou déduit des `shapes` pour `developpement`), `piece_attendue` (pour `traces`), et `shapes` (cases rouges interdites, traces, flèches/cercles).
 
@@ -431,5 +431,5 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 | Version doc | Version DAME-PWA | Date | Modifications |
 | :--- | :--- | :--- | :--- |
 | `1.0.0` | `1.13.11` | `2026-11-21` | Rédaction initiale des spécifications TDD & Guide Entraîneur pour les Types 1 à 16. |
-| `1.1.0` | `1.13.11` | `2026-11-21` | **Type 9 (Parcours)** : ajout de la 5ᵉ variante `developpement` (dérivée de `stealth` à destination cachée, support double format Bleu+Vert et Cercle Bleu seul). |
+| `1.1.0` | `1.13.11` | `2026-11-21` | **Type 9 (Parkour)** : ajout de la 5ᵉ variante `developpement` (dérivée de `stealth` à destination cachée, support double format Bleu+Vert et Cercle Bleu seul). |
 | `1.2.0` | `1.13.13` | `2026-11-22` | **Type 9 (`stealth` & `developpement`)** : les cercles rouges ne sont plus considérés comme des cases piégées, sont masqués au départ et révélés une fois la solution trouvée. |

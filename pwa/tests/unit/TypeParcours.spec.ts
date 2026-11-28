@@ -444,7 +444,7 @@ describe( 'TypeParcours.vue', () => {
 		// ==========================================
 		// PARCOURS 1 / 3
 		// ==========================================
-		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 1 / 3' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Parkour 1 / 3' );
 		expect( headerState.value.consigne ).toBe(
 			'Parcours 1 : Rejoignez la case e4.'
 		);
@@ -458,33 +458,33 @@ describe( 'TypeParcours.vue', () => {
 
 		// Click target e4 -> Solved
 		await btnTarget1.trigger( 'click' );
-		expect( wrapper.text() ).toContain( 'Parcours réussi !' );
+		expect( wrapper.text() ).toContain( 'Parkour réussi !' );
 
-		// Click "Parcours suivant"
+		// Click "Parkour suivant"
 		const nextBtn1 = wrapper.find( '.action-zone ion-button' );
 		await nextBtn1.trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
 		// ==========================================
-		// PARCOURS 2 / 3
+		// PARKOUR 2 / 3
 		// ==========================================
-		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 2 / 3' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Parkour 2 / 3' );
 		expect( headerState.value.consigne ).toBe(
 			'Parcours 2 : Mangez tout avant c6.'
 		);
 
 		const btnC6 = wrapper.find( '.mock-move-btn-c6' );
 		await btnC6.trigger( 'click' );
-		expect( wrapper.text() ).toContain( 'Parcours Pacman réussi !' );
+		expect( wrapper.text() ).toContain( 'Parkour Pacman réussi !' );
 
 		const nextBtn2 = wrapper.find( '.action-zone ion-button' );
 		await nextBtn2.trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
 		// ==========================================
-		// PARCOURS 3 / 3
+		// PARKOUR 3 / 3
 		// ==========================================
-		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 3 / 3' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Parkour 3 / 3' );
 		expect( headerState.value.consigne ).toBe( 'Parcours 3 : Infiltrez h8.' );
 
 		const btnH8 = wrapper.find( '.mock-move-btn-h8' );
@@ -545,7 +545,7 @@ describe( 'TypeParcours.vue', () => {
 			},
 		} );
 
-		expect( headerState.value.stepBadgeText ).toBe( 'Parcours 1 / 1' );
+		expect( headerState.value.stepBadgeText ).toBe( 'Parkour 1 / 1' );
 		expect( headerState.value.consigne ).toBe(
 			'Olalala, mais qui a bien pu laisser ces traces ? Gardes !'
 		);
