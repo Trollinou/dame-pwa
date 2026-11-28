@@ -195,45 +195,21 @@
           </div>
         </div>
 
-        <!-- 3.B. Sous-étape QCM (choix sur la branche principale) -->
-        <div v-else-if="currentMainStage?.type === 'qcm'" class="stage-qcm-wrapper">
+        <!-- 3.B. Sous-étape QCM (coup à jouer directement sur l'échiquier) -->
+        <div v-else-if="currentMainStage?.type === 'qcm'" class="exercise-viewer-layout">
           <div class="chessboard-container">
             <Chessboard
               :key="`main-qcm-${mainBranchStageIndex}`"
               mode="game"
-              :fen="activeMainQcmFen"
+              :fen="activeMainQcmFen || currentMainStage.fen"
               :last-move="activeMainQcmLastMove"
               :shapes="currentMainStage.shapes"
               :orientation="currentMainStage.orientation"
               :player-color="currentMainStage.orientation"
-              :view-only="true"
+              :view-only="isMainQcmSolved"
               @board-created="onMainQcmBoardCreated"
+              @move="handleMainQcmMove"
             />
-          </div>
-
-          <div class="learning-side-panel">
-            <div class="qcm-instruction-bar">
-              <span class="qcm-instruction-text">Trouve le coup suivant</span>
-            </div>
-
-            <ion-card class="exercise-card">
-              <ion-card-content>
-                <div class="qcm-choices">
-                  <ion-button
-                    v-for="(choix, index) in currentMainStage.choices"
-                    :key="index"
-                    expand="block"
-                    fill="solid"
-                    :color="couleurBoutonMainQcm(choix, index)"
-                    :disabled="isMainQcmSolved"
-                    class="choice-btn"
-                    @click="validerChoixMainQcm(choix, index)"
-                  >
-                    {{ choix.label }}
-                  </ion-button>
-                </div>
-              </ion-card-content>
-            </ion-card>
           </div>
         </div>
       </div>
@@ -269,7 +245,7 @@ import {
   arrowBackOutline,
 } from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
-import type { BoardCore, DrawShape, Key } from 'eg-chessboard';
+import type { BoardCore, DrawShape, Key, Move } from 'eg-chessboard';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import {
@@ -669,7 +645,6 @@ const viewMainPgnNext = () => {
 
 // 3.B. QCM Main Stage
 const mainQcmBoardApi = ref<BoardCore | null>(null);
-const selectedMainQcmChoiceIndex = ref<number | null>(null);
 const isMainQcmSolved = ref(false);
 const activeMainQcmFen = ref('');
 
@@ -690,23 +665,26 @@ const onMainQcmBoardCreated = (api: BoardCore) => {
   }
 };
 
-const couleurBoutonMainQcm = (choix: PosiPlanQcmChoice, index: number): string => {
-  if (selectedMainQcmChoiceIndex.value === null) {
-    return 'primary';
+const resetMainQcmBoardPosition = (stage: PosiPlanQcmStage, stageIndex: number) => {
+  if (
+    mainBranchStageIndex.value !== stageIndex ||
+    isMainQcmSolved.value ||
+    !mainQcmBoardApi.value
+  ) {
+    return;
   }
-  if (choix.isCorrect && isMainQcmSolved.value) {
-    return 'success';
+  mainQcmBoardApi.value.setPosition(stage.fen, stage.lastMove);
+  mainQcmBoardApi.value.setShapes(stage.shapes || []);
+  if (typeof mainQcmBoardApi.value.redraw === 'function') {
+    mainQcmBoardApi.value.redraw(true);
   }
-  if (index === selectedMainQcmChoiceIndex.value && !choix.isCorrect) {
-    return 'danger';
-  }
-  return 'primary';
 };
 
-const validerChoixMainQcm = (choix: PosiPlanQcmChoice, index: number) => {
-  if (isMainQcmSolved.value) return;
+const normalizeSanForMatch = (san?: string): string =>
+  (san || '').replace(/[+#x=!?]/g, '').trim();
 
-  selectedMainQcmChoiceIndex.value = index;
+const validerChoixMainQcm = (choix: PosiPlanQcmChoice, stage: PosiPlanQcmStage, stageIndex: number) => {
+  if (isMainQcmSolved.value) return;
 
   if (choix.isCorrect) {
     isMainQcmSolved.value = true;
@@ -714,19 +692,46 @@ const validerChoixMainQcm = (choix: PosiPlanQcmChoice, index: number) => {
       type: 'success',
       message: choix.explanation || 'Bravo ! C\'est le meilleur coup.',
     };
-
-    if (mainQcmBoardApi.value) {
-      try {
-        mainQcmBoardApi.value.move(choix.san);
-      } catch (err) {
-        console.warn('Erreur coup QCM sur échiquier:', err);
-      }
-    }
   } else {
     mainBranchFeedback.value = {
       type: 'danger',
       message: choix.explanation || 'Ce n\'est pas le bon coup ! Réessaie.',
     };
+    setTimeout(() => {
+      resetMainQcmBoardPosition(stage, stageIndex);
+    }, 1200);
+  }
+};
+
+const handleMainQcmMove = (move: Move) => {
+  if (isMainQcmSolved.value) return;
+  const stage = currentMainStage.value;
+  if (!stage || stage.type !== 'qcm') return;
+
+  const stageIndex = mainBranchStageIndex.value;
+  const playedSanRaw = (move.san || '').replace(/[+#!?]/g, '').trim();
+  const playedSanClean = normalizeSanForMatch(move.san);
+
+  const matchedChoix =
+    stage.choices.find((c) => {
+      const choiceSanRaw = (c.san || '').replace(/[+#!?]/g, '').trim();
+      return Boolean(playedSanRaw && choiceSanRaw && choiceSanRaw === playedSanRaw);
+    }) ||
+    stage.choices.find((c) => {
+      const choiceSanClean = normalizeSanForMatch(c.san);
+      return Boolean(playedSanClean && choiceSanClean && choiceSanClean === playedSanClean);
+    });
+
+  if (matchedChoix) {
+    validerChoixMainQcm(matchedChoix, stage, stageIndex);
+  } else {
+    mainBranchFeedback.value = {
+      type: 'warning',
+      message: 'Ce coup ne fait pas partie des coups envisagés. Réessaie !',
+    };
+    setTimeout(() => {
+      resetMainQcmBoardPosition(stage, stageIndex);
+    }, 800);
   }
 };
 
@@ -739,7 +744,6 @@ const resetMainStageState = (stage?: PosiPlanStage | null) => {
     currentMainPgnMoveIndex.value = -1;
     isMainPgnCompleted.value = !current.moves || current.moves.length === 0;
   } else if (current.type === 'qcm') {
-    selectedMainQcmChoiceIndex.value = null;
     isMainQcmSolved.value = false;
     activeMainQcmFen.value = current.fen;
   }

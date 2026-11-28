@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Type 5 (Posi'Plan) — Jeu direct sur l'échiquier à l'étape QCM (`TypePosiPlan.vue`, `TypePosiPlan.spec.ts`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Suppression des 3 boutons de choix sur les sous-étapes `qcm` de la branche principale afin de jouer le coup directement sur l'échiquier (`:view-only="isMainQcmSolved"`, validation via `@move` avec réinitialisation de la position en cas d'erreur ou de coup hors propositions), aligné sur les Types 4 et 13.
+
 - **Type 9 (Parkour) — Renommage des libellés et de la documentation (`TypeParcours.vue`, `ParcoursViewer.vue`, `parcoursVariants.ts`, `TypeParcours.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Renommage des libellés utilisateur de « Parcours » vers « Parkour » (`Parkour X / Y`, `Parkour suivant`, `Parkour réussi !`, `Parkour classique`, `Parkour Pacman réussi !`) et mise à jour de la documentation et des assertions de tests unitaires.
 

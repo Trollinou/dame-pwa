@@ -148,14 +148,14 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Affiché vs Caché** :
   - **Mode `initial_choice`** : Échiquier `view-only`, barre `"Trouve le bon plan"`, boutons correspondant aux coups candidats à la racine du PGN (`root.children`, non mélangés : principale + variantes).
   - **Mode `variant_view`** : Bandeau jaune/warning `"Variante alternative : ..."`, bouton `"Choix initial"`, échiquier `view-only` avec surbrillance du dernier coup (`lastMove`), contrôles `Début / Précédent / Suivant`, zone de commentaire, et bouton `"Retourner au choix initial"` en fin de variante.
-  - **Mode `main_branch`** : Alternance `pgn` (contrôles + commentaires + `lastMove` / `startingLastMove`) et `qcm` (surbrillance du coup précédent `lastMove` + barre `"Trouve le coup suivant"` + choix mélangés).
+  - **Mode `main_branch`** : Alternance `pgn` (contrôles + commentaires + `lastMove` / `startingLastMove`) et `qcm` (surbrillance du coup précédent `lastMove`, échiquier interactif `view-only = false` tant que non résolu, sans affichage des 3 boutons de choix).
 - **Changement de vue** :
   - Clic sur une **variante alternative** au choix initial → bascule immédiate en `variant_view`.
   - Clic sur `"Choix initial"` ou `"Retourner au choix initial"` → retour en `initial_choice`.
   - Clic sur le **bon plan initial** puis clic sur `Étape suivante` dans `SeriesCardFooter` → bascule en `main_branch`.
 - **Après une réponse** :
   - **Choix initial correct** : Bouton en vert, coup joué sur l'échiquier, feedback vert (`explanation`), déblocage du bouton `Étape suivante` dans le footer.
-  - **Sous-étape QCM dans `main_branch`** : Identique au Type 4 (mauvais choix → rouge + explication ; bon choix → vert + coup joué sur l'échiquier + déblocage de `Étape suivante`).
+  - **Sous-étape QCM dans `main_branch`** : Identique au Type 4 (jeu direct sur l'échiquier via `@move` : mauvais choix → feedback `danger` + explication + réinitialisation de la position après **1200 ms** ; coup hors propositions → feedback `warning` + réinitialisation après **800 ms** ; bon choix → feedback `success` + verrouillage de l'échiquier + déblocage de `Étape suivante`).
 - **Rédaction Entraîneur** :
   - Rédiger un PGN dont le **1er coup** comporte la branche principale (bon plan) et 1 ou plusieurs variantes `(...)` (plans alternatifs à explorer).
   - Dans la suite de la branche principale, tout embranchement (`node.children.length > 1`) génère automatiquement un sous-QCM (sans contrainte des 3 flèches contrairement au Type 4).

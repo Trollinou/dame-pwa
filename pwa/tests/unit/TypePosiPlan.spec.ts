@@ -221,29 +221,28 @@ describe( 'TypePosiPlan.vue', () => {
 		await wrapper.find( '.next-card-btn' ).trigger( 'click' );
 		await wrapper.vm.$nextTick();
 
-		// 3. Étape 3 : QCM coup 13 (Nc3 / Cc3)
+		// 3. Étape 3 : QCM coup 13 (Nc3 / Cc3) joué directement sur l'échiquier
 		expect( wrapper.text() ).toContain( 'Étape 3 / 4' );
-		const qcmBtns = wrapper.findAll( '.choice-btn' );
-		const wrongBtn = qcmBtns.find(
-			( b ) => b.text().includes( 'Cg3' ) || b.text().includes( 'Ng3' )
-		);
-		if ( wrongBtn ) {
-			await wrongBtn.trigger( 'click' );
-			await wrapper.vm.$nextTick();
-			const footer = wrapper.findComponent( {
-				name: 'SeriesCardFooter',
-			} );
-			expect( footer.props( 'feedback' )?.type ).toBe( 'danger' );
-		}
+		expect( wrapper.findAll( '.choice-btn' ) ).toHaveLength( 0 );
 
-		const correctQcmBtn = wrapper
-			.findAll( '.choice-btn' )
-			.find(
-				( b ) =>
-					b.text().includes( 'Cc3' ) || b.text().includes( 'Nc3' )
-			);
-		await correctQcmBtn!.trigger( 'click' );
+		const qcmBoard = wrapper.findComponent( { name: 'EgChessboard' } );
+		const footer = wrapper.findComponent( { name: 'SeriesCardFooter' } );
+
+		// Coup non proposé dans les choix
+		await qcmBoard.vm.$emit( 'move', { from: 'a3', to: 'a4', san: 'a4' } );
 		await wrapper.vm.$nextTick();
+		expect( footer.props( 'feedback' )?.type ).toBe( 'warning' );
+
+		// Mauvais coup proposé dans le PGN (Ng3)
+		await qcmBoard.vm.$emit( 'move', { from: 'e2', to: 'g3', san: 'Ng3' } );
+		await wrapper.vm.$nextTick();
+		expect( footer.props( 'feedback' )?.type ).toBe( 'danger' );
+
+		// Bon coup (Nc3)
+		await qcmBoard.vm.$emit( 'move', { from: 'b1', to: 'c3', san: 'Nc3' } );
+		await wrapper.vm.$nextTick();
+		expect( footer.props( 'feedback' )?.type ).toBe( 'success' );
+		expect( footer.props( 'isSolved' ) ).toBe( true );
 
 		await wrapper.find( '.next-card-btn' ).trigger( 'click' );
 		await wrapper.vm.$nextTick();

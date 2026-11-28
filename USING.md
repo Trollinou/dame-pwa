@@ -147,9 +147,10 @@ L'onglet **Apprentissage** (`/tabs/apprentissage`) présente trois pôles :
           - Si l'apprenant clique sur une variante alternative : bascule en mode exploration de la variante avec boutons de navigation PGN (*Début*, *Précédent*, *Suivant*), surbrillance du dernier coup, restitution des flèches et commentaires du coup courant, et bouton d'action proéminent **« ⬅️ Retourner au choix initial »** pour réexaminer la position de départ.
         - **Déroulement de la Branche Principale** :
           - Dès le bon plan initial sélectionné, l'étape est validée dans le `SeriesCardFooter` (feedback vert) et l'apprenant avance sur la branche principale.
-          - Enchaînement séquentiel des réponses adverses et des étapes QCM sur les décisions clés suivantes (avec surbrillance du dernier coup joué en navigation PGN et à l'entrée de chaque QCM) :
-            - Les mauvais choix affichent l'explication spécifique dans la zone de feedback rouge du `SeriesCardFooter` sans lancer de sous-variante complexe.
-            - Le bon choix avance sur l'échiquier vers les coups suivants.
+          - Enchaînement séquentiel des réponses adverses et des étapes QCM sur les décisions clés suivantes (avec surbrillance du dernier coup joué en navigation PGN et à l'entrée de chaque QCM), avec jeu direct du coup sur l'échiquier sans affichage des 3 boutons de choix :
+            - Les mauvais choix prévus dans le PGN affichent l'explication spécifique dans la zone de feedback rouge du `SeriesCardFooter` puis réinitialisent la position sur l'échiquier.
+            - Un coup hors propositions affiche un avertissement puis réinitialise l'échiquier.
+            - Le bon coup valide l'étape dans le `SeriesCardFooter` (feedback vert) et permet de passer aux coups suivants.
           - Au terme du dernier coup de la ligne principale, restitution du commentaire explicatif final et validation de l'exercice avec célébration confettis.
         - Intégration complète et harmonisée de `ContentHeader` (titre, type, consigne contextuelle, badge d'étape) et `SeriesCardFooter` (feedback vert/rouge, bouton *« Étape suivante »* et validation finale).
       - **Exercices Associ'Plan (Type 6)** :
