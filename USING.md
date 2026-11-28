@@ -188,13 +188,13 @@ L'onglet **Apprentissage** (`/tabs/apprentissage`) présente trois pôles :
           - L'apprenant touche la case de l'échiquier déduite des indices.
           - Dès la bonne case touchée, un cercle vert s'affiche sur la case cible avec feedback de succès et déblocage du passage à la carte suivante.
       - **Exercices Ouvre'boîte (Type 13)** :
-        - Déroulement en **série de mini-situations** (jusqu'à 6 cartes, avec détection et adaptation dynamique du nombre total de cartes configurées) avec `ContentHeader` (titre, consigne générale, badge `Carte X / Total`) et pied fixe `SeriesCardFooter`.
+        - Déroulement en **série de mini-situations** (jusqu'à 6 cartes, avec détection et adaptation dynamique du nombre total de cartes configurées) avec `ContentHeader` (titre, consigne générale par défaut *« Trouve le bon coup ! »*, badge `Carte X / Total`) et pied fixe `SeriesCardFooter`.
         - Saisie auteur sous forme de Mini-PGN (position de départ FEN avec flèches indicatrices `[%cal ...]`, branche principale comme coup gagnant avec son explication, et variantes alternatives comme mauvais coups avec leurs explications d'erreur).
-        - **Double Mode d'Interaction Tactile & Visuel** :
-          - L'apprenant peut soit **toucher/glisser directement la pièce sur l'échiquier** (déplacement interactif immédiat), soit **cliquer sur l'un des boutons de choix** traduits en français sous l'échiquier (*Pion e2 en e4*, *Fou f1 en b5*, etc.).
-        - **Panneau Pédagogique Détaillé & Substitution Zero-Scroll Mobile** :
-          - En cas de mauvais choix ou coup inadéquat, le bouton passe en rouge (ou l'échiquier se repositionne avec avertissement) et l'explication complète d'erreur s'affiche de façon compacte dans la carte sous les choix afin que l'élève puisse comprendre son erreur à son propre rythme avant de tenter un autre choix.
-          - En cas de bon choix, le coup est validé et joué sur l'échiquier, et l'encart d'explication de succès (`LearningFeedbackCallout`) se substitue automatiquement à l'ensemble de la carte de choix pour garantir un confort de lecture optimal sans aucun défilement vertical sous le pied de page fixe.
+        - **Interaction Directe sur l'Échiquier** :
+          - L'apprenant **touche/glisse directement la pièce sur l'échiquier** pour jouer le coup choisi parmi les propositions indiquées par les flèches.
+        - **Panneau Pédagogique Détaillé** :
+          - En cas de mauvais coup, l'échiquier se repositionne avec avertissement et l'explication complète d'erreur s'affiche sous l'échiquier (`LearningFeedbackCallout`) afin que l'élève puisse comprendre son erreur à son propre rythme avant de tenter un autre coup.
+          - En cas de bon coup, celui-ci est validé sur l'échiquier et l'encart d'explication de succès (`LearningFeedbackCallout`) s'affiche avec un confort de lecture optimal sans défilement vertical inutile.
           - L'avancement vers la carte suivante s'effectue au rythme de l'élève via le bouton fixe du `SeriesCardFooter`.
       - **Exercices Cap ou pas Cap ? (Type 14)** :
         - Déroulement en **série de 5 mini-situations** sous une consigne commune avec `ContentHeader` (titre, consigne générale, badge `Carte X / 5`) et pied fixe `SeriesCardFooter`.

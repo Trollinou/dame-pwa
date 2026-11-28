@@ -15,56 +15,18 @@
         />
       </div>
 
-      <!-- Substitution de la zone de choix par l'encart d'explication pédagogique dès que résolu -->
+      <!-- Encart d'explication pédagogique (succès ou erreur pendant la recherche) -->
       <LearningFeedbackCallout
         v-if="isCurrentCardSolved && currentExplanation"
         :type="currentExplanation.type"
         title="Explication"
         :text="currentExplanation.message"
       />
-
-      <!-- Choix de déplacements (3 choix possibles mélangés) pendant la recherche -->
-      <ion-card v-else class="exercise-card">
-        <ion-card-header>
-          <ion-card-title class="exercise-card-header">
-            Quel coup choisis-tu ?
-          </ion-card-title>
-        </ion-card-header>
-
-        <ion-card-content>
-          <div class="qcm-choices">
-            <ion-button
-              v-for="choix in carteActuelle.choix"
-              :key="choix.id"
-              expand="block"
-              :color="getButtonColor(choix)"
-              :fill="getButtonFill(choix)"
-              :disabled="isCurrentCardSolved"
-              class="choice-btn"
-              @click="selectionnerChoix(choix, true)"
-            >
-              <span class="choice-text">{{ choix.texte }}</span>
-              <ion-icon
-                v-if="selectedChoixId === choix.id && choix.isCorrect"
-                slot="end"
-                :icon="checkmarkCircleOutline"
-              />
-              <ion-icon
-                v-else-if="selectedChoixId === choix.id && !choix.isCorrect"
-                slot="end"
-                :icon="closeCircleOutline"
-              />
-            </ion-button>
-          </div>
-
-          <!-- Explication d'erreur éventuelle affichée sous les choix pendant la recherche -->
-          <LearningFeedbackCallout
-            v-if="!isCurrentCardSolved && currentExplanation"
-            :type="currentExplanation.type"
-            :text="currentExplanation.message"
-          />
-        </ion-card-content>
-      </ion-card>
+      <LearningFeedbackCallout
+        v-else-if="currentExplanation"
+        :type="currentExplanation.type"
+        :text="currentExplanation.message"
+      />
     </template>
 
     <div v-else class="ion-text-center ion-padding error-container">
@@ -84,18 +46,6 @@
 
 <script setup lang="ts">
 import { ref, computed, shallowRef, watch } from 'vue';
-import {
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonButton,
-  IonIcon
-} from '@ionic/vue';
-import {
-  checkmarkCircleOutline,
-  closeCircleOutline
-} from 'ionicons/icons';
 import { Chessboard } from '@/components/shared/Chessboard';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
@@ -138,7 +88,6 @@ const emit = defineEmits<{
 const exerciseHeader = useExerciseHeader();
 const boardApi = shallowRef<BoardCore | null>(null);
 const carteIndex = ref(0);
-const selectedChoixId = ref<number | null>(null);
 const isCurrentCardSolved = ref(false);
 const feedback = ref<CardFeedback | null>(null);
 const fenAffichee = ref<string>('');
@@ -174,7 +123,7 @@ const carteActuelle = computed<CarteOuvreBoite | null>(() => {
 });
 
 const consigneAffichee = computed(() => {
-  return props.consigne || 'Trouve le bon coup d’ouverture.';
+  return props.consigne || 'Trouve le bon coup !';
 });
 
 watch(
@@ -200,7 +149,6 @@ const onBoardCreated = (api: BoardCore) => {
 
 // Initialisation de la carte courante
 const initCarte = () => {
-  selectedChoixId.value = null;
   isCurrentCardSolved.value = false;
   feedback.value = null;
   currentExplanation.value = null;
@@ -224,28 +172,8 @@ watch(
   { immediate: true, deep: true }
 );
 
-// Style et couleur des boutons de choix
-const getButtonColor = (choix: OuvreBoiteChoix) => {
-  if (selectedChoixId.value === choix.id) {
-    return choix.isCorrect ? 'success' : 'danger';
-  }
-  if (isCurrentCardSolved.value && choix.isCorrect) {
-    return 'success';
-  }
-  return 'primary';
-};
-
-const getButtonFill = (choix: OuvreBoiteChoix) => {
-  if (selectedChoixId.value === choix.id || (isCurrentCardSolved.value && choix.isCorrect)) {
-    return 'solid';
-  }
-  return 'outline';
-};
-
-// Sélection d'un choix (via clic bouton ou déplacement sur l'échiquier)
-const selectionnerChoix = (choix: OuvreBoiteChoix, animateOnBoard: boolean = true) => {
-  selectedChoixId.value = choix.id;
-
+// Sélection d'un choix suite à un déplacement sur l'échiquier
+const selectionnerChoix = (choix: OuvreBoiteChoix) => {
   if (choix.isCorrect) {
     isCurrentCardSolved.value = true;
     feedback.value = {
@@ -256,15 +184,6 @@ const selectionnerChoix = (choix: OuvreBoiteChoix, animateOnBoard: boolean = tru
       type: 'success',
       message: choix.explication
     };
-
-    // Animer ou jouer le coup sur l'échiquier si déclenché par le bouton
-    if (animateOnBoard && boardApi.value && choix.orig && choix.dest) {
-      try {
-        boardApi.value.move(choix.orig + choix.dest);
-      } catch (e) {
-        console.warn('Erreur animation coup échiquier:', e);
-      }
-    }
   } else {
     isCurrentCardSolved.value = false;
     feedback.value = {
@@ -276,17 +195,15 @@ const selectionnerChoix = (choix: OuvreBoiteChoix, animateOnBoard: boolean = tru
       message: choix.explication
     };
 
-    // Si le coup a été joué directement sur l'échiquier mais est incorrect, réinitialiser la position après délai
-    if (!animateOnBoard) {
-      setTimeout(() => {
-        if (boardApi.value && carteActuelle.value && !isCurrentCardSolved.value) {
-          boardApi.value.setPosition(carteActuelle.value.fenDepart);
-          if (carteActuelle.value.shapes.length > 0) {
-            boardApi.value.setShapes(carteActuelle.value.shapes);
-          }
+    // Réinitialiser la position après délai si le coup joué est incorrect
+    setTimeout(() => {
+      if (boardApi.value && carteActuelle.value && !isCurrentCardSolved.value) {
+        boardApi.value.setPosition(carteActuelle.value.fenDepart);
+        if (carteActuelle.value.shapes.length > 0) {
+          boardApi.value.setShapes(carteActuelle.value.shapes);
         }
-      }, 1200);
-    }
+      }
+    }, 1200);
   }
 };
 
@@ -311,7 +228,7 @@ const handleBoardMove = (move: Move) => {
   });
 
   if (matchedChoix) {
-    selectionnerChoix(matchedChoix, false);
+    selectionnerChoix(matchedChoix);
   } else {
     // Coup non proposé dans cette situation d'ouverture
     feedback.value = {

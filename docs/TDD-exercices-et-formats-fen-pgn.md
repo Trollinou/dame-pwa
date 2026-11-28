@@ -319,17 +319,15 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 ### Type 13 — Ouvre'Boîte (`TypeOuvreBoite.vue` → `OuvreBoiteViewer.vue` + `ouvreBoiteParser.ts`)
 
-- **Rôle** : Choisir le meilleur coup d'ouverture parmi 3 propositions (en cliquant sur un bouton ou en jouant directement le coup sur l'échiquier).
+- **Rôle** : Choisir le meilleur coup parmi les propositions en le jouant directement sur l'échiquier (consigne par défaut : `"Trouve le bon coup !"`).
 - **Position initiale affichée** :
   - Affiche `fenDepart` extraite du mini-PGN (`[FEN "..."]`, sinon position standard), orientée selon le trait de la FEN.
 - **Affiché vs Caché** :
-  - **Pendant la recherche** : Échiquier interactif avec toutes les shapes extraites (si aucune shape `[%cal]` n'est fournie dans le PGN, le parser génère automatiquement des **flèches colorées** `green, yellow, blue, red` pour chaque coup proposé). Sous l'échiquier : carte `"Quel coup choisis-tu ?"` avec les boutons mélangés (libellés en français, ex. `"Fou f1 en c4"`).
-  - **Une fois résolu** : La carte de choix est **remplacée** par un encart `LearningFeedbackCallout` `"Explication"` affichant le commentaire du bon coup.
-- **Changement de vue** : Substitution de la carte des choix par l'encart d'explication dès que le bon coup est choisi ou joué.
+  - **Pendant la recherche** : Échiquier interactif avec toutes les shapes extraites (si aucune shape `[%cal]` n'est fournie dans le PGN, le parser génère automatiquement des **flèches colorées** `green, yellow, blue, red` pour chaque coup proposé). Aucun bouton de choix n'est affiché sous l'échiquier ; en cas d'erreur, un encart `LearningFeedbackCallout` d'erreur s'affiche sous l'échiquier.
+  - **Une fois résolu** : Encart `LearningFeedbackCallout` `"Explication"` affichant le commentaire du bon coup.
 - **Après une réponse** :
-  - **Coup incorrect (bouton)** : Bouton en rouge, encart d'explication rouge sous les choix avec le commentaire de la variante, feedback rouge dans le footer.
-  - **Coup incorrect (sur l'échiquier)** : Si le coup fait partie des variantes, même feedback + réinitialisation de la position sur `fenDepart` après **1200 ms**. S'il ne fait pas partie des choix proposés, warning + réinitialisation après **800 ms**.
-  - **Bon coup** : Si cliqué via bouton, le coup est **joué sur l'échiquier** (`boardApi.move`). Encart d'explication vert, feedback vert `"Excellent coup !"`, déblocage du bouton Suivant dans `SeriesCardFooter`.
+  - **Coup incorrect (sur l'échiquier)** : Si le coup fait partie des variantes, encart d'explication rouge avec le commentaire de la variante, feedback rouge dans le footer + réinitialisation de la position sur `fenDepart` après **1200 ms**. S'il ne fait pas partie des choix proposés, warning + réinitialisation après **800 ms**.
+  - **Bon coup** : Encart d'explication vert, feedback vert `"Excellent coup !"`, déblocage du bouton Suivant dans `SeriesCardFooter`.
 - **Rédaction Entraîneur** :
   - Fournir `exercices[]` contenant chacun un mini-PGN :
     - `[FEN "..."]` (optionnel si début de partie)
