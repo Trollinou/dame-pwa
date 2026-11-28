@@ -158,6 +158,29 @@
     transform: translateY(-2px) scale(1.02);
   }
 
+  &.learning-board-card--draggable {
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &.is-dragging {
+    opacity: 0.55;
+    transform: scale(0.97);
+    border-color: var(--ion-color-primary, #3880ff) !important;
+  }
+
+  &.is-drag-over {
+    border-color: var(--ion-color-primary, #3880ff) !important;
+    border-style: dashed;
+    box-shadow: 0 0 0 3px rgba(56, 128, 255, 0.3) !important;
+    transform: scale(1.02);
+  }
+
   &.is-linked,
   &.is-valid {
     border-color: var(--ion-color-success, #2dd36f) !important;

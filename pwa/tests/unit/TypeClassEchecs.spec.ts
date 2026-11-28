@@ -87,10 +87,31 @@ describe('TypeClassEchecs.vue', () => {
 		});
 	};
 
-	test('affiche la grille 2 colonnes en mode Tap & Swap, masque les commentaires et respecte couleur_joueur', () => {
+	const dragTile = async (wrapper: ReturnType<typeof mountComponent>, fromIdx: number, toIdx: number) => {
+		const cards = wrapper.findAll('.learning-board-card--draggable');
+		const targetEl = cards[toIdx].element;
+		const originalElementFromPoint = document.elementFromPoint;
+		document.elementFromPoint = vi.fn().mockReturnValue(targetEl);
+
+		cards[fromIdx].element.dispatchEvent(
+			new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 10, clientY: 10 })
+		);
+		window.dispatchEvent(
+			new MouseEvent('pointermove', { bubbles: true, clientX: 50, clientY: 50 })
+		);
+		await wrapper.vm.$nextTick();
+		window.dispatchEvent(
+			new MouseEvent('pointerup', { bubbles: true, clientX: 50, clientY: 50 })
+		);
+		await wrapper.vm.$nextTick();
+		document.elementFromPoint = originalElementFromPoint;
+	};
+
+	test('affiche la grille 2 colonnes en mode Drag & Drop, masque les commentaires et respecte couleur_joueur', () => {
 		const wrapper = mountComponent();
 
 		expect(wrapper.find('.learning-board-grid-2col').exists()).toBe(true);
+		expect(wrapper.findAll('.learning-board-card--draggable')).toHaveLength(3);
 		expect(wrapper.find('.order-validated-list').exists()).toBe(false);
 		expect(wrapper.find('.order-comment-box').exists()).toBe(false);
 
@@ -104,21 +125,19 @@ describe('TypeClassEchecs.vue', () => {
 		expect(diagrams[2].attributes('data-shapes-count')).toBe('1');
 	});
 
-	test('permet de permuter deux cartes (Tap & Swap), valide en temps réel et affiche les commentaires correspondants', async () => {
+	test('permet de classer les cartes par glisser-déposer, valide en temps réel et affiche les commentaires correspondants', async () => {
 		const wrapper = mountComponent();
 
-		const cards = wrapper.findAll('.learning-board-card');
+		const cards = wrapper.findAll('.learning-board-card--draggable');
 		expect(cards).toHaveLength(3);
 
-		// Sélection puis désélection sur la même carte
-		await cards[0].trigger('click');
-		expect(wrapper.findAll('.learning-board-card')[0].classes()).toContain('is-swap-selected');
-		await cards[0].trigger('click');
-		expect(wrapper.findAll('.learning-board-card')[0].classes()).not.toContain('is-swap-selected');
+		// L'ordre initial inversé est [2, 1, 0].
+		// Glisser index 2 (pos 0) en position 0 -> [0, 2, 1]
+		await dragTile(wrapper, 2, 0);
+		expect(wrapper.find('.order-validated-list').exists()).toBe(false);
 
-		// L'ordre initial inversé est [2, 1, 0]. Un seul swap entre 0 et 2 remet [0, 1, 2] !
-		await wrapper.findAll('.learning-board-card')[0].trigger('click');
-		await wrapper.findAll('.learning-board-card')[2].trigger('click');
+		// Glisser index 2 (pos 1) en position 1 -> [0, 1, 2]
+		await dragTile(wrapper, 2, 1);
 
 		// Validation temps-réel immédiate : bascule vers .order-validated-list
 		expect(wrapper.find('.order-validated-list').exists()).toBe(true);
@@ -148,9 +167,8 @@ describe('TypeClassEchecs.vue', () => {
 		};
 		const wrapper = mountComponent(configNoComments);
 
-		// Ordre inversé [1, 0] -> swap 0 et 1
-		await wrapper.findAll('.learning-board-card')[0].trigger('click');
-		await wrapper.findAll('.learning-board-card')[1].trigger('click');
+		// Ordre inversé [1, 0] -> glisser index 1 en position 0 -> [0, 1]
+		await dragTile(wrapper, 1, 0);
 
 		expect(wrapper.find('.order-validated-list').exists()).toBe(false);
 		expect(wrapper.find('.learning-board-grid-2col').exists()).toBe(true);

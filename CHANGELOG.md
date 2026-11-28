@@ -6,6 +6,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Types 7 (La Marche du Héros) & 11 (Class'échecs) — Réordonnancement par glisser-déposer (`useBoardDragReorder.ts`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `_learning-components.scss`, `TypeMarcheHeros.spec.ts`, `TypeClassEchecs.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Extraction du composable `useBoardDragReorder` (basé sur les *Pointer Events* souris et tactile, avec `touch-action: none` et réinsertion par `splice`) pour remplacer le mécanisme *Tap & Swap* sur l'étape 2 du Type 7 et sur le tri du Type 11.
+  - Ajout des styles `.learning-board-card--draggable`, `.is-dragging` et `.is-drag-over` dans `_learning-components.scss`, création de `TypeMarcheHeros.spec.ts` et mise à jour de `TypeClassEchecs.spec.ts`.
+
 - **Type 6 (Associ'Plan) — Déroulé séquentiel par élimination & Plans A à D (`TypeAssociPlan.vue`, `associPlanParser.ts`, `_learning-layout.scss`, `_learning-components.scss`, `associPlanParser.spec.ts`, `TypeAssociPlan.spec.ts`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Remplacement de la phase de matching globale (`MatchingViewer`) par un parcours séquentiel par élimination sur les **Plans A, B, C et D** (au lieu de 1 à 4) : description du plan courant à gauche et pile verticale des diagrammes restants à droite (4, puis 3, puis 2).
   - En cas de mauvais clic, feedback invitant à réessayer avec mise en évidence rouge du diagramme ; en cas de bon choix, passage immédiat au visionnage du `PgnViewer` correspondant avant de passer au plan suivant.

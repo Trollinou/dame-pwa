@@ -22,19 +22,24 @@
       </div>
     </div>
 
-    <!-- SOUS-ÉTAPE 2 : Ordonnancement chronologique en grille 2 colonnes (Tap & Swap) -->
+    <!-- SOUS-ÉTAPE 2 : Ordonnancement chronologique en grille 2 colonnes (Drag & Drop) -->
     <div v-else-if="sousEtape === 'ordonnancement'" class="animate-fade-in learning-full-width">
       <div class="learning-callout learning-callout--info ion-text-center">
-        <span>Touche deux cartes pour permuter leur position chronologique.</span>
+        <span>Fais glisser chaque carte à sa bonne position chronologique.</span>
       </div>
 
       <div class="learning-board-grid-2col">
         <div
           v-for="(item, index) in itemsEnCoursOrdonnancement"
           :key="'order-' + item.id"
-          class="learning-board-card"
-          :class="{ 'is-swap-selected': selectedSwapIndex === index }"
-          @click="handleCardClickSwap(index)"
+          :data-order-index="index"
+          draggable="false"
+          class="learning-board-card learning-board-card--draggable"
+          :class="{
+            'is-dragging': isDraggingCard && dragSourceIndex === index,
+            'is-drag-over': isDraggingCard && dragTargetIndex === index && dragSourceIndex !== index
+          }"
+          @pointerdown="onOrderCardPointerDown($event, index)"
         >
           <div class="learning-board-card__header">
             <div class="learning-board-card__badge">
@@ -101,6 +106,7 @@ import { Chessboard } from '@/components/shared/Chessboard';
 import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import PuzzleViewer from '@/components/learning/viewers/PuzzleViewer.vue';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
+import { useBoardDragReorder } from '@/composables/learning/useBoardDragReorder';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { shuffleArray, shuffleNonSorted, extractShapesAndComment } from '@/utils/chess/chessNotation';
 
@@ -329,10 +335,7 @@ const currentStepPendingHint = computed(() => {
     return 'Désélectionne une position pour corriger le groupe';
   }
   if (sousEtape.value === 'ordonnancement') {
-    if (selectedSwapIndex.value !== null) {
-      return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touche une autre position pour permuter.`;
-    }
-    return 'Touche 2 cartes pour permuter leur ordre chronologique';
+    return 'Fais glisser les cartes pour les remettre dans l’ordre chronologique';
   }
   if (isPuzzleMoveFound.value && !hasCompletedFirstReplay.value) {
     return 'Démonstration de la série en cours...';
@@ -364,8 +367,13 @@ const solutionCourante = computed(() => {
 // ACTIONS ET NAVIGATION ENTRE ÉTAPES
 // ==========================================
 
-// Index de la carte sélectionnée pour la permutation au clic (Tap & Swap)
-const selectedSwapIndex = ref<number | null>(null);
+// État du Drag & Drop pour l'ordonnancement
+const {
+  dragSourceIndex,
+  dragTargetIndex,
+  isDraggingCard,
+  onCardPointerDown: onOrderCardPointerDown,
+} = useBoardDragReorder(itemsEnCoursOrdonnancement);
 
 const isItemSelected = (id: string) => {
   return itemsSelectionnes.value.some(item => item.id === id);
@@ -381,22 +389,6 @@ const toggleSelection = (item: Diagramme) => {
     if (itemsSelectionnes.value.length < nbDiagrammesPerSerie.value) {
       itemsSelectionnes.value.push(item);
     }
-  }
-};
-
-// Clic pour permuter (Tap & Swap)
-const handleCardClickSwap = (index: number) => {
-  if (selectedSwapIndex.value === null) {
-    selectedSwapIndex.value = index;
-  } else if (selectedSwapIndex.value === index) {
-    selectedSwapIndex.value = null; // Désélection si on reclique sur la même carte
-  } else {
-    // Permutation des deux éléments
-    const prev = selectedSwapIndex.value;
-    const temp = itemsEnCoursOrdonnancement.value[prev];
-    itemsEnCoursOrdonnancement.value[prev] = itemsEnCoursOrdonnancement.value[index];
-    itemsEnCoursOrdonnancement.value[index] = temp;
-    selectedSwapIndex.value = null;
   }
 };
 

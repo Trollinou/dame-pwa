@@ -1,19 +1,24 @@
 <!-- src/components/learning/viewers/OrderViewer.vue -->
 <template>
   <div class="exercise-stage">
-    <!-- Phase d'ordonnancement (Tap & Swap sur grille 2 colonnes, alignée sur TypeMarcheHeros) -->
+    <!-- Phase d'ordonnancement (Drag & Drop sur grille 2 colonnes) -->
     <template v-if="!isSolved">
       <div class="learning-callout learning-callout--info ion-text-center">
-        <span>Touche deux cartes pour permuter leur position.</span>
+        <span>Fais glisser chaque carte à sa bonne position.</span>
       </div>
 
       <div class="learning-board-grid-2col">
         <div
           v-for="(item, index) in orderedItems"
           :key="'order-' + item.id"
-          class="learning-board-card"
-          :class="{ 'is-swap-selected': selectedSwapIndex === index }"
-          @click="handleCardClickSwap(index)"
+          :data-order-index="index"
+          draggable="false"
+          class="learning-board-card learning-board-card--draggable"
+          :class="{
+            'is-dragging': isDraggingCard && dragSourceIndex === index,
+            'is-drag-over': isDraggingCard && dragTargetIndex === index && dragSourceIndex !== index
+          }"
+          @pointerdown="onOrderCardPointerDown($event, index)"
         >
           <div class="learning-board-card__header">
             <div class="learning-board-card__badge">{{ index + 1 }}</div>
@@ -89,6 +94,7 @@ import { ref, computed, watch } from 'vue';
 import type { DrawShape } from 'eg-chessboard';
 import DiagramViewer from '@/components/learning/viewers/DiagramViewer.vue';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
+import { useBoardDragReorder } from '@/composables/learning/useBoardDragReorder';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
 import { shuffleNonSorted } from '@/utils/chess/chessNotation';
 
@@ -113,7 +119,6 @@ const emit = defineEmits<{
 }>();
 
 const orderedItems = ref<OrderItem[]>([]);
-const selectedSwapIndex = ref<number | null>(null);
 
 const isSolved = computed(() => {
   if (orderedItems.value.length === 0 || orderedItems.value.length !== props.correctItems.length) {
@@ -121,6 +126,14 @@ const isSolved = computed(() => {
   }
   return orderedItems.value.every((item, idx) => item.id === props.correctItems[idx].id);
 });
+
+const {
+  dragSourceIndex,
+  dragTargetIndex,
+  isDraggingCard,
+  onCardPointerDown: onOrderCardPointerDown,
+  resetDragState,
+} = useBoardDragReorder(orderedItems, { disabled: isSolved });
 
 const hasAnyComment = computed(() =>
   orderedItems.value.some((item) => typeof item.commentaire === 'string' && item.commentaire.trim().length > 0)
@@ -137,10 +150,7 @@ const footerFeedback = computed<CardFeedback | null>(() => {
 });
 
 const pendingHint = computed(() => {
-  if (selectedSwapIndex.value !== null) {
-    return `Position ${selectedSwapIndex.value + 1} sélectionnée. Touche une autre position pour permuter.`;
-  }
-  return 'Touche 2 cartes pour permuter leur ordre';
+  return 'Fais glisser les cartes pour les remettre dans l’ordre';
 });
 
 watch(
@@ -160,26 +170,8 @@ const initOrder = () => {
     props.correctItems,
     (items) => items.every((item, idx) => item.id === props.correctItems[idx].id)
   );
-  selectedSwapIndex.value = null;
+  resetDragState();
 };
 
 watch(() => props.correctItems, () => { initOrder(); }, { deep: true, immediate: true });
-
-// Clic pour permuter (Tap & Swap)
-const handleCardClickSwap = (index: number) => {
-  if (isSolved.value) {
-    return;
-  }
-  if (selectedSwapIndex.value === null) {
-    selectedSwapIndex.value = index;
-  } else if (selectedSwapIndex.value === index) {
-    selectedSwapIndex.value = null;
-  } else {
-    const prev = selectedSwapIndex.value;
-    const temp = orderedItems.value[prev];
-    orderedItems.value[prev] = orderedItems.value[index];
-    orderedItems.value[index] = temp;
-    selectedSwapIndex.value = null;
-  }
-};
 </script>
