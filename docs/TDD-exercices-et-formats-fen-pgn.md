@@ -162,24 +162,23 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 
 ---
 
-### Type 6 — Associ'Plan (`TypeAssociPlan.vue` + `associPlanParser.ts` + `MatchingViewer.vue` + `PgnViewer.vue`)
+### Type 6 — Associ'Plan (`TypeAssociPlan.vue` + `associPlanParser.ts` + `PgnViewer.vue`)
 
-- **Rôle** : Associer 4 diagrammes à leurs 4 descriptions textuelles (Carte 1), puis visionner les 4 PGN correspondants (Cartes 2 à 5).
+- **Rôle** : Associer successivement chaque description (**Plan A**, **Plan B**, **Plan C**) au bon diagramme par élimination et dérouler son PGN, puis découvrir le **Plan D** et dérouler son PGN.
 - **Position initiale affichée** :
-  - **Carte 1 (`MatchingViewer`)** : 4 mini-échiquiers affichant chacun la `fen` de départ de son PGN (mélangés aléatoirement), avec les shapes du commentaire initial.
-  - **Cartes 2 à 5 (`PgnViewer`)** : Affiche le PGN complet de chacune des 4 paires dans l'ordre d'origine (`mode="study"`).
-- **Affiché vs Caché** :
-  - **Carte 1** : Colonne gauche = 4 mini-échiquiers mélangés (sans coordonnées) ; colonne droite = 4 descriptions fixes (`Option A` à `D`, couleurs bleu/violet/orange/rose). Bouton `"Valider mes choix"` affiché uniquement lorsque les 4 liaisons sont effectuées.
-  - **Cartes 2 à 5** : `PgnViewer` complet (contrôles Début/Précédent/Suivant/Fin + commentaires).
+  - **Phase `choice` (Plans A, B, C)** : Colonne gauche = description du plan courant (badge `Plan A/B/C`) ; colonne droite = pile verticale des mini-échiquiers restants (4, puis 3, puis 2, dans un ordre mélangé à l'initialisation) avec `fen` de départ et `shapes`.
+  - **Phase `preview` (Plan D)** : Colonne gauche = description du `Plan D` ; colonne droite = son unique échiquier restant (avec zoom possible).
+  - **Phase `pgn` (Plans A à D)** : `PgnViewer` complet du plan sélectionné (`mode="study"`).
 - **Changement de vue** :
-  - **Carte 1 → Carte 2** : Après validation réussie des 4 associations, clic sur `Position suivante` dans `SeriesCardFooter`.
-  - **Cartes 2 → 5** : Clic sur `Position suivante` / `Terminer l'exercice` une fois le PGN déroulé jusqu'au bout (`onPgnFinished`).
-- **Après une réponse (Carte 1)** :
-  - Clic sur `"Valider mes choix"` : les paires correctes sont **verrouillées en vert** (`✓ Correct`), les paires erronées sont **supprimées** pour correction immédiate, feedback rouge `"Certaines associations sont incorrectes, réessaie !"`.
-  - Si 4/4 correctes : feedback vert `"Bravo ! Toutes les correspondances sont trouvées."`, déblocage du footer.
+  - **Phase `choice` → Phase `pgn`** : Immédiat dès le clic sur le bon diagramme.
+  - **Phase `preview` → Phase `pgn`** : Clic sur `Dérouler le Plan D` dans `SeriesCardFooter`.
+  - **Phase `pgn` → Plan suivant / Fin** : Clic sur `Plan suivant` / `Terminer l'exercice` une fois le PGN déroulé jusqu'au bout (`onPgnFinished`).
+- **Après une réponse (en phase `choice`)** :
+  - **Mauvais diagramme** : Bordure rouge sur le diagramme cliqué (`.is-wrong`), feedback rouge dans le footer `"Ce n’est pas le bon diagramme pour ce plan. Réessaie !"`.
+  - **Bon diagramme** : Ouverture immédiate du `PgnViewer` correspondant.
 - **Rédaction Entraîneur** :
   - Fournir 4 PGN (`paires[0..3]`).
-  - Pour chaque PGN : définir `[FEN "..."]` et placer **la description du plan dans le commentaire initial avant le 1er coup** `{Description du plan...}` (avec d'éventuels `[%csl]` / `[%cal]`).
+  - Pour chaque PGN : définir `[FEN "..."]` et placer **la description du plan dans le commentaire initial avant le 1er coup** `{Description du plan...}` (avec d'éventuels `[%csl]` / `[%cal]`). Libellé par défaut si absent : `Plan A` à `Plan D`.
 
 ---
 

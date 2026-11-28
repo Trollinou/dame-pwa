@@ -184,8 +184,52 @@
   width: 100%;
   animation: learningFadeIn 0.3s ease-out;
 
-  &.matching-phase {
+  &.matching-phase,
+  &.associ-plan-phase {
     padding-bottom: 60px;
+  }
+}
+
+.associ-plan-stage {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+
+  @include learning-tablet-portrait {
+    gap: 16px;
+  }
+
+  @include learning-landscape {
+    gap: 24px;
+  }
+}
+
+.associ-plan-desc-col {
+  flex: 1;
+  min-width: 0;
+  position: sticky;
+  top: 8px;
+}
+
+.associ-plan-boards-col {
+  flex: 0 0 46%;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @include learning-tablet-portrait {
+    flex: 0 0 260px;
+    max-width: 260px;
+    gap: 12px;
+  }
+
+  @include learning-landscape {
+    flex: 0 0 300px;
+    max-width: 300px;
+    gap: 14px;
   }
 }
 

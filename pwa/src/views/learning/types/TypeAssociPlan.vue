@@ -1,45 +1,82 @@
 <template>
   <div class="exercice-type-associ-plan">
-    <!-- Carte 1 : Phase de matching (Association) -->
-    <div v-if="carteCourante === 1" class="phase-container matching-phase">
-      <MatchingViewer
-        :paires="pairesFormateesPourMatching"
-        @success="onMatchingSuccess"
-        @feedback="onMatchingFeedback"
-      />
+    <!-- Phase de choix par élimination (Plans A à C) ou prise de connaissance (Plan D) -->
+    <div
+      v-if="phase === 'choice' || phase === 'preview'"
+      class="phase-container associ-plan-phase"
+    >
+      <div v-if="paireActive" class="associ-plan-stage">
+        <!-- Colonne gauche : Description du plan courant -->
+        <div class="associ-plan-desc-col">
+          <ion-card class="associ-plan-desc-card">
+            <ion-card-content>
+              <div class="associ-plan-badge">
+                {{ getPlanLabel(currentPlanIndex) }}
+              </div>
+              <p class="associ-plan-desc-text">
+                {{ paireActive.description }}
+              </p>
+            </ion-card-content>
+          </ion-card>
+        </div>
 
-      <!-- Footer Série pour la Carte 1 (Matching) -->
+        <!-- Colonne droite : Diagrammes restants empilés (ou diagramme unique en phase preview) -->
+        <div class="associ-plan-boards-col">
+          <div
+            v-for="item in remainingPaires"
+            :key="item.originalIndex"
+            class="associ-plan-board-card"
+            :class="{
+              'is-clickable': phase === 'choice',
+              'is-wrong': phase === 'choice' && wrongClickedIndex === item.originalIndex,
+            }"
+            @click="phase === 'choice' ? onSelectBoard(item.originalIndex) : undefined"
+          >
+            <div class="chessboard-container--mini">
+              <Chessboard
+                :fen="item.fen"
+                :player-color="item.couleurJoueur"
+                :orientation="item.couleurJoueur"
+                :shapes="item.shapes || []"
+                :view-only="true"
+                :coordinates="false"
+                :zoomable="phase === 'preview'"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <SeriesCardFooter
-        :currentCard="1"
-        :totalCards="5"
-        :isSolved="matchingReussi"
-        :feedback="carte1Feedback"
-        pendingHint="Associe correctement les 4 diagrammes et descriptions pour continuer"
-        nextText="Position suivante"
-        @next="passerCarteSuivante"
+        :currentCard="currentPlanIndex + 1"
+        :totalCards="totalPlans"
+        :isSolved="phase === 'preview'"
+        :feedback="phase === 'choice' ? choiceFeedback : null"
+        :pendingHint="phase === 'choice' ? 'Clique sur le diagramme correspondant à la description' : undefined"
+        :nextText="`Dérouler le ${getPlanLabel(currentPlanIndex)}`"
+        @next="startPgnPhase"
       />
     </div>
 
-    <!-- Cartes 2 à 5 : Visualisation individuelle des PGNs 1 à 4 -->
-    <div v-else-if="carteCourante >= 2 && carteCourante <= 5" class="phase-container pgn-phase">
+    <!-- Phase PGN : Visualisation du PGN du plan sélectionné -->
+    <div v-else-if="phase === 'pgn'" class="phase-container pgn-phase">
       <div v-if="paireActive" class="pgn-card-wrapper">
         <PgnViewer
-          :key="`pgn-view-${carteCourante}`"
+          :key="`pgn-view-${currentPlanIndex}`"
           :pgnString="paireActive.pgn"
           :orientation="paireActive.couleurJoueur"
           @finished="onPgnFinished"
         />
 
-        <!-- Footer Série pour les Cartes PGN (Cartes 2 à 5) -->
         <SeriesCardFooter
-          :currentCard="carteCourante"
-          :totalCards="5"
+          :currentCard="currentPlanIndex + 1"
+          :totalCards="totalPlans"
           :isSolved="pgnVisionne"
-          :feedback="pgnVisionne ? { type: 'success', message: 'Plan visualisé avec succès !' } : null"
+          :feedback="pgnVisionne ? { type: 'success', message: `${getPlanLabel(currentPlanIndex)} visualisé avec succès !` } : null"
           pendingHint="Déroule tous les coups du PGN jusqu'au bout pour continuer"
-          :nextText="carteCourante === 5 ? 'Terminer l\'exercice' : 'Position suivante'"
-          :finishText="'Terminer l\'exercice'"
-          @next="passerCarteSuivante"
+          :nextText="isLastPlan ? 'Terminer l\'exercice' : 'Plan suivant'"
+          finishText="Terminer l'exercice"
+          @next="passerPlanSuivant"
         />
       </div>
     </div>
@@ -48,12 +85,15 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { IonCard, IonCardContent } from '@ionic/vue';
 import { useExerciseHeader } from '@/composables/learning/useExerciseHeader';
 import SeriesCardFooter, { type CardFeedback } from '@/components/learning/SeriesCardFooter.vue';
-import MatchingViewer from '@/components/learning/viewers/MatchingViewer.vue';
+import { Chessboard } from '@/components/shared/Chessboard';
 import PgnViewer from '@/components/learning/viewers/PgnViewer.vue';
+import { shuffleArray } from '@/utils/chess/chessNotation';
 import {
   parseAssociPlanPaires,
+  getPlanLabel,
   type AssociPlanPaire,
 } from '@/utils/parsers/associPlanParser';
 import type { ExerciseType6Config } from '@/types/roi';
@@ -67,92 +107,120 @@ const emit = defineEmits<{
   (e: 'success'): void;
 }>();
 
-// État de navigation (Cartes 1 à 5)
-const carteCourante = ref(1);
+type AssociPlanPhase = 'choice' | 'preview' | 'pgn';
 
-// État de validation de la carte 1
-const matchingReussi = ref(false);
-
-// Feedback contextuel de la carte 1 (succès ou erreur)
-const carte1Feedback = ref<CardFeedback | null>(null);
-
-// État de visionnage complet du PGN de la carte courante (Cartes 2 à 5)
+const currentPlanIndex = ref(0);
+const phase = ref<AssociPlanPhase>('choice');
+const solvedIndices = ref<number[]>([]);
+const wrongClickedIndex = ref<number | null>(null);
+const choiceFeedback = ref<CardFeedback | null>(null);
 const pgnVisionne = ref(false);
+const shuffledBoardOrder = ref<number[]>([]);
 
-// Extraction et parsing des 4 PGNs
+// Extraction et parsing des PGNs (4 plans max : A, B, C, D)
 const paires = computed<AssociPlanPaire[]>(() => {
   return parseAssociPlanPaires((props.config as any)?.paires || []);
 });
 
-// Paires formatées pour le composant MatchingViewer
-const pairesFormateesPourMatching = computed(() => {
-  return paires.value.map((p) => ({
-    fen: p.fen,
-    couleur_joueur: p.couleurJoueur,
-    description: p.description,
-    shapes: p.shapes,
-  }));
+const totalPlans = computed(() => paires.value.length || 1);
+const isLastPlan = computed(() => currentPlanIndex.value >= totalPlans.value - 1);
+
+const paireActive = computed<AssociPlanPaire | null>(() => {
+  return paires.value[currentPlanIndex.value] || null;
 });
 
-// Paire active pour les cartes 2 à 5 (index 0 à 3)
-const paireActive = computed<AssociPlanPaire | null>(() => {
-  const index = carteCourante.value - 2;
-  return paires.value[index] || null;
+const remainingPaires = computed<AssociPlanPaire[]>(() => {
+  const remainingSet = new Set(
+    shuffledBoardOrder.value.filter((idx) => !solvedIndices.value.includes(idx))
+  );
+  return shuffledBoardOrder.value
+    .filter((idx) => remainingSet.has(idx))
+    .map((idx) => paires.value[idx])
+    .filter((p): p is AssociPlanPaire => Boolean(p));
 });
+
+const initExercise = () => {
+  currentPlanIndex.value = 0;
+  solvedIndices.value = [];
+  wrongClickedIndex.value = null;
+  choiceFeedback.value = null;
+  pgnVisionne.value = false;
+
+  const indices = paires.value.map((p) => p.originalIndex);
+  shuffledBoardOrder.value = indices.length > 1 ? shuffleArray(indices) : indices;
+  phase.value = indices.length <= 1 ? 'preview' : 'choice';
+};
+
+watch(
+  paires,
+  () => {
+    initExercise();
+  },
+  { immediate: true }
+);
 
 const exerciseHeader = useExerciseHeader();
 
-// Consigne contextuelle dynamique selon la carte
 const consigneActuelle = computed(() => {
-  if (carteCourante.value === 1) {
-    return 'Associe chaque diagramme à sa description.';
+  const label = getPlanLabel(currentPlanIndex.value);
+  if (phase.value === 'choice') {
+    return `Associe le ${label} au bon diagramme.`;
   }
-  const planNum = carteCourante.value - 1;
-  return `Plan ${planNum}`;
+  if (phase.value === 'preview') {
+    return `Découvre le ${label}.`;
+  }
+  return label;
 });
 
 watch(
-  [consigneActuelle, carteCourante],
-  ([consigne, carte]) => {
+  [consigneActuelle, currentPlanIndex, totalPlans],
+  ([consigne, idx, total]) => {
     exerciseHeader?.setHeaderState({
       consigne,
-      stepBadgeText: `Carte ${carte} / 5`,
+      stepBadgeText: `Carte ${idx + 1} / ${total}`,
     });
   },
   { immediate: true }
 );
 
-// Gestion du succès du matching (Carte 1)
-const onMatchingSuccess = () => {
-  matchingReussi.value = true;
+const startPgnPhase = () => {
+  const pgn = paireActive.value?.pgn || '';
+  const hasMoves = /\b\d+\s*\./.test(pgn);
+  pgnVisionne.value = !hasMoves;
+  wrongClickedIndex.value = null;
+  choiceFeedback.value = null;
+  phase.value = 'pgn';
 };
 
-// Gestion du feedback (succès / erreur) émis par le MatchingViewer
-const onMatchingFeedback = (feedback: CardFeedback | null) => {
-  carte1Feedback.value = feedback;
+const onSelectBoard = (clickedOriginalIndex: number) => {
+  if (phase.value !== 'choice') return;
+
+  if (clickedOriginalIndex === currentPlanIndex.value) {
+    startPgnPhase();
+  } else {
+    wrongClickedIndex.value = clickedOriginalIndex;
+    choiceFeedback.value = {
+      type: 'danger',
+      message: 'Ce n’est pas le bon diagramme pour ce plan. Réessaie !',
+    };
+  }
 };
 
-// Gestion du visionnage complet d'un PGN (Cartes 2 à 5)
 const onPgnFinished = () => {
   pgnVisionne.value = true;
 };
 
-// Réinitialisation de l'état de complétion lors d'un changement de carte
-watch(carteCourante, (newCard) => {
-  if (newCard >= 2) {
-    // Si la carte active a un PGN vide ou 0 coups, on peut la considérer immédiatement visionnée
-    const pgn = paireActive.value?.pgn || '';
-    const hasMoves = /\b\d+\s*\./.test(pgn);
-    pgnVisionne.value = !hasMoves;
-  }
-});
+const passerPlanSuivant = () => {
+  if (!isLastPlan.value) {
+    solvedIndices.value = [...solvedIndices.value, currentPlanIndex.value];
+    currentPlanIndex.value++;
+    wrongClickedIndex.value = null;
+    choiceFeedback.value = null;
+    pgnVisionne.value = false;
 
-// Passage à la carte suivante ou validation finale
-const passerCarteSuivante = () => {
-  if (carteCourante.value < 5) {
-    carteCourante.value++;
+    const remainingCount = paires.value.length - solvedIndices.value.length;
+    phase.value = remainingCount <= 1 ? 'preview' : 'choice';
   } else {
-    // Carte 5/5 validée -> fin de l'exercice
     emit('success');
   }
 };

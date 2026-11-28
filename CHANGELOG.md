@@ -6,6 +6,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Type 6 (Associ'Plan) — Déroulé séquentiel par élimination & Plans A à D (`TypeAssociPlan.vue`, `associPlanParser.ts`, `_learning-layout.scss`, `_learning-components.scss`, `associPlanParser.spec.ts`, `TypeAssociPlan.spec.ts`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Remplacement de la phase de matching globale (`MatchingViewer`) par un parcours séquentiel par élimination sur les **Plans A, B, C et D** (au lieu de 1 à 4) : description du plan courant à gauche et pile verticale des diagrammes restants à droite (4, puis 3, puis 2).
+  - En cas de mauvais clic, feedback invitant à réessayer avec mise en évidence rouge du diagramme ; en cas de bon choix, passage immédiat au visionnage du `PgnViewer` correspondant avant de passer au plan suivant.
+  - Pour le 4ᵉ plan (**Plan D**), affichage direct de sa description et de son échiquier en aperçu de prise de connaissance avant de dérouler son PGN jusqu'à la validation finale.
+
 - **Type 4 (La Partie dont tu es le Héros) — Choix sur l'échiquier, hauteur adaptative des commentaires & consigne par défaut (`TypePartieHeros.vue`, `partieHerosParser.ts`, `_learning-components.scss`, `_learning-layout.scss`, `TypePartieHeros.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Remplacement des 3 boutons de choix à l'étape `qcm` par une sélection directe du coup sur l'échiquier (`:view-only="isQcmSolved"`, validation via `@move` avec réinitialisation de la position sur erreur).
   - Suppression du défilement interne (`max-height` et `overflow-y: auto`) des zones de commentaires `.learning-comment-box` et `.comment-container` afin qu'elles s'adaptent automatiquement à la longueur du texte (défilement global de l'écran sur mobile).

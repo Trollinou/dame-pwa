@@ -56,6 +56,6 @@ describe( 'associPlanParser', () => {
 
 		expect( paires ).toHaveLength( 2 );
 		expect( paires[ 0 ].couleurJoueur ).toBe( 'white' );
-		expect( paires[ 1 ].description ).toBe( 'Plan 2' );
+		expect( paires[ 1 ].description ).toBe( 'Plan B' );
 	} );
 } );

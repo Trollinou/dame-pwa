@@ -2,6 +2,13 @@ import { parsePgn } from 'chessops/pgn';
 import type { DrawShape } from 'eg-chessboard';
 import { getActiveColorFromFen } from '@/utils/chess/fenUtils';
 
+export const PLAN_LETTERS = [ 'A', 'B', 'C', 'D' ] as const;
+
+export function getPlanLabel( index: number ): string {
+	const letter = PLAN_LETTERS[ index ] || String( index + 1 );
+	return `Plan ${ letter }`;
+}
+
 export interface AssociPlanPaire {
 	originalIndex: number;
 	fen: string;
@@ -88,7 +95,7 @@ export function parseAssociPlanSinglePgn(
 		fen,
 		couleurJoueur,
 		shapes,
-		description: description || `Plan ${ originalIndex + 1 }`,
+		description: description || getPlanLabel( originalIndex ),
 		pgn: trimmed,
 	};
 }
