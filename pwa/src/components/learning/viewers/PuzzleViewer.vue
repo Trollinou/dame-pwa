@@ -29,11 +29,13 @@ const props = withDefaults(
     fen: string;
     couleurJoueur: 'white' | 'black';
     solution: string[];
+    alternatives?: string[][];
     shapes?: DrawShape[];
     lastMoveHighlight?: Key[];
     disableFeedbackToast?: boolean;
   }>(),
   {
+    alternatives: () => [],
     shapes: () => [],
     disableFeedbackToast: false,
   }
@@ -47,6 +49,16 @@ const emit = defineEmits<{
 const boardApi = ref<BoardCore | null>(null);
 const etapeActuelle = ref(0);
 const isComputerPlaying = ref(false);
+const currentLastMove = ref<Key[] | undefined>(props.lastMoveHighlight);
+
+watch(
+  () => [props.fen, props.lastMoveHighlight] as const,
+  ([, newLastMove]) => {
+    etapeActuelle.value = 0;
+    isComputerPlaying.value = false;
+    currentLastMove.value = newLastMove;
+  }
+);
 
 const onBoardCreated = (api: BoardCore) => {
   boardApi.value = api;
@@ -58,19 +70,30 @@ watch(() => props.shapes, (newShapes) => {
   }
 }, { deep: true });
 
+const isMoveMatching = (move: Move, expected: string): boolean => {
+  if (!expected) return false;
+  return (
+    move.san === expected ||
+    move.lan === expected ||
+    `${move.from}${move.to}` === expected ||
+    (Boolean(move.san) && expected.replace(/[+#x=]/g, '') === move.san.replace(/[+#x=]/g, ''))
+  );
+};
+
 const verifierCoup = async (move: Move) => {
   if (isComputerPlaying.value) {
+    currentLastMove.value = [move.from as Key, move.to as Key];
     return;
   }
 
-  // Normalize move comparison
+  // Normalize move comparison (main solution + optional step alternatives)
   const coupAttendu = props.solution[etapeActuelle.value];
-  const isCoupCorrect = coupAttendu && (
-    move.san === coupAttendu || 
-    move.lan === coupAttendu || 
-    `${move.from}${move.to}` === coupAttendu ||
-    (move.san && coupAttendu.replace(/[+#x=]/g, '') === move.san.replace(/[+#x=]/g, ''))
-  );
+  const coupsAlternatifs = props.alternatives?.[etapeActuelle.value] ?? [];
+  const candidats = [
+    ...(coupAttendu ? [coupAttendu] : []),
+    ...coupsAlternatifs,
+  ];
+  const isCoupCorrect = candidats.some((c) => isMoveMatching(move, c));
 
   if (isCoupCorrect) {
     // Le coup de l'utilisateur est correct
@@ -103,10 +126,21 @@ const verifierCoup = async (move: Move) => {
       }, 600);
     }
   } else {
-    // Le coup est incorrect : on l'annule et on restaure les shapes immédiatement
+    // Le coup est incorrect : on l'annule et on restaure les shapes et le lastMove immédiatement
     boardApi.value?.undoLastMove();
-    if (boardApi.value && props.shapes && props.shapes.length > 0) {
-      boardApi.value.setShapes(props.shapes);
+    if (boardApi.value) {
+      if (currentLastMove.value && currentLastMove.value.length > 0) {
+        if (etapeActuelle.value === 0) {
+          boardApi.value.setPosition(props.fen, currentLastMove.value);
+        } else if (typeof boardApi.value.getFen === 'function') {
+          boardApi.value.setPosition(boardApi.value.getFen(), currentLastMove.value);
+        } else if (typeof boardApi.value.setConfig === 'function') {
+          boardApi.value.setConfig({ lastMove: currentLastMove.value });
+        }
+      }
+      if (props.shapes && props.shapes.length > 0) {
+        boardApi.value.setShapes(props.shapes);
+      }
     }
     emit('error', move);
     if (!props.disableFeedbackToast) {

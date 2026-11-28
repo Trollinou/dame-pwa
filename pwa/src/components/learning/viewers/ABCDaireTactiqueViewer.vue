@@ -87,6 +87,7 @@ const isPgnFinished = ref(false);
 const isComputerPlaying = ref(false);
 const currentMoveIndex = ref(0);
 const boardApi = ref<BoardCore | null>(null);
+const currentLastMove = ref<Key[] | undefined>(undefined);
 const feedback = ref<CardFeedback | null>(null);
 
 // Normalisation de la liste des 4 exercices
@@ -273,6 +274,7 @@ const initialiserPositionJeu = () => {
   isPgnFinished.value = false;
   isComputerPlaying.value = false;
   currentMoveIndex.value = 0;
+  currentLastMove.value = undefined;
   feedback.value = null;
 
   if (boardApi.value) {
@@ -307,7 +309,11 @@ const activerModeRecapitulatif = () => {
 };
 
 const verifierCoup = async (move: Move) => {
-  if (isComputerPlaying.value || isCardSolved.value || etapeJeu.value !== 'playing') {
+  if (isComputerPlaying.value) {
+    currentLastMove.value = [move.from as Key, move.to as Key];
+    return;
+  }
+  if (isCardSolved.value || etapeJeu.value !== 'playing') {
     return;
   }
 
@@ -358,6 +364,13 @@ const verifierCoup = async (move: Move) => {
   } else {
     // Mauvais coup
     boardApi.value?.undoLastMove();
+    if (boardApi.value && currentLastMove.value && currentLastMove.value.length > 0) {
+      if (typeof boardApi.value.getFen === 'function') {
+        boardApi.value.setPosition(boardApi.value.getFen(), currentLastMove.value);
+      } else if (typeof boardApi.value.setConfig === 'function') {
+        boardApi.value.setConfig({ lastMove: currentLastMove.value });
+      }
+    }
     if (formesJaunes.value.length > 0) {
       boardApi.value?.setShapes(formesJaunes.value);
     }

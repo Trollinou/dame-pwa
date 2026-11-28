@@ -72,6 +72,7 @@
           :fen="solutionCourante.fenDepart"
           :couleur-joueur="solutionCourante.orientation"
           :solution="solutionCourante.solution"
+          :alternatives="solutionCourante.alternatives"
           :shapes="[]"
           :lastMoveHighlight="solutionCourante.lastMoveHighlight"
           :disable-feedback-toast="true"
@@ -148,6 +149,7 @@ interface Solution {
   fenInitiale: string;
   orientation: 'white' | 'black';
   solution: string[];
+  alternatives?: string[][];
   shapes: DrawShape[];
   initialShapes: DrawShape[];
   replayMoves: ReplayMove[];
@@ -564,12 +566,16 @@ const initExercice = () => {
     const fenInitiale = game?.headers.get('FEN') || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
     const history: string[] = [];
+    const historyAlternatives: string[][] = [];
     const replayMoves: ReplayMove[] = [];
     if (game) {
       let node = game.moves;
       while (node.children.length > 0) {
         const child = node.children[0];
         history.push(child.data.san);
+        historyAlternatives.push(
+          node.children.slice(1).map((alt) => alt.data.san).filter(Boolean)
+        );
         const parsedComment = extractShapesAndComment(child.data?.comments);
         replayMoves.push({
           san: child.data.san,
@@ -633,7 +639,11 @@ const initExercice = () => {
     }
 
     const indexCoupATrouver = i;
-    const dernierCoup = history[indexCoupATrouver] || (history.length > 0 ? history[history.length - 1] : '');
+    const resolvedIndex = indexCoupATrouver >= 0 && indexCoupATrouver < history.length
+      ? indexCoupATrouver
+      : history.length - 1;
+    const dernierCoup = resolvedIndex >= 0 ? history[resolvedIndex] : '';
+    const dernierCoupAlternatives = resolvedIndex >= 0 ? (historyAlternatives[resolvedIndex] ?? []) : [];
 
     let lastMoveHighlight: Key[] | undefined = undefined;
     if (indexCoupATrouver - 1 >= 0 && indexCoupATrouver - 1 < history.length) {
@@ -656,6 +666,7 @@ const initExercice = () => {
       fenInitiale,
       orientation,
       solution: [dernierCoup],
+      alternatives: dernierCoupAlternatives.length > 0 ? [dernierCoupAlternatives] : [],
       shapes: [],
       initialShapes,
       replayMoves,

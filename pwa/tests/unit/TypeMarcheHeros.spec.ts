@@ -126,4 +126,87 @@ describe( 'TypeMarcheHeros.vue', () => {
 
 		document.elementFromPoint = originalElementFromPoint;
 	} );
+
+	test( 'accepte les variantes PGN sur le dernier coup en phase résolution', async () => {
+		const headerState = ref<ExerciseHeaderState>( {} );
+		const configWithVariants: ExerciseType7Config = {
+			mode: '5x3',
+			series: [
+				makeSerie( '1. e4 e5 2. Nf3 Nc6 3. Bc4 (3. Bb5 a6) (3. d4)' ),
+				makeSerie( '1. d4 d5 2. c4 e6 3. Nc3' ),
+				makeSerie( '1. c4 e5 2. Nc3 Nf6 3. g3' ),
+				makeSerie( '1. Nf3 d5 2. g3 Nf6 3. Bg2' ),
+				makeSerie( '1. e4 c5 2. Nf3 d6 3. d4' ),
+			],
+		};
+
+		const wrapper = mount( TypeMarcheHeros, {
+			props: {
+				config: configWithVariants,
+				id: 71,
+			},
+			global: {
+				plugins: [ createPinia(), [ VueQueryPlugin, { queryClient } ] ],
+				provide: {
+					[ EXERCISE_HEADER_KEY as symbol ]: {
+						state: headerState,
+						isManagedByShell: ref( true ),
+						setHeaderState: ( next: ExerciseHeaderState ) => {
+							headerState.value = { ...next };
+						},
+						resetHeaderState: () => {},
+					},
+				},
+			},
+		} );
+		await wrapper.vm.$nextTick();
+
+		// Sélection des 3 cartes de la série 1
+		const bankCards = wrapper.findAll( '.learning-board-card' );
+		await bankCards[ 0 ].trigger( 'click' );
+		await bankCards[ 1 ].trigger( 'click' );
+		await bankCards[ 2 ].trigger( 'click' );
+		await wrapper.find( '.next-card-btn' ).trigger( 'click' );
+
+		// Ordonnancement [2, 1, 0] -> [0, 1, 2]
+		const originalElementFromPoint = document.elementFromPoint;
+		const dragTile = async ( fromIdx: number, toIdx: number ) => {
+			const cards = wrapper.findAll( '.learning-board-card--draggable' );
+			document.elementFromPoint = vi.fn().mockReturnValue( cards[ toIdx ].element );
+			cards[ fromIdx ].element.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true, button: 0, clientX: 10, clientY: 10 } )
+			);
+			window.dispatchEvent(
+				new MouseEvent( 'pointermove', { bubbles: true, clientX: 50, clientY: 50 } )
+			);
+			await wrapper.vm.$nextTick();
+			window.dispatchEvent(
+				new MouseEvent( 'pointerup', { bubbles: true, clientX: 50, clientY: 50 } )
+			);
+			await wrapper.vm.$nextTick();
+		};
+		await dragTile( 2, 0 );
+		await dragTile( 2, 1 );
+		document.elementFromPoint = originalElementFromPoint;
+
+		// Passer en phase résolution
+		await wrapper.find( '.next-card-btn' ).trigger( 'click' );
+		await wrapper.vm.$nextTick();
+
+		const puzzleViewer = wrapper.findComponent( { name: 'PuzzleViewer' } );
+		expect( puzzleViewer.exists() ).toBe( true );
+		expect( puzzleViewer.props( 'solution' ) ).toEqual( [ 'Bc4' ] );
+		expect( puzzleViewer.props( 'alternatives' ) ).toEqual( [ [ 'Bb5', 'd4' ] ] );
+
+		// Jouer la variante alternative Bb5 via EgChessboard
+		const board = puzzleViewer.findComponent( { name: 'EgChessboard' } );
+		board.vm.$emit( 'move', { from: 'f1', to: 'b5', san: 'Bb5', lan: 'f1b5' } );
+		await wrapper.vm.$nextTick();
+
+		const footer = wrapper.findComponent( { name: 'SeriesCardFooter' } );
+		expect( footer.props( 'feedback' ) ).toEqual( {
+			type: 'success',
+			message: 'Coup décisif trouvé !',
+		} );
+	} );
 } );

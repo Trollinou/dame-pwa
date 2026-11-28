@@ -6,6 +6,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+- **Restauration de la surbrillance `lastMove` après un mauvais coup (`PuzzleViewer.vue`, `ABCDaireTactiqueViewer.vue`, `README.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
+  - Mémorisation du dernier coup valide (`props.lastMoveHighlight` initial ou dernier coup joué par l'ordinateur) et réapplication après `undoLastMove()` lors d'un mauvais coup pour préserver la surbrillance visuelle sur l'échiquier.
+
 ## [1.14.3] - 2026-11-28
 
 - **Types 7 (La Marche du Héros) & 11 (Class'échecs) — Réordonnancement par glisser-déposer (`useBoardDragReorder.ts`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `_learning-components.scss`, `TypeMarcheHeros.spec.ts`, `TypeClassEchecs.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :

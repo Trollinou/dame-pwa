@@ -189,7 +189,7 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
   - Pour chaque série (`config.series`), le code lit le PGN à partir de `[FEN "..."]`.
   - Si le camp à jouer (`orientation`) n'est pas celui du trait initial de la FEN, le **1er coup du PGN est joué automatiquement** avant de capturer le diagramme 0.
   - Les diagrammes suivants sont capturés tous les **2 demi-coups** (un tour complet).
-  - Le dernier coup restant constitue le puzzle final (`solution: [dernierCoup]`) avec `lastMoveHighlight` sur le coup précédent.
+  - Le dernier coup restant constitue le puzzle final (`solution: [dernierCoup]`, complété le cas échéant par les variantes sœurs `alternatives` du même nœud PGN) avec `lastMoveHighlight` sur le coup précédent.
 - **Position initiale affichée & Affiché vs Caché selon les 3 sous-étapes** :
   1. **`selection`** : Grille adaptative (`.learning-board-grid-2col` : 2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) de tous les mini-diagrammes restants dans la banque (mélangés), avec surbrillance du dernier coup (`lastMoveHighlight`) menant à chaque position et coche de sélection placée dans `.learning-board-card__header` au-dessus du damier (sans masquer `h8`/`a1`).
   2. **`ordonnancement`** : Grille adaptative (2 colonnes sur mobile/tablette portrait, 3–4 colonnes en paysage/ordinateur) des 3 ou 5 diagrammes de la série choisie, mélangés via `shuffleNonSorted()` (garantissant que l'ordre initial n'est jamais déjà résolu), avec surbrillance du dernier coup (`lastMoveHighlight`), numérotés `1..N` dans `.learning-board-card__header` au-dessus du damier, avec bandeau `"Fais glisser chaque carte à sa bonne position chronologique."` (glisser-déposer via `useBoardDragReorder`).
@@ -201,10 +201,11 @@ Tous les exercices (`roi_exercice`, types `1` à `16`) partagent la même coquil
 - **Après une réponse** :
   - `selection` : Si N cartes sélectionnées de parties différentes → feedback rouge immédiat ; si même partie → feedback vert + bouton `Classer la série`.
   - `ordonnancement` : Dès que l'ordre est exact → feedback vert `"Chronologie exacte ! Bravo."` + bouton `Coup suivant`.
-  - `resolution` : Mauvais coup → annulé sans aucune shape affichée + feedback rouge `"Mauvais coup, cherche encore !"` (2500 ms). Bon coup → feedback vert `"Coup décisif trouvé !"`, puis après `600 ms`, bascule en mode lecture seule pour rejouer automatiquement le mini-PGN complet depuis la position initiale à raison d'un ply par seconde (`1000 ms`) avec les shapes de chaque ply (boucle avec pause de `2500 ms` en fin de séquence). Le bouton `Série suivante` (et le déclenchement des confettis sur la dernière série) reste bloqué jusqu'à la fin du premier passage complet de l'animation.
+  - `resolution` : Mauvais coup → annulé sans aucune shape affichée (avec restauration de `lastMoveHighlight`) + feedback rouge `"Mauvais coup, cherche encore !"` (2500 ms). Bon coup → feedback vert `"Coup décisif trouvé !"`, puis après `600 ms`, bascule en mode lecture seule pour rejouer automatiquement le mini-PGN complet depuis la position initiale à raison d'un ply par seconde (`1000 ms`) avec les shapes de chaque ply (boucle avec pause de `2500 ms` en fin de séquence). Le bouton `Série suivante` (et le déclenchement des confettis sur la dernière série) reste bloqué jusqu'à la fin du premier passage complet de l'animation.
 - **Rédaction Entraîneur** :
   - Choisir le `mode` (`3x5` ou `5x3`) et fournir 3 ou 5 `series` avec `pgn_data`, `couleur_joueur`, et optionnellement `shapes`.
   - Chaque PGN doit contenir **au moins `(nbDiagrammes - 1) * 2 + 1` demi-coups** (soit min 9 demi-coups pour `3x5`, 5 demi-coups pour `5x3`) afin de générer tous les diagrammes + le coup final à trouver.
+  - Pour autoriser plusieurs solutions sur le coup décisif, ajouter des variantes PGN entre parenthèses sur ce coup (ex. `5. Qxf7# (5. Bxf7+ Kh8)` : seul le 1er coup de chaque variante est vérifié, et le replay final rejoue toujours la ligne principale).
 
 ---
 
