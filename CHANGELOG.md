@@ -6,6 +6,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.14.3] - 2026-11-28
+
 - **Types 7 (La Marche du Héros) & 11 (Class'échecs) — Réordonnancement par glisser-déposer (`useBoardDragReorder.ts`, `TypeMarcheHeros.vue`, `OrderViewer.vue`, `_learning-components.scss`, `TypeMarcheHeros.spec.ts`, `TypeClassEchecs.spec.ts`, `README.md`, `USING.md`, `TDD-exercices-et-formats-fen-pgn.md`)** :
   - Extraction du composable `useBoardDragReorder` (basé sur les *Pointer Events* souris et tactile, avec `touch-action: none` et réinsertion par `splice`) pour remplacer le mécanisme *Tap & Swap* sur l'étape 2 du Type 7 et sur le tri du Type 11.
   - Ajout des styles `.learning-board-card--draggable`, `.is-dragging` et `.is-drag-over` dans `_learning-components.scss`, création de `TypeMarcheHeros.spec.ts` et mise à jour de `TypeClassEchecs.spec.ts`.
